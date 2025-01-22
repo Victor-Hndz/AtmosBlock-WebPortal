@@ -6,6 +6,11 @@ services:
     container_name: c_container
     volumes:
       - ./backend/FAST-IBAN_Project:/app
+      - out_data:/app/out
     stdin_open: true
     tty: true
     working_dir: /app
+
+volumes:
+  out_data:
+    driver: local
