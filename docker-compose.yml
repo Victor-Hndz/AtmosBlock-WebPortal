@@ -1,0 +1,11 @@
+services:
+  c_project:
+    build:
+      context: ./backend/FAST-IBAN_Project/
+      dockerfile: ./execution/Dockerfile
+    container_name: c_container
+    volumes:
+      - ./backend/FAST-IBAN_Project:/app
+    stdin_open: true
+    tty: true
+    working_dir: /app
