@@ -1,7 +1,7 @@
 import subprocess
 import yaml
 import os
-from utils.enums import *
+from utils.enums import DataType, DataType_map
 from utils.map_utils import date_from_nc
 from utils.gif_generator import svg_to_gif_folder
 

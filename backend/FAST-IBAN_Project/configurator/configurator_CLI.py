@@ -2,10 +2,22 @@ import argparse
 import os
 import platform
 import yaml
-import configparser
-from utils.enums import *
+import sys
+
+sys.path.append('/app/')
+
+from utils.enums.DataType import DataType
+from utils.enums.DataRange import DataRange
+from utils.enums.DataFormat import DataFormat
 from utils.map_utils import time_validator, date_from_nc
 
+ARGS_FILE = "./configurator/exec_args.yaml"
+
+
+# Función para cargar argumentos desde un archivo YAML
+def load_args_from_file(file_path):
+    with open(file_path, 'r') as f:
+        return yaml.safe_load(f)
 
 # Función para verificar si el o los archivos existen y son válidos
 def check_files(file_paths):
@@ -66,8 +78,8 @@ def check_out(value):
 
 # Configurar el parser de argumentos
 parser = argparse.ArgumentParser(description="Configuración de archivo CLI")
-parser.add_argument('-d', '--data', nargs='+', type=check_files, required=True, help="Archivo de datos en formato .nc")
-parser.add_argument('-t', '--type', nargs='+', choices=[t.value for t in DataType], required=True, help="Tipos de datos")
+parser.add_argument('-d', '--data', nargs='+', type=check_files, required=False, help="Archivo de datos en formato .nc")
+parser.add_argument('-t', '--type', nargs='+', choices=[t.value for t in DataType], required=False, help="Tipos de datos")
 parser.add_argument('-r', '--range', nargs='+', choices=[r.value for r in DataRange], required=False, help="Rangos de datos")
 parser.add_argument('-l', '--levels', type=check_levels, required=False, help="Número de niveles")
 parser.add_argument('-i', '--instant', nargs="+", type=check_instants, required=False, help="Número de instantes")
@@ -89,9 +101,16 @@ parser.add_argument('-np', '--n-proces', type=check_levels, required=False, help
 
 parser.add_argument('--all', action='store_true', required=False, help="Todos los instantes de tiempo")
 
+args = parser.parse_args()
 
 # Parsear los argumentos
-args = parser.parse_args()
+file_args = load_args_from_file(ARGS_FILE)
+
+for key, value in file_args.items():
+    if key in vars(args) and value is not None:
+        setattr(args, key, value)
+
+# print("Argumentos cargados exitosamente: ", args)
 
 # Verificar que no se use -i junto con --all
 if args.all and args.instant:
@@ -115,7 +134,7 @@ if args.no_compile_execute:
     args.no_execute = True
     
 # Convertir args.data a una lista plana de cadenas de texto
-args.data = [data_file[0] for data_file in args.data] if args.data else None
+args.data = args.data if args.data else None
 args.instant = [int(instant[0]) for instant in args.instant] if args.instant else None
 
 
@@ -126,8 +145,16 @@ if args.all and not args.instant:
         print(f"Se han seleccionado los instantes de tiempo {args.instant} para el archivo {file}")
     
 
+#buscar si el archivo existe
+for file in args.data:
+    if not os.path.exists(file):
+        #llamar a la API y bajarlo
+        print(f"El archivo {file} no existe, se procederá a descargarlo.")
+
+
 #Validar los instantes de tiempo
 for file in args.data:
+    print(f"Validando los instantes de tiempo para el archivo {file}")
     dates = date_from_nc(file)
     for instant in args.instant:
         print(time_validator(instant, dates))
@@ -161,14 +188,6 @@ configuration = {
     "n_proces": args.n_proces if args.n_proces else None,
 }
 
-#clear the output folder
-# if(args.no_execute == False):
-#     if os.path.exists("out/"):
-#         for file in os.listdir("out/"):
-#             os.remove("out/"+file)
-#         print("Carpeta de salida limpia exitosamente.")
-
-
 # Escribir el archivo de configuración
 configuration = {'MAP': configuration}
 # Escribir un archivo .yaml
@@ -178,4 +197,4 @@ print("Archivo de configuración .yaml creado exitosamente.")
 
 
 print("Configuración ejecutada exitosamente.")
-exec(open("config_executor.py").read())
+# exec(open("config_executor.py").read())

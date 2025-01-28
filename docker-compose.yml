@@ -1,16 +1,67 @@
 services:
-  c_project:
+  configurator_module:
     build:
       context: ./backend/FAST-IBAN_Project/
-      dockerfile: ./execution/Dockerfile
-    container_name: c_container
+      dockerfile: ./configurator/Dockerfile
+    container_name: configurator_container
     volumes:
-      - ./backend/FAST-IBAN_Project:/app
-      - out_data:/app/out
+      - config_data:/app/config
     stdin_open: true
     tty: true
     working_dir: /app
 
+  # execution_module:
+  #   build:
+  #     context: ./backend/FAST-IBAN_Project/
+  #     dockerfile: ./execution/Dockerfile
+  #   container_name: execution_container
+  #   volumes:
+  #     - ./backend/FAST-IBAN_Project:/app
+  #     - out_data:/app/out
+  #   stdin_open: true
+  #   tty: true
+  #   working_dir: /app
+
+  # algorithm_module:
+  #   build:
+  #     context: ./backend/FAST-IBAN_Project/
+  #     dockerfile: ./execution/Dockerfile
+  #   container_name: algorithm_container
+  #   volumes:
+  #     - ./backend/FAST-IBAN_Project:/app
+  #     - out_data:/app/out
+  #   stdin_open: true
+  #   tty: true
+  #   working_dir: /app
+
+  # visualization_module:
+  #   build:
+  #     context: ./backend/FAST-IBAN_Project/
+  #     dockerfile: ./visualization/Dockerfile
+  #   container_name: visualization_container
+  #   volumes:
+  #     - ./backend/FAST-IBAN_Project:/app
+  #     - out_data:/app/out
+  #   stdin_open: true
+  #   tty: true
+  #   working_dir: /app
+
+  # tracking_module:
+  #   build:
+  #     context: ./backend/FAST-IBAN_Project/
+  #     dockerfile: ./tracking/Dockerfile
+  #   container_name: tracking_container
+  #   volumes:
+  #     - ./backend/FAST-IBAN_Project:/app
+  #     - out_data:/app/out
+  #   stdin_open: true
+  #   tty: true
+  #   working_dir: /app
+
 volumes:
   out_data:
+    driver: local
+  in_data:
+    driver: local
+  config_data:
     driver: local

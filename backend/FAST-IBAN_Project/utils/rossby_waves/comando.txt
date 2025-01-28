@@ -1,2 +1,0 @@
-python .\csv_converter.py min_lat_pts-overturning_largestPVcontour_2PVU-330K-2000.txt
-
