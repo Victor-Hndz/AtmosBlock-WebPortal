@@ -1,21 +1,29 @@
 import cdsapi
 
-dataset = "reanalysis-era5-pressure-levels"
-request = {
-    "product_type": ["reanalysis"],
-    "variable": ["geopotential"],
-    "year": ["1940"],
-    "month": ["10"],
-    "day": ["01"],
-    "time": [
-        "00:00", "06:00", "12:00",
-        "18:00"
-    ],
-    "pressure_level": ["550"],
-    "data_format": "netcdf",
-    "download_format": "unarchived"
-}
+PRODUCT_TYPE = "reanalysis"
+DATASET = "reanalysis-era5-pressure-levels"
+DOWNLOAD_FORMAT = "unarchived"
+DATA_FORMAT = "netcdf"
 
-client = cdsapi.Client()
-# Put the file in /app/config/data
-client.retrieve(dataset, request, 'config/data/era5.nc')
+def request_data(variable, years, months, days, hours, pressure_levels, area, file_name):
+    try:
+        request = {
+            "product_type": [PRODUCT_TYPE],
+            "variable": variable,
+            "year": years,
+            "month": months,
+            "day": days,
+            "time": hours,
+            "pressure_level": pressure_levels,
+            "data_format": DATA_FORMAT,
+            "download_format": DOWNLOAD_FORMAT,
+            "area": area #N W S E
+        }
+        print(f"Request: {request}")
+
+        client = cdsapi.Client()
+        
+        # Put the file in /app/config/data
+        client.retrieve(DATASET, request, file_name)
+    except Exception as e:
+        print(f"Error en la petición de datos: {e}")

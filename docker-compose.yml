@@ -3,7 +3,12 @@ services:
     build:
       context: ./backend/FAST-IBAN_Project/
       dockerfile: ./configurator/Dockerfile
+      args:
+        CDSAPI_URL: ${CDSAPI_URL}
+        CDSAPI_KEY: ${CDSAPI_KEY}
     container_name: configurator_container
+    env_file:
+      - .env
     volumes:
       - config_data:/app/config
     stdin_open: true
