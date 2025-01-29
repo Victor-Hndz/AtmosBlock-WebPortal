@@ -92,54 +92,39 @@ def main():
         #llamar a la API y bajarlo
         print(f"El archivo {file} no existe, se procederá a descargarlo.")
         request_data(args["variable"], args["years"], args["months"], args["days"], args["hours"], args["pressure_levels"], args["area"], file)
+        print(f"\n✅ Archivo {file} descargado con éxito.")
+        
+    
+    # Crear el diccionario de configuración para cada mapa
+    configuration = {
+        "file": file,
+        "maps": args["types"],
+        "es_max": args["ranges"],
+        "times": args["instants"],
+        "area": args["area"],
+        "levels": args["levels"],
+        "file_format": args["format"],
+        "output": args["out"],
+        "tracking": args["tracking"],
+        "debug": args["debug"],
+        "no_compile": args["no_compile"],
+        "no_execute": args["no_execute"],
+        "no_maps": args["no_maps"],
+        "animation": args["animation"],
+        "omp": args["omp"],
+        "mpi": args["mpi"],
+        "n_threads": args["n_threads"],
+        "n_proces": args["n_proces"]
+    }
 
-    print(f"Archivo {file} descargado con éxito.")
+    # Escribir el archivo de configuración
+    configuration = {'MAP': configuration}
+    
+    # Escribir un archivo .yaml
+    with open('config/config.yaml', 'w') as yamlfile:
+        yaml.dump(configuration, yamlfile, default_flow_style=False, sort_keys=False)
+    print("\n✅Archivo de configuración .yaml creado exitosamente.\n")
+
+
 if __name__ == "__main__":
     main()
-
-
-
-
-# #Validar los instantes de tiempo
-# for file in args.data:
-#     print(f"Validando los instantes de tiempo para el archivo {file}")
-#     dates = date_from_nc(file)
-#     for instant in args.instant:
-#         print(time_validator(instant, dates))
-        
-
-# print("Datos recopilados correctamente.")
-
-# # Crear el diccionario de configuración para cada mapa
-# configuration = {
-#     "files": args.data,
-#     "maps": args.type,
-#     "es_max": args.range if args.range else None,
-#     "times": args.instant if args.instant else None,
-#     "lat_range": args.latrange if args.latrange else None,
-#     "lon_range": args.lonrange if args.lonrange else None,
-#     "levels": args.levels if args.levels else None,
-#     "file_format": args.format if args.format else None,
-#     "output": args.out if args.out else None,
-#     "debug": args.debug,
-#     "no_compile": args.no_compile,
-#     "no_execute": args.no_execute,
-#     "no_maps": args.no_maps,
-#     "animation": args.animation,
-#     "omp": args.omp,
-#     "mpi": args.mpi,
-#     "tracking": args.tracking,
-#     "n_threads": args.n_threads if args.n_threads else None,
-#     "n_proces": args.n_proces if args.n_proces else None,
-# }
-
-# # Escribir el archivo de configuración
-# configuration = {'MAP': configuration}
-# # Escribir un archivo .yaml
-# with open('config/config.yaml', 'w') as yamlfile:
-#     yaml.dump(configuration, yamlfile, default_flow_style=False, sort_keys=False)
-# print("Archivo de configuración .yaml creado exitosamente.")
-
-
-# print("Configuración ejecutada exitosamente.")
-# # exec(open("config_executor.py").read())
