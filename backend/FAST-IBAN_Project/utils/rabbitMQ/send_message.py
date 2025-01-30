@@ -17,11 +17,11 @@ def send_message(message, queue_name=None):
     password = os.getenv("RABBITMQ_PASSWORD", "guest")
     queue_name = queue_name or os.getenv("RABBITMQ_CONF_QUEUE", "default_queue")
     
-    print(f" [ ] Enviando mensaje a '{queue_name}': {message}")
-    print(f" [ ] host: {host}")
-    print(f" [ ] port: {port}")
-    print(f" [ ] user: {user}")
-    print(f" [ ] password: {password}")
+    # print(f" [ ] Enviando mensaje a '{queue_name}': {message}")
+    # print(f" [ ] host: {host}")
+    # print(f" [ ] port: {port}")
+    # print(f" [ ] user: {user}")
+    # print(f" [ ] password: {password}")
     
     # Configurar credenciales
     credentials = pika.PlainCredentials(user, password)

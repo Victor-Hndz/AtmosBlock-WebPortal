@@ -126,7 +126,7 @@ def main():
         with open('config/config.yaml', 'w') as yamlfile:
             yaml.dump(configuration, yamlfile, default_flow_style=False, sort_keys=False)
         print("\n✅Archivo de configuración .yaml creado exitosamente.\n")
-        send_message("config/config.yaml", "config_queue")
+        send_message("config/config.yaml")
         print("\n✅Archivo de configuración .yaml enviado a la cola de RabbitMQ.\n")
     except Exception as e:
         print(f"\n❌ Error al escribir el archivo de configuración: {e}")
