@@ -20,7 +20,7 @@ def receive_messages(callback, queue_name=None):
     # Configurar credenciales
     credentials = pika.PlainCredentials(user, password)
     
-    _connection, channel = start_conection(credentials, host, port)
+    connection, channel = start_conection(credentials, host, port)
 
     if channel:
         # Declarar la cola
@@ -28,15 +28,17 @@ def receive_messages(callback, queue_name=None):
         
         print(f" [ ] Cola '{queue_name}' declarada")
 
-        # Callback para recibir mensajes
-        def on_message(ch, method, properties, body):
+        # Intentar obtener un solo mensaje
+        method_frame, _header_frame, body = channel.basic_get(queue=queue_name, auto_ack=False)
+
+        if method_frame:
             print(f" [ ] Mensaje recibido en '{queue_name}': {body.decode()}")
             callback(body.decode())  # Llamar a la función del usuario
-            ch.basic_ack(delivery_tag=method.delivery_tag)  # Confirmar recepción
+            channel.basic_ack(delivery_tag=method_frame.delivery_tag)  # Confirmar recepción
+        else:
+            print(" [ ] No hay mensajes disponibles en la cola.")
 
-        channel.basic_consume(queue=queue_name, on_message_callback=on_message)
-
-        print(f" [*] Escuchando mensajes en '{queue_name}'. Presiona CTRL+C para salir.")
-        channel.start_consuming()
+        # Cerrar la conexión después de recibir el mensaje
+        connection.close()
     else:
         print(" [ ] No se pudo establecer conexión con RabbitMQ. Abortando.")
