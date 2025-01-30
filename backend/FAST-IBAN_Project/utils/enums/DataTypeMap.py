@@ -1,4 +1,4 @@
-from enums import DataType
+from utils.enums.DataType import DataType
 from visualization.generate_maps import generate_maps as gm
 
 DataType_map = {

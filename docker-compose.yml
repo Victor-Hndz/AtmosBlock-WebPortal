@@ -1,4 +1,20 @@
 services:
+  rabbitmq:
+    image: rabbitmq:3-management  # Incluye la interfaz web de administración
+    container_name: rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: pass
+      RABBITMQ_CONF_QUEUE: conf_queue
+    ports:
+      - "5672:5672"  # Puerto para la comunicación entre servicios
+      - "15672:15672"  # Puerto para la interfaz de administración
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq  # Persistencia de datos
+  
   configurator_module:
     build:
       context: ./backend/FAST-IBAN_Project/
@@ -7,6 +23,8 @@ services:
         CDSAPI_URL: ${CDSAPI_URL}
         CDSAPI_KEY: ${CDSAPI_KEY}
     container_name: configurator_container
+    depends_on:
+      - rabbitmq
     env_file:
       - .env
     volumes:
@@ -15,30 +33,26 @@ services:
     tty: true
     working_dir: /app
 
-  rabbitmq:
-    image: rabbitmq:3-management  # Incluye la interfaz web de administración
-    container_name: rabbitmq
-    restart: always
+  handler_module:
+    build:
+      context: ./backend/FAST-IBAN_Project/
+      dockerfile: ./handler/Dockerfile
+    container_name: handler_container
+    depends_on:
+      - rabbitmq
+      - configurator_module
     environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin
-    ports:
-      - "5672:5672"  # Puerto para la comunicación entre servicios
-      - "15672:15672"  # Puerto para la interfaz de administración
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: admin
+      RABBITMQ_PASSWORD: pass
+      RABBITMQ_CONF_QUEUE: conf_queue
     volumes:
-      - rabbitmq_data:/var/lib/rabbitmq  # Persistencia de datos
-
-  # handler_module:
-  #   build:
-  #     context: ./backend/FAST-IBAN_Project/
-  #     dockerfile: ./handler/Dockerfile
-  #   container_name: handler_container
-  #   volumes:
-  #     - ./backend/FAST-IBAN_Project:/app
-  #     - out_data:/app/out
-  #   stdin_open: true
-  #   tty: true
-  #   working_dir: /app
+      - config_data:/app/config
+      # - out_data:/app/out
+    stdin_open: true
+    tty: true
+    working_dir: /app
 
   # execution_module:
   #   build:
