@@ -5,6 +5,7 @@ import sys
 sys.path.append('/app/')
 
 from utils.api_request import request_data
+from utils.rabbitMQ.send_message import send_message
 
 ARGS_FILE = "./configurator/exec_args.yaml"
 API_FOLDER = "./config/data"
@@ -121,9 +122,15 @@ def main():
     configuration = {'MAP': configuration}
     
     # Escribir un archivo .yaml
-    with open('config/config.yaml', 'w') as yamlfile:
-        yaml.dump(configuration, yamlfile, default_flow_style=False, sort_keys=False)
-    print("\n✅Archivo de configuración .yaml creado exitosamente.\n")
+    try:
+        with open('config/config.yaml', 'w') as yamlfile:
+            yaml.dump(configuration, yamlfile, default_flow_style=False, sort_keys=False)
+        print("\n✅Archivo de configuración .yaml creado exitosamente.\n")
+        send_message("config/config.yaml", "config_queue")
+        print("\n✅Archivo de configuración .yaml enviado a la cola de RabbitMQ.\n")
+    except Exception as e:
+        print(f"\n❌ Error al escribir el archivo de configuración: {e}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

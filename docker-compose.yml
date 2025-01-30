@@ -15,11 +15,24 @@ services:
     tty: true
     working_dir: /app
 
-  # execution_module:
+  rabbitmq:
+    image: rabbitmq:3-management  # Incluye la interfaz web de administración
+    container_name: rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    ports:
+      - "5672:5672"  # Puerto para la comunicación entre servicios
+      - "15672:15672"  # Puerto para la interfaz de administración
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq  # Persistencia de datos
+
+  # handler_module:
   #   build:
   #     context: ./backend/FAST-IBAN_Project/
-  #     dockerfile: ./execution/Dockerfile
-  #   container_name: execution_container
+  #     dockerfile: ./handler/Dockerfile
+  #   container_name: handler_container
   #   volumes:
   #     - ./backend/FAST-IBAN_Project:/app
   #     - out_data:/app/out
@@ -27,11 +40,11 @@ services:
   #   tty: true
   #   working_dir: /app
 
-  # algorithm_module:
+  # execution_module:
   #   build:
   #     context: ./backend/FAST-IBAN_Project/
   #     dockerfile: ./execution/Dockerfile
-  #   container_name: algorithm_container
+  #   container_name: execution_container
   #   volumes:
   #     - ./backend/FAST-IBAN_Project:/app
   #     - out_data:/app/out
@@ -69,4 +82,6 @@ volumes:
   in_data:
     driver: local
   config_data:
+    driver: local
+  rabbitmq_data:
     driver: local
