@@ -11,7 +11,7 @@ from utils.map_utils import date_from_nc
 # from utils.gif_generator import svg_to_gif_folder
 
 from utils.rabbitMQ.send_message import send_message
-from utils.rabbitMQ.receive_message import receive_messages
+from utils.rabbitMQ.receive_single_message import receive_single_message
 
 
 EXEC_FILE = "./execution/FAST-IBAN"
@@ -19,7 +19,7 @@ EXEC_FILE = "./execution/FAST-IBAN"
 
 def process_message(message):
     # Se obtiene el mensaje y se procesa
-    print(f"Mensaje recibido: {message}")
+    print(f"\n\tMensaje recibido en handler: {message}")
     send_message("Mensaje recibido")
     return message
 
@@ -117,7 +117,7 @@ def process_file():
                     
 
 if __name__ == "__main__":
-    receive_messages(callback=process_message)
+    receive_single_message(callback=process_message)
     
     file, maps, es_max, times, area, levels, file_format, output, debug, no_compile, no_execute, no_maps, animation, omp, mpi, tracking, n_threads, n_processes = init()
     

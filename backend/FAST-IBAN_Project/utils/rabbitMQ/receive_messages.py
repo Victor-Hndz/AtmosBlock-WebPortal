@@ -1,6 +1,5 @@
 import pika
 import os
-
 from dotenv import load_dotenv
 from utils.rabbitMQ.start_conection import start_conection
 
@@ -8,7 +7,7 @@ from utils.rabbitMQ.start_conection import start_conection
 load_dotenv()
 
 def receive_messages(callback, queue_name=None):
-    """ Escucha mensajes en RabbitMQ y ejecuta un callback cuando llega un mensaje """
+    """ Mantiene la escucha en RabbitMQ y ejecuta el callback cada vez que recibe un mensaje """
 
     # Obtener credenciales desde .env
     host = os.getenv("RABBITMQ_HOST", "rabbitmq")
@@ -16,29 +15,30 @@ def receive_messages(callback, queue_name=None):
     user = os.getenv("RABBITMQ_USER", "guest")
     password = os.getenv("RABBITMQ_PASSWORD", "guest")
     queue_name = queue_name or os.getenv("RABBITMQ_CONF_QUEUE", "default_queue")
-    
+
     # Configurar credenciales
     credentials = pika.PlainCredentials(user, password)
-    
     connection, channel = start_conection(credentials, host, port)
 
     if channel:
         # Declarar la cola
         channel.queue_declare(queue=queue_name, durable=True)
-        
-        print(f" [ ] Cola '{queue_name}' declarada")
 
-        # Intentar obtener un solo mensaje
-        method_frame, _header_frame, body = channel.basic_get(queue=queue_name, auto_ack=False)
+        print(f" [*] Escuchando mensajes en '{queue_name}'. Presiona CTRL+C para salir.")
 
-        if method_frame:
-            print(f" [ ] Mensaje recibido en '{queue_name}': {body.decode()}")
+        # Callback para recibir mensajes de forma continua
+        def on_message(ch, method, properties, body):
+            print(f" [✔] Mensaje recibido en '{queue_name}': {body.decode()}")
             callback(body.decode())  # Llamar a la función del usuario
-            channel.basic_ack(delivery_tag=method_frame.delivery_tag)  # Confirmar recepción
-        else:
-            print(" [ ] No hay mensajes disponibles en la cola.")
+            ch.basic_ack(delivery_tag=method.delivery_tag)  # Confirmar recepción
 
-        # Cerrar la conexión después de recibir el mensaje
-        connection.close()
+        # Consumir mensajes continuamente
+        channel.basic_consume(queue=queue_name, on_message_callback=on_message)
+
+        try:
+            channel.start_consuming()
+        except KeyboardInterrupt:
+            print(" [ ] Se detuvo la escucha de mensajes.")
+            connection.close()
     else:
         print(" [ ] No se pudo establecer conexión con RabbitMQ. Abortando.")
