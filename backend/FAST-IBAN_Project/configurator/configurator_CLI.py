@@ -6,9 +6,10 @@ sys.path.append('/app/')
 
 from utils.api_request import request_data
 from utils.rabbitMQ.send_message import send_message
+from utils.netcdf_editor import adapt_netcdf
 
 ARGS_FILE = "./configurator/exec_args.yaml"
-API_FOLDER = "./config/data"
+API_FOLDER = "/app/config/data"
 
 # Lista de argumentos permitidos
 ARGUMENTS = [
@@ -94,6 +95,9 @@ def main():
         print(f"El archivo {file} no existe, se procederá a descargarlo.")
         request_data(args["variable"], args["years"], args["months"], args["days"], args["hours"], args["pressure_levels"], args["area"], file)
         print(f"\n✅ Archivo {file} descargado con éxito.")
+        
+    adapt_netcdf(file)
+    print(f"\n✅ Archivo {file} adaptado con éxito.")
         
     
     # Crear el diccionario de configuración para cada mapa

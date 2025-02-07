@@ -54,17 +54,25 @@ services:
     tty: true
     working_dir: /app
 
-  # execution_module:
-  #   build:
-  #     context: ./backend/FAST-IBAN_Project/
-  #     dockerfile: ./execution/Dockerfile
-  #   container_name: execution_container
-  #   volumes:
-  #     - ./backend/FAST-IBAN_Project:/app
-  #     - out_data:/app/out
-  #   stdin_open: true
-  #   tty: true
-  #   working_dir: /app
+  execution_module:
+    build:
+      context: ./backend/FAST-IBAN_Project/
+      dockerfile: ./execution/Dockerfile
+    container_name: execution_container
+    depends_on:
+      - rabbitmq
+      - configurator_module
+      - handler_module
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: admin
+      RABBITMQ_PASSWORD: pass
+    volumes:
+      - config_data:/app/config
+    stdin_open: true
+    tty: true
+    working_dir: /app
 
   # visualization_module:
   #   build:

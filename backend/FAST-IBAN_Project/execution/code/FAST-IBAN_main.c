@@ -2,6 +2,7 @@
 #include "libraries/utils.h"
 #include "libraries/calc.h"
 #include "libraries/init.h"
+#include <dirent.h>
 #include <omp.h>
 
 
@@ -22,6 +23,8 @@ int main(int argc, char **argv) {
         perror("Error: Couldn't allocate memory for data. ");
         return 2;
     }
+
+    printf("\n\nEntrando al programa.\n");
     
 
     t_ini = omp_get_wtime();
@@ -29,9 +32,10 @@ int main(int argc, char **argv) {
     //Process the entry arguments.
     process_entry(argc, argv);
 
-    //Open the file.
+    //Open the file for reading.
     if ((retval = nc_open(FILE_NAME, NC_NOWRITE, &ncid)))
         ERR(retval)
+
 
     //Extract the names and limits of the variables from the netcdf file.
     extract_nc_data(ncid);
@@ -96,6 +100,7 @@ int main(int argc, char **argv) {
 
     //Loop for every z value.
     for (time=0; time<NTIME; time++) { 
+        printf("Instante de tiempo: %d", time);
         t_ini = omp_get_wtime();
 
         for(lat=0;lat<size_x;lat++) {
@@ -171,7 +176,6 @@ int main(int argc, char **argv) {
         t_fin = omp_get_wtime();
         t_total += (t_fin-t_ini);
         t_ini = omp_get_wtime();
-
 
         search_formation(clusters, j, z_in[time], lats, lons, scale_factor, offset, filename2, time);
     

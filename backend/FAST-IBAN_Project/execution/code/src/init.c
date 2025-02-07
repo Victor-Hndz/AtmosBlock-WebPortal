@@ -35,12 +35,21 @@ void process_entry(int argc, char **argv) {
         LON_LIM_MAX = 180;
         N_THREADS = 40;
     } else {
+        // char* input_file_name = argv[1];
+        // FILE_NAME = "/app/config/data/geopotential_500hPa_2003-08-(01-15)_00-06-12-18UTC.nc";
         FILE_NAME = argv[1];
         LAT_LIM_MIN = atoi(argv[2]);
         LAT_LIM_MAX = atoi(argv[3]);
         LON_LIM_MIN = atoi(argv[4]);
         LON_LIM_MAX = atoi(argv[5]);
         N_THREADS = atoi(argv[6]);
+
+        // char temp[strlen(BASE_PATH) + strlen(input_file_name) +1];
+        // snprintf(temp, sizeof(temp), "%s%s", BASE_PATH, input_file_name);
+
+        // FILE_NAME = temp;
+
+        printf("FILE_NAME: %s\n", FILE_NAME);
 
         if(strlen(FILE_NAME) > 255) {
             printf("Error: El nombre del archivo es demasiado largo.\n");
@@ -263,4 +272,5 @@ void extract_nc_data(int ncid) {
             // return;
         }
     }
+    printf("NLON: %d, NLAT: %d, NTIME: %d\n", NLON, NLAT, NTIME);
 }

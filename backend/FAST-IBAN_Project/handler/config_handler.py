@@ -1,6 +1,7 @@
 import subprocess
 import yaml
 import sys
+import os
 
 sys.path.append('/app/')
 
@@ -14,19 +15,14 @@ from utils.rabbitMQ.send_message import send_message
 from utils.rabbitMQ.receive_single_message import receive_single_message
 
 
-EXEC_FILE = "./execution/FAST-IBAN"
+EXEC_FILE = "./FAST-IBAN"
 
 
-def process_message(message):
-    # Se obtiene el mensaje y se procesa
-    print(f"\n\tMensaje recibido en handler: {message}")
-    send_message("Mensaje recibido")
-    return message
 
-
-def init():
+def init(file_name):
+    '''Inicializa las variables necesarias para el procesamiento del archivo .yaml.'''
     # Read the configuration file (yaml)
-    with open('config/config.yaml', 'r') as yamlfile:
+    with open(file_name, 'r') as yamlfile:
         config = yaml.load(yamlfile, Loader=yaml.FullLoader)
     print("Archivo de configuración .yaml leído exitosamente.")
         
@@ -51,7 +47,7 @@ def init():
     n_processes = config["MAP"]["n_proces"]
         
     # Get the last part of the path
-    file = file.split("/")[-1]
+    # file = file.split("/")[-1]
 
     # Compile the C code
     # if not no_compile:
@@ -70,9 +66,12 @@ def init():
     return file, maps, es_max, times, area, levels, file_format, output, debug, no_compile, no_execute, no_maps, animation, omp, mpi, tracking, n_threads, n_processes
 
 
-def process_file():
+def process_file(file, area, debug, no_execute, omp, mpi, n_threads, n_processes):
+    '''Procesa el archivo .yaml y ejecuta el programa en C.'''
     lat_range = [int(area[2]), int(area[0])]
     lon_range = [int(area[1]), int(area[3])]
+    
+    print("Ejecutando el programa para el archivo:", file)
     
     return_code = None
     if not no_execute:
@@ -89,22 +88,42 @@ def process_file():
             cmd = [EXEC_FILE, file, str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), "1"]
             debug_cmd = ["gdb", "--args", EXEC_FILE, file, str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), "1"]
         
+        print("Enviando mensaje a la cola de ejecución...")
         if not debug:
-            return_code = subprocess.call(cmd)
+            message = " ".join(cmd)
+            return_code = send_message(message, queue_name="execution_queue")
         else:
-            return_code = subprocess.call(debug_cmd)
+            message = " ".join(debug_cmd)
+            return_code = send_message(message, queue_name="execution_queue")
         
     [int(lat) for lat in lat_range]
     [int(lon) for lon in lon_range]
     
-    max_times = len(date_from_nc(file))
+    # max_times = len(date_from_nc(file))
     
     if return_code == 0 or no_execute:
         print("Ejecución completada exitosamente para el archivo:", file)
-        generate_map(file, es_max, max_times, levels, lat_range, lon_range, file_format)        
+        # generate_map(file, es_max, max_times, levels, lat_range, lon_range, file_format)        
     else:
         print("Error al ejecutar el programa para el archivo:", file)
         
+
+def process_message(message):
+    '''Procesa el mensaje recibido por el handler, si es un archivo .yaml válido, lo retorna.'''
+    print(f"\n\tMensaje recibido en handler: {message}")
+    
+    if not message.endswith(".yaml"):
+        print("\tMensaje inválido. Se esperaba un archivo .yaml existente.")
+        return 
+
+    print("Archivo válido recibido. Procesando...")
+    file, maps, es_max, times, area, levels, file_format, output, debug, no_compile, no_execute, no_maps, animation, omp, mpi, tracking, n_threads, n_processes = init(message)
+    
+    print("Archivo: ", file)
+
+    process_file(file, area, debug, no_execute, omp, mpi, n_threads, n_processes)
+
+
 
 # def generate_map(file, es_max, max_times, levels, lat_range, lon_range, file_format):
 #     if not no_maps:
@@ -118,12 +137,6 @@ def process_file():
 
 if __name__ == "__main__":
     receive_single_message(callback=process_message)
-    
-    file, maps, es_max, times, area, levels, file_format, output, debug, no_compile, no_execute, no_maps, animation, omp, mpi, tracking, n_threads, n_processes = init()
-    
-    print("Archivo: ", file)
-    
-    #process_file()
     
     # if(animation):
     #     print("Generando animación...")

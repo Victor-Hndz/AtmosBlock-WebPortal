@@ -1,5 +1,5 @@
 # Base image with build tools and libraries
-FROM victorhndz/netcdf-base:latest
+FROM ubuntu:22.04
 
 # Set up environment variables
 ENV DEBIAN_FRONTEND=noninteractive
@@ -8,6 +8,7 @@ ENV LC_ALL=C.UTF-8
 
 # Install Ansible and required tools and update dependencies
 RUN apt-get update && apt-get install -y \
+    ansible \
     build-essential \
     cmake \
     git \
@@ -25,22 +26,15 @@ RUN apt-get update && apt-get install -y \
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy project files to the container
-COPY ./execution/code /app
-COPY ./config /app/config
-COPY ./execution/handler /app/handler
+# Copy playbook and related files
+COPY /execution/install_netcdf.yaml /app/install_netcdf.yml
 
-# Copy project files to the container
-COPY ./utils /app/utils
+# Run Ansible playbook
+RUN ansible-playbook install_netcdf.yml
 
-# Install required Python packages
-RUN pip install --no-cache-dir -r ./utils/requirements.txt
+# Set environment variables for NetCDF and HDF5
+ENV HDF5_DIR=/usr/local/hdf5-1.14.3
+ENV NETCDF4_DIR=/usr/local
 
-# Run the executable
-CMD [ "python3", "handler/exec_handler.py" ]
-
-# Run CMake to configure the project and build the project
-# RUN cmake . && make
-
-# # Run the executable
-# CMD [ "./execution/FAST-IBAN" ]
+# Define default command (can be overridden)
+CMD ["/bin/bash"]
