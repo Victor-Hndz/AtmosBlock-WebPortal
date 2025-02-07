@@ -37,8 +37,7 @@
 #define CONFIG_DIR_NAME "config/"
 #define CONFIG_FILE_NAME_LIN "config.yaml"
 #define CONFIG_FILE_NAME_WIN "config.conf"
-#define ACTUAL_DIR "execution"
-#define DIR_PERMS 0777
+#define ACTUAL_DIR "build"
 
 
 #define g_0 9.80665 // Standard gravity in m/s^2

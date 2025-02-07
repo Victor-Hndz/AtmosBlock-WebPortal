@@ -12,8 +12,8 @@ def receive_messages(callback, queue_name=None):
     # Obtener credenciales desde .env
     host = os.getenv("RABBITMQ_HOST", "rabbitmq")
     port = os.getenv("RABBITMQ_PORT", 5672)
-    user = os.getenv("RABBITMQ_USER", "guest")
-    password = os.getenv("RABBITMQ_PASSWORD", "guest")
+    user = os.getenv("RABBITMQ_DEFAULT_USER", "guest")
+    password = os.getenv("RABBITMQ_DEFAULT_PASS", "guest")
     queue_name = queue_name or os.getenv("RABBITMQ_CONF_QUEUE", "default_queue")
 
     # Configurar credenciales

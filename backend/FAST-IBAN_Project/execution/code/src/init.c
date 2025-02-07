@@ -86,12 +86,12 @@ void process_entry(int argc, char **argv) {
 void init_files(char* filename, char* filename2, char* log_file, char* speed_file, char* long_name) {
     char cwd[NC_MAX_CHAR];
     char file_path[NC_MAX_CHAR];
-    char* error_catcher_char;
+    char* error_catcher_char, *p;
     int error_catcher_int;
     error_catcher_char = getcwd(cwd, sizeof(cwd));
 
     //extract the last part of the path
-    char *p = strrchr(cwd, '/');
+    p = strrchr(cwd, '/');
     p == NULL ? p = cwd : p++;
     if(strcmp(p, ACTUAL_DIR) == 0) {
         error_catcher_int = chdir("..");
@@ -100,16 +100,13 @@ void init_files(char* filename, char* filename2, char* log_file, char* speed_fil
 
     snprintf(file_path, sizeof(file_path), "%s/%s", cwd, OUT_DIR_NAME);
 
-    if (!mkdir(file_path, DIR_PERMS)) 
-        printf("Carpeta creada con éxito.\n");
-
     // FILE_NAME extract the last part of the path
     p = strrchr(FILE_NAME, '/');
     p == NULL ? p = FILE_NAME : p++;
 
     // printf("File name: %s\n", p);
     char temp[NC_MAX_CHAR];
-    strcpy(temp, p);
+    strncpy(temp, p, strlen(p));
 
     //delete the extension from p
     char *dot = strrchr(temp, '.');

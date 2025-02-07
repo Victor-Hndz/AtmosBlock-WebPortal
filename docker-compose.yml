@@ -1,19 +1,14 @@
 services:
   rabbitmq:
-    image: rabbitmq:3-management  # Incluye la interfaz web de administración
-    container_name: rabbitmq
-    restart: always
-    environment:
-      RABBITMQ_HOST: rabbitmq
-      RABBITMQ_PORT: 5672
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: pass
-      RABBITMQ_CONF_QUEUE: conf_queue
+    image: rabbitmq:3-management
+    container_name: rabbitmq_container
+    env_file:
+      - .env
     ports:
-      - "5672:5672"  # Puerto para la comunicación entre servicios
-      - "15672:15672"  # Puerto para la interfaz de administración
+      - ${RABBITMQ_PORT}:${RABBITMQ_PORT}
+      - ${RABBITMQ_MANAGEMENT_PORT}:${RABBITMQ_MANAGEMENT_PORT}
     volumes:
-      - rabbitmq_data:/var/lib/rabbitmq  # Persistencia de datos
+      - rabbitmq_data:/var/lib/rabbitmq
   
   configurator_module:
     build:
@@ -38,15 +33,11 @@ services:
       context: ./backend/FAST-IBAN_Project/
       dockerfile: ./handler/Dockerfile
     container_name: handler_container
+    env_file:
+      - .env
     depends_on:
       - rabbitmq
       - configurator_module
-    environment:
-      RABBITMQ_HOST: rabbitmq
-      RABBITMQ_PORT: 5672
-      RABBITMQ_USER: admin
-      RABBITMQ_PASSWORD: pass
-      RABBITMQ_CONF_QUEUE: conf_queue
     volumes:
       - config_data:/app/config
       # - out_data:/app/out
@@ -59,17 +50,15 @@ services:
       context: ./backend/FAST-IBAN_Project/
       dockerfile: ./execution/Dockerfile
     container_name: execution_container
+    env_file:
+      - .env
     depends_on:
       - rabbitmq
       - configurator_module
       - handler_module
-    environment:
-      RABBITMQ_HOST: rabbitmq
-      RABBITMQ_PORT: 5672
-      RABBITMQ_USER: admin
-      RABBITMQ_PASSWORD: pass
     volumes:
       - config_data:/app/config
+      - out_data:/app/out
     stdin_open: true
     tty: true
     working_dir: /app
@@ -100,8 +89,6 @@ services:
 
 volumes:
   out_data:
-    driver: local
-  in_data:
     driver: local
   config_data:
     driver: local
