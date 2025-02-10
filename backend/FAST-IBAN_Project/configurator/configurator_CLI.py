@@ -1,12 +1,14 @@
 import os
 import yaml
 import sys
+import json
 
 sys.path.append('/app/')
 
 from utils.api_request import request_data
-from utils.rabbitMQ.send_message import send_message
 from utils.netcdf_editor import adapt_netcdf
+from utils.rabbitMQ.send_message import send_message
+from utils.rabbitMQ.init_rabbit import init_rabbitmq
 
 ARGS_FILE = "./configurator/exec_args.yaml"
 API_FOLDER = "/app/config/data"
@@ -125,12 +127,15 @@ def main():
     # Escribir el archivo de configuración
     configuration = {'MAP': configuration}
     
+    #inicilizar rabbitmq
+    init_rabbitmq()
+    
     # Escribir un archivo .yaml
     try:
         with open('config/config.yaml', 'w') as yamlfile:
             yaml.dump(configuration, yamlfile, default_flow_style=False, sort_keys=False)
         print("\n✅Archivo de configuración .yaml creado exitosamente.\n")
-        send_message("config/config.yaml")
+        send_message("config/config.yaml", "requests", "handler.start")
         print("\n✅Archivo de configuración .yaml enviado a la cola de RabbitMQ.\n")
     except Exception as e:
         print(f"\n❌ Error al escribir el archivo de configuración: {e}")

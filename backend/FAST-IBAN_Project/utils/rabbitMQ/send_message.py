@@ -1,5 +1,6 @@
 import pika
 import os
+import json
 
 from dotenv import load_dotenv
 from utils.rabbitMQ.start_conection import start_conection
@@ -7,7 +8,7 @@ from utils.rabbitMQ.start_conection import start_conection
 # Cargar variables desde .env
 load_dotenv()
 
-def send_message(message, queue_name=None):
+def send_message(body, exchange, routing_key):
     """ Envía un mensaje a RabbitMQ usando credenciales desde .env """
     
     # Obtener credenciales desde .env
@@ -15,7 +16,6 @@ def send_message(message, queue_name=None):
     port = os.getenv("RABBITMQ_PORT", 5672)
     user = os.getenv("RABBITMQ_DEFAULT_USER", "guest")
     password = os.getenv("RABBITMQ_DEFAULT_PASS", "guest")
-    queue_name = queue_name or os.getenv("RABBITMQ_CONF_QUEUE", "default_queue")
     
     # print(f" [ ] Enviando mensaje a '{queue_name}': {message}")
     # print(f" [ ] host: {host}")
@@ -28,21 +28,20 @@ def send_message(message, queue_name=None):
     
     connection, channel = start_conection(credentials, host, port)
 
-    if channel:
-        # Declarar la cola (durable para persistencia)
-        channel.queue_declare(queue=queue_name, durable=True)
-        
-        print(f" [ ] Cola '{queue_name}' declarada")
+    if channel:        
+        message = json.dumps(body)
 
         # Publicar mensaje
         channel.basic_publish(
-            exchange='',
-            routing_key=queue_name,
+            exchange=exchange,
+            routing_key=routing_key,
             body=message,
-            properties=pika.BasicProperties(delivery_mode=2)  # Persistente
-        )
+            properties=pika.BasicProperties(
+                delivery_mode=2,  # Mensajes persistentes
+            )
+        )     
 
-        print(f" [✔] Mensaje enviado a '{queue_name}': {message}")
+        print(f" [✔] Mensaje enviado a '{exchange}': {message}")
         connection.close()
     else:
         print(" [ ] No se pudo establecer conexión con RabbitMQ. Abortando.")

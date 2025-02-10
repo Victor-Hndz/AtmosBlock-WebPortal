@@ -1,7 +1,6 @@
-import subprocess
 import yaml
 import sys
-import os
+import json
 
 sys.path.append('/app/')
 
@@ -12,7 +11,7 @@ from utils.map_utils import date_from_nc
 # from utils.gif_generator import svg_to_gif_folder
 
 from utils.rabbitMQ.send_message import send_message
-from utils.rabbitMQ.receive_single_message import receive_single_message
+from utils.rabbitMQ.receive_messages import receive_messages
 
 
 EXEC_FILE = "./FAST-IBAN"
@@ -66,6 +65,31 @@ def init(file_name):
     return file, maps, es_max, times, area, levels, file_format, output, debug, no_compile, no_execute, no_maps, animation, omp, mpi, tracking, n_threads, n_processes
 
 
+def handle_execution_message(body):
+    '''Procesa el mensaje recibido por el handler, si es un archivo .yaml válido, lo retorna.'''
+    message = json.loads(body)
+    print(f"\n\tMensaje recibido en exec handler: {message}")
+    
+    if message[0] == "error":
+        print("\tError: ", message[1])
+        return None
+    elif message[0] == "return_code":
+        print("Se recibió un mensaje de ejecución: ", message)
+    
+    # [int(lat) for lat in lat_range]
+    # [int(lon) for lon in lon_range]
+    
+    return_code = message[1]
+    
+    # max_times = len(date_from_nc(file))
+    
+    if return_code == 0:
+        print("Ejecución completada exitosamente.")
+        # generate_map(file, es_max, max_times, levels, lat_range, lon_range, file_format)        
+    else:
+        print("Error al ejecutar el programa.")
+        
+
 def process_file(file, area, debug, no_execute, omp, mpi, n_threads, n_processes):
     '''Procesa el archivo .yaml y ejecuta el programa en C.'''
     lat_range = [int(area[2]), int(area[0])]
@@ -91,25 +115,17 @@ def process_file(file, area, debug, no_execute, omp, mpi, n_threads, n_processes
         print("Enviando mensaje a la cola de ejecución...")
         if not debug:
             message = " ".join(cmd)
-            return_code = send_message(message, queue_name="execution_queue")
         else:
             message = " ".join(debug_cmd)
-            return_code = send_message(message, queue_name="execution_queue")
+            
+        send_message(message, "execution", "execution.algorithm")
+        receive_messages("notifications_queue", "notify.handler", callback=handle_execution_message)
         
-    [int(lat) for lat in lat_range]
-    [int(lon) for lon in lon_range]
-    
-    # max_times = len(date_from_nc(file))
-    
-    if return_code == 0 or no_execute:
-        print("Ejecución completada exitosamente para el archivo:", file)
-        # generate_map(file, es_max, max_times, levels, lat_range, lon_range, file_format)        
-    else:
-        print("Error al ejecutar el programa para el archivo:", file)
         
 
-def process_message(message):
+def handle_config_message(body):
     '''Procesa el mensaje recibido por el handler, si es un archivo .yaml válido, lo retorna.'''
+    message = json.loads(body)
     print(f"\n\tMensaje recibido en handler: {message}")
     
     if not message.endswith(".yaml"):
@@ -136,7 +152,7 @@ def process_message(message):
                     
 
 if __name__ == "__main__":
-    receive_single_message(callback=process_message)
+    receive_messages("config_queue", "handler.start", callback=handle_config_message)
     
     # if(animation):
     #     print("Generando animación...")

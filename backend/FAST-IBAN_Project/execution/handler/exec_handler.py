@@ -1,13 +1,17 @@
 import subprocess
 import sys
 import os
+import json
 
 sys.path.append('/app/')
 
 from utils.rabbitMQ.receive_messages import receive_messages
+from utils.rabbitMQ.send_message import send_message
 
-def handle_message(message):
+def handle_message(body):
     '''Procesa el mensaje recibido por el handler, si es un archivo .yaml válido, lo retorna.'''
+    message = json.loads(body)
+    
     print(f"\n\tMensaje recibido en exec handler: {message}")
     
     if message[0] == None:
@@ -41,16 +45,17 @@ def handle_message(message):
     
     print("Ejecutando comando: ", run_cmd)
     result = subprocess.run(run_cmd, capture_output=True, text=True, cwd="build")
-    print("Salida estándar (stdout):")
-    print(result.stdout)
+    # print("Salida estándar (stdout):")
+    # print(result.stdout)
 
-    print("Salida de error (stderr):")
-    print(result.stderr)
+    # print("Salida de error (stderr):")
+    # print(result.stderr)
 
     print(f"Código de salida: {result.returncode}")
     
     if result.returncode == 0:
         print("Ejecución exitosa.")
+        send_message(["return_code", 0], "notifications", "notify.handler")
         return True
     else:
         print("Ejecución fallida.")
@@ -58,7 +63,7 @@ def handle_message(message):
 
 
 def main():
-    receive_messages(callback=handle_message, queue_name="execution_queue")
+    receive_messages("execution_queue", "execution.algorithm", callback=handle_message)
 
 if __name__ == "__main__":
     main()
