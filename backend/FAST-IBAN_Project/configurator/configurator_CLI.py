@@ -8,6 +8,7 @@ sys.path.append('/app/')
 from utils.api_request import request_data
 from utils.netcdf_editor import adapt_netcdf
 from utils.rabbitMQ.send_message import send_message
+from utils.rabbitMQ.receive_messages import receive_messages
 from utils.rabbitMQ.init_rabbit import init_rabbitmq
 
 ARGS_FILE = "./configurator/exec_args.yaml"
@@ -37,6 +38,19 @@ def load_args_from_file(file_path):
         sys.exit(1)
     
     return {key: config.get(key, None) for key in ARGUMENTS}
+
+
+def load_args_from_queue(body):
+    """Carga los argumentos desde la cola de RabbitMQ."""
+    try:
+        config = json.loads(body)
+    except json.JSONDecodeError as e:
+        print(f"❌ Error al decodificar JSON: {e}")
+        sys.exit(1)
+    
+    print("\n✅ Argumentos cargados y validados con éxito.\n")
+    args = {key: config.get(key, None) for key in ARGUMENTS}
+    print(args)
 
 
 def mount_file_name(variable, pressure_levels, years, months, days, hours):
@@ -85,7 +99,11 @@ def mount_file_name(variable, pressure_levels, years, months, days, hours):
 
 
 def main():
-    args = load_args_from_file(ARGS_FILE)
+    # args = load_args_from_file(ARGS_FILE)
+    #inicilizar rabbitmq
+    init_rabbitmq()
+    receive_messages("config_queue", ["config.create"], load_args_from_queue)
+    exit(1)
     
     print("\n✅ Argumentos cargados y validados con éxito.\n")
     
@@ -126,9 +144,6 @@ def main():
 
     # Escribir el archivo de configuración
     configuration = {'MAP': configuration}
-    
-    #inicilizar rabbitmq
-    init_rabbitmq()
     
     # Escribir un archivo .yaml
     try:
