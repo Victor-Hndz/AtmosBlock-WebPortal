@@ -29,7 +29,6 @@ def init(file_name):
     file = config["MAP"]["file"]
     maps = config["MAP"]["maps"]
     es_max = config["MAP"]["es_max"]
-    times = config["MAP"]["times"]
     area = config["MAP"]["area"]
     levels = config["MAP"]["levels"]
     file_format = config["MAP"]["file_format"]
@@ -62,7 +61,7 @@ def init(file_name):
     #         print("Error al ejecutar el build:")
     #         exit(1)
 
-    return file, maps, es_max, times, area, levels, file_format, output, debug, no_compile, no_execute, no_maps, animation, omp, mpi, tracking, n_threads, n_processes
+    return file, maps, es_max, area, levels, file_format, output, debug, no_compile, no_execute, no_maps, animation, omp, mpi, tracking, n_threads, n_processes
 
 
 def handle_execution_message(body):
@@ -133,7 +132,7 @@ def handle_config_message(body):
         return 
 
     print("Archivo válido recibido. Procesando...")
-    file, maps, es_max, times, area, levels, file_format, output, debug, no_compile, no_execute, no_maps, animation, omp, mpi, tracking, n_threads, n_processes = init(message)
+    file, maps, es_max, area, levels, file_format, output, debug, no_compile, no_execute, no_maps, animation, omp, mpi, tracking, n_threads, n_processes = init(message)
     
     print("Archivo: ", file)
 

@@ -17,9 +17,8 @@ API_FOLDER = "/app/config/data"
 # Lista de argumentos permitidos
 ARGUMENTS = [
     "variable", "pressure_levels", "years", "months", "days", "hours",
-    "area", "types", "ranges", "levels", "instants",
-    "all", "format", "out", "tracking", "debug", "no_compile", "no_execute",
-    "no_compile_execute", "no_maps", "animation", "omp", "mpi",
+    "area", "types", "ranges", "levels",
+    "all", "format", "out", "tracking", "debug", "no_compile", "no_execute", "no_maps", "animation", "omp", "mpi",
     "n_threads", "n_proces"
 ]
 
@@ -125,7 +124,6 @@ def main():
         "file": file,
         "maps": args["types"],
         "es_max": args["ranges"],
-        "times": args["instants"],
         "area": args["area"],
         "levels": args["levels"],
         "file_format": args["format"],

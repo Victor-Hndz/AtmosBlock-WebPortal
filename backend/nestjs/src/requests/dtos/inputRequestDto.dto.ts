@@ -50,17 +50,6 @@ export class InputRequestDto {
   @IsString({ each: true })
   mapLevels: string[];
 
-  @IsArray()
-  @IsString({ each: true })
-  @ValidateIf(o => o.allTimeInstants !== true)
-  @IsNotEmpty({ message: "At least one timeInstant must be provided if allTimeInstants is not true" })
-  timeInstants?: string[];
-
-  @ValidateIf(o => !o.timeInstants || o.timeInstants.length == 0)
-  @IsBoolean({ message: "allTimeInstants cannot be true if timeInstants is provided" })
-  @IsNotEmpty({ message: "allTimeInstants must be true if no timeInstants are provided" })
-  allTimeInstants?: boolean;
-
   @IsString()
   @IsOptional()
   fileFormat?: boolean;
