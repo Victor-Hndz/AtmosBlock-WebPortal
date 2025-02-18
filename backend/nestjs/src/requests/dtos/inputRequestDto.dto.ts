@@ -93,10 +93,10 @@ export class InputRequestDto {
   @ValidateIf(o => o.omp === true)
   @IsBoolean()
   @IsOptional()
-  n_threads?: boolean;
+  nThreads?: boolean;
 
   @ValidateIf(o => o.mpi === true)
   @IsBoolean()
   @IsOptional()
-  n_process?: boolean;
+  nProces?: boolean;
 }

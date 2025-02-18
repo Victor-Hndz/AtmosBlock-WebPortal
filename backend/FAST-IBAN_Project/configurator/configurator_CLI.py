@@ -16,14 +16,11 @@ API_FOLDER = "/app/config/data"
 
 # Lista de argumentos permitidos
 ARGUMENTS = [
-    "variable", "pressure_levels", "years", "months", "days", "hours",
-    "area", "types", "ranges", "levels",
-    "all", "format", "out", "tracking", "debug", "no_compile", "no_execute", "no_maps", "animation", "omp", "mpi",
-    "n_threads", "n_proces"
+    "variableName", "pressureLevels", "years", "months", "days", "hours",
+    "areaCovered", "mapTypes", "mapRanges", "mapLevels", "fileFormat", "outDir", "tracking", "debug", "noCompile", "noExecute", "noMaps", "animation", "omp", "mpi",
+    "nThreads", "nProces"
 ]
 
-
-# Función para cargar argumentos desde un archivo YAML
 def load_args_from_file(file_path):
     """Carga los argumentos desde un archivo YAML."""
     try:
@@ -42,14 +39,14 @@ def load_args_from_file(file_path):
 def load_args_from_queue(body):
     """Carga los argumentos desde la cola de RabbitMQ."""
     try:
-        config = json.loads(body)
+        decoded_body = json.loads(body.decode("utf-8"))
+        config = json.loads(decoded_body['data'])
     except json.JSONDecodeError as e:
         print(f"❌ Error al decodificar JSON: {e}")
         sys.exit(1)
     
     print("\n✅ Argumentos cargados y validados con éxito.\n")
-    args = {key: config.get(key, None) for key in ARGUMENTS}
-    print(args)
+    return {key: config.get(key, None) for key in ARGUMENTS}
 
 
 def mount_file_name(variable, pressure_levels, years, months, days, hours):
@@ -79,7 +76,7 @@ def mount_file_name(variable, pressure_levels, years, months, days, hours):
         return [f"{int(v):02d}" for v in values]
     
     # Asignar valores por defecto si alguno es None
-    variable = variable or []
+    variable = variable or ""
     pressure_levels = pressure_levels or []
     years = format_list(years or [])
     months = format_list(months or [])
@@ -87,32 +84,35 @@ def mount_file_name(variable, pressure_levels, years, months, days, hours):
     hours = format_list(hours or [])
 
     # Construcción del nombre del archivo
-    variable_part = "-".join(variable) if len(variable) > 1 else variable[0]
     pressure_part = "-".join(pressure_levels) + "hPa" if len(pressure_levels) > 1 else pressure_levels[0] + "hPa"
     year_part = "-".join(years)
     month_part = "-".join(months)
     day_part = f"({format_range(days)})"
     hour_part = "-".join(hours) + "UTC"
 
-    return f"{API_FOLDER}/{variable_part}_{pressure_part}_{year_part}-{month_part}-{day_part}_{hour_part}.nc"
+    return f"{API_FOLDER}/{variable}_{pressure_part}_{year_part}-{month_part}-{day_part}_{hour_part}.nc"
 
 
 def main():
     # args = load_args_from_file(ARGS_FILE)
     #inicilizar rabbitmq
     init_rabbitmq()
-    receive_messages("config_queue", ["config.create"], load_args_from_queue)
-    exit(1)
+    receive_messages("config_queue", ["config.create"], process_message)
+    
+
+def process_message(body):
+    args = load_args_from_queue(body)
     
     print("\n✅ Argumentos cargados y validados con éxito.\n")
+    print(f"Argumentos: {args}")
     
-    file = mount_file_name(args["variable"], args["pressure_levels"], args["years"], args["months"], args["days"], args["hours"])
+    file = mount_file_name(args["variableName"], args["pressureLevels"], args["years"], args["months"], args["days"], args["hours"])
     
     #buscar si el archivo existe
     if not os.path.exists(file):
         #llamar a la API y bajarlo
         print(f"El archivo {file} no existe, se procederá a descargarlo.")
-        request_data(args["variable"], args["years"], args["months"], args["days"], args["hours"], args["pressure_levels"], args["area"], file)
+        request_data(args["variableName"], args["years"], args["months"], args["days"], args["hours"], args["pressureLevels"], args["areaCovered"], file)
         print(f"\n✅ Archivo {file} descargado con éxito.")
         
     adapt_netcdf(file)
@@ -122,22 +122,22 @@ def main():
     # Crear el diccionario de configuración para cada mapa
     configuration = {
         "file": file,
-        "maps": args["types"],
-        "es_max": args["ranges"],
-        "area": args["area"],
-        "levels": args["levels"],
-        "file_format": args["format"],
-        "output": args["out"],
+        "maps": args["mapTypes"],
+        "es_max": args["mapRanges"],
+        "area": args["areaCovered"],
+        "levels": args["mapLevels"],
+        "file_format": args["fileFormat"],
+        "output": args["outDir"],
         "tracking": args["tracking"],
         "debug": args["debug"],
-        "no_compile": args["no_compile"],
-        "no_execute": args["no_execute"],
-        "no_maps": args["no_maps"],
+        "no_compile": args["noCompile"],
+        "no_execute": args["noExecute"],
+        "no_maps": args["noMaps"],
         "animation": args["animation"],
         "omp": args["omp"],
         "mpi": args["mpi"],
-        "n_threads": args["n_threads"],
-        "n_proces": args["n_proces"]
+        "n_threads": args["nThreads"],
+        "n_proces": args["nProces"]
     }
 
     # Escribir el archivo de configuración

@@ -27,7 +27,7 @@ def receive_messages(queue_name, routing_key, callback):
         def on_message(ch, method, properties, body):
             body_pattern = json.loads(body).get("pattern", None)
             print(f"body pattern: {body_pattern}")
-            if (method.routing_key or body_pattern) in routing_key:
+            if (method.routing_key in routing_key or body_pattern in routing_key):
                 print(f" [✔] Mensaje recibido en '{queue_name}': {body}")
                 callback(body)  # Llamar a la función del usuario
                 ch.basic_ack(delivery_tag=method.delivery_tag)  # Confirmar recepción
