@@ -41,7 +41,7 @@ def send_message(body, exchange, routing_key):
             )
         )     
 
-        print(f" [✔] Mensaje enviado a '{exchange}': {message}")
+        # print(f"\n✅ Mensaje enviado a '{exchange}': {message}")
         connection.close()
     else:
-        print(" [ ] No se pudo establecer conexión con RabbitMQ. Abortando.")
+        print("\n[ ] No se pudo establecer conexión con RabbitMQ. Abortando.")

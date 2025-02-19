@@ -23,7 +23,7 @@ def init(file_name):
     # Read the configuration file (yaml)
     with open(file_name, 'r') as yamlfile:
         config = yaml.load(yamlfile, Loader=yaml.FullLoader)
-    print("Archivo de configuración .yaml leído exitosamente.")
+    print("\n✅ Archivo de configuración .yaml leído exitosamente.\n")
         
     # Extract all
     file = config["MAP"]["file"]
@@ -67,13 +67,12 @@ def init(file_name):
 def handle_execution_message(body):
     '''Procesa el mensaje recibido por el handler, si es un archivo .yaml válido, lo retorna.'''
     message = json.loads(body)
-    print(f"\n\tMensaje recibido en exec handler: {message}")
     
     if message[0] == "error":
-        print("\tError: ", message[1])
+        print("\t❌ Error: ", message[1])
         return None
     elif message[0] == "return_code":
-        print("Se recibió un mensaje de ejecución: ", message)
+        print("\n[ ] Se recibió un mensaje de ejecución: ", message)
     
     # [int(lat) for lat in lat_range]
     # [int(lon) for lon in lon_range]
@@ -83,10 +82,10 @@ def handle_execution_message(body):
     # max_times = len(date_from_nc(file))
     
     if return_code == 0:
-        print("Ejecución completada exitosamente.")
+        print("\n✅ Ejecución completada exitosamente.\n")
         # generate_map(file, es_max, max_times, levels, lat_range, lon_range, file_format)        
     else:
-        print("Error al ejecutar el programa.")
+        print("\n❌ Error al ejecutar el programa.\n")
         
 
 def process_file(file, area, debug, no_execute, omp, mpi, n_threads, n_processes):
@@ -94,7 +93,7 @@ def process_file(file, area, debug, no_execute, omp, mpi, n_threads, n_processes
     lat_range = [int(area[2]), int(area[0])]
     lon_range = [int(area[1]), int(area[3])]
     
-    print("Ejecutando el programa para el archivo:", file)
+    print("\n✅ Ejecutando el programa para el archivo:", file)
     
     return_code = None
     if not no_execute:
@@ -111,7 +110,7 @@ def process_file(file, area, debug, no_execute, omp, mpi, n_threads, n_processes
             cmd = [EXEC_FILE, file, str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), "1"]
             debug_cmd = ["gdb", "--args", EXEC_FILE, file, str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), "1"]
         
-        print("Enviando mensaje a la cola de ejecución...")
+        print("\n[] Enviando mensaje a la cola de ejecución...")
         if not debug:
             message = " ".join(cmd)
         else:
@@ -125,13 +124,13 @@ def process_file(file, area, debug, no_execute, omp, mpi, n_threads, n_processes
 def handle_config_message(body):
     '''Procesa el mensaje recibido por el handler, si es un archivo .yaml válido, lo retorna.'''
     message = json.loads(body)
-    print(f"\n\tMensaje recibido en handler: {message}")
+    print(f"\n✅ Mensaje recibido en handler: {message}")
     
     if not message.endswith(".yaml"):
         print("\tMensaje inválido. Se esperaba un archivo .yaml existente.")
         return 
 
-    print("Archivo válido recibido. Procesando...")
+    print("\n✅ Archivo válido recibido. Procesando...")
     file, maps, es_max, area, levels, file_format, output, debug, no_compile, no_execute, no_maps, animation, omp, mpi, tracking, n_threads, n_processes = init(message)
     
     print("Archivo: ", file)

@@ -45,7 +45,6 @@ def load_args_from_queue(body):
         print(f"❌ Error al decodificar JSON: {e}")
         sys.exit(1)
     
-    print("\n✅ Argumentos cargados y validados con éxito.\n")
     return {key: config.get(key, None) for key in ARGUMENTS}
 
 
@@ -147,9 +146,9 @@ def process_message(body):
     try:
         with open('config/config.yaml', 'w') as yamlfile:
             yaml.dump(configuration, yamlfile, default_flow_style=False, sort_keys=False)
-        print("\n✅Archivo de configuración .yaml creado exitosamente.\n")
+        print("\n✅ Archivo de configuración .yaml creado exitosamente.\n")
         send_message("config/config.yaml", "requests", "handler.start")
-        print("\n✅Archivo de configuración .yaml enviado a la cola de RabbitMQ.\n")
+        print("\n✅ Archivo de configuración .yaml enviado a la cola de RabbitMQ.\n")
     except Exception as e:
         print(f"\n❌ Error al escribir el archivo de configuración: {e}")
         sys.exit(1)

@@ -21,18 +21,23 @@ def receive_messages(queue_name, routing_key, callback):
     connection, channel = start_conection(credentials, host, port)
 
     if channel:
-        print(f" [*] Escuchando mensajes en '{queue_name}'. Presiona CTRL+C para salir.")
+        print(f"[*] Escuchando mensajes en '{queue_name}'. Presiona CTRL+C para salir.")
 
         # Callback para recibir mensajes de forma continua
         def on_message(ch, method, properties, body):
-            body_pattern = json.loads(body).get("pattern", None)
-            print(f"body pattern: {body_pattern}")
+            body_dict = json.loads(body)
+            #si es str, lo convierte a dict
+            if isinstance(body_dict, dict):
+                body_pattern = body_dict.get("pattern", None)
+            else:
+                body_pattern = body_dict
+            # print(f"body pattern: {body_pattern}")
             if (method.routing_key in routing_key or body_pattern in routing_key):
-                print(f" [✔] Mensaje recibido en '{queue_name}': {body}")
+                # print(f"\n✅ Mensaje recibido en '{queue_name}': {body}")
                 callback(body)  # Llamar a la función del usuario
                 ch.basic_ack(delivery_tag=method.delivery_tag)  # Confirmar recepción
             else:
-                print(f" [ ] Mensaje descartado: {body}")
+                # print(f"\n[ ] Mensaje descartado: {body}")
                 ch.basic_nack(delivery_tag=method.delivery_tag)  # Rechazar mensaje
 
         # Consumir mensajes continuamente
@@ -41,7 +46,7 @@ def receive_messages(queue_name, routing_key, callback):
         try:
             channel.start_consuming()
         except KeyboardInterrupt:
-            print(" [ ] Se detuvo la escucha de mensajes.")
+            print("\n[ ] Se detuvo la escucha de mensajes.")
             connection.close()
     else:
-        print(" [ ] No se pudo establecer conexión con RabbitMQ. Abortando.")
+        print("\n[ ] No se pudo establecer conexión con RabbitMQ. Abortando.")
