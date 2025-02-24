@@ -27,7 +27,6 @@ WORKDIR /app
 
 # Copy project files to the container
 COPY ./execution/code /app
-COPY ./config /app/config
 COPY ./execution/handler /app/handler
 
 # Copy project files to the container
