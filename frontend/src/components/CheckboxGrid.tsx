@@ -32,35 +32,26 @@ type FormData = {
   n_proces: number;
 };
 
-const CheckboxGrid: React.FC<CheckboxGridProps> = ({
-  title,
-  category,
-  items,
-  selectedItems,
-  setFormData,
-}) => {
+const CheckboxGrid: React.FC<CheckboxGridProps> = ({ title, category, items, selectedItems, setFormData }) => {
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { checked, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [category]: checked
         ? [...(prev[category] as string[]), value]
-        : (prev[category] as string[]).filter((item) => item !== value),
+        : (prev[category] as string[]).filter(item => item !== value),
     }));
   };
 
   const handleSelectAll = () => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
-      [category]:
-        Array.isArray(prev[category]) && prev[category].length === items.length
-          ? []
-          : items,
+      [category]: Array.isArray(prev[category]) && prev[category].length === items.length ? [] : items,
     }));
   };
 
   const handleClear = () => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [category]: [],
     }));
@@ -77,11 +68,9 @@ const CheckboxGrid: React.FC<CheckboxGridProps> = ({
           Clear all
         </button>
       </h3>
-      {selectedItems.length === 0 && (
-        <p className="error-message">At least one selection must be made</p>
-      )}
+      {selectedItems.length === 0 && <p className="error-message">At least one selection must be made</p>}
       <div className="checkbox-grid">
-        {items.map((item) => (
+        {items.map(item => (
           <label key={item} className="checkbox-label">
             <input
               type="checkbox"

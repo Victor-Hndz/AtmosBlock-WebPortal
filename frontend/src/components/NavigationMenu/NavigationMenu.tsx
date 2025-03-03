@@ -1,7 +1,7 @@
 import styles from "@pages/home/homePage.module.css";
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@context/AuthContext";
+import { useAuth } from "@hooks/useAuth";
 import { Group, Text, ActionIcon } from "@mantine/core";
 
 const NavigationMenu: React.FC = () => {
@@ -38,13 +38,7 @@ const NavigationMenu: React.FC = () => {
             <Text size="md" c="dimmed">
               Welcome, {user.name}!
             </Text>
-            <ActionIcon
-              variant="filled"
-              color="red"
-              radius="xl"
-              size="lg"
-              onClick={handleLogout}
-            ></ActionIcon>
+            <ActionIcon variant="filled" color="red" radius="xl" size="lg" onClick={handleLogout}></ActionIcon>
           </Group>
         ) : (
           <Group>

@@ -19,20 +19,13 @@ const Home: React.FC = () => {
         <Group className={classes.content}>
           <div>
             <Title order={1} className={classes.title}>
-              Bienvenido a{" "}
-              <span className={classes.highlight}>Nuestra Plataforma</span>
+              Bienvenido a <span className={classes.highlight}>Nuestra Plataforma</span>
             </Title>
             <Text className={classes.description}>
-              Explora, descubre y sumérgete en una experiencia única con nuestra
-              plataforma. Diseñada para facilitar tu vida con tecnología de
-              última generación.
+              Explora, descubre y sumérgete en una experiencia única con nuestra plataforma. Diseñada para facilitar tu
+              vida con tecnología de última generación.
             </Text>
-            <Button
-              size="lg"
-              className={classes.button}
-              onClick={handleClick}
-              loading={loading}
-            >
+            <Button size="lg" className={classes.button} onClick={handleClick} loading={loading}>
               ¡Empezar Ahora!
             </Button>
           </div>

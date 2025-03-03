@@ -5,9 +5,7 @@ import RegionSelector from "./RegionSelector";
 
 const variables = ["Geopotential", "Temperature"];
 
-const years = Array.from({ length: 2025 - 1940 }, (_, i) =>
-  (1940 + i).toString()
-);
+const years = Array.from({ length: 2025 - 1940 }, (_, i) => (1940 + i).toString());
 
 const months = [
   "January",
@@ -26,10 +24,7 @@ const months = [
 
 const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
 
-const hours = Array.from(
-  { length: 24 },
-  (_, i) => i.toString().padStart(2, "0") + ":00"
-);
+const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0") + ":00");
 
 const pressureLevels = [
   "1 hPa",
@@ -128,13 +123,7 @@ const RequestForm = () => {
         selectedItems={formData.months}
         setFormData={setFormData}
       />
-      <CheckboxGrid
-        title="Day"
-        category="days"
-        items={days}
-        selectedItems={formData.days}
-        setFormData={setFormData}
-      />
+      <CheckboxGrid title="Day" category="days" items={days} selectedItems={formData.days} setFormData={setFormData} />
       <CheckboxGrid
         title="Time"
         category="hours"
@@ -170,14 +159,14 @@ const RequestForm = () => {
         <select
           id="format"
           value={formData.format}
-          onChange={(e) =>
-            setFormData((prev) => ({
+          onChange={e =>
+            setFormData(prev => ({
               ...prev,
               format: e.target.value,
             }))
           }
         >
-          {format.map((f) => (
+          {format.map(f => (
             <option key={f} value={f}>
               {f}
             </option>
@@ -190,8 +179,8 @@ const RequestForm = () => {
           type="checkbox"
           id="out"
           checked={formData.out !== ""}
-          onChange={(e) =>
-            setFormData((prev) => ({
+          onChange={e =>
+            setFormData(prev => ({
               ...prev,
               out: e.target.checked ? "output" : "",
             }))
@@ -202,8 +191,8 @@ const RequestForm = () => {
           <input
             type="text"
             value={formData.out}
-            onChange={(e) =>
-              setFormData((prev) => ({
+            onChange={e =>
+              setFormData(prev => ({
                 ...prev,
                 out: e.target.value,
               }))
@@ -217,8 +206,8 @@ const RequestForm = () => {
           type="checkbox"
           id="tracking"
           checked={formData.tracking}
-          onChange={(e) =>
-            setFormData((prev) => ({
+          onChange={e =>
+            setFormData(prev => ({
               ...prev,
               tracking: e.target.checked,
             }))
@@ -232,8 +221,8 @@ const RequestForm = () => {
           type="checkbox"
           id="debug"
           checked={formData.debug}
-          onChange={(e) =>
-            setFormData((prev) => ({
+          onChange={e =>
+            setFormData(prev => ({
               ...prev,
               debug: e.target.checked,
             }))
@@ -247,8 +236,8 @@ const RequestForm = () => {
           type="checkbox"
           id="no_compile"
           checked={formData.no_compile}
-          onChange={(e) =>
-            setFormData((prev) => ({
+          onChange={e =>
+            setFormData(prev => ({
               ...prev,
               no_compile: e.target.checked,
             }))
@@ -262,8 +251,8 @@ const RequestForm = () => {
           type="checkbox"
           id="no_execute"
           checked={formData.no_execute}
-          onChange={(e) =>
-            setFormData((prev) => ({
+          onChange={e =>
+            setFormData(prev => ({
               ...prev,
               no_execute: e.target.checked,
             }))
@@ -277,8 +266,8 @@ const RequestForm = () => {
           type="checkbox"
           id="no_maps"
           checked={formData.no_maps}
-          onChange={(e) =>
-            setFormData((prev) => ({
+          onChange={e =>
+            setFormData(prev => ({
               ...prev,
               no_maps: e.target.checked,
             }))
@@ -292,8 +281,8 @@ const RequestForm = () => {
           type="checkbox"
           id="animation"
           checked={formData.animation}
-          onChange={(e) =>
-            setFormData((prev) => ({
+          onChange={e =>
+            setFormData(prev => ({
               ...prev,
               animation: e.target.checked,
             }))
@@ -307,8 +296,8 @@ const RequestForm = () => {
           type="checkbox"
           id="omp"
           checked={formData.omp}
-          onChange={(e) =>
-            setFormData((prev) => ({
+          onChange={e =>
+            setFormData(prev => ({
               ...prev,
               omp: e.target.checked,
             }))
@@ -324,8 +313,8 @@ const RequestForm = () => {
             type="number"
             id="n_threads"
             value={formData.n_threads}
-            onChange={(e) =>
-              setFormData((prev) => ({
+            onChange={e =>
+              setFormData(prev => ({
                 ...prev,
                 n_threads: parseInt(e.target.value),
               }))
@@ -339,8 +328,8 @@ const RequestForm = () => {
           type="checkbox"
           id="mpi"
           checked={formData.mpi}
-          onChange={(e) =>
-            setFormData((prev) => ({
+          onChange={e =>
+            setFormData(prev => ({
               ...prev,
               mpi: e.target.checked,
             }))
@@ -356,8 +345,8 @@ const RequestForm = () => {
             type="number"
             id="n_proces"
             value={formData.n_proces}
-            onChange={(e) =>
-              setFormData((prev) => ({
+            onChange={e =>
+              setFormData(prev => ({
                 ...prev,
                 n_proces: parseInt(e.target.value),
               }))

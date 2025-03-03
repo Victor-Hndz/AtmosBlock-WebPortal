@@ -1,11 +1,6 @@
 import React from "react";
 import { MantineProvider } from "@mantine/core";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import NavigationMenu from "@components/NavigationMenu/NavigationMenu";
 import Home from "@pages/home/homePage";
 import theme from "@theme/theme";

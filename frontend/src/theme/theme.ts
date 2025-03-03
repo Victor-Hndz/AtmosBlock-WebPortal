@@ -1,4 +1,4 @@
-import { createTheme, DEFAULT_THEME } from "@mantine/core";
+import { createTheme } from "@mantine/core";
 
 const theme = createTheme({
   /** 🎨 Colores personalizados */
