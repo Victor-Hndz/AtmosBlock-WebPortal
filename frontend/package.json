@@ -12,10 +12,17 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@mantine/carousel": "^7.17.0",
+    "@mantine/core": "^7.17.0",
+    "@mantine/dates": "^7.17.0",
+    "@mantine/hooks": "^7.17.0",
     "@mui/material": "^6.4.4",
+    "@tabler/icons-react": "^3.30.0",
+    "dayjs": "^1.11.13",
     "formik": "^2.4.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-router-dom": "^7.2.0",
     "yup": "^1.6.1"
   },
   "devDependencies": {
