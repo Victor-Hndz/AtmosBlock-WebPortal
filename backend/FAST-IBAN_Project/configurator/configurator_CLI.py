@@ -98,21 +98,21 @@ def process_message(body):
     # Crear el diccionario de configuración para cada mapa
     configuration = {
         "file": file_name,
-        "maps": args["mapTypes"],
-        "es_max": args["mapRanges"],
-        "area": args["areaCovered"],
-        "levels": args["mapLevels"],
-        "file_format": args["fileFormat"],
+        "mapTypes": args["mapTypes"],
+        "mapRanges": args["mapRanges"],
+        "areaCovered": args["areaCovered"],
+        "mapLevels": args["mapLevels"],
+        "fileFormat": args["fileFormat"],
         "tracking": args["tracking"],
         "debug": args["debug"],
-        "no_compile": args["noCompile"],
-        "no_execute": args["noExecute"],
-        "no_maps": args["noMaps"],
+        "noCompile": args["noCompile"],
+        "noExecute": args["noExecute"],
+        "noMaps": args["noMaps"],
         "animation": args["animation"],
         "omp": args["omp"],
         "mpi": args["mpi"],
-        "n_threads": args["nThreads"],
-        "n_proces": args["nProces"]
+        "nThreads": args["nThreads"],
+        "nProces": args["nProces"]
     }
 
     # Escribir el archivo de configuración
