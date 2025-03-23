@@ -5,7 +5,7 @@ DATASET = "reanalysis-era5-pressure-levels"
 DOWNLOAD_FORMAT = "unarchived"
 DATA_FORMAT = "netcdf"
 
-def request_data(variable, years, months, days, hours, pressure_levels, area, file_name):
+def request_data(variable, years, months, days, hours, pressure_levels, file_name):
     try:
         request = {
             "product_type": [PRODUCT_TYPE],
@@ -17,7 +17,7 @@ def request_data(variable, years, months, days, hours, pressure_levels, area, fi
             "pressure_level": pressure_levels,
             "data_format": DATA_FORMAT,
             "download_format": DOWNLOAD_FORMAT,
-            "area": area #N W S E
+            "area": [90, -180, -90, 180],  # North, West, South, East. Global coverage
         }
         print(f"Request: {request}")
 

@@ -88,6 +88,19 @@ int main(int argc, char **argv) {
 
     //Initialize the output files.
     init_files(filename, filename2, log_file, speed_file, long_name);
+
+    //EVALUATE AND FILTER COORDS 
+    /* 
+        INPUT: a copy of the lats array 
+        1. Check each value of lats (min. and max. value) 
+            1.1. Keep only the values ot the zone of interest (89.75 - 10 or inverse) 
+        2. Iterate for inversion 
+            2.1. If 90 > lats > 0 --> continue (validate previously enter for saving time). 
+            2.2. If 0 > lats > -90 --> Treat the values as if it were inverted. 
+            2.3. If 90 > lats > -90 --> Treat the values < 0 as if it were inverted. 
+        3. Return the array 
+        OUTPUT: new lats array filtered and evaluated
+    */ 
     
 
     t_fin = omp_get_wtime();

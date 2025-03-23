@@ -54,10 +54,6 @@ export class InputRequestDto {
   @IsOptional()
   fileFormat?: boolean;
 
-  @IsString()
-  @IsOptional()
-  outDir?: string;
-
   @IsBoolean()
   @IsOptional()
   tracking?: boolean;
