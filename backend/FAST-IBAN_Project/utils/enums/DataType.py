@@ -4,6 +4,5 @@ class DataType(enum.Enum):
     TYPE1 = "comb"
     TYPE2 = "disp"
     TYPE3 = "cont"
-    TYPE4 = "comb_circ"
-    TYPE5 = "forms"
+    TYPE4 = "forms"
     

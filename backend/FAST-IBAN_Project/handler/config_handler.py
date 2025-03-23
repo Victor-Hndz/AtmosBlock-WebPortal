@@ -5,6 +5,9 @@ from typing import List
 
 sys.path.append('/app/')
 
+from visualization.generate_maps import generate_maps as gm
+from utils.enums.DataType import DataType
+
 from utils.rabbitMQ.send_message import send_message
 from utils.rabbitMQ.receive_messages import receive_messages
 from utils.rabbitMQ.process_body import process_body
@@ -296,12 +299,22 @@ class ConfigHandler:
         """
         print("\n[ ] Iniciando generación de mapas...")
         
-        # This would be implemented to send a message to the map generation service
-        # send_message(create_message(STATUS_OK, "", data), "maps", "maps.generate")
-        # receive_messages("map_notifications", "notify.maps", callback=self.handle_map_generation_message)
+        # GENERATE MAPS
+        # Iterate over map types, ranges, and levels to generate maps
+        for map_type in self.map_types:
+            for map_range in self.map_ranges:
+                for map_level in self.map_levels:
+                    if map_type == DataType.TYPE1:
+                        gm.generate_contour_map()
+                    elif map_type == DataType.TYPE2:
+                        gm.generate_scatter_map()
+                    elif map_type == DataType.TYPE3:
+                        gm.generate_combined_map()
+                    elif map_type == DataType.TYPE4:
+                        gm.generate_formations_map()
         
-        # Temporary placeholder for the implementation
-        print("\n[ ] Simulando finalización de generación de mapas...")
+                    
+        
         self.maps_generated = True
         
         # Continue with next steps
