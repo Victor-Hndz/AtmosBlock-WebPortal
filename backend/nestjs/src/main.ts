@@ -9,10 +9,10 @@ async function bootstrap() {
   // Habilitar la validación global
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // Remueve propiedades no definidas en DTO
-      forbidNonWhitelisted: true, // Lanza error si hay propiedades no permitidas
-      transform: true, // Transforma los datos al tipo definido en DTO
-      stopAtFirstError: false, // Opcional: devuelve todos los errores encontrados
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      stopAtFirstError: false,
       exceptionFactory: errors => {
         throw new BadRequestException({
           statusCode: 400,

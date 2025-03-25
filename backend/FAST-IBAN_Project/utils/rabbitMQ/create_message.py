@@ -1,17 +1,9 @@
 import json
 
 def create_message(status, message, data):
-    """Crea un mensaje JSON para enviar a RabbitMQ."""
-    message_dict = {
+    """Crea un mensaje JSON para enviar a RabbitMQ.""" 
+    return  {
         "status": status,
         "message": message,
-        "data": data
+        "data": json.dumps(data)
     }
-    
-    try:
-        json_message = json.dumps(message_dict)
-    except TypeError as e:
-        print(f"❌ Error al convertir el mensaje a JSON: {e}")
-        return None
-    
-    return json_message

@@ -7,9 +7,19 @@ def process_body(body):
     """Carga los argumentos desde la cola de RabbitMQ y verifica el estado."""
     try:
         decoded_body = json.loads(body.decode("utf-8"))
+        print("ℹ️ Cuerpo del mensaje:")
+        print(decoded_body)
+        
+        # Extract if comes from nestjs
+        if decoded_body.get("pattern", "") == "config.create":
+            decoded_body = decoded_body["data"]
+    
         status = decoded_body.get("status", "")
         message = decoded_body.get("message", "")
         data = decoded_body.get("data", None)
+        
+        print(f"ℹ️ Estado: {status}")
+        print(f"ℹ️ Mensaje: {message}")
         
         if status != STATUS_OK:
             print(f"❌ Error: {message}")

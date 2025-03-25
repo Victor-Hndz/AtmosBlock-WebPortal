@@ -9,12 +9,13 @@ from utils.rabbitMQ.receive_messages import receive_messages
 from utils.rabbitMQ.send_message import send_message
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
-from utils.consts.consts import EXEC_FILE, STATUS_OK, STATUS_ERROR, MESSAGE_NO_COMPILE, MESSAGE_DEBUG
+from utils.consts.consts import STATUS_OK, STATUS_ERROR, MESSAGE_NO_COMPILE, MESSAGE_DEBUG
 
 
 def handle_message(body):
     '''Procesa el mensaje recibido por el handler, si es un archivo .yaml válido, lo retorna.'''
-    data = process_body(body)
+    raw_data = process_body(body)
+    data = json.loads(raw_data)
     
     # print(f"\n\tMensaje recibido en exec handler: {message}")
     
@@ -43,8 +44,7 @@ def handle_message(body):
             print("\n❌ Error al ejecutar el build:")
         
     # return True
-    #from message (string) to list. Separate by spaces
-    run_cmd = data["cmd"].split()
+    run_cmd = data["cmd"]
     
     print("\n[ ] Ejecutando comando: ", run_cmd)
     result = subprocess.run(run_cmd, capture_output=True, text=True, cwd="build")

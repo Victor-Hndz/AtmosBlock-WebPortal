@@ -17,6 +17,7 @@ RUN pip install --no-cache-dir -r ./handler/requirements.txt
 
 # Copy project files to the container
 COPY ./utils /app/utils
+COPY ./visualization /app/visualization
 
 # Install required Python packages
 RUN pip install --no-cache-dir -r ./utils/requirements.txt
