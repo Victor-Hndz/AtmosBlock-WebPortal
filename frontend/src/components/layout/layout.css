@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+/* Container */
+.layout-container {
+  @apply flex flex-col min-h-screen relative;
+}
+
+/* Navbar */
+.layout-navbar {
+  @apply fixed top-0 left-0 right-0 bg-gray-800 text-white flex gap-4 p-4 z-50 shadow-md;
+}
+
+/* Nav link with animated underline */
+.nav-link {
+  @apply text-white font-medium relative transition-all duration-300 hover:text-blue-300;
+}
+
+.nav-link::after {
+  @apply content-[''] absolute w-0 h-0.5 bg-blue-400 bottom-0 left-0 transition-all duration-300;
+}
+
+.nav-link:hover::after {
+  @apply w-full;
+}
+
+/* Main content */
+.layout-main {
+  @apply flex-1 mt-16 mb-20 p-4 bg-gray-100 mx-auto w-full max-w-screen-lg min-w-7xl transition-all duration-300;
+}
+
+/* Footer */
+.layout-footer {
+  @apply fixed bottom-0 left-0 right-0 bg-gray-800 text-white text-center p-4 shadow-md;
+}
+
+/* Footer copyright text */
+.footer-copyright {
+  @apply transition-opacity duration-300 hover:opacity-80;
+}
+
+/* Footer link with animated underline */
+.footer-link {
+  @apply text-blue-400 font-medium relative inline-block ml-4 transition-all duration-300 hover:text-blue-200;
+}
+
+.footer-link::after {
+  @apply content-[''] absolute w-0 h-0.5 bg-blue-200 bottom-0 left-0 transition-all duration-300;
+}
+
+.footer-link:hover::after {
+  @apply w-full;
+}
