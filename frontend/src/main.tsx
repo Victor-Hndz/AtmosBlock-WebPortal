@@ -1,16 +1,13 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { AuthProvider } from "@/contexts/authProvider";
+import App from "./App";
 import "./index.css";
 
-const rootElement = document.getElementById("root");
-
-if (rootElement) {
-  createRoot(rootElement).render(
-    <StrictMode>
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <AuthProvider>
       <App />
-    </StrictMode>
-  );
-} else {
-  console.error("❌ No se encontró el elemento #root en el DOM");
-}
+    </AuthProvider>
+  </React.StrictMode>
+);

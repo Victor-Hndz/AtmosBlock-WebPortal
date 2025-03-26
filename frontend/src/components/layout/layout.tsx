@@ -1,4 +1,5 @@
 import { Outlet, Link } from "react-router-dom";
+import { House, LogIn } from "lucide-react";
 import "./layout.css";
 
 export default function Layout() {
@@ -7,7 +8,10 @@ export default function Layout() {
       {/* Navbar */}
       <nav className="layout-navbar">
         <Link to="/" className="nav-link">
-          🏡 Home
+          <House /> Home
+        </Link>
+        <Link to="/auth" className="nav-link">
+          <LogIn /> Login
         </Link>
       </nav>
 

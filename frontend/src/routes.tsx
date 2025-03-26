@@ -3,6 +3,7 @@ import Home from "@/pages/homePage";
 import About from "@/pages/aboutPage";
 import NotFound from "@/pages/notFoundPage";
 import Layout from "@/components/layout/layout";
+import AuthPage from "@/pages/authPage";
 
 const router = createBrowserRouter([
   {
@@ -11,6 +12,7 @@ const router = createBrowserRouter([
     children: [
       { path: "", element: <Home /> },
       { path: "about", element: <About /> },
+      { path: "auth", element: <AuthPage /> },
     ],
   },
   { path: "*", element: <NotFound /> },
