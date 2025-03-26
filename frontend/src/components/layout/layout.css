@@ -7,12 +7,17 @@
 
 /* Navbar */
 .layout-navbar {
-  @apply fixed top-0 left-0 right-0 bg-gray-800 text-white flex gap-4 p-4 z-50 shadow-md;
+  @apply fixed top-0 left-0 right-0 bg-gray-800 text-white p-4 z-50 shadow-md;
+}
+
+/* Nav icon styling */
+.nav-icon {
+  @apply inline-block align-middle w-4 h-4;
 }
 
 /* Nav link with animated underline */
 .nav-link {
-  @apply text-white font-medium relative transition-all duration-300 hover:text-blue-300;
+  @apply text-white font-medium relative transition-all duration-300 hover:text-blue-300 px-2 py-1 flex items-center;
 }
 
 .nav-link::after {
@@ -23,14 +28,45 @@
   @apply w-full;
 }
 
+.nav-link[data-active="true"] {
+  @apply text-blue-300;
+}
+
+.nav-link[data-active="true"]::after {
+  @apply w-full;
+}
+
+/* Mobile menu button */
+.mobile-menu-button {
+  @apply p-2 rounded-md transition-colors duration-200 hover:bg-gray-700;
+}
+
+/* Dropdown menu styling */
+.dropdown-content {
+  @apply bg-gray-800 rounded-md shadow-lg p-2 min-w-[150px] origin-top-left;
+}
+
+.dropdown-item {
+  @apply flex items-center p-2 text-white rounded-md hover:bg-gray-700 transition-colors duration-200;
+}
+
+.dropdown-arrow {
+  @apply fill-gray-800;
+}
+
 /* Main content */
 .layout-main {
-  @apply flex-1 mt-16 mb-20 p-4 bg-gray-100 mx-auto w-full max-w-screen-lg min-w-7xl transition-all duration-300;
+  @apply flex-1 mt-16 mb-20 p-4 bg-gray-100 mx-auto w-full max-w-screen-lg transition-all duration-300;
 }
 
 /* Footer */
 .layout-footer {
-  @apply fixed bottom-0 left-0 right-0 bg-gray-800 text-white text-center p-4 shadow-md;
+  @apply fixed bottom-0 left-0 right-0 bg-gray-800 text-white p-4 shadow-md;
+}
+
+/* Footer content container */
+.footer-content {
+  @apply flex justify-center items-center gap-2 flex-wrap;
 }
 
 /* Footer copyright text */
@@ -38,9 +74,19 @@
   @apply transition-opacity duration-300 hover:opacity-80;
 }
 
+/* Footer separator */
+.footer-separator {
+  @apply h-4 w-px bg-gray-500 mx-2;
+}
+
+/* Footer icon */
+.footer-icon {
+  @apply inline-block mr-1;
+}
+
 /* Footer link with animated underline */
 .footer-link {
-  @apply text-blue-400 font-medium relative inline-block ml-4 transition-all duration-300 hover:text-blue-200;
+  @apply text-blue-400 font-medium relative inline-flex items-center transition-all duration-300 hover:text-blue-200;
 }
 
 .footer-link::after {
@@ -49,4 +95,21 @@
 
 .footer-link:hover::after {
   @apply w-full;
+}
+
+/* Tooltip styling */
+.tooltip-content {
+  @apply bg-gray-900 text-white px-4 py-2 rounded-md text-sm z-50 shadow-md;
+}
+
+.tooltip-arrow {
+  @apply fill-gray-900;
+}
+
+/* Responsive adjustments */
+@screen md {
+  .layout-main {
+    @apply min-w-0;
+    max-width: 1024px;
+  }
 }

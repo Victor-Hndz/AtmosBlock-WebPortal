@@ -4,7 +4,12 @@ import About from "@/pages/aboutPage";
 import NotFound from "@/pages/notFoundPage";
 import Layout from "@/components/layout/layout";
 import AuthPage from "@/pages/authPage";
+import { JSX } from "react";
 
+/**
+ * Application router configuration
+ * Defines all available routes and their respective components
+ */
 const router = createBrowserRouter([
   {
     path: "/",
@@ -18,6 +23,10 @@ const router = createBrowserRouter([
   { path: "*", element: <NotFound /> },
 ]);
 
-export function AppRoutes() {
+/**
+ * Provides routing functionality for the application
+ * @returns {JSX.Element} RouterProvider component with configured routes
+ */
+export function AppRoutes(): JSX.Element {
   return <RouterProvider router={router} />;
 }
