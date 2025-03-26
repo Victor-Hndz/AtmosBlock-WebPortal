@@ -13,9 +13,9 @@ export class RequestsPublisher {
       .connect()
       .then(() => {
         const message = {
-          "status": STATUS_OK,
-          "message": "",
-          "data": JSON.stringify(request),
+          status: STATUS_OK,
+          message: "",
+          data: JSON.stringify(request),
         };
         this.client.emit("config.create", message); // Stringify the entire message once
         console.log("✅ Mensaje enviado a RabbitMQ");

@@ -7,11 +7,13 @@ import { RequestsModule } from "./requests/requests.module";
 import { RequestsController } from "./requests/controllers/requests.controller";
 import { RequestsService } from "./requests/services/requests.service";
 import { RequestsPublisher } from "./requests/messaging/requests.publisher";
+import { AuthModule } from "./auth/auth.module";
 
 @Module({
   imports: [
     UsersModule,
     RequestsModule,
+    AuthModule,
     ClientsModule.register([
       {
         name: "RABBITMQ_SERVICE",
