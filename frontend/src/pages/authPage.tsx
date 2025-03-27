@@ -428,7 +428,7 @@ export default function AuthPage(): JSX.Element {
   return (
     <Tooltip.Provider>
       <Toast.Provider swipeDirection="right">
-        <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+        <div className="flex min-h-full min-w-full items-center justify-center bg-gray-50 p-4">
           <div className="w-full max-w-md overflow-hidden rounded-lg bg-white shadow-xl">
             <Tabs.Root
               defaultValue="login"
