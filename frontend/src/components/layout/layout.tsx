@@ -1,6 +1,6 @@
 import React, { JSX } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { House, LogIn, Info, Menu } from "lucide-react";
+import { House, LogIn, Info, Menu, ListTodo } from "lucide-react";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import * as Separator from "@radix-ui/react-separator";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -42,6 +42,12 @@ const Layout: React.FC = (): JSX.Element => {
       label: "Login",
       icon: <LogIn className="nav-icon" aria-hidden="true" />,
       tooltip: "Sign in to your account",
+    },
+    {
+      path: "/requests",
+      label: "Requests",
+      icon: <ListTodo className="nav-icon" aria-hidden="true" />,
+      tooltip: "Manage your requests",
     },
   ];
 

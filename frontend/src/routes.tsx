@@ -5,6 +5,7 @@ import NotFound from "@/pages/notFoundPage";
 import Layout from "@/components/layout/layout";
 import AuthPage from "@/pages/authPage";
 import { JSX } from "react";
+import RequestsPage from "./pages/requestsPage";
 
 /**
  * Application router configuration
@@ -18,6 +19,7 @@ const router = createBrowserRouter([
       { path: "", element: <Home /> },
       { path: "about", element: <About /> },
       { path: "auth", element: <AuthPage /> },
+      { path: "requests", element: <RequestsPage /> },
     ],
   },
   { path: "*", element: <NotFound /> },
