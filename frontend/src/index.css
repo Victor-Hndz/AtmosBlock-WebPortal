@@ -33,3 +33,8 @@ button {
   font-family: inherit;
   cursor: pointer;
 }
+
+button:focus {
+  outline: none;
+  box-shadow: none;
+}
