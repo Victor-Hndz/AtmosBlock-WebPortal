@@ -2,7 +2,7 @@
 
 /**
  * Root variables for theming
- * Using Radix UI color system for consistent design
+ * Using Radix UI color system for consistent light theme design
  */
 :root {
   /* Base font settings */
@@ -21,19 +21,24 @@
   line-height: 1.5;
   font-weight: 400;
 
-  /* Color scheme settings */
+  /* Always use light color scheme */
   color-scheme: light;
 
-  /* Radix UI color system integration */
-  --slate1: var(--slate-1);
-  --slate2: var(--slate-2);
-  --slate12: var(--slate-12);
+  /* Radix UI color system integration - light theme values */
+  --slate1: hsl(206, 30%, 98.8%);
+  --slate2: hsl(210, 16.7%, 97.6%);
+  --slate12: hsl(206, 24%, 9%);
 
-  /* App colors */
-  --background: #f8f9fa;
-  --foreground: var(--slate12);
-  --muted: var(--slate2);
-  --accent: var(--violet9);
+  /* App colors - light theme */
+  --background: #ffffff;
+  --foreground: hsl(206, 24%, 9%);
+  --muted: hsl(210, 16.7%, 97.6%);
+  --accent: hsl(250, 46.8%, 38.9%); /* violet9 */
+  --accent-hover: hsl(250, 43%, 48%); /* lighter violet */
+  --accent-muted: hsl(252, 16%, 85%); /* muted violet */
+  --border: hsl(214, 15%, 91%);
+  --shadow-light: rgba(0, 0, 0, 0.05);
+  --shadow-medium: rgba(0, 0, 0, 0.1);
 
   /* Text rendering */
   font-synthesis: none;
@@ -45,14 +50,7 @@
   --transition-default: 150ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Dark theme support */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --background: #121212;
-    --foreground: #f8f9fa;
-  }
-}
+/* Remove dark theme support */
 
 /**
  * Base styles

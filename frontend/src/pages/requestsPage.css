@@ -1,6 +1,7 @@
-@reference "@/index.css";
-
 /* RequestsPage specific styles */
+@import "@/index.css";
+
+/* Animation keyframes */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -21,162 +22,128 @@
   }
 }
 
-/* Main container styles */
+/* Custom component styles that can't be handled by utility classes */
 .request-container {
-  @apply container mx-auto px-6 py-8 bg-white shadow-lg rounded-xl max-w-4xl;
+  max-width: 56rem;
   animation: fadeIn 0.5s ease-out;
+  background-color: #ffffff;
   box-shadow:
-    0 10px 25px -5px rgba(0, 0, 0, 0.1),
-    0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    0 10px 25px -5px var(--shadow-light),
+    0 8px 10px -6px var(--shadow-medium);
 }
 
-/* Header styles */
 .header-container {
-  @apply flex items-center justify-between mb-8;
   animation: slideIn 0.5s ease-out;
 }
 
-.page-title {
-  @apply text-3xl font-bold text-gray-800;
-}
-
-/* Mode toggle switch */
-.mode-toggle {
-  @apply flex items-center;
-}
-
-.mode-label {
-  @apply mr-3 text-sm font-medium text-gray-600;
-}
-
 .switch-root {
-  @apply w-12 h-6 bg-gray-300 rounded-full relative transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75 data-[state=checked]:bg-blue-500;
+  width: 3rem;
+  height: 1.5rem;
+  background-color: rgb(229 231 235); /* Gray-200 */
+  border-radius: 9999px;
+  position: relative;
+  transition: background-color 200ms ease-in-out;
+}
+
+.switch-root:focus {
+  outline: none;
+}
+
+.switch-root:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px rgba(109, 40, 217, 0.4); /* Lighter violet shadow */
+}
+
+.switch-root[data-state="checked"] {
+  background-color: var(--accent);
 }
 
 .switch-thumb {
-  @apply block w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ease-in-out translate-x-0.5 will-change-transform data-[state=checked]:translate-x-6;
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+  background-color: white;
+  border-radius: 9999px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transform: translateX(0.125rem);
+  transition: transform 200ms ease-in-out;
+  will-change: transform;
 }
 
-.help-button {
-  @apply ml-2 text-gray-400 hover:text-gray-600 transition-colors duration-200 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75;
+.switch-thumb[data-state="checked"] {
+  transform: translateX(1.5rem);
 }
 
-/* Authentication alert */
 .auth-alert {
-  @apply bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8 rounded-md animate-pulse;
   animation: slideIn 0.5s ease-out 0.2s backwards;
 }
 
-.alert-content {
-  @apply flex;
-}
-
-.alert-icon {
-  @apply h-5 w-5 text-yellow-400;
-}
-
-.alert-message {
-  @apply ml-3 text-sm text-yellow-700;
-}
-
-/* Tabs styling */
-.tabs-container {
-  @apply w-full;
-}
-
-.tabs-list {
-  @apply flex border-b border-gray-200 mb-8 overflow-x-auto;
-}
-
-.tab-trigger {
-  @apply px-4 py-3 border-b-2 border-transparent text-gray-600 font-medium hover:text-blue-600 transition-all duration-200 whitespace-nowrap data-[state=active]:border-blue-600 data-[state=active]:text-blue-600;
-  @apply focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75;
-}
-
 .tab-content {
-  @apply outline-none;
+  outline: none;
   animation: fadeIn 0.4s ease-out;
 }
 
-/* Form container */
-.form-container {
-  @apply space-y-6;
+.tab-trigger {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom-width: 2px;
+  border-color: transparent;
+  color: rgb(75 85 99); /* Gray-600 */
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 200ms;
 }
 
-/* Action buttons container */
-.actions-container {
-  @apply flex justify-end gap-4 mt-8;
+.tab-trigger:hover {
+  color: var(--accent);
 }
 
-.primary-button {
-  @apply px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 ease-in-out flex items-center justify-center min-w-[140px];
+.tab-trigger[data-state="active"] {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
-.primary-button:disabled {
-  @apply bg-blue-400 cursor-not-allowed;
+.tab-trigger:focus {
+  outline: none;
 }
 
-.secondary-button {
-  @apply px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 ease-in-out min-w-[120px];
+.tab-trigger:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px rgba(109, 40, 217, 0.4); /* Lighter violet shadow */
 }
 
-.secondary-button:disabled {
-  @apply text-gray-400 border-gray-200 bg-gray-50 cursor-not-allowed;
-}
-
-/* Enhanced form controls - these will affect child components */
-:global(.form-input) {
-  @apply block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm transition-colors duration-200 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50;
-}
-
-:global(.form-label) {
-  @apply block mb-2 text-sm font-medium text-gray-700;
-}
-
-:global(.form-checkbox) {
-  @apply h-5 w-5 text-blue-600 border-gray-300 rounded transition-colors duration-200 focus:ring-blue-500 focus:ring-opacity-50;
-}
-
-:global(.form-radio) {
-  @apply h-5 w-5 text-blue-600 border-gray-300 transition-colors duration-200 focus:ring-blue-500 focus:ring-opacity-50;
-}
-
-:global(.form-group) {
-  @apply mb-6;
-}
-
-:global(.form-hint) {
-  @apply mt-1 text-sm text-gray-500;
-}
-
-:global(.form-error) {
-  @apply mt-1 text-sm text-red-600;
-}
-
-/* Responsive adjustments */
+/* Media query for responsive adjustments */
 @media (max-width: 640px) {
   .header-container {
-    @apply flex-col items-start space-y-4;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
   }
 
   .mode-toggle {
-    @apply self-end;
+    align-self: flex-end;
   }
 
   .tabs-list {
-    @apply pb-2;
+    padding-bottom: 0.5rem;
   }
 
   .tab-trigger {
-    @apply text-sm py-2 px-3;
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
   }
 
   .actions-container {
-    @apply flex-col-reverse space-y-4 space-y-reverse;
+    flex-direction: column-reverse;
+    gap: 1rem;
   }
 
   .primary-button,
   .secondary-button {
-    @apply w-full;
+    width: 100%;
   }
 }

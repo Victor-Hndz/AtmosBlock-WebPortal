@@ -64,11 +64,11 @@ const RequestsPage: React.FC = () => {
   };
 
   return (
-    <div className="request-container">
-      <div className="header-container">
-        <h1 className="page-title">Create New Request</h1>
-        <div className="mode-toggle">
-          <label htmlFor="advanced-mode" className="mode-label">
+    <div className="request-container container mx-auto px-6 py-8 bg-white shadow-lg rounded-xl">
+      <div className="header-container flex items-center justify-between mb-8">
+        <h1 className="page-title text-3xl font-bold text-gray-800">Create New Request</h1>
+        <div className="mode-toggle flex items-center">
+          <label htmlFor="advanced-mode" className="mode-label mr-3 text-sm font-medium text-gray-600">
             Advanced Mode
           </label>
           <Switch.Root
@@ -81,7 +81,10 @@ const RequestsPage: React.FC = () => {
             <Switch.Thumb className="switch-thumb" />
           </Switch.Root>
           <Tooltip content="Enable advanced mode to access additional configuration options">
-            <button className="help-button" aria-label="Advanced mode help">
+            <button
+              className="help-button ml-2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+              aria-label="Advanced mode help"
+            >
               <HelpCircle size={16} />
             </button>
           </Tooltip>
@@ -89,16 +92,24 @@ const RequestsPage: React.FC = () => {
       </div>
 
       {!isAuthenticated && (
-        <div className="auth-alert" role="alert">
-          <div className="alert-content">
-            <AlertCircle className="alert-icon" />
-            <p className="alert-message">You are not logged in. Your request will be processed anonymously.</p>
+        <div
+          className="auth-alert bg-amber-50 border-l-4 border-amber-400 p-4 mb-8 rounded-md animate-pulse"
+          role="alert"
+        >
+          <div className="alert-content flex">
+            <AlertCircle className="h-5 w-5 text-yellow-400" />
+            <p className="ml-3 text-sm text-yellow-700">
+              You are not logged in. Your request will be processed anonymously.
+            </p>
           </div>
         </div>
       )}
 
-      <Tabs.Root value={activeTab} onValueChange={setActiveTab} className="tabs-container">
-        <Tabs.List className="tabs-list" aria-label="Request form steps">
+      <Tabs.Root value={activeTab} onValueChange={setActiveTab} className="tabs-container w-full">
+        <Tabs.List
+          className="tabs-list flex border-b border-gray-200 mb-8 overflow-x-auto"
+          aria-label="Request form steps"
+        >
           <Tabs.Trigger value="basic-info" className="tab-trigger">
             1. Basic Information
           </Tabs.Trigger>
@@ -113,7 +124,7 @@ const RequestsPage: React.FC = () => {
           </Tabs.Trigger>
         </Tabs.List>
 
-        <form onSubmit={handleSubmit} className="form-container">
+        <form onSubmit={handleSubmit} className="form-container space-y-6">
           <Tabs.Content value="basic-info" className="tab-content">
             <BasicInfoForm
               formData={formData}
@@ -144,11 +155,20 @@ const RequestsPage: React.FC = () => {
           <Tabs.Content value="summary" className="tab-content">
             <RequestSummary formData={formData} onPrevious={() => setActiveTab("advanced-settings")} />
 
-            <div className="actions-container">
-              <button type="button" onClick={handleClear} className="secondary-button" disabled={isSubmitting}>
+            <div className="actions-container flex justify-end gap-4 mt-8">
+              <button
+                type="button"
+                onClick={handleClear}
+                className="secondary-button px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 min-w-[120px]"
+                disabled={isSubmitting}
+              >
                 Clear All
               </button>
-              <button type="submit" className="primary-button" disabled={isSubmitting}>
+              <button
+                type="submit"
+                className="primary-button px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-violet-600 hover:bg-violet-700 flex items-center justify-center min-w-[140px]"
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="animate-spin mr-2" size={16} />
