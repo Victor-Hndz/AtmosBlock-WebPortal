@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import * as Switch from "@radix-ui/react-switch";
-import { AlertCircle, HelpCircle } from "lucide-react";
+import { AlertCircle, HelpCircle, Loader2 } from "lucide-react";
 import { Tooltip } from "@/components/ui/Tooltip";
 import BasicInfoForm from "@/components/requests/BasicInfoForm";
 import MapConfigForm from "@/components/requests/MapConfigForm";
@@ -10,10 +10,11 @@ import RequestSummary from "@/components/requests/RequestSummary";
 import { useAuth } from "@/hooks/useAuth";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { updateFormField, submitRequest } from "@/redux/slices/requestsSlice";
+import "./requestsPage.css";
 
 /**
  * RequestsPage component for handling user requests.
- * Contains a multi-step form for submitting requests.
+ * Contains a multi-step form for submitting requests with modern UI elements.
  * @returns {JSX.Element} The RequestsPage component.
  */
 const RequestsPage: React.FC = () => {
@@ -63,23 +64,24 @@ const RequestsPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Create New Request</h1>
-        <div className="flex items-center">
-          <label htmlFor="advanced-mode" className="mr-2 text-sm">
+    <div className="request-container">
+      <div className="header-container">
+        <h1 className="page-title">Create New Request</h1>
+        <div className="mode-toggle">
+          <label htmlFor="advanced-mode" className="mode-label">
             Advanced Mode
           </label>
           <Switch.Root
             id="advanced-mode"
             checked={advancedMode}
             onCheckedChange={setAdvancedMode}
-            className="w-10 h-5 bg-gray-300 rounded-full relative data-[state=checked]:bg-blue-600"
+            className="switch-root"
+            aria-label="Toggle advanced mode"
           >
-            <Switch.Thumb className="block w-4 h-4 bg-white rounded-full transition-transform duration-100 transform translate-x-0.5 will-change-transform data-[state=checked]:translate-x-5" />
+            <Switch.Thumb className="switch-thumb" />
           </Switch.Root>
           <Tooltip content="Enable advanced mode to access additional configuration options">
-            <button className="ml-1">
+            <button className="help-button" aria-label="Advanced mode help">
               <HelpCircle size={16} />
             </button>
           </Tooltip>
@@ -87,50 +89,46 @@ const RequestsPage: React.FC = () => {
       </div>
 
       {!isAuthenticated && (
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <AlertCircle className="h-5 w-5 text-yellow-400" />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm text-yellow-700">
-                You are not logged in. Your request will be processed anonymously.
-              </p>
-            </div>
+        <div className="auth-alert" role="alert">
+          <div className="alert-content">
+            <AlertCircle className="alert-icon" />
+            <p className="alert-message">
+              You are not logged in. Your request will be processed anonymously.
+            </p>
           </div>
         </div>
       )}
 
-      <Tabs.Root value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <Tabs.List className="flex border-b border-gray-200 mb-6" aria-label="Request form steps">
+      <Tabs.Root value={activeTab} onValueChange={setActiveTab} className="tabs-container">
+        <Tabs.List className="tabs-list" aria-label="Request form steps">
           <Tabs.Trigger
             value="basic-info"
-            className="px-4 py-2 border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
+            className="tab-trigger"
           >
             1. Basic Information
           </Tabs.Trigger>
           <Tabs.Trigger
             value="map-config"
-            className="px-4 py-2 border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
+            className="tab-trigger"
           >
             2. Map Configuration
           </Tabs.Trigger>
           <Tabs.Trigger
             value="advanced-settings"
-            className="px-4 py-2 border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
+            className="tab-trigger"
           >
             3. Advanced Settings
           </Tabs.Trigger>
           <Tabs.Trigger
             value="summary"
-            className="px-4 py-2 border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
+            className="tab-trigger"
           >
             4. Summary
           </Tabs.Trigger>
         </Tabs.List>
 
-        <form onSubmit={handleSubmit}>
-          <Tabs.Content value="basic-info">
+        <form onSubmit={handleSubmit} className="form-container">
+          <Tabs.Content value="basic-info" className="tab-content">
             <BasicInfoForm
               formData={formData}
               updateFormField={updateField}
@@ -138,7 +136,7 @@ const RequestsPage: React.FC = () => {
             />
           </Tabs.Content>
 
-          <Tabs.Content value="map-config">
+          <Tabs.Content value="map-config" className="tab-content">
             <MapConfigForm
               formData={formData}
               updateFormField={updateField}
@@ -147,7 +145,7 @@ const RequestsPage: React.FC = () => {
             />
           </Tabs.Content>
 
-          <Tabs.Content value="advanced-settings">
+          <Tabs.Content value="advanced-settings" className="tab-content">
             <AdvancedSettingsForm
               formData={formData}
               updateFormField={updateField}
@@ -157,24 +155,29 @@ const RequestsPage: React.FC = () => {
             />
           </Tabs.Content>
 
-          <Tabs.Content value="summary">
+          <Tabs.Content value="summary" className="tab-content">
             <RequestSummary formData={formData} onPrevious={() => setActiveTab("advanced-settings")} />
 
-            <div className="flex justify-end gap-4 mt-6">
+            <div className="actions-container">
               <button
                 type="button"
                 onClick={handleClear}
-                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                className="secondary-button"
                 disabled={isSubmitting}
               >
                 Clear All
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                className="primary-button"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Submitting..." : "Submit Request"}
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="animate-spin mr-2" size={16} />
+                    Submitting...
+                  </>
+                ) : "Submit Request"}
               </button>
             </div>
           </Tabs.Content>

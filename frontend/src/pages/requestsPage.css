@@ -1,0 +1,182 @@
+@reference "@/index.css";
+
+/* RequestsPage specific styles */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Main container styles */
+.request-container {
+  @apply container mx-auto px-6 py-8 bg-white shadow-lg rounded-xl max-w-4xl;
+  animation: fadeIn 0.5s ease-out;
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* Header styles */
+.header-container {
+  @apply flex items-center justify-between mb-8;
+  animation: slideIn 0.5s ease-out;
+}
+
+.page-title {
+  @apply text-3xl font-bold text-gray-800;
+}
+
+/* Mode toggle switch */
+.mode-toggle {
+  @apply flex items-center;
+}
+
+.mode-label {
+  @apply mr-3 text-sm font-medium text-gray-600;
+}
+
+.switch-root {
+  @apply w-12 h-6 bg-gray-300 rounded-full relative transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75 data-[state=checked]:bg-blue-500;
+}
+
+.switch-thumb {
+  @apply block w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ease-in-out translate-x-0.5 will-change-transform data-[state=checked]:translate-x-6;
+}
+
+.help-button {
+  @apply ml-2 text-gray-400 hover:text-gray-600 transition-colors duration-200 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75;
+}
+
+/* Authentication alert */
+.auth-alert {
+  @apply bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8 rounded-md animate-pulse;
+  animation: slideIn 0.5s ease-out 0.2s backwards;
+}
+
+.alert-content {
+  @apply flex;
+}
+
+.alert-icon {
+  @apply h-5 w-5 text-yellow-400;
+}
+
+.alert-message {
+  @apply ml-3 text-sm text-yellow-700;
+}
+
+/* Tabs styling */
+.tabs-container {
+  @apply w-full;
+}
+
+.tabs-list {
+  @apply flex border-b border-gray-200 mb-8 overflow-x-auto;
+}
+
+.tab-trigger {
+  @apply px-4 py-3 border-b-2 border-transparent text-gray-600 font-medium hover:text-blue-600 transition-all duration-200 whitespace-nowrap data-[state=active]:border-blue-600 data-[state=active]:text-blue-600;
+  @apply focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75;
+}
+
+.tab-content {
+  @apply outline-none;
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Form container */
+.form-container {
+  @apply space-y-6;
+}
+
+/* Action buttons container */
+.actions-container {
+  @apply flex justify-end gap-4 mt-8;
+}
+
+.primary-button {
+  @apply px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 ease-in-out flex items-center justify-center min-w-[140px];
+}
+
+.primary-button:disabled {
+  @apply bg-blue-400 cursor-not-allowed;
+}
+
+.secondary-button {
+  @apply px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 ease-in-out min-w-[120px];
+}
+
+.secondary-button:disabled {
+  @apply text-gray-400 border-gray-200 bg-gray-50 cursor-not-allowed;
+}
+
+/* Enhanced form controls - these will affect child components */
+:global(.form-input) {
+  @apply block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm transition-colors duration-200 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50;
+}
+
+:global(.form-label) {
+  @apply block mb-2 text-sm font-medium text-gray-700;
+}
+
+:global(.form-checkbox) {
+  @apply h-5 w-5 text-blue-600 border-gray-300 rounded transition-colors duration-200 focus:ring-blue-500 focus:ring-opacity-50;
+}
+
+:global(.form-radio) {
+  @apply h-5 w-5 text-blue-600 border-gray-300 transition-colors duration-200 focus:ring-blue-500 focus:ring-opacity-50;
+}
+
+:global(.form-group) {
+  @apply mb-6;
+}
+
+:global(.form-hint) {
+  @apply mt-1 text-sm text-gray-500;
+}
+
+:global(.form-error) {
+  @apply mt-1 text-sm text-red-600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .header-container {
+    @apply flex-col items-start space-y-4;
+  }
+
+  .mode-toggle {
+    @apply self-end;
+  }
+
+  .tabs-list {
+    @apply pb-2;
+  }
+
+  .tab-trigger {
+    @apply text-sm py-2 px-3;
+  }
+
+  .actions-container {
+    @apply flex-col-reverse space-y-4 space-y-reverse;
+  }
+
+  .primary-button,
+  .secondary-button {
+    @apply w-full;
+  }
+}
