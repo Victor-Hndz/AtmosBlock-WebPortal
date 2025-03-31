@@ -1,41 +1,128 @@
 @import "tailwindcss";
 
-
+/**
+ * Root variables for theming
+ * Using Radix UI color system for consistent design
+ */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* Base font settings */
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    "Open Sans",
+    "Helvetica Neue",
+    sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: normal;
-  color: black;
-  background-color: #e4e4e4;
+  /* Color scheme settings */
+  color-scheme: light;
 
+  /* Radix UI color system integration */
+  --slate1: var(--slate-1);
+  --slate2: var(--slate-2);
+  --slate12: var(--slate-12);
+
+  /* App colors */
+  --background: #f8f9fa;
+  --foreground: var(--slate12);
+  --muted: var(--slate2);
+  --accent: var(--violet9);
+
+  /* Text rendering */
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Animations */
+  --transition-default: 150ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --background: #121212;
+    --foreground: #f8f9fa;
+  }
+}
+
+/**
+ * Base styles
+ * Following clean code principles with minimal overrides
+ */
 body {
   margin: 0;
   display: flex;
   flex-direction: column;
-  place-items: center;
+  align-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 h1 {
-  font-size: 3.2em;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.1;
 }
 
+/* Button styles with focus states for accessibility */
 button {
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
+  transition: all var(--transition-default);
 }
 
-button:focus {
-  outline: none;
-  box-shadow: none;
+/* Focus styles for all interactive elements */
+:is(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Radix UI component styles */
+.radix-dialog-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}
+
+/* Utility classes for common patterns */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Separator styles matching Radix UI */
+.separator {
+  height: 1px;
+  background-color: var(--muted);
+  margin: 1rem 0;
+}
+
+/* Responsive container for layouts */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  max-width: 80rem;
 }

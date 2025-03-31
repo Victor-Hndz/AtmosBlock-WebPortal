@@ -92,37 +92,23 @@ const RequestsPage: React.FC = () => {
         <div className="auth-alert" role="alert">
           <div className="alert-content">
             <AlertCircle className="alert-icon" />
-            <p className="alert-message">
-              You are not logged in. Your request will be processed anonymously.
-            </p>
+            <p className="alert-message">You are not logged in. Your request will be processed anonymously.</p>
           </div>
         </div>
       )}
 
       <Tabs.Root value={activeTab} onValueChange={setActiveTab} className="tabs-container">
         <Tabs.List className="tabs-list" aria-label="Request form steps">
-          <Tabs.Trigger
-            value="basic-info"
-            className="tab-trigger"
-          >
+          <Tabs.Trigger value="basic-info" className="tab-trigger">
             1. Basic Information
           </Tabs.Trigger>
-          <Tabs.Trigger
-            value="map-config"
-            className="tab-trigger"
-          >
+          <Tabs.Trigger value="map-config" className="tab-trigger">
             2. Map Configuration
           </Tabs.Trigger>
-          <Tabs.Trigger
-            value="advanced-settings"
-            className="tab-trigger"
-          >
+          <Tabs.Trigger value="advanced-settings" className="tab-trigger">
             3. Advanced Settings
           </Tabs.Trigger>
-          <Tabs.Trigger
-            value="summary"
-            className="tab-trigger"
-          >
+          <Tabs.Trigger value="summary" className="tab-trigger">
             4. Summary
           </Tabs.Trigger>
         </Tabs.List>
@@ -159,25 +145,18 @@ const RequestsPage: React.FC = () => {
             <RequestSummary formData={formData} onPrevious={() => setActiveTab("advanced-settings")} />
 
             <div className="actions-container">
-              <button
-                type="button"
-                onClick={handleClear}
-                className="secondary-button"
-                disabled={isSubmitting}
-              >
+              <button type="button" onClick={handleClear} className="secondary-button" disabled={isSubmitting}>
                 Clear All
               </button>
-              <button
-                type="submit"
-                className="primary-button"
-                disabled={isSubmitting}
-              >
+              <button type="submit" className="primary-button" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
                     <Loader2 className="animate-spin mr-2" size={16} />
                     Submitting...
                   </>
-                ) : "Submit Request"}
+                ) : (
+                  "Submit Request"
+                )}
               </button>
             </div>
           </Tabs.Content>
