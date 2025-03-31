@@ -24,24 +24,51 @@
 
 /* Custom component styles that can't be handled by utility classes */
 .request-container {
-  max-width: 56rem;
+  max-width: 64rem; /* Slightly wider for better content spacing */
   animation: fadeIn 0.5s ease-out;
-  background-color: #ffffff;
+  background-color: var(--background);
+  border-radius: 1rem;
   box-shadow:
     0 10px 25px -5px var(--shadow-light),
     0 8px 10px -6px var(--shadow-medium);
 }
 
+.page-title {
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 700;
+  color: var(--foreground);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
 .header-container {
   animation: slideIn 0.5s ease-out;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Advanced mode toggle switch */
+.mode-toggle {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 200ms ease;
+}
+
+.mode-label {
+  font-weight: 500;
+  margin-right: 0.75rem;
 }
 
 .switch-root {
-  width: 3rem;
+  width: 2.75rem;
   height: 1.5rem;
   background-color: rgb(229 231 235); /* Gray-200 */
   border-radius: 9999px;
   position: relative;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
   transition: background-color 200ms ease-in-out;
 }
 
@@ -52,7 +79,6 @@
 .switch-root:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  box-shadow: 0 0 0 2px rgba(109, 40, 217, 0.4); /* Lighter violet shadow */
 }
 
 .switch-root[data-state="checked"] {
@@ -72,38 +98,59 @@
 }
 
 .switch-thumb[data-state="checked"] {
-  transform: translateX(1.5rem);
+  transform: translateX(1.375rem);
 }
 
 .auth-alert {
   animation: slideIn 0.5s ease-out 0.2s backwards;
 }
 
+/* Tab styles */
+.tabs-container {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.tabs-list {
+  background-color: var(--muted);
+  border-radius: 0.5rem 0.5rem 0 0;
+  gap: 0.25rem;
+  border: 1px solid var(--border);
+}
+
 .tab-content {
   outline: none;
   animation: fadeIn 0.4s ease-out;
+  padding: 1.5rem;
+  border-radius: 0 0 0.5rem 0.5rem;
+  background-color: var(--background);
+  min-height: 300px;
 }
 
 .tab-trigger {
-  padding-left: 1rem;
-  padding-right: 1rem;
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-  border-bottom-width: 2px;
-  border-color: transparent;
-  color: rgb(75 85 99); /* Gray-600 */
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  border: none;
+  color: var(--foreground);
   font-weight: 500;
+  font-size: 0.9rem;
   white-space: nowrap;
   transition: all 200ms;
+  position: relative;
+  opacity: 0.7;
 }
 
 .tab-trigger:hover {
   color: var(--accent);
+  opacity: 0.9;
+  background-color: rgba(255, 255, 255, 0.5);
 }
 
 .tab-trigger[data-state="active"] {
-  border-color: var(--accent);
+  background-color: var(--background);
   color: var(--accent);
+  font-weight: 600;
+  opacity: 1;
 }
 
 .tab-trigger:focus {
@@ -113,7 +160,85 @@
 .tab-trigger:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  box-shadow: 0 0 0 2px rgba(109, 40, 217, 0.4); /* Lighter violet shadow */
+}
+
+/* Button styles */
+.primary-button {
+  background-color: var(--accent);
+  color: white;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  transition: all 200ms ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-width: 10rem;
+}
+
+.primary-button:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.primary-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.primary-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.secondary-button {
+  background-color: white;
+  color: var(--foreground);
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  transition: all 200ms ease;
+  min-width: 8rem;
+}
+
+.secondary-button:hover:not(:disabled) {
+  background-color: var(--muted);
+  border-color: var(--border);
+}
+
+.secondary-button:active:not(:disabled) {
+  background-color: var(--accent-muted);
+}
+
+.secondary-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.form-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.form-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 1rem;
+}
+
+.actions-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
 }
 
 /* Media query for responsive adjustments */
@@ -121,20 +246,34 @@
   .header-container {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 1.25rem;
+    padding-bottom: 1rem;
   }
 
   .mode-toggle {
-    align-self: flex-end;
+    width: 100%;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
   }
 
   .tabs-list {
-    padding-bottom: 0.5rem;
+    padding: 0.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .tabs-list::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
   }
 
   .tab-trigger {
-    font-size: 0.875rem;
-    padding: 0.5rem 0.75rem;
+    font-size: 0.825rem;
+    padding: 0.625rem 0.75rem;
+  }
+
+  .tab-content {
+    padding: 1rem;
   }
 
   .actions-container {
