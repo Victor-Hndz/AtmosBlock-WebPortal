@@ -13,29 +13,48 @@ interface FormFieldProps {
   tooltip?: string;
   error?: string;
   required?: boolean;
+  className?: string;
 }
 
 /**
  * FormField component that wraps form inputs with labels and tooltips
+ * Provides consistent styling and accessibility features
+ * Note: This component is designed to work independently from Radix UI Form context
  */
-const FormField: React.FC<FormFieldProps> = ({ id, label, children, tooltip, error, required = false }) => {
+const FormField: React.FC<FormFieldProps> = ({
+  id,
+  label,
+  children,
+  tooltip,
+  error,
+  required = false,
+  className = "",
+}) => {
   return (
-    <div className="mb-4">
-      <div className="flex items-center mb-1">
-        <Label.Root htmlFor={id} className="text-sm font-medium text-gray-700">
+    <div className={`mb-4 ${className}`}>
+      <div className="flex items-center mb-1.5">
+        <Label.Root htmlFor={id} className="text-sm font-medium text-slate-700 cursor-pointer">
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </Label.Root>
+
         {tooltip && (
-          <Tooltip content={tooltip}>
-            <button type="button" className="ml-1">
-              <HelpCircle size={16} className="text-gray-400" />
+          <Tooltip content={tooltip} delay={200}>
+            <button
+              type="button"
+              className="ml-1.5 rounded-full p-0.5 text-slate-400 hover:text-slate-600 
+                        focus:outline-none focus:ring-2 focus:ring-violet-500"
+              aria-label={`Help about ${label}`}
+            >
+              <HelpCircle size={14} />
             </button>
           </Tooltip>
         )}
       </div>
+
       {children}
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+
+      {error && <p className="mt-1.5 text-xs text-red-500 font-medium">{error}</p>}
     </div>
   );
 };

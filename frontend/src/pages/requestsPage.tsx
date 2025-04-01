@@ -45,11 +45,8 @@ const RequestsPage: React.FC = () => {
 
   /**
    * Handles form submission
-   * @param {React.FormEvent} e - The form event
    */
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleSubmit = () => {
     dispatch(submitRequest(formData))
       .unwrap()
       .then(() => {
@@ -118,7 +115,7 @@ const RequestsPage: React.FC = () => {
         <h1 className="page-title">Create New Request</h1>
 
         <div className="mode-toggle">
-          <label htmlFor="advanced-mode" className="mode-label text-sm font-medium text-gray-700">
+          <label htmlFor="advanced-mode" className="mode-label text-sm font-medium text-slate-700">
             Advanced Mode
           </label>
 
@@ -136,7 +133,7 @@ const RequestsPage: React.FC = () => {
             <Tooltip content="Enable advanced mode to access additional configuration options">
               <button
                 type="button"
-                className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                className="text-slate-400 hover:text-slate-600 transition-colors duration-200"
                 aria-label="Advanced mode help"
               >
                 <HelpCircle size={16} />
@@ -173,11 +170,12 @@ const RequestsPage: React.FC = () => {
           </Tabs.Trigger>
         </Tabs.List>
 
-        <form onSubmit={handleSubmit} className="form-container">
+        <div className="form-container">
+          {" "}
+          {/* Changed from <form> to <div> */}
           <Tabs.Content value="basic-info" className="tab-content">
             <BasicInfoForm formData={formData} updateFormField={updateField} onNext={() => goToNextTab("basic-info")} />
           </Tabs.Content>
-
           <Tabs.Content value="map-config" className="tab-content">
             <MapConfigForm
               formData={formData}
@@ -186,7 +184,6 @@ const RequestsPage: React.FC = () => {
               onPrevious={() => goToPreviousTab("map-config")}
             />
           </Tabs.Content>
-
           <Tabs.Content value="advanced-settings" className="tab-content">
             <AdvancedSettingsForm
               formData={formData}
@@ -196,11 +193,10 @@ const RequestsPage: React.FC = () => {
               onPrevious={() => goToPreviousTab("advanced-settings")}
             />
           </Tabs.Content>
-
           <Tabs.Content value="summary" className="tab-content">
             <RequestSummary formData={formData} onPrevious={() => goToPreviousTab("summary")} />
 
-            <Separator.Root className="h-px bg-gray-200 my-6" />
+            <Separator.Root className="h-px bg-slate-200 my-6" />
 
             <div className="actions-container">
               <button
@@ -213,7 +209,8 @@ const RequestsPage: React.FC = () => {
                 Clear All
               </button>
               <button
-                type="submit"
+                type="button" // Changed from type="submit" to type="button"
+                onClick={handleSubmit}
                 className="primary-button flex items-center justify-center"
                 disabled={isSubmitting}
                 aria-label="Submit request"
@@ -229,28 +226,28 @@ const RequestsPage: React.FC = () => {
               </button>
             </div>
           </Tabs.Content>
-        </form>
+        </div>
       </Tabs.Root>
 
       {/* Toast notifications for form actions */}
       <Toast.Provider swipeDirection="right">
         <Toast.Root
-          className="bg-white rounded-lg shadow-lg p-4 flex items-start gap-3 border border-gray-200 fixed bottom-4 right-4 max-w-sm"
+          className="bg-white rounded-lg shadow-lg p-4 flex items-start gap-3 border border-slate-200 fixed bottom-4 right-4 max-w-sm"
           open={toastOpen}
           onOpenChange={setToastOpen}
           duration={5000}
         >
-          <Toast.Title className="font-medium text-gray-900">
+          <Toast.Title className="font-medium text-slate-900">
             {toastMessage.startsWith("Error") ? "Error" : "Success"}
           </Toast.Title>
-          <Toast.Description className="text-sm text-gray-600 mt-1">{toastMessage}</Toast.Description>
+          <Toast.Description className="text-sm text-slate-600 mt-1">{toastMessage}</Toast.Description>
           <Toast.Action className="ml-auto" asChild altText="Close toast">
-            <button className="text-gray-400 hover:text-gray-600" aria-label="Close notification">
+            <button className="text-slate-400 hover:text-slate-600 rounded-full p-1" aria-label="Close notification">
               &times;
             </button>
           </Toast.Action>
         </Toast.Root>
-        <Toast.Viewport className="fixed bottom-0 right-0 flex flex-col p-4 gap-2 w-full max-w-sm" />
+        <Toast.Viewport className="fixed bottom-0 right-0 flex flex-col p-4 gap-2 w-full max-w-sm z-50" />
       </Toast.Provider>
     </div>
   );

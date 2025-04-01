@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import * as Checkbox from "@radix-ui/react-checkbox";
+import { Check } from "lucide-react";
 import FormField from "./FormField";
 import { RequestForm } from "@/redux/slices/requestsSlice";
 
@@ -89,182 +91,187 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField
     }
   };
 
+  /**
+   * Handles checkbox change for array type form fields
+   * @param field - The form field to update
+   * @param value - The value to add or remove
+   * @param checked - Whether the checkbox is checked
+   */
+  const handleCheckboxChange = <K extends keyof RequestForm>(
+    field: K,
+    value: string,
+    checked: boolean | "indeterminate"
+  ) => {
+    if (typeof checked !== "boolean") return;
+
+    const currentValues = (formData[field] as string[]) || [];
+    if (checked) {
+      updateFormField(field, [...currentValues, value] as RequestForm[K]);
+    } else {
+      updateFormField(field, currentValues.filter(v => v !== value) as RequestForm[K]);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold">Map Configuration</h2>
+      <h2 className="text-xl font-semibold text-slate-900">Map Configuration</h2>
 
-      <FormField
-        id="pressureLevels"
-        label="Pressure Levels"
-        tooltip="Select one or more pressure levels for your data visualization"
-        error={errors.pressureLevels}
-        required
-      >
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-          {pressureLevelOptions.map(level => (
-            <label key={level} className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={formData.pressureLevels?.includes(level) || false}
-                onChange={e => {
-                  const current = formData.pressureLevels || [];
-                  if (e.target.checked) {
-                    updateFormField("pressureLevels", [...current, level]);
-                  } else {
-                    updateFormField(
-                      "pressureLevels",
-                      current.filter(l => l !== level)
-                    );
-                  }
-                }}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span>{level}</span>
-            </label>
-          ))}
-        </div>
-      </FormField>
-
-      <FormField
-        id="areaCovered"
-        label="Area Coverage"
-        tooltip="Select the geographical areas to be covered"
-        error={errors.areaCovered}
-        required
-      >
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-          {areaCoverageOptions.map(area => (
-            <label key={area} className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={formData.areaCovered?.includes(area) || false}
-                onChange={e => {
-                  const current = formData.areaCovered || [];
-                  if (e.target.checked) {
-                    updateFormField("areaCovered", [...current, area]);
-                  } else {
-                    updateFormField(
-                      "areaCovered",
-                      current.filter(a => a !== area)
-                    );
-                  }
-                }}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span>{area}</span>
-            </label>
-          ))}
-        </div>
-      </FormField>
-
-      <FormField
-        id="mapTypes"
-        label="Map Types"
-        tooltip="Select the types of maps to generate"
-        error={errors.mapTypes}
-        required
-      >
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {mapTypeOptions.map(type => (
-            <label key={type} className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={formData.mapTypes?.includes(type) || false}
-                onChange={e => {
-                  const current = formData.mapTypes || [];
-                  if (e.target.checked) {
-                    updateFormField("mapTypes", [...current, type]);
-                  } else {
-                    updateFormField(
-                      "mapTypes",
-                      current.filter(t => t !== type)
-                    );
-                  }
-                }}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span>{type}</span>
-            </label>
-          ))}
-        </div>
-      </FormField>
-
-      <FormField
-        id="mapRanges"
-        label="Map Ranges"
-        tooltip="Select the range options for your maps"
-        error={errors.mapRanges}
-        required
-      >
-        <div className="grid grid-cols-3 gap-2">
-          {mapRangeOptions.map(range => (
-            <label key={range} className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={formData.mapRanges?.includes(range) || false}
-                onChange={e => {
-                  const current = formData.mapRanges || [];
-                  if (e.target.checked) {
-                    updateFormField("mapRanges", [...current, range]);
-                  } else {
-                    updateFormField(
-                      "mapRanges",
-                      current.filter(r => r !== range)
-                    );
-                  }
-                }}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span>{range}</span>
-            </label>
-          ))}
-        </div>
-      </FormField>
-
-      <FormField
-        id="mapLevels"
-        label="Map Levels"
-        tooltip="Select the vertical levels for your maps"
-        error={errors.mapLevels}
-        required
-      >
-        <div className="grid grid-cols-3 gap-2">
-          {mapLevelOptions.map(level => (
-            <label key={level} className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={formData.mapLevels?.includes(level) || false}
-                onChange={e => {
-                  const current = formData.mapLevels || [];
-                  if (e.target.checked) {
-                    updateFormField("mapLevels", [...current, level]);
-                  } else {
-                    updateFormField(
-                      "mapLevels",
-                      current.filter(l => l !== level)
-                    );
-                  }
-                }}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span>{level}</span>
-            </label>
-          ))}
-        </div>
-      </FormField>
+      <div>
+        {" "}
+        {/* Changed from Form.Root to plain div */}
+        <FormField
+          id="pressureLevels"
+          label="Pressure Levels"
+          tooltip="Select one or more pressure levels for your data visualization"
+          error={errors.pressureLevels}
+          required
+        >
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-1.5">
+            {pressureLevelOptions.map(level => (
+              <label key={level} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
+                <Checkbox.Root
+                  id={`level-${level}`}
+                  checked={formData.pressureLevels?.includes(level) || false}
+                  onCheckedChange={checked => handleCheckboxChange("pressureLevels", level, checked)}
+                  className="h-4 w-4 rounded border border-slate-300 bg-white
+                            data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600 
+                            focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-1"
+                >
+                  <Checkbox.Indicator className="flex items-center justify-center text-white">
+                    <Check className="h-3 w-3" />
+                  </Checkbox.Indicator>
+                </Checkbox.Root>
+                <span>{level}</span>
+              </label>
+            ))}
+          </div>
+        </FormField>
+        <FormField
+          id="areaCovered"
+          label="Area Coverage"
+          tooltip="Select the geographical areas to be covered"
+          error={errors.areaCovered}
+          required
+        >
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-1.5">
+            {areaCoverageOptions.map(area => (
+              <label key={area} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
+                <Checkbox.Root
+                  id={`area-${area}`}
+                  checked={formData.areaCovered?.includes(area) || false}
+                  onCheckedChange={checked => handleCheckboxChange("areaCovered", area, checked)}
+                  className="h-4 w-4 rounded border border-slate-300 bg-white
+                            data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600 
+                            focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-1"
+                >
+                  <Checkbox.Indicator className="flex items-center justify-center text-white">
+                    <Check className="h-3 w-3" />
+                  </Checkbox.Indicator>
+                </Checkbox.Root>
+                <span>{area}</span>
+              </label>
+            ))}
+          </div>
+        </FormField>
+        <FormField
+          id="mapTypes"
+          label="Map Types"
+          tooltip="Select the types of maps to generate"
+          error={errors.mapTypes}
+          required
+        >
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1.5">
+            {mapTypeOptions.map(type => (
+              <label key={type} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
+                <Checkbox.Root
+                  id={`type-${type}`}
+                  checked={formData.mapTypes?.includes(type) || false}
+                  onCheckedChange={checked => handleCheckboxChange("mapTypes", type, checked)}
+                  className="h-4 w-4 rounded border border-slate-300 bg-white
+                            data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600 
+                            focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-1"
+                >
+                  <Checkbox.Indicator className="flex items-center justify-center text-white">
+                    <Check className="h-3 w-3" />
+                  </Checkbox.Indicator>
+                </Checkbox.Root>
+                <span>{type}</span>
+              </label>
+            ))}
+          </div>
+        </FormField>
+        <FormField
+          id="mapRanges"
+          label="Map Ranges"
+          tooltip="Select the range options for your maps"
+          error={errors.mapRanges}
+          required
+        >
+          <div className="grid grid-cols-3 gap-2 mt-1.5">
+            {mapRangeOptions.map(range => (
+              <label key={range} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
+                <Checkbox.Root
+                  id={`range-${range}`}
+                  checked={formData.mapRanges?.includes(range) || false}
+                  onCheckedChange={checked => handleCheckboxChange("mapRanges", range, checked)}
+                  className="h-4 w-4 rounded border border-slate-300 bg-white
+                            data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600 
+                            focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-1"
+                >
+                  <Checkbox.Indicator className="flex items-center justify-center text-white">
+                    <Check className="h-3 w-3" />
+                  </Checkbox.Indicator>
+                </Checkbox.Root>
+                <span>{range}</span>
+              </label>
+            ))}
+          </div>
+        </FormField>
+        <FormField
+          id="mapLevels"
+          label="Map Levels"
+          tooltip="Select the vertical levels for your maps"
+          error={errors.mapLevels}
+          required
+        >
+          <div className="grid grid-cols-3 gap-2 mt-1.5">
+            {mapLevelOptions.map(level => (
+              <label key={level} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
+                <Checkbox.Root
+                  id={`level-${level}`}
+                  checked={formData.mapLevels?.includes(level) || false}
+                  onCheckedChange={checked => handleCheckboxChange("mapLevels", level, checked)}
+                  className="h-4 w-4 rounded border border-slate-300 bg-white
+                            data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600 
+                            focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-1"
+                >
+                  <Checkbox.Indicator className="flex items-center justify-center text-white">
+                    <Check className="h-3 w-3" />
+                  </Checkbox.Indicator>
+                </Checkbox.Root>
+                <span>{level}</span>
+              </label>
+            ))}
+          </div>
+        </FormField>
+      </div>
 
       <div className="flex justify-between">
         <button
           type="button"
           onClick={onPrevious}
-          className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="px-4 py-2 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 
+                    bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2
+                    transition-colors duration-200"
         >
           Previous
         </button>
         <button
           type="button"
           onClick={handleNextClick}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 
+                    focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2
+                    transition-colors duration-200"
         >
           Next
         </button>
