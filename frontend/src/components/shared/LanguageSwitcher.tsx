@@ -26,7 +26,7 @@ export default function LanguageSwitcher() {
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button
-          className="flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text:white hover:text-blue-300"
+          className="flex items-center gap-1 rounded-md px-2 py-1 text:white hover:text-blue-300"
           aria-label={t("language.switchLanguage")}
         >
           <GlobeIcon className="h-4 w-4" />
