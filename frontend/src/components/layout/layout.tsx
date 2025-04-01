@@ -24,6 +24,10 @@ interface NavItem {
   icon: LucideIconType;
   /** Optional tooltip text */
   tooltip?: string;
+  /** Position of the item in the menu (left/right/center) */
+  position?: "l" | "r" | "c";
+  /** Whether the item should collapse into mobile menu on smaller screens */
+  collapse?: boolean;
 }
 
 /**
@@ -32,7 +36,13 @@ interface NavItem {
  * @param {NavItem} props.item - Navigation item data
  * @param {boolean} props.isActive - Whether the link is currently active
  */
-const NavLink: React.FC<{ item: NavItem; isActive: boolean }> = ({ item, isActive }) => {
+const NavLink: React.FC<{ item: NavItem; isActive: boolean }> = ({
+  item,
+  isActive,
+}: {
+  item: NavItem;
+  isActive: boolean;
+}) => {
   const Icon = item.icon;
 
   return (
@@ -73,7 +83,7 @@ const NavLink: React.FC<{ item: NavItem; isActive: boolean }> = ({ item, isActiv
  * @param {Object} props - Component properties
  * @param {NavItem} props.item - Navigation item data
  */
-const MobileMenuItem: React.FC<{ item: NavItem }> = ({ item }) => {
+const MobileMenuItem: React.FC<{ item: NavItem }> = ({ item }: { item: NavItem }) => {
   const Icon = item.icon;
 
   return (
@@ -103,50 +113,103 @@ const Layout: React.FC = (): JSX.Element => {
       label: "Home",
       icon: House,
       tooltip: "Go to homepage",
-    },
-    {
-      path: "/auth",
-      label: "Login",
-      icon: LogIn,
-      tooltip: "Sign in to your account",
+      position: "l",
+      collapse: true,
     },
     {
       path: "/requests",
       label: "Requests",
       icon: ListTodo,
       tooltip: "Manage your requests",
+      position: "l",
+      collapse: true,
+    },
+    {
+      path: "/auth",
+      label: "Login",
+      icon: LogIn,
+      tooltip: "Sign in to your account",
+      position: "r",
+      collapse: true,
     },
   ];
+
+  // Group navigation items by position and collapsibility
+  const leftNavItems = navItems.filter(item => item.position === "l");
+  const centerNavItems = navItems.filter(item => item.position === "c");
+  const rightNavItems = navItems.filter(item => item.position === "r");
+
+  // Items that should be included in the mobile menu
+  const collapsibleItems = navItems.filter(item => item.collapse !== false);
+
+  // Items that should always be visible (non-collapsible)
+  const alwaysVisibleItems = navItems.filter(item => item.collapse === false);
+
+  // Check if we have any collapsible items for mobile menu
+  const hasCollapsibleItems = collapsibleItems.length > 0;
 
   return (
     <div className="flex flex-col min-h-screen relative">
       {/* Navbar using Radix UI NavigationMenu */}
       <NavigationMenu.Root className="fixed top-0 left-0 right-0 bg-gray-800 text-white p-4 z-50 shadow-md">
-        <NavigationMenu.List className="flex gap-4">
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex gap-4">
-            {navItems.map(item => (
-              <NavLink key={item.path} item={item} isActive={location.pathname === item.path} />
-            ))}
-          </div>
+        <NavigationMenu.List className="w-full max-w-[1024px] mx-auto">
+          {/* Desktop Navigation and Non-collapsible Items */}
+          <div className="flex w-full justify-between items-center">
+            {/* Left aligned items */}
+            <div className="hidden md:flex gap-4">
+              {leftNavItems.map(item => (
+                <NavLink key={item.path} item={item} isActive={location.pathname === item.path} />
+              ))}
+            </div>
 
-          {/* Mobile Navigation */}
-          <div className="md:hidden">
-            <DropdownMenu.Root>
-              <DropdownMenu.Trigger asChild>
-                <button className="p-2 rounded-md transition-colors duration-200 hover:bg-gray-700" aria-label="Menu">
-                  <Menu aria-hidden="true" />
-                </button>
-              </DropdownMenu.Trigger>
-              <DropdownMenu.Portal>
-                <DropdownMenu.Content className="bg-gray-800 rounded-md shadow-lg p-2 min-w-[150px] origin-top-left">
-                  {navItems.map(item => (
-                    <MobileMenuItem key={item.path} item={item} />
-                  ))}
-                  <DropdownMenu.Arrow className="dropdown-arrow" />
-                </DropdownMenu.Content>
-              </DropdownMenu.Portal>
-            </DropdownMenu.Root>
+            {/* Center aligned items */}
+            <div className="hidden md:flex gap-4">
+              {centerNavItems.map(item => (
+                <NavLink key={item.path} item={item} isActive={location.pathname === item.path} />
+              ))}
+            </div>
+
+            {/* Right aligned items */}
+            <div className="hidden md:flex gap-4">
+              {rightNavItems.map(item => (
+                <NavLink key={item.path} item={item} isActive={location.pathname === item.path} />
+              ))}
+            </div>
+
+            {/* Always visible items (even on mobile) */}
+            <div className="md:hidden flex gap-4">
+              {alwaysVisibleItems.map(item => (
+                <NavLink key={item.path} item={item} isActive={location.pathname === item.path} />
+              ))}
+            </div>
+
+            {/* Mobile Navigation */}
+            {hasCollapsibleItems && (
+              <div className="md:hidden flex flex-1 justify-start">
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger asChild>
+                    <button
+                      className="p-2 rounded-md transition-colors duration-200 hover:bg-gray-700"
+                      aria-label="Menu"
+                    >
+                      <Menu aria-hidden="true" />
+                    </button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Portal>
+                    <DropdownMenu.Content
+                      className="bg-gray-800 rounded-md shadow-lg p-2 min-w-[150px] origin-top-left z-50"
+                      sideOffset={5}
+                      align="start"
+                    >
+                      {collapsibleItems.map(item => (
+                        <MobileMenuItem key={item.path} item={item} />
+                      ))}
+                      <DropdownMenu.Arrow className="fill-gray-800" />
+                    </DropdownMenu.Content>
+                  </DropdownMenu.Portal>
+                </DropdownMenu.Root>
+              </div>
+            )}
           </div>
         </NavigationMenu.List>
       </NavigationMenu.Root>
