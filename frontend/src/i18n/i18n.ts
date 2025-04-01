@@ -5,7 +5,7 @@ import Backend from "i18next-http-backend";
 
 /**
  * Initialize i18next for internationalization support
- * - Loads translations from public/locales/{language}/translation.json
+ * - Loads common from public/locales/{language}/common.json
  * - Auto-detects user language preferences
  * - Includes fallback languages
  * - Provides debug information in development mode
@@ -46,9 +46,16 @@ i18n
     },
     // React config
     react: {
-      // Don't suspend rendering until translations are loaded
-      useSuspense: false,
+      // Enable suspense for translation loading
+      useSuspense: true,
     },
   });
+
+// Preload the common namespace to avoid the error
+const currentLanguage = i18n.language || "es";
+
+i18n.changeLanguage(currentLanguage).then(() => {
+  i18n.loadNamespaces("common");
+});
 
 export default i18n;
