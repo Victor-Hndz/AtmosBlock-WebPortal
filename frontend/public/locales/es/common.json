@@ -24,18 +24,48 @@
   "login-form": {
     "title": "Iniciar sesión",
     "email": "Correo electrónico",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "emailRequired": "Por favor, introduce tu correo electrónico",
+    "emailInvalid": "Por favor, introduce un correo electrónico válido",
     "password": "Contraseña",
+    "passwordRequirements": "Requisitos de contraseña",
+    "passwordMustContain": "La contraseña debe contener",
+    "passwordCriteria": {
+      "minLength": "Al menos 8 caracteres",
+      "upperCase": "Al menos una letra mayúscula",
+      "lowerCase": "Al menos una letra minúscula",
+      "number": "Al menos un número",
+      "specialChar": "Al menos un carácter especial"
+    },
+    "passwordStrength": {
+      "weak": "Contraseña débil",
+      "medium": "Contraseña media",
+      "strong": "Contraseña fuerte"
+    },
+    "passwordTooShort": "La contraseña debe tener al menos {{count}} caracteres",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña",
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "login-button": "Iniciar sesión",
-    "loginSuccess": "¡Sesión iniciada correctamente!"
+    "loggingIn": "Iniciando sesión...",
+    "loginSuccess": "¡Sesión iniciada correctamente!",
+    "authenticationTabsLabel": "Autentícate con tu cuenta"
   },
   "register-form": {
     "title": "Crear cuenta",
     "name": "Nombre completo",
+    "namePlaceholder": "Juan Pérez",
+    "nameRequired": "Por favor, introduce tu nombre",
     "email": "Correo electrónico",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "emailRequired": "Por favor, introduce tu correo electrónico",
+    "emailInvalid": "Por favor, introduce un correo electrónico válido",
     "password": "Contraseña",
     "confirmPassword": "Confirmar contraseña",
+    "confirmPasswordRequired": "Por favor, confirma tu contraseña",
+    "passwordsDoNotMatch": "Las contraseñas no coinciden",
     "register-button": "Registrarse",
+    "creatingAccount": "Creando cuenta...",
     "registerSuccess": "¡Registro exitoso!"
   },
   "requests-titles": {
@@ -68,9 +98,11 @@
     "save": "Guardar",
     "delete": "Eliminar",
     "edit": "Editar",
-    "back": "Atrás"
+    "back": "Atrás",
+    "close": "Cerrar"
   },
   "errors": {
+    "title": "Error",
     "generic": "Ha ocurrido un error",
     "login": "Error al iniciar sesión. Por favor, compruebe sus credenciales.",
     "register": "Error al registrarse. Por favor, inténtelo de nuevo.",

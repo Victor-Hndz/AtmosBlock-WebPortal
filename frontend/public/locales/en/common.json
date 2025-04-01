@@ -24,18 +24,48 @@
   "login-form": {
     "title": "Login",
     "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "emailRequired": "Please enter your email",
+    "emailInvalid": "Please enter a valid email",
     "password": "Password",
+    "passwordRequirements": "Password requirements",
+    "passwordMustContain": "Password must contain",
+    "passwordCriteria": {
+      "minLength": "At least 8 characters",
+      "upperCase": "At least one uppercase letter",
+      "lowerCase": "At least one lowercase letter",
+      "number": "At least one number",
+      "specialChar": "At least one special character"
+    },
+    "passwordStrength": {
+      "weak": "Weak password",
+      "medium": "Medium password",
+      "strong": "Strong password"
+    },
+    "passwordTooShort": "Password must be at least {{count}} characters",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "forgotPassword": "Forgot password?",
     "login-button": "Login",
-    "loginSuccess": "Login successful!"
+    "loggingIn": "Logging in...",
+    "loginSuccess": "Login successful!",
+    "authenticationTabsLabel": "Authenticate with your account"
   },
   "register-form": {
     "title": "Register",
     "name": "Full Name",
+    "namePlaceholder": "John Doe",
+    "nameRequired": "Please enter your name",
     "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "emailRequired": "Please enter your email",
+    "emailInvalid": "Please enter a valid email",
     "password": "Password",
     "confirmPassword": "Confirm Password",
-    "register-button": "Register",
+    "confirmPasswordRequired": "Please confirm your password",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "register-button": "Create Account",
+    "creatingAccount": "Creating account...",
     "registerSuccess": "Registration successful!"
   },
   "requests-titles": {
@@ -68,9 +98,11 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
-    "back": "Back"
+    "back": "Back",
+    "close": "Close"
   },
   "errors": {
+    "title": "Error",
     "generic": "An error occurred",
     "login": "Login failed. Please check your credentials.",
     "register": "Registration failed. Please try again.",

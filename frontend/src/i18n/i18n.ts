@@ -20,7 +20,7 @@ i18n
   // Initialize i18next
   .init({
     // Default language
-    fallbackLng: "en",
+    fallbackLng: "es",
     // Supported languages
     supportedLngs: ["en", "es"],
     // Debug in development only
