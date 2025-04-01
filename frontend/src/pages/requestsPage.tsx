@@ -4,6 +4,7 @@ import * as Switch from "@radix-ui/react-switch";
 import * as Separator from "@radix-ui/react-separator";
 import * as Toast from "@radix-ui/react-toast";
 import { AlertCircle, HelpCircle, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Tooltip } from "@/components/ui/Tooltip";
 import BasicInfoForm from "@/components/requests/BasicInfoForm";
 import MapConfigForm from "@/components/requests/MapConfigForm";
@@ -20,6 +21,8 @@ import "./requestsPage.css";
  * @returns {JSX.Element} The RequestsPage component.
  */
 const RequestsPage: React.FC = () => {
+  const { t } = useTranslation();
+
   // State management
   const [activeTab, setActiveTab] = useState("basic-info");
   const [advancedMode, setAdvancedMode] = useState(false);
@@ -50,11 +53,11 @@ const RequestsPage: React.FC = () => {
     dispatch(submitRequest(formData))
       .unwrap()
       .then(() => {
-        setToastMessage("Request submitted successfully!");
+        setToastMessage(t("requests-titles.success"));
         setToastOpen(true);
       })
       .catch(error => {
-        setToastMessage(`Error: ${error.message || "Failed to submit request"}`);
+        setToastMessage(`${t("errors.title")}: ${error.message || t("errors.submission")}`);
         setToastOpen(true);
       });
   };
@@ -79,7 +82,7 @@ const RequestsPage: React.FC = () => {
       updateField(field, value as (typeof formData)[keyof typeof formData]);
     });
 
-    setToastMessage("Form cleared successfully");
+    setToastMessage(t("requests-titles.clearSuccess", "Form cleared successfully"));
     setToastOpen(true);
   };
 
@@ -112,11 +115,11 @@ const RequestsPage: React.FC = () => {
   return (
     <div className="request-container container mx-auto px-4 sm:px-6 py-6 sm:py-8 bg-white shadow-lg rounded-xl">
       <div className="header-container flex items-center justify-between">
-        <h1 className="page-title">Create New Request</h1>
+        <h1 className="page-title">{t("requests-titles.title")}</h1>
 
         <div className="mode-toggle">
           <label htmlFor="advanced-mode" className="mode-label text-sm font-medium text-slate-700">
-            Advanced Mode
+            {t("requests-form.advancedMode", "Advanced Mode")}
           </label>
 
           <div className="flex items-center gap-2">
@@ -125,16 +128,21 @@ const RequestsPage: React.FC = () => {
               checked={advancedMode}
               onCheckedChange={setAdvancedMode}
               className="switch-root"
-              aria-label="Toggle advanced mode"
+              aria-label={t("requests-form.toggleAdvancedMode", "Toggle advanced mode")}
             >
               <Switch.Thumb className="switch-thumb" />
             </Switch.Root>
 
-            <Tooltip content="Enable advanced mode to access additional configuration options">
+            <Tooltip
+              content={t(
+                "requests-form.advancedModeTooltip",
+                "Enable advanced mode to access additional configuration options"
+              )}
+            >
               <button
                 type="button"
                 className="text-slate-400 hover:text-slate-600 transition-colors duration-200"
-                aria-label="Advanced mode help"
+                aria-label={t("navigation-tooltips.help", "Help")}
               >
                 <HelpCircle size={16} />
               </button>
@@ -148,31 +156,32 @@ const RequestsPage: React.FC = () => {
           <div className="flex items-center">
             <AlertCircle className="h-5 w-5 text-amber-500 flex-shrink-0" />
             <p className="ml-3 text-sm text-amber-800 font-medium">
-              You are not logged in. Your request will be processed anonymously.
+              {t(
+                "requests-form.anonymousWarning",
+                "You are not logged in. Your request will be processed anonymously."
+              )}
             </p>
           </div>
         </div>
       )}
 
       <Tabs.Root value={activeTab} onValueChange={setActiveTab} className="tabs-container w-full">
-        <Tabs.List className="tabs-list flex" aria-label="Request form steps">
+        <Tabs.List className="tabs-list flex" aria-label={t("requests-form.formSteps", "Request form steps")}>
           <Tabs.Trigger value="basic-info" className="tab-trigger">
-            1. Basic Information
+            1. {t("requests-titles.basicInfo")}
           </Tabs.Trigger>
           <Tabs.Trigger value="map-config" className="tab-trigger">
-            2. Map Configuration
+            2. {t("requests-titles.mapConfig")}
           </Tabs.Trigger>
           <Tabs.Trigger value="advanced-settings" className="tab-trigger">
-            3. Advanced Settings
+            3. {t("requests-titles.advancedSettings")}
           </Tabs.Trigger>
           <Tabs.Trigger value="summary" className="tab-trigger">
-            4. Summary
+            4. {t("requests-titles.summary", "Summary")}
           </Tabs.Trigger>
         </Tabs.List>
 
         <div className="form-container">
-          {" "}
-          {/* Changed from <form> to <div> */}
           <Tabs.Content value="basic-info" className="tab-content">
             <BasicInfoForm formData={formData} updateFormField={updateField} onNext={() => goToNextTab("basic-info")} />
           </Tabs.Content>
@@ -204,24 +213,24 @@ const RequestsPage: React.FC = () => {
                 onClick={handleClear}
                 className="secondary-button flex items-center justify-center"
                 disabled={isSubmitting}
-                aria-label="Clear all form fields"
+                aria-label={t("requests-titles.clear")}
               >
-                Clear All
+                {t("requests-titles.clear")}
               </button>
               <button
-                type="button" // Changed from type="submit" to type="button"
+                type="button"
                 onClick={handleSubmit}
                 className="primary-button flex items-center justify-center"
                 disabled={isSubmitting}
-                aria-label="Submit request"
+                aria-label={t("requests-titles.submit")}
               >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="animate-spin mr-2" size={18} />
-                    <span>Submitting...</span>
+                    <span>{t("requests-form.submitting", "Submitting...")}</span>
                   </>
                 ) : (
-                  "Submit Request"
+                  t("requests-titles.submit")
                 )}
               </button>
             </div>
@@ -238,11 +247,11 @@ const RequestsPage: React.FC = () => {
           duration={5000}
         >
           <Toast.Title className="font-medium text-slate-900">
-            {toastMessage.startsWith("Error") ? "Error" : "Success"}
+            {toastMessage.startsWith(t("errors.title")) ? t("errors.title") : t("requests-form.success", "Success")}
           </Toast.Title>
           <Toast.Description className="text-sm text-slate-600 mt-1">{toastMessage}</Toast.Description>
-          <Toast.Action className="ml-auto" asChild altText="Close toast">
-            <button className="text-slate-400 hover:text-slate-600 rounded-full p-1" aria-label="Close notification">
+          <Toast.Action className="ml-auto" asChild altText={t("buttons.close")}>
+            <button className="text-slate-400 hover:text-slate-600 rounded-full p-1" aria-label={t("buttons.close")}>
               &times;
             </button>
           </Toast.Action>

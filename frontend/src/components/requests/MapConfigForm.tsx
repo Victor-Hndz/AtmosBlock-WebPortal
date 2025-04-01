@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { Check } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import FormField from "./FormField";
 import { RequestForm } from "@/redux/slices/requestsSlice";
 
@@ -49,6 +50,7 @@ const mapLevelOptions = ["Surface", "Upper Air", "Both"];
  * Map configuration form component for the second step of the request form
  */
 const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField, onNext, onPrevious }) => {
+  const { t } = useTranslation();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   /**
@@ -59,23 +61,23 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField
     const newErrors: Record<string, string> = {};
 
     if (!formData.pressureLevels?.length) {
-      newErrors.pressureLevels = "At least one pressure level must be selected";
+      newErrors.pressureLevels = t("requests-form.required");
     }
 
     if (!formData.areaCovered?.length) {
-      newErrors.areaCovered = "At least one area must be selected";
+      newErrors.areaCovered = t("requests-form.required");
     }
 
     if (!formData.mapTypes?.length) {
-      newErrors.mapTypes = "At least one map type must be selected";
+      newErrors.mapTypes = t("requests-form.required");
     }
 
     if (!formData.mapRanges?.length) {
-      newErrors.mapRanges = "At least one map range must be selected";
+      newErrors.mapRanges = t("requests-form.required");
     }
 
     if (!formData.mapLevels?.length) {
-      newErrors.mapLevels = "At least one map level must be selected";
+      newErrors.mapLevels = t("requests-form.required");
     }
 
     setErrors(newErrors);
@@ -114,15 +116,18 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-slate-900">Map Configuration</h2>
+      <h2 className="text-xl font-semibold text-slate-900">{t("requests-titles.mapConfig")}</h2>
 
       <div>
         {" "}
         {/* Changed from Form.Root to plain div */}
         <FormField
           id="pressureLevels"
-          label="Pressure Levels"
-          tooltip="Select one or more pressure levels for your data visualization"
+          label={t("requests-form.pressureLevels")}
+          tooltip={t(
+            "requests-form.pressureLevelsTooltip",
+            "Select one or more pressure levels for your data visualization"
+          )}
           error={errors.pressureLevels}
           required
         >
@@ -148,8 +153,8 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField
         </FormField>
         <FormField
           id="areaCovered"
-          label="Area Coverage"
-          tooltip="Select the geographical areas to be covered"
+          label={t("requests-form.areaCovered")}
+          tooltip={t("requests-form.areaCoveredTooltip", "Select the geographical areas to be covered")}
           error={errors.areaCovered}
           required
         >
@@ -175,8 +180,8 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField
         </FormField>
         <FormField
           id="mapTypes"
-          label="Map Types"
-          tooltip="Select the types of maps to generate"
+          label={t("requests-form.mapTypes")}
+          tooltip={t("requests-form.mapTypesTooltip", "Select the types of maps to generate")}
           error={errors.mapTypes}
           required
         >
@@ -202,8 +207,8 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField
         </FormField>
         <FormField
           id="mapRanges"
-          label="Map Ranges"
-          tooltip="Select the range options for your maps"
+          label={t("requests-form.mapRanges")}
+          tooltip={t("requests-form.mapRangesTooltip", "Select the range options for your maps")}
           error={errors.mapRanges}
           required
         >
@@ -229,8 +234,8 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField
         </FormField>
         <FormField
           id="mapLevels"
-          label="Map Levels"
-          tooltip="Select the vertical levels for your maps"
+          label={t("requests-form.mapLevels")}
+          tooltip={t("requests-form.mapLevelsTooltip", "Select the vertical levels for your maps")}
           error={errors.mapLevels}
           required
         >
@@ -264,7 +269,7 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField
                     bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2
                     transition-colors duration-200"
         >
-          Previous
+          {t("buttons.back")}
         </button>
         <button
           type="button"
@@ -273,7 +278,7 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField
                     focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2
                     transition-colors duration-200"
         >
-          Next
+          {t("buttons.next", "Next")}
         </button>
       </div>
     </div>

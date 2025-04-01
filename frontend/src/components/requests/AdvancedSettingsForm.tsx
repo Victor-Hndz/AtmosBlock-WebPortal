@@ -2,6 +2,7 @@ import React from "react";
 import * as Switch from "@radix-ui/react-switch";
 import * as Select from "@radix-ui/react-select";
 import { ChevronDown, ChevronUp, Check } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import FormField from "./FormField";
 import { RequestForm } from "@/redux/slices/requestsSlice";
 
@@ -28,14 +29,18 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
   onNext,
   onPrevious,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-slate-900">Advanced Settings</h2>
+      <h2 className="text-xl font-semibold text-slate-900">{t("requests-titles.advancedSettings")}</h2>
 
       <div>
-        {" "}
-        {/* Changed from Form.Root to plain div */}
-        <FormField id="fileFormat" label="File Format" tooltip="Select the output file format for your data">
+        <FormField
+          id="fileFormat"
+          label={t("requests-form.fileFormat")}
+          tooltip={t("requests-form.fileFormatTooltip", "Select the output file format for your data")}
+        >
           <Select.Root value={formData.fileFormat ?? ""} onValueChange={value => updateFormField("fileFormat", value)}>
             <Select.Trigger
               className="inline-flex items-center justify-between w-full px-3 py-2 text-sm border border-slate-300 
@@ -78,7 +83,11 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
         {advancedMode && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField id="tracking" label="Enable Tracking" tooltip="Enable tracking of request execution">
+              <FormField
+                id="tracking"
+                label={t("requests-form.tracking")}
+                tooltip={t("requests-form.trackingTooltip", "Enable tracking of request execution")}
+              >
                 <div className="flex items-center h-5">
                   <Switch.Root
                     id="tracking"
@@ -94,7 +103,11 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                 </div>
               </FormField>
 
-              <FormField id="debug" label="Debug Mode" tooltip="Enable debug output during processing">
+              <FormField
+                id="debug"
+                label={t("requests-form.debug")}
+                tooltip={t("requests-form.debugTooltip", "Enable debug output during processing")}
+              >
                 <div className="flex items-center h-5">
                   <Switch.Root
                     id="debug"
@@ -107,7 +120,11 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                 </div>
               </FormField>
 
-              <FormField id="noCompile" label="Skip Compilation" tooltip="Skip compilation step">
+              <FormField
+                id="noCompile"
+                label={t("requests-form.noCompile")}
+                tooltip={t("requests-form.noCompileTooltip", "Skip compilation step")}
+              >
                 <div className="flex items-center h-5">
                   <Switch.Root
                     id="noCompile"
@@ -120,7 +137,11 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                 </div>
               </FormField>
 
-              <FormField id="noExecute" label="Skip Execution" tooltip="Skip execution step">
+              <FormField
+                id="noExecute"
+                label={t("requests-form.noExecute")}
+                tooltip={t("requests-form.noExecuteTooltip", "Skip execution step")}
+              >
                 <div className="flex items-center h-5">
                   <Switch.Root
                     id="noExecute"
@@ -133,7 +154,11 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                 </div>
               </FormField>
 
-              <FormField id="noMaps" label="Skip Map Generation" tooltip="Skip map generation step">
+              <FormField
+                id="noMaps"
+                label={t("requests-form.noMaps")}
+                tooltip={t("requests-form.noMapsTooltip", "Skip map generation step")}
+              >
                 <div className="flex items-center h-5">
                   <Switch.Root
                     id="noMaps"
@@ -146,7 +171,11 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                 </div>
               </FormField>
 
-              <FormField id="animation" label="Generate Animation" tooltip="Generate animation from maps">
+              <FormField
+                id="animation"
+                label={t("requests-form.animation")}
+                tooltip={t("requests-form.animationTooltip", "Generate animation from maps")}
+              >
                 <div className="flex items-center h-5">
                   <Switch.Root
                     id="animation"
@@ -161,10 +190,16 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
             </div>
 
             <div className="border-t border-slate-200 pt-4 mt-4">
-              <h3 className="text-lg font-medium mb-3 text-slate-900">Parallel Processing Options</h3>
+              <h3 className="text-lg font-medium mb-3 text-slate-900">
+                {t("requests-form.parallelProcessingOptions", "Parallel Processing Options")}
+              </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField id="omp" label="Enable OpenMP" tooltip="Use OpenMP for parallel processing">
+                <FormField
+                  id="omp"
+                  label={t("requests-form.omp")}
+                  tooltip={t("requests-form.ompTooltip", "Use OpenMP for parallel processing")}
+                >
                   <div className="flex items-center h-5">
                     <Switch.Root
                       id="omp"
@@ -178,7 +213,11 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                 </FormField>
 
                 {formData.omp && (
-                  <FormField id="nThreads" label="Use Multiple Threads" tooltip="Enable multithreading">
+                  <FormField
+                    id="nThreads"
+                    label={t("requests-form.nThreads")}
+                    tooltip={t("requests-form.nThreadsTooltip", "Enable multithreading")}
+                  >
                     <div className="flex items-center h-5">
                       <Switch.Root
                         id="nThreads"
@@ -192,7 +231,11 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                   </FormField>
                 )}
 
-                <FormField id="mpi" label="Enable MPI" tooltip="Use MPI for distributed processing">
+                <FormField
+                  id="mpi"
+                  label={t("requests-form.mpi")}
+                  tooltip={t("requests-form.mpiTooltip", "Use MPI for distributed processing")}
+                >
                   <div className="flex items-center h-5">
                     <Switch.Root
                       id="mpi"
@@ -206,7 +249,11 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                 </FormField>
 
                 {formData.mpi && (
-                  <FormField id="nProces" label="Use Multiple Processes" tooltip="Enable multi-process execution">
+                  <FormField
+                    id="nProces"
+                    label={t("requests-form.nProces")}
+                    tooltip={t("requests-form.nProcesTooltip", "Enable multi-process execution")}
+                  >
                     <div className="flex items-center h-5">
                       <Switch.Root
                         id="nProces"
@@ -233,7 +280,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                     bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2
                     transition-colors duration-200"
         >
-          Previous
+          {t("buttons.back")}
         </button>
         <button
           type="button"
@@ -242,7 +289,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                     focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2
                     transition-colors duration-200"
         >
-          Next
+          {t("buttons.next", "Next")}
         </button>
       </div>
     </div>

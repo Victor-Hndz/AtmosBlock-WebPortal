@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { Check } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import FormField from "./FormField";
 import { RequestForm } from "@/redux/slices/requestsSlice";
 
@@ -47,6 +48,7 @@ const availableHours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
  * Basic information form component for the first step of the request form
  */
 const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, updateFormField, onNext }) => {
+  const { t } = useTranslation();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   /**
@@ -57,23 +59,23 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, updateFormField
     const newErrors: Record<string, string> = {};
 
     if (!formData.variableName) {
-      newErrors.variableName = "Variable name is required";
+      newErrors.variableName = t("requests-form.required");
     }
 
     if (!formData.years?.length) {
-      newErrors.years = "At least one year must be selected";
+      newErrors.years = t("requests-form.required");
     }
 
     if (!formData.months?.length) {
-      newErrors.months = "At least one month must be selected";
+      newErrors.months = t("requests-form.required");
     }
 
     if (!formData.days?.length) {
-      newErrors.days = "At least one day must be selected";
+      newErrors.days = t("requests-form.required");
     }
 
     if (!formData.hours?.length) {
-      newErrors.hours = "At least one hour must be selected";
+      newErrors.hours = t("requests-form.required");
     }
 
     setErrors(newErrors);
@@ -112,15 +114,15 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, updateFormField
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-slate-900">Basic Information</h2>
+      <h2 className="text-xl font-semibold text-slate-900">{t("requests-titles.basicInfo")}</h2>
 
       <div>
         {" "}
         {/* Changed from Form.Root to plain div */}
         <FormField
           id="variableName"
-          label="Variable Name"
-          tooltip="Enter the name of the variable you want to process"
+          label={t("requests-form.variableName")}
+          tooltip={t("requests-form.variableNameTooltip", "Enter the name of the variable you want to process")}
           error={errors.variableName}
           required
         >
@@ -135,8 +137,8 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, updateFormField
         </FormField>
         <FormField
           id="years"
-          label="Select Years"
-          tooltip="Select one or more years for the data"
+          label={t("requests-form.years")}
+          tooltip={t("requests-form.yearsTooltip", "Select one or more years for the data")}
           error={errors.years}
           required
         >
@@ -162,8 +164,8 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, updateFormField
         </FormField>
         <FormField
           id="months"
-          label="Select Months"
-          tooltip="Select one or more months for the data"
+          label={t("requests-form.months")}
+          tooltip={t("requests-form.monthsTooltip", "Select one or more months for the data")}
           error={errors.months}
           required
         >
@@ -189,8 +191,8 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, updateFormField
         </FormField>
         <FormField
           id="days"
-          label="Select Days"
-          tooltip="Select one or more days for the data"
+          label={t("requests-form.days")}
+          tooltip={t("requests-form.daysTooltip", "Select one or more days for the data")}
           error={errors.days}
           required
         >
@@ -219,8 +221,8 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, updateFormField
         </FormField>
         <FormField
           id="hours"
-          label="Select Hours"
-          tooltip="Select one or more hours for the data"
+          label={t("requests-form.hours")}
+          tooltip={t("requests-form.hoursTooltip", "Select one or more hours for the data")}
           error={errors.hours}
           required
         >
@@ -254,7 +256,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, updateFormField
                   focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2
                   transition-colors duration-200"
         >
-          Next
+          {t("buttons.next", "Next")}
         </button>
       </div>
     </div>

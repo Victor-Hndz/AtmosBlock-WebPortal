@@ -1,6 +1,7 @@
 import React from "react";
 import * as Label from "@radix-ui/react-label";
 import { HelpCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Tooltip } from "../ui/Tooltip";
 
 /**
@@ -30,6 +31,8 @@ const FormField: React.FC<FormFieldProps> = ({
   required = false,
   className = "",
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className={`mb-4 ${className}`}>
       <div className="flex items-center mb-1.5">
@@ -44,7 +47,7 @@ const FormField: React.FC<FormFieldProps> = ({
               type="button"
               className="ml-1.5 rounded-full p-0.5 text-slate-400 hover:text-slate-600 
                         focus:outline-none focus:ring-2 focus:ring-violet-500"
-              aria-label={`Help about ${label}`}
+              aria-label={t("navigation-tooltips.help", "Help about {{label}}", { label })}
             >
               <HelpCircle size={14} />
             </button>

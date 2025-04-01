@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { RequestForm } from "@/redux/slices/requestsSlice";
 
 interface RequestSummaryProps {
@@ -10,35 +11,39 @@ interface RequestSummaryProps {
  * Component to display a summary of the request form data before submission
  */
 const RequestSummary: React.FC<RequestSummaryProps> = ({ formData, onPrevious }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-slate-900">Request Summary</h2>
-      <p className="text-sm text-slate-500">Please review your request details before submitting:</p>
+      <h2 className="text-xl font-semibold text-slate-900">{t("requests-titles.summary", "Request Summary")}</h2>
+      <p className="text-sm text-slate-500">
+        {t("requests-titles.reviewBeforeSubmit", "Please review your request details before submitting:")}
+      </p>
 
       <div className="bg-slate-50 shadow overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg leading-6 font-medium text-slate-900">Basic Information</h3>
+          <h3 className="text-lg leading-6 font-medium text-slate-900">{t("requests-titles.basicInfo")}</h3>
         </div>
         <div className="border-t border-slate-200">
           <dl>
             <div className="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-slate-500">Variable Name</dt>
+              <dt className="text-sm font-medium text-slate-500">{t("requests-form.variableName")}</dt>
               <dd className="mt-1 text-sm text-slate-900 sm:mt-0 sm:col-span-2">{formData.variableName}</dd>
             </div>
             <div className="bg-slate-50 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-slate-500">Years</dt>
+              <dt className="text-sm font-medium text-slate-500">{t("requests-form.years")}</dt>
               <dd className="mt-1 text-sm text-slate-900 sm:mt-0 sm:col-span-2">{formData.years?.join(", ")}</dd>
             </div>
             <div className="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-slate-500">Months</dt>
+              <dt className="text-sm font-medium text-slate-500">{t("requests-form.months")}</dt>
               <dd className="mt-1 text-sm text-slate-900 sm:mt-0 sm:col-span-2">{formData.months?.join(", ")}</dd>
             </div>
             <div className="bg-slate-50 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-slate-500">Days</dt>
+              <dt className="text-sm font-medium text-slate-500">{t("requests-form.days")}</dt>
               <dd className="mt-1 text-sm text-slate-900 sm:mt-0 sm:col-span-2">{formData.days?.join(", ")}</dd>
             </div>
             <div className="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-slate-500">Hours</dt>
+              <dt className="text-sm font-medium text-slate-500">{t("requests-form.hours")}</dt>
               <dd className="mt-1 text-sm text-slate-900 sm:mt-0 sm:col-span-2">{formData.hours?.join(", ")}</dd>
             </div>
           </dl>
@@ -47,30 +52,30 @@ const RequestSummary: React.FC<RequestSummaryProps> = ({ formData, onPrevious })
 
       <div className="bg-slate-50 shadow overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg leading-6 font-medium text-slate-900">Map Configuration</h3>
+          <h3 className="text-lg leading-6 font-medium text-slate-900">{t("requests-titles.mapConfig")}</h3>
         </div>
         <div className="border-t border-slate-200">
           <dl>
             <div className="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-slate-500">Pressure Levels</dt>
+              <dt className="text-sm font-medium text-slate-500">{t("requests-form.pressureLevels")}</dt>
               <dd className="mt-1 text-sm text-slate-900 sm:mt-0 sm:col-span-2">
                 {formData.pressureLevels?.join(", ")}
               </dd>
             </div>
             <div className="bg-slate-50 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-slate-500">Areas Covered</dt>
+              <dt className="text-sm font-medium text-slate-500">{t("requests-form.areaCovered")}</dt>
               <dd className="mt-1 text-sm text-slate-900 sm:mt-0 sm:col-span-2">{formData.areaCovered?.join(", ")}</dd>
             </div>
             <div className="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-slate-500">Map Types</dt>
+              <dt className="text-sm font-medium text-slate-500">{t("requests-form.mapTypes")}</dt>
               <dd className="mt-1 text-sm text-slate-900 sm:mt-0 sm:col-span-2">{formData.mapTypes?.join(", ")}</dd>
             </div>
             <div className="bg-slate-50 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-slate-500">Map Ranges</dt>
+              <dt className="text-sm font-medium text-slate-500">{t("requests-form.mapRanges")}</dt>
               <dd className="mt-1 text-sm text-slate-900 sm:mt-0 sm:col-span-2">{formData.mapRanges?.join(", ")}</dd>
             </div>
             <div className="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-slate-500">Map Levels</dt>
+              <dt className="text-sm font-medium text-slate-500">{t("requests-form.mapLevels")}</dt>
               <dd className="mt-1 text-sm text-slate-900 sm:mt-0 sm:col-span-2">{formData.mapLevels?.join(", ")}</dd>
             </div>
           </dl>
@@ -79,30 +84,71 @@ const RequestSummary: React.FC<RequestSummaryProps> = ({ formData, onPrevious })
 
       <div className="bg-slate-50 shadow overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg leading-6 font-medium text-slate-900">Advanced Settings</h3>
+          <h3 className="text-lg leading-6 font-medium text-slate-900">{t("requests-titles.advancedSettings")}</h3>
         </div>
         <div className="border-t border-slate-200">
           <dl>
             {formData.fileFormat && (
               <div className="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-slate-500">File Format</dt>
+                <dt className="text-sm font-medium text-slate-500">{t("requests-form.fileFormat")}</dt>
                 <dd className="mt-1 text-sm text-slate-900 sm:mt-0 sm:col-span-2">{formData.fileFormat}</dd>
               </div>
             )}
             <div className="bg-slate-50 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-slate-500">Options</dt>
+              <dt className="text-sm font-medium text-slate-500">{t("requests-form.options", "Options")}</dt>
               <dd className="mt-1 text-sm text-slate-900 sm:mt-0 sm:col-span-2">
                 <ul className="grid grid-cols-2 gap-2">
-                  {formData.tracking && <li>Tracking: Enabled</li>}
-                  {formData.debug && <li>Debug: Enabled</li>}
-                  {formData.noCompile && <li>Skip Compilation: Yes</li>}
-                  {formData.noExecute && <li>Skip Execution: Yes</li>}
-                  {formData.noMaps && <li>Skip Map Generation: Yes</li>}
-                  {formData.animation && <li>Generate Animation: Yes</li>}
-                  {formData.omp && <li>OpenMP: Enabled</li>}
-                  {formData.nThreads && <li>Use Multiple Threads: Yes</li>}
-                  {formData.mpi && <li>MPI: Enabled</li>}
-                  {formData.nProces && <li>Use Multiple Processes: Yes</li>}
+                  {formData.tracking && (
+                    <li>
+                      {t("requests-form.tracking", "Tracking")}: {t("requests-form.enabled", "Enabled")}
+                    </li>
+                  )}
+                  {formData.debug && (
+                    <li>
+                      {t("requests-form.debug", "Debug")}: {t("requests-form.enabled", "Enabled")}
+                    </li>
+                  )}
+                  {formData.noCompile && (
+                    <li>
+                      {t("requests-form.skipCompilation", "Skip Compilation")}: {t("requests-form.yes", "Yes")}
+                    </li>
+                  )}
+                  {formData.noExecute && (
+                    <li>
+                      {t("requests-form.skipExecution", "Skip Execution")}: {t("requests-form.yes", "Yes")}
+                    </li>
+                  )}
+                  {formData.noMaps && (
+                    <li>
+                      {t("requests-form.skipMapGeneration", "Skip Map Generation")}: {t("requests-form.yes", "Yes")}
+                    </li>
+                  )}
+                  {formData.animation && (
+                    <li>
+                      {t("requests-form.generateAnimation", "Generate Animation")}: {t("requests-form.yes", "Yes")}
+                    </li>
+                  )}
+                  {formData.omp && (
+                    <li>
+                      {t("requests-form.openMP", "OpenMP")}: {t("requests-form.enabled", "Enabled")}
+                    </li>
+                  )}
+                  {formData.nThreads && (
+                    <li>
+                      {t("requests-form.useMultipleThreads", "Use Multiple Threads")}: {t("requests-form.yes", "Yes")}
+                    </li>
+                  )}
+                  {formData.mpi && (
+                    <li>
+                      {t("requests-form.mpi", "MPI")}: {t("requests-form.enabled", "Enabled")}
+                    </li>
+                  )}
+                  {formData.nProces && (
+                    <li>
+                      {t("requests-form.useMultipleProcesses", "Use Multiple Processes")}:{" "}
+                      {t("requests-form.yes", "Yes")}
+                    </li>
+                  )}
                 </ul>
               </dd>
             </div>
@@ -118,7 +164,7 @@ const RequestSummary: React.FC<RequestSummaryProps> = ({ formData, onPrevious })
                     bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2
                     transition-colors duration-200"
         >
-          Previous
+          {t("buttons.back")}
         </button>
       </div>
     </div>
