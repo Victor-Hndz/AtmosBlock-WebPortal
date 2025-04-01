@@ -1,0 +1,66 @@
+{
+  "app": {
+    "title": "Request Form Application",
+    "description": "Application for submitting and managing requests"
+  },
+  "navigation": {
+    "home": "Home",
+    "about": "About",
+    "requests": "Requests",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout"
+  },
+  "language": {
+    "switchLanguage": "Switch language",
+    "selectLanguage": "Select language"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "login": "Login",
+    "register": "Register",
+    "loginSuccess": "Successfully logged in!",
+    "registerSuccess": "Successfully registered!",
+    "logoutSuccess": "Successfully logged out!"
+  },
+  "requests": {
+    "title": "Request Form",
+    "submit": "Submit Request",
+    "clear": "Clear Form",
+    "success": "Request submitted successfully!",
+    "basicInfo": "Basic Information",
+    "mapConfig": "Map Configuration",
+    "advancedSettings": "Advanced Settings"
+  },
+  "form": {
+    "variableName": "Variable Name",
+    "years": "Years",
+    "months": "Months",
+    "days": "Days",
+    "hours": "Hours",
+    "pressureLevels": "Pressure Levels",
+    "areaCovered": "Area Covered",
+    "mapTypes": "Map Types",
+    "mapRanges": "Map Ranges",
+    "mapLevels": "Map Levels",
+    "fileFormat": "File Format",
+    "required": "This field is required",
+    "invalid": "Invalid value"
+  },
+  "buttons": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back"
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "login": "Login failed. Please check your credentials.",
+    "register": "Registration failed. Please try again.",
+    "submission": "Failed to submit request. Please try again."
+  }
+}
