@@ -3,29 +3,36 @@
     "title": "Aplicación de Formulario de Solicitud",
     "description": "Aplicación para enviar y gestionar solicitudes"
   },
-  "navigation": {
+  "navigation-header": {
     "home": "Inicio",
-    "about": "Acerca de",
     "requests": "Solicitudes",
-    "login": "Iniciar sesión",
-    "register": "Registrarse",
-    "logout": "Cerrar sesión"
+    "login": "Iniciar sesión"
+  },
+  "navigation-footer": {
+    "about": "Acerca de"
   },
   "language": {
     "switchLanguage": "Cambiar idioma",
     "selectLanguage": "Seleccionar idioma"
   },
-  "auth": {
+  "login-form": {
+    "title": "Iniciar sesión",
     "email": "Correo electrónico",
     "password": "Contraseña",
-    "name": "Nombre",
-    "login": "Iniciar sesión",
-    "register": "Registrarse",
-    "loginSuccess": "¡Sesión iniciada correctamente!",
-    "registerSuccess": "¡Registro completado correctamente!",
-    "logoutSuccess": "¡Sesión cerrada correctamente!"
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "login-button": "Iniciar sesión",
+    "loginSuccess": "¡Sesión iniciada correctamente!"
   },
-  "requests": {
+  "register-form": {
+    "title": "Crear cuenta",
+    "name": "Nombre completo",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "register-button": "Registrarse",
+    "registerSuccess": "¡Registro exitoso!"
+  },
+  "requests-titles": {
     "title": "Formulario de Solicitud",
     "submit": "Enviar Solicitud",
     "clear": "Limpiar Formulario",
@@ -34,7 +41,7 @@
     "mapConfig": "Configuración del Mapa",
     "advancedSettings": "Ajustes Avanzados"
   },
-  "form": {
+  "requests-form": {
     "variableName": "Nombre de Variable",
     "years": "Años",
     "months": "Meses",

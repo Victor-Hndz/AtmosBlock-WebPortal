@@ -3,29 +3,36 @@
     "title": "Request Form Application",
     "description": "Application for submitting and managing requests"
   },
-  "navigation": {
+  "navigation-header": {
     "home": "Home",
-    "about": "About",
     "requests": "Requests",
-    "login": "Login",
-    "register": "Register",
-    "logout": "Logout"
+    "login": "Login"
+  },
+  "navigation-footer": {
+    "about": "About"
   },
   "language": {
     "switchLanguage": "Switch language",
     "selectLanguage": "Select language"
   },
-  "auth": {
+  "login-form": {
+    "title": "Login",
     "email": "Email",
     "password": "Password",
-    "name": "Name",
-    "login": "Login",
-    "register": "Register",
-    "loginSuccess": "Successfully logged in!",
-    "registerSuccess": "Successfully registered!",
-    "logoutSuccess": "Successfully logged out!"
+    "forgotPassword": "Forgot password?",
+    "login-button": "Login",
+    "loginSuccess": "Login successful!"
   },
-  "requests": {
+  "register-form": {
+    "title": "Register",
+    "name": "Full Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "register-button": "Register",
+    "registerSuccess": "Registration successful!"
+  },
+  "requests-titles": {
     "title": "Request Form",
     "submit": "Submit Request",
     "clear": "Clear Form",
@@ -34,7 +41,7 @@
     "mapConfig": "Map Configuration",
     "advancedSettings": "Advanced Settings"
   },
-  "form": {
+  "requests-form": {
     "variableName": "Variable Name",
     "years": "Years",
     "months": "Months",
