@@ -8,6 +8,12 @@
     "requests": "Requests",
     "login": "Login"
   },
+  "navigation-tooltips": {
+    "home": "Go to Homepage",
+    "requests": "Create and manage your requests",
+    "login": "Sign in to your account",
+    "about": "Learn more about this application"
+  },
   "navigation-footer": {
     "about": "About"
   },

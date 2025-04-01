@@ -26,7 +26,7 @@ export default function LanguageSwitcher() {
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button
-          className="flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-slate-800 hover:bg-slate-100 focus-ring"
+          className="flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text:white hover:text-blue-300"
           aria-label={t("language.switchLanguage")}
         >
           <GlobeIcon className="h-4 w-4" />
@@ -35,7 +35,10 @@ export default function LanguageSwitcher() {
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>
-        <DropdownMenu.Content className="min-w-32 animate-in rounded-md bg-white p-1 shadow-md" sideOffset={5}>
+        <DropdownMenu.Content
+          className="mt-3 mr-1 min-w-32 animate-in rounded-md bg-white p-1 shadow-md"
+          sideOffset={5}
+        >
           <DropdownMenu.Label className="px-2 py-1.5 text-xs text-slate-500">
             {t("language.selectLanguage")}
           </DropdownMenu.Label>

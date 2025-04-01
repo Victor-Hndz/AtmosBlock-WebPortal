@@ -5,6 +5,8 @@ import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import * as Separator from "@radix-ui/react-separator";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Tooltip from "@radix-ui/react-tooltip";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@/components/shared/LanguageSwitcher";
 import "./layout.css";
 
 /**
@@ -18,12 +20,23 @@ type LucideIconType = React.ComponentType<LucideProps>;
 interface NavItem {
   /** Path to navigate to */
   path: string;
-  /** Label to display */
-  label: string;
+  /** Translation key for label */
+  labelKey:
+    | "app.title"
+    | "app.description"
+    | "navigation-header.home"
+    | "navigation-header.requests"
+    | "navigation-header.login"
+    | "navigation-footer.about"
+    | "language.switchLanguage";
   /** Icon component to display */
   icon: LucideIconType;
-  /** Optional tooltip text */
-  tooltip?: string;
+  /** Translation key for tooltip */
+  tooltipKey?:
+    | "navigation-tooltips.home"
+    | "navigation-tooltips.requests"
+    | "navigation-tooltips.login"
+    | "navigation-tooltips.about";
   /** Position of the item in the menu (left/right/center) */
   position?: "l" | "r" | "c";
   /** Whether the item should collapse into mobile menu on smaller screens */
@@ -44,6 +57,7 @@ const NavLink: React.FC<{ item: NavItem; isActive: boolean }> = ({
   isActive: boolean;
 }) => {
   const Icon = item.icon;
+  const { t } = useTranslation();
 
   return (
     <Tooltip.Provider delayDuration={300}>
@@ -57,18 +71,18 @@ const NavLink: React.FC<{ item: NavItem; isActive: boolean }> = ({
             >
               <Link to={item.path}>
                 <Icon aria-hidden="true" size={16} className="inline-block align-middle mr-1" />
-                <span>{item.label}</span>
+                <span>{t(item.labelKey)}</span>
               </Link>
             </NavigationMenu.Link>
           </NavigationMenu.Item>
         </Tooltip.Trigger>
-        {item.tooltip && (
+        {item.tooltipKey && (
           <Tooltip.Portal>
             <Tooltip.Content
               className="tooltip-content bg-gray-900 text-white px-4 py-2 rounded-md text-sm z-50 shadow-md"
               sideOffset={5}
             >
-              {item.tooltip}
+              {t(item.tooltipKey)}
               <Tooltip.Arrow className="tooltip-arrow" />
             </Tooltip.Content>
           </Tooltip.Portal>
@@ -85,6 +99,7 @@ const NavLink: React.FC<{ item: NavItem; isActive: boolean }> = ({
  */
 const MobileMenuItem: React.FC<{ item: NavItem }> = ({ item }: { item: NavItem }) => {
   const Icon = item.icon;
+  const { t } = useTranslation();
 
   return (
     <DropdownMenu.Item asChild>
@@ -93,7 +108,7 @@ const MobileMenuItem: React.FC<{ item: NavItem }> = ({ item }: { item: NavItem }
         className="flex items-center p-2 text-white rounded-md hover:bg-gray-700 transition-colors duration-200"
       >
         <Icon aria-hidden="true" size={16} className="inline-block mr-1" />
-        <span>{item.label}</span>
+        <span>{t(item.labelKey)}</span>
       </Link>
     </DropdownMenu.Item>
   );
@@ -105,30 +120,31 @@ const MobileMenuItem: React.FC<{ item: NavItem }> = ({ item }: { item: NavItem }
  */
 const Layout: React.FC = (): JSX.Element => {
   const location = useLocation();
+  const { t } = useTranslation();
 
-  // Navigation items configuration
+  // Navigation items configuration with translation keys
   const navItems: NavItem[] = [
     {
       path: "/",
-      label: "Home",
+      labelKey: "navigation-header.home",
       icon: House,
-      tooltip: "Go to homepage",
+      tooltipKey: "navigation-tooltips.home",
       position: "l",
       collapse: true,
     },
     {
       path: "/requests",
-      label: "Requests",
+      labelKey: "navigation-header.requests",
       icon: ListTodo,
-      tooltip: "Manage your requests",
+      tooltipKey: "navigation-tooltips.requests",
       position: "l",
       collapse: true,
     },
     {
       path: "/auth",
-      label: "Login",
+      labelKey: "navigation-header.login",
       icon: LogIn,
-      tooltip: "Sign in to your account",
+      tooltipKey: "navigation-tooltips.login",
       position: "r",
       collapse: true,
     },
@@ -169,11 +185,12 @@ const Layout: React.FC = (): JSX.Element => {
               ))}
             </div>
 
-            {/* Right aligned items */}
-            <div className="hidden md:flex gap-4">
+            {/* Right aligned items with language switcher */}
+            <div className="hidden md:flex gap-4 items-center">
               {rightNavItems.map(item => (
                 <NavLink key={item.path} item={item} isActive={location.pathname === item.path} />
               ))}
+              <LanguageSwitcher />
             </div>
 
             {/* Always visible items (even on mobile) */}
@@ -185,12 +202,13 @@ const Layout: React.FC = (): JSX.Element => {
 
             {/* Mobile Navigation */}
             {hasCollapsibleItems && (
-              <div className="md:hidden flex flex-1 justify-start">
+              <div className="md:hidden flex flex-1 justify-between items-center">
+                {/* Hamburger menu */}
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger asChild>
                     <button
                       className="p-2 rounded-md transition-colors duration-200 hover:bg-gray-700"
-                      aria-label="Menu"
+                      aria-label={t("language.switchLanguage")}
                     >
                       <Menu aria-hidden="true" />
                     </button>
@@ -208,6 +226,9 @@ const Layout: React.FC = (): JSX.Element => {
                     </DropdownMenu.Content>
                   </DropdownMenu.Portal>
                 </DropdownMenu.Root>
+
+                {/* Language switcher in mobile view */}
+                <LanguageSwitcher />
               </div>
             )}
           </div>
@@ -232,7 +253,7 @@ const Layout: React.FC = (): JSX.Element => {
                   className="text-blue-400 font-medium relative inline-flex items-center transition-all duration-300 hover:text-blue-200"
                 >
                   <Info className="inline-block mr-1" size={16} aria-hidden="true" />
-                  <span>About</span>
+                  <span>{t("navigation-footer.about")}</span>
                 </Link>
               </Tooltip.Trigger>
               <Tooltip.Portal>
@@ -240,7 +261,7 @@ const Layout: React.FC = (): JSX.Element => {
                   className="tooltip-content bg-gray-900 text-white px-4 py-2 rounded-md text-sm z-50 shadow-md"
                   sideOffset={5}
                 >
-                  About this application
+                  {t("navigation-tooltips.about")}
                   <Tooltip.Arrow className="tooltip-arrow" />
                 </Tooltip.Content>
               </Tooltip.Portal>

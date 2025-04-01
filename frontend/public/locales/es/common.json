@@ -8,6 +8,12 @@
     "requests": "Solicitudes",
     "login": "Iniciar sesión"
   },
+  "navigation-tooltips": {
+    "home": "Ir a la Página Principal",
+    "requests": "Crear y gestionar tus solicitudes",
+    "login": "Iniciar sesión en tu cuenta",
+    "about": "Conocer más sobre esta aplicación"
+  },
   "navigation-footer": {
     "about": "Acerca de"
   },
