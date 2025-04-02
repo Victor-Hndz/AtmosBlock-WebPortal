@@ -1,12 +1,15 @@
 import { NestFactory } from "@nestjs/core";
-import { BadRequestException, ValidationPipe } from "@nestjs/common";
+import { ValidationPipe, BadRequestException } from "@nestjs/common";
 import { AppModule } from "./app.module";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
+import { ConfigService } from "@nestjs/config";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
 
-  // Habilitar la validación global
+  // Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -14,7 +17,7 @@ async function bootstrap() {
       transform: true,
       stopAtFirstError: false,
       exceptionFactory: errors => {
-        throw new BadRequestException({
+        return new BadRequestException({
           statusCode: 400,
           message: "Validation failed",
           errors: errors,
@@ -23,12 +26,28 @@ async function bootstrap() {
     })
   );
 
-  //Conectar RabbitMQ
+  // Enable CORS
+  app.enableCors();
+
+  // Global prefix
+  app.setGlobalPrefix("api");
+
+  // Swagger documentation
+  const config = new DocumentBuilder()
+    .setTitle("NestJS API")
+    .setDescription("The NestJS API description")
+    .setVersion("1.0")
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup("api/docs", app, document);
+
+  // Connect to RabbitMQ
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: [process.env.RABBITMQ_URL ?? "amqp://admin:pass@localhost:5672"],
-      queue: "config_queue",
+      urls: [configService.get<string>("RABBITMQ_URL") ?? "amqp://admin:pass@localhost:5672"],
+      queue: configService.get<string>("RABBITMQ_QUEUE") ?? "config_queue",
       queueOptions: { durable: true },
       noAck: false,
       prefetchCount: 1,
@@ -36,6 +55,9 @@ async function bootstrap() {
   });
 
   await app.startAllMicroservices();
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(configService.get<number>("PORT") ?? 3000);
+
+  // eslint-disable-next-line no-console
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
