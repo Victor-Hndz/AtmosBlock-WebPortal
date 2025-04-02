@@ -9,7 +9,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
         name: "RABBITMQ_SERVICE",
         imports: [ConfigModule],
         inject: [ConfigService],
-        useFactory: (configService: ConfigService) => ({
+        useFactory: (_configService: ConfigService) => ({
           transport: Transport.RMQ,
           options: {
             urls: [process.env.RABBITMQ_URL!],
