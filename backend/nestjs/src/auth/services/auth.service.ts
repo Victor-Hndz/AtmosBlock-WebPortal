@@ -1,68 +1,89 @@
 import { Injectable, UnauthorizedException, ConflictException } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { UsersService } from "../../users/services/users.service";
 import { LoginDto } from "../dtos/login.dto";
 import { RegisterDto } from "../dtos/register.dto";
+import { CreateUserDto } from "../../users/dtos/create-user.dto";
 
 @Injectable()
 export class AuthService {
-  // In a real application, you would use a database
-  private users = [
-    {
-      id: "1",
-      name: "John Doe",
-      email: "john.doe@example.com",
-      password: "password123", // Would be hashed in a real app
-    },
-  ];
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService
+  ) {}
 
   async login(loginDto: LoginDto) {
-    const user = this.users.find(user => user.email === loginDto.email);
+    const user = await this.usersService.findByEmail(loginDto.email);
 
-    if (!user || user.password !== loginDto.password) {
+    if (!user) {
       throw new UnauthorizedException("Invalid credentials");
     }
 
-    // In a real app, you would generate a JWT token here
-    const token = "mock-jwt-token";
+    const isPasswordValid = await user.validatePassword(loginDto.password);
 
-    const { password, ...result } = user;
+    if (!isPasswordValid) {
+      throw new UnauthorizedException("Invalid credentials");
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedException("Account is inactive");
+    }
+
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    };
 
     return {
-      user: result,
-      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+      accessToken: this.jwtService.sign(payload),
     };
   }
 
   async register(registerDto: RegisterDto) {
-    // Check if user already exists
-    const existingUser = this.users.find(user => user.email === registerDto.email);
-    if (existingUser) {
-      throw new ConflictException("User with this email already exists");
+    try {
+      const createUserDto: CreateUserDto = {
+        name: registerDto.name,
+        email: registerDto.email,
+        password: registerDto.password,
+      };
+
+      const user = await this.usersService.create(createUserDto);
+
+      const payload = {
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+      };
+
+      return {
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+        accessToken: this.jwtService.sign(payload),
+      };
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+      throw new Error("Registration failed");
     }
-
-    // In a real app, you would hash the password and save to DB
-    const newUser = {
-      id: (this.users.length + 1).toString(),
-      name: registerDto.name,
-      email: registerDto.email,
-      password: registerDto.password, // Would be hashed in a real app
-    };
-
-    this.users.push(newUser);
-
-    // Generate token (JWT in real app)
-    const token = "mock-jwt-token";
-
-    const { password, ...result } = newUser;
-
-    return {
-      user: result,
-      token,
-    };
   }
 
-  logout() {
-    // In a real app with JWT, you could implement token blacklisting
-    // For session-based auth, you would destroy the session
-    return { success: true };
+  validateToken(token: string) {
+    try {
+      return this.jwtService.verify(token);
+    } catch (error) {
+      throw new UnauthorizedException("Invalid token: " + error.message);
+    }
   }
 }
