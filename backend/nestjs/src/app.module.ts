@@ -8,9 +8,13 @@ import { RequestsController } from "./requests/controllers/requests.controller";
 import { RequestsService } from "./requests/services/requests.service";
 import { RequestsPublisher } from "./requests/messaging/requests.publisher";
 import { AuthModule } from "./auth/auth.module";
+import { ConfigModule } from "./config/config.module";
+import { DatabaseModule } from "./database/database.module";
 
 @Module({
   imports: [
+    ConfigModule,
+    DatabaseModule,
     UsersModule,
     RequestsModule,
     AuthModule,
