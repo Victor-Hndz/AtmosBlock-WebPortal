@@ -1,0 +1,57 @@
+services:
+  nest_api_dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: nest_api_dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    environment:
+      - DB_HOST=postgres
+      - RABBITMQ_URL=amqp://admin:pass@rabbitmq:5672
+    depends_on:
+      - postgres
+      - rabbitmq
+    command: npm run start:dev
+    networks:
+      - dev-network
+
+  postgres:
+    image: postgres:16
+    container_name: postgres_dev
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_DATABASE:-nestjs_auth_db}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
+    networks:
+      - dev-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq_dev
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=pass
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    volumes:
+      - rabbitmq_dev_data:/var/lib/rabbitmq
+    networks:
+      - dev-network
+
+volumes:
+  postgres_dev_data:
+  rabbitmq_dev_data:
+
+networks:
+  dev-network:
+    driver: bridge
