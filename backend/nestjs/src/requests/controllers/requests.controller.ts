@@ -1,14 +1,72 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, UseGuards, Request } from "@nestjs/common";
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from "@nestjs/swagger";
 import { RequestsService } from "../services/requests.service";
-import { InputRequestDto } from "../dtos/inputRequestDto.dto";
+import { CreateRequestDto } from "../dtos/create-request.dto";
+import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard";
+import { RolesGuard } from "../../auth/guards/roles.guard";
+import { Roles } from "../../auth/decorators/roles.decorator";
+import { UserRole } from "../../users/entities/user.entity";
 
+@ApiTags("requests")
 @Controller("requests")
 export class RequestsController {
-  constructor(private readonly service: RequestsService) {}
+  constructor(private readonly requestsService: RequestsService) {}
 
-  @Post("/")
-  async launchRequest(@Body() request: InputRequestDto) {
-    const response = await this.service.processRequest(request);
-    return { message: response };
+  @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get all requests" })
+  @ApiResponse({ status: 200, description: "Return all requests." })
+  findAll() {
+    return this.requestsService.findAll();
+  }
+
+  @Get("my-requests")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get user's own requests" })
+  @ApiResponse({ status: 200, description: "Return user's requests." })
+  findMyRequests(@Request() req) {
+    return this.requestsService.findAllByUser(req.user.id);
+  }
+
+  @Get(":id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get a request by id" })
+  @ApiResponse({ status: 200, description: "Return the request." })
+  @ApiResponse({ status: 404, description: "Request not found." })
+  findOne(@Param("id") id: string) {
+    return this.requestsService.findOne(id);
+  }
+
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Create a new request" })
+  @ApiResponse({ status: 201, description: "The request has been successfully created." })
+  create(@Body() createRequestDto: CreateRequestDto, @Request() req) {
+    // Automatically associate the request with the logged-in user
+    createRequestDto.userId = req.user.id;
+    return this.requestsService.create(createRequestDto);
+  }
+
+  @Delete(":id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Delete a request" })
+  @ApiResponse({ status: 200, description: "The request has been successfully deleted." })
+  @ApiResponse({ status: 404, description: "Request not found." })
+  remove(@Param("id") id: string) {
+    return this.requestsService.remove(id);
+  }
+
+  @Post("process")
+  @ApiOperation({ summary: "Process a request" })
+  @ApiResponse({ status: 201, description: "Request processed successfully." })
+  async launchRequest(@Body() request: CreateRequestDto) {
+    const response = await this.requestsService.processRequest(request);
+    return response;
   }
 }

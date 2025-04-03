@@ -1,11 +1,16 @@
 import { Module } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { ClientsModule, Transport } from "@nestjs/microservices";
 import { RequestsService } from "./services/requests.service";
 import { RequestsController } from "./controllers/requests.controller";
 import { RequestsPublisher } from "./messaging/requests.publisher";
-import { ClientsModule, Transport } from "@nestjs/microservices";
+import { Request } from "./entities/request.entity";
+import { UsersModule } from "../users/users.module";
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([Request]),
+    UsersModule,
     ClientsModule.register([
       {
         name: "RABBITMQ_SERVICE",
@@ -14,7 +19,7 @@ import { ClientsModule, Transport } from "@nestjs/microservices";
           urls: [process.env.RABBITMQ_URL ?? "amqp://admin:pass@localhost:5672"],
           queue: process.env.RABBITMQ_QUEUE ?? "config_queue",
           queueOptions: {
-            durable: true, // Ensure the queue survives RabbitMQ restarts
+            durable: true,
           },
         },
       },
@@ -22,5 +27,6 @@ import { ClientsModule, Transport } from "@nestjs/microservices";
   ],
   providers: [RequestsService, RequestsPublisher],
   controllers: [RequestsController],
+  exports: [RequestsService],
 })
 export class RequestsModule {}
