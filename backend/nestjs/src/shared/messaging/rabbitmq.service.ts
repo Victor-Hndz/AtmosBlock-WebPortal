@@ -1,21 +1,37 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { ClientRMQ } from "@nestjs/microservices";
 import { Observable, firstValueFrom } from "rxjs";
 
 @Injectable()
-export class RabbitMQService {
+export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(RabbitMQService.name);
   private readonly client: ClientRMQ;
 
   constructor(private readonly configService: ConfigService) {
+    const rabbitMqUrl = this.configService.get<string>("RABBITMQ_URL");
+    const rabbitMqQueue = this.configService.get<string>("RABBITMQ_QUEUE");
+
+    if (!rabbitMqUrl || !rabbitMqQueue) {
+      throw new Error("RabbitMQ connection information is missing");
+    }
+
     this.client = new ClientRMQ({
-      urls: [this.configService.get<string>("RABBITMQ_URL")!],
-      queue: this.configService.get<string>("RABBITMQ_QUEUE")!,
+      urls: [rabbitMqUrl],
+      queue: rabbitMqQueue,
       queueOptions: {
         durable: true,
       },
+      noAck: false,
     });
+  }
+
+  async onModuleInit() {
+    await this.connect();
+  }
+
+  async onModuleDestroy() {
+    await this.disconnect();
   }
 
   async connect() {

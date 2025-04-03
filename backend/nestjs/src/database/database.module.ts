@@ -15,8 +15,12 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
         password: configService.get("DB_PASSWORD"),
         database: configService.get("DB_DATABASE"),
         entities: [__dirname + "/../**/*.entity{.ts,.js}"],
-        synchronize: configService.get("NODE_ENV") === "development", // Only use in development
+        synchronize: configService.get("NODE_ENV") === "development",
         logging: configService.get("NODE_ENV") === "development",
+        ssl: configService.get("NODE_ENV") === "production",
+        autoLoadEntities: true,
+        retryAttempts: 5,
+        retryDelay: 3000,
       }),
     }),
   ],

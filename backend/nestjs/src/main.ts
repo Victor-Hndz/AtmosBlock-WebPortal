@@ -1,11 +1,13 @@
 import { NestFactory } from "@nestjs/core";
-import { ValidationPipe, BadRequestException } from "@nestjs/common";
+import { ValidationPipe, BadRequestException, Logger } from "@nestjs/common";
 import { AppModule } from "./app.module";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { ConfigService } from "@nestjs/config";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { HttpExceptionFilter } from "./shared/filters/http-exception.filter";
 
 async function bootstrap() {
+  const logger = new Logger("Bootstrap");
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
@@ -25,6 +27,9 @@ async function bootstrap() {
       },
     })
   );
+
+  // Global filters
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   // Enable CORS
   app.enableCors();
@@ -54,10 +59,25 @@ async function bootstrap() {
     },
   });
 
-  await app.startAllMicroservices();
-  await app.listen(configService.get<number>("PORT") ?? 3000);
+  // Handle graceful shutdown
+  const signals = ["SIGTERM", "SIGINT"];
 
-  // eslint-disable-next-line no-console
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  signals.forEach(signal => {
+    process.on(signal, async () => {
+      logger.log(`Received ${signal} signal - shutting down gracefully`);
+
+      await app.close();
+      logger.log("Application closed");
+
+      process.exit(0);
+    });
+  });
+
+  await app.startAllMicroservices();
+  const port = configService.get<number>("PORT") ?? 3000;
+  await app.listen(port);
+
+  logger.log(`🚀 Application is running on: ${await app.getUrl()}`);
+  logger.log(`📝 Swagger documentation available at: ${await app.getUrl()}/api/docs`);
 }
 bootstrap();
