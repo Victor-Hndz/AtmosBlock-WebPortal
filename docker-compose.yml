@@ -9,6 +9,49 @@ services:
       - ${RABBITMQ_MANAGEMENT_PORT}:${RABBITMQ_MANAGEMENT_PORT}
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - app-network
+  
+  postgres:
+    image: postgres:16
+    container_name: postgres_container
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/nestjs/db/init:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nest_api:
+    build:
+      context: ./backend/nestjs
+      dockerfile: Dockerfile
+    container_name: nest_api_container
+    env_file:
+      - .env
+    environment:
+      DB_HOST: postgres
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    networks:
+      - app-network
   
   configurator_module:
     build:
@@ -27,6 +70,8 @@ services:
     stdin_open: true
     tty: true
     working_dir: /app
+    networks:
+      - app-network
 
   handler_module:
     build:
@@ -40,10 +85,11 @@ services:
       - configurator_module
     volumes:
       - config_data:/app/config
-      # - out_data:/app/out
     stdin_open: true
     tty: true
     working_dir: /app
+    networks:
+      - app-network
 
   execution_module:
     build:
@@ -62,6 +108,8 @@ services:
     stdin_open: true
     tty: true
     working_dir: /app
+    networks:
+      - app-network
 
   # visualization_module:
   #   build:
@@ -94,3 +142,9 @@ volumes:
     driver: local
   rabbitmq_data:
     driver: local
+  postgres_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

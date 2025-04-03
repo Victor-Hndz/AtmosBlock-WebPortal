@@ -1,2 +1,11 @@
-node_modules/
-dist/
+node_modules
+npm-debug.log
+dist
+.git
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.vscode
+coverage
+.DS_Store
