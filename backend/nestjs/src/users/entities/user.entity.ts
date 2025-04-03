@@ -6,8 +6,10 @@ import {
   UpdateDateColumn,
   BeforeInsert,
   BeforeUpdate,
+  OneToMany,
 } from "typeorm";
 import * as bcrypt from "bcrypt";
+import { Request } from "../../requests/entities/request.entity";
 
 export enum UserRole {
   ADMIN = "admin",
@@ -35,14 +37,17 @@ export class User {
   })
   role: UserRole;
 
-  @Column({ default: true })
+  @Column({ name: "is_active", default: true })
   isActive: boolean;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
+
+  @OneToMany(() => Request, request => request.user)
+  requests: Request[];
 
   @BeforeInsert()
   @BeforeUpdate()
