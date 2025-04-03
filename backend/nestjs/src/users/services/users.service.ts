@@ -4,6 +4,7 @@ import { Repository } from "typeorm";
 import { User } from "../entities/user.entity";
 import { CreateUserDto } from "../dtos/create-user.dto";
 import { UpdateUserDto } from "../dtos/update-user.dto";
+import { UpdateProfileDto } from "../dtos/update-profile.dto";
 
 @Injectable()
 export class UsersService {
@@ -55,5 +56,38 @@ export class UsersService {
   async remove(id: string): Promise<void> {
     const user = await this.findOne(id);
     await this.userRepository.remove(user);
+  }
+
+  async findOneWithRequests(id: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ["requests"],
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    // Remove password from the returned object
+    const { password, ...result } = user;
+    return result as User;
+  }
+
+  async updateProfile(id: string, updateProfileDto: UpdateProfileDto): Promise<User> {
+    const user = await this.findOne(id);
+
+    if (updateProfileDto.email && updateProfileDto.email !== user.email) {
+      const existingUser = await this.findByEmail(updateProfileDto.email);
+      if (existingUser) {
+        throw new ConflictException("Email already in use");
+      }
+    }
+
+    Object.assign(user, updateProfileDto);
+    await this.userRepository.save(user);
+
+    // Remove password from the returned object
+    const { password, ...result } = user;
+    return result as User;
   }
 }

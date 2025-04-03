@@ -7,6 +7,7 @@ import { RolesGuard } from "../../auth/guards/roles.guard";
 import { Roles } from "../../auth/decorators/roles.decorator";
 import { UserRole } from "../entities/user.entity";
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from "@nestjs/swagger";
+import { UpdateProfileDto } from "../dtos/update-profile.dto";
 
 @ApiTags("users")
 @ApiBearerAuth()
@@ -25,10 +26,27 @@ export class UsersController {
 
   @Get("profile")
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: "Get user profile" })
-  @ApiResponse({ status: 200, description: "Return the user profile." })
+  @ApiOperation({ summary: "Get user profile with requests" })
+  @ApiResponse({ status: 200, description: "Return the user profile with associated requests." })
   getProfile(@Request() req) {
-    return this.usersService.findOne(req.user.id);
+    return this.usersService.findOneWithRequests(req.user.id);
+  }
+
+  @Patch("profile")
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: "Update own profile" })
+  @ApiResponse({ status: 200, description: "The profile has been successfully updated." })
+  @ApiResponse({ status: 409, description: "Email already in use." })
+  updateProfile(@Request() req, @Body() updateProfileDto: UpdateProfileDto) {
+    return this.usersService.updateProfile(req.user.id, updateProfileDto);
+  }
+
+  @Delete("profile")
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: "Delete own account" })
+  @ApiResponse({ status: 200, description: "The account has been successfully deleted." })
+  removeProfile(@Request() req) {
+    return this.usersService.remove(req.user.id);
   }
 
   @Get(":id")
