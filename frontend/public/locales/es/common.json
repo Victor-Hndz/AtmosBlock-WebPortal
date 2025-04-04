@@ -80,6 +80,21 @@
     "summary": "Resumen de la Solicitud",
     "reviewBeforeSubmit": "Por favor, revisa los detalles de tu solicitud antes de enviar:"
   },
+  "profile": {
+    "userMenu": "Menú de usuario",
+    "viewProfile": "Ver Perfil",
+    "settings": "Configuración",
+    "logout": "Cerrar sesión",
+    "profile": "Mi Perfil",
+    "userInformation": "Información del Usuario",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "role": "Rol",
+    "accountOptions": "Opciones de la Cuenta",
+    "editProfile": "Editar Perfil",
+    "changePassword": "Cambiar Contraseña",
+    "deleteAccount": "Eliminar Cuenta"
+  },
   "requests-form": {
     "variableName": "Nombre de Variable",
     "variableNameTooltip": "Introduce el nombre de la variable que deseas procesar",

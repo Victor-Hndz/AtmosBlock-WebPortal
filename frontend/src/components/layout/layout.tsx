@@ -1,5 +1,5 @@
 import React, { JSX } from "react";
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { House, LogIn, Info, Menu, ListTodo, LucideProps } from "lucide-react";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import * as Separator from "@radix-ui/react-separator";
@@ -7,6 +7,8 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/shared/LanguageSwitcher";
+import UserProfileMenu from "@/components/shared/UserProfileMenu";
+import { useAppSelector } from "@/redux/hooks";
 import "./layout.css";
 
 /**
@@ -120,7 +122,9 @@ const MobileMenuItem: React.FC<{ item: NavItem }> = ({ item }: { item: NavItem }
  */
 const Layout: React.FC = (): JSX.Element => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { t } = useTranslation();
+  const { isAuthenticated, user } = useAppSelector(state => state.auth);
 
   // Navigation items configuration with translation keys
   const navItems: NavItem[] = [
@@ -140,15 +144,18 @@ const Layout: React.FC = (): JSX.Element => {
       position: "l",
       collapse: true,
     },
-    {
+  ];
+
+  if (!isAuthenticated) {
+    navItems.push({
       path: "/auth",
       labelKey: "navigation-header.login",
       icon: LogIn,
       tooltipKey: "navigation-tooltips.login",
       position: "r",
       collapse: true,
-    },
-  ];
+    });
+  }
 
   // Group navigation items by position and collapsibility
   const leftNavItems = navItems.filter(item => item.position === "l");
@@ -185,11 +192,15 @@ const Layout: React.FC = (): JSX.Element => {
               ))}
             </div>
 
-            {/* Right aligned items with language switcher */}
+            {/* Right aligned items with language switcher and user profile */}
             <div className="hidden md:flex gap-4 items-center">
               {rightNavItems.map(item => (
                 <NavLink key={item.path} item={item} isActive={location.pathname === item.path} />
               ))}
+
+              {/* Show user profile menu if authenticated */}
+              {isAuthenticated && user && <UserProfileMenu user={user} />}
+
               <LanguageSwitcher />
             </div>
 
@@ -222,13 +233,30 @@ const Layout: React.FC = (): JSX.Element => {
                       {collapsibleItems.map(item => (
                         <MobileMenuItem key={item.path} item={item} />
                       ))}
+
+                      {/* Add logout option in mobile menu when authenticated */}
+                      {isAuthenticated && (
+                        <>
+                          <DropdownMenu.Separator className="h-px bg-gray-700 my-1" />
+                          <DropdownMenu.Item
+                            className="flex items-center p-2 text-white rounded-md hover:bg-gray-700 transition-colors duration-200"
+                            onSelect={() => {
+                              navigate("/profile");
+                            }}
+                          >
+                            <span className="mr-2">👤</span>
+                            <span>{t("profile.profile")}</span>
+                          </DropdownMenu.Item>
+                        </>
+                      )}
+
                       <DropdownMenu.Arrow className="fill-gray-800" />
                     </DropdownMenu.Content>
                   </DropdownMenu.Portal>
                 </DropdownMenu.Root>
 
-                {/* Language switcher in mobile view */}
-                <LanguageSwitcher />
+                {/* User profile in mobile view when authenticated */}
+                {isAuthenticated && user ? <UserProfileMenu user={user} /> : <LanguageSwitcher />}
               </div>
             )}
           </div>

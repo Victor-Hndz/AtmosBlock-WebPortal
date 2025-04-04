@@ -4,6 +4,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import * as Form from "@radix-ui/react-form";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import * as Toast from "@radix-ui/react-toast";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 
@@ -438,12 +439,13 @@ const RegisterForm: React.FC<{
  */
 export default function AuthPage(): JSX.Element {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   // State for showing/hiding password
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   // Auth hook for authentication operations
-  const { login, register, isLoading, error, clearError } = useAuth();
+  const { login, register, isAuthenticated, isLoading, error, clearError } = useAuth();
 
   // Active tab state (login or register)
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
@@ -451,6 +453,13 @@ export default function AuthPage(): JSX.Element {
   // Toast notification state
   const [toastOpen, setToastOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>("");
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
 
   // Clear error when switching tabs
   useEffect(() => {

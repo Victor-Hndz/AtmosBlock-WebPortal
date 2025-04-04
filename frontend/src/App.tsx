@@ -1,4 +1,4 @@
-import { AppRoutes } from "@/routes";
+import AppRoutes from "@/routes";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "@/redux/hooks";

@@ -80,6 +80,21 @@
     "summary": "Request Summary",
     "reviewBeforeSubmit": "Please review your request details before submitting:"
   },
+  "profile": {
+    "userMenu": "User menu",
+    "viewProfile": "View Profile",
+    "settings": "Settings",
+    "logout": "Log out",
+    "profile": "My Profile",
+    "userInformation": "User Information",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "accountOptions": "Account Options",
+    "editProfile": "Edit Profile",
+    "changePassword": "Change Password",
+    "deleteAccount": "Delete Account"
+  },
   "requests-form": {
     "variableName": "Variable Name",
     "variableNameTooltip": "Enter the name of the variable you want to process",

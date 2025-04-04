@@ -8,15 +8,38 @@ interface AuthState {
   error: string | null;
 }
 
-// const url = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+// const url = process.env.PORT ?? "http://localhost:3000";
 const url = "http://localhost:3000";
 
-const initialState: AuthState = {
-  user: null,
-  isAuthenticated: false,
-  isLoading: false,
-  error: null,
+// Helper function to load initial state from localStorage
+const loadAuthState = (): AuthState => {
+  try {
+    const serializedAuth = localStorage.getItem("auth");
+    if (serializedAuth === null) {
+      return {
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+        error: null,
+      };
+    }
+    const authData = JSON.parse(serializedAuth);
+    return {
+      ...authData,
+      isLoading: false,
+      error: null,
+    };
+  } catch (error) {
+    return {
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      error: error instanceof Error ? error.message : null,
+    };
+  }
 };
+
+const initialState: AuthState = loadAuthState();
 
 export const loginUser = createAsyncThunk(
   "auth/login",
@@ -35,6 +58,12 @@ export const loginUser = createAsyncThunk(
       }
 
       const data = await response.json();
+
+      // Save token to localStorage for persistent sessions
+      if (data.accessToken) {
+        localStorage.setItem("token", data.accessToken);
+      }
+
       return data.user;
     } catch (error) {
       console.error("Login error:", error);
@@ -59,6 +88,12 @@ export const registerUser = createAsyncThunk(
       }
 
       const data = await response.json();
+
+      // Save token to localStorage for persistent sessions
+      if (data.accessToken) {
+        localStorage.setItem("token", data.accessToken);
+      }
+
       return data.user;
     } catch (error) {
       console.error("Registration error:", error);
@@ -69,13 +104,9 @@ export const registerUser = createAsyncThunk(
 
 export const logoutUser = createAsyncThunk("auth/logout", async (_, { rejectWithValue }) => {
   try {
-    const response = await fetch(`${url}/api/auth/logout`, {
-      method: "POST",
-    });
-
-    if (!response.ok) {
-      return rejectWithValue("Logout failed");
-    }
+    // Clear token from localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("auth");
 
     return true;
   } catch (error) {
@@ -104,6 +135,15 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.user = action.payload;
         state.error = null;
+
+        // Save auth state to localStorage
+        localStorage.setItem(
+          "auth",
+          JSON.stringify({
+            user: action.payload,
+            isAuthenticated: true,
+          })
+        );
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -121,6 +161,15 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.user = action.payload;
         state.error = null;
+
+        // Save auth state to localStorage
+        localStorage.setItem(
+          "auth",
+          JSON.stringify({
+            user: action.payload,
+            isAuthenticated: true,
+          })
+        );
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
