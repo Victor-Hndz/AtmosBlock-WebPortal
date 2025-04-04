@@ -9,6 +9,7 @@ import RequestsPage from "@/pages/requestsPage";
 import { useAppSelector } from "@/redux/hooks";
 import ProtectedRoute from "@/components/shared/ProtectedRoute";
 import ProfilePage from "@/pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
 
 /**
  * Application router configuration
@@ -31,6 +32,14 @@ function AppRoutes(): JSX.Element {
           element: (
             <ProtectedRoute>
               <ProfilePage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "settings",
+          element: (
+            <ProtectedRoute>
+              <SettingsPage />
             </ProtectedRoute>
           ),
         },

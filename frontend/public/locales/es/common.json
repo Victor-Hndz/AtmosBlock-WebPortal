@@ -80,6 +80,25 @@
     "summary": "Resumen de la Solicitud",
     "reviewBeforeSubmit": "Por favor, revisa los detalles de tu solicitud antes de enviar:"
   },
+  "requests": {
+    "details": "Detalles de la Solicitud",
+    "variableName": "Nombre de la Variable",
+    "date": "Fecha",
+    "pressureLevels": "Niveles de Presión",
+    "areaCovered": "Área Cubierta",
+    "format": "Formato",
+    "interpolation": "Interpolación",
+    "resolution": "Resolución",
+    "status": "Estado",
+    "created": "Creado",
+    "requestAgain": "Solicitar de nuevo",
+    "statuses": {
+      "pending": "Pendiente",
+      "processing": "Procesando",
+      "completed": "Completado",
+      "failed": "Fallido"
+    }
+  },
   "profile": {
     "userMenu": "Menú de usuario",
     "viewProfile": "Ver Perfil",
@@ -93,7 +112,20 @@
     "accountOptions": "Opciones de la Cuenta",
     "editProfile": "Editar Perfil",
     "changePassword": "Cambiar Contraseña",
-    "deleteAccount": "Eliminar Cuenta"
+    "deleteAccount": "Eliminar Cuenta",
+    "edit": "Editar",
+    "nameRequired": "El nombre es obligatorio",
+    "emailRequired": "El correo electrónico es obligatorio",
+    "emailInvalid": "Por favor, introduce un correo electrónico válido",
+    "viewRequests": "Ver mis solicitudes",
+    "deleteConfirmTitle": "¿Eliminar cuenta?",
+    "deleteConfirmMessage": "Esta acción no se puede deshacer. Eliminará permanentemente tu cuenta y todos tus datos de nuestros servidores."
+  },
+  "settings": {
+    "title": "Configuración",
+    "requestsHistory": "Historial de Solicitudes",
+    "noRequests": "Aún no has realizado ninguna solicitud",
+    "makeRequest": "Realizar una solicitud"
   },
   "requests-form": {
     "variableName": "Nombre de Variable",
@@ -162,12 +194,19 @@
   "buttons": {
     "submit": "Enviar",
     "cancel": "Cancelar",
+    "canceling": "Cancelando...",
     "save": "Guardar",
+    "saving": "Guardando...",
     "delete": "Eliminar",
+    "deleteing": "Eliminando...",
     "edit": "Editar",
     "back": "Atrás",
     "close": "Cerrar",
     "next": "Siguiente"
+  },
+  "toast": {
+    "success": "Éxito",
+    "error": "Error"
   },
   "errors": {
     "title": "Error",
@@ -175,5 +214,9 @@
     "login": "Error al iniciar sesión. Por favor, compruebe sus credenciales.",
     "register": "Error al registrarse. Por favor, inténtelo de nuevo.",
     "submission": "Error al enviar la solicitud. Por favor, inténtelo de nuevo."
+  },
+  "common": {
+    "loading": "Cargando...",
+    "none": "Ninguno"
   }
 }

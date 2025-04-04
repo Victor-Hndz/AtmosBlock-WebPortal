@@ -6,6 +6,7 @@ import HomePage from "@/pages/homePage";
 import AboutPage from "@/pages/aboutPage";
 import RequestsPage from "@/pages/requestsPage";
 import ProfilePage from "@/pages/ProfilePage";
+import SettingsPage from "@/pages/SettingsPage";
 import { useAppSelector } from "@/redux/hooks";
 
 /**
@@ -41,6 +42,14 @@ const AppRoutes: React.FC = () => {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="settings"
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
               </ProtectedRoute>
             }
           />

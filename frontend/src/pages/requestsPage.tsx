@@ -12,7 +12,7 @@ import AdvancedSettingsForm from "@/components/requests/AdvancedSettingsForm";
 import RequestSummary from "@/components/requests/RequestSummary";
 import { useAuth } from "@/hooks/useAuth";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { updateFormField, submitRequest } from "@/redux/slices/requestsSlice";
+import updateFormField, { submitRequest } from "@/redux/slices/requestsSlice";
 import "./requestsPage.css";
 
 /**

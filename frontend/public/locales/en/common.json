@@ -80,6 +80,25 @@
     "summary": "Request Summary",
     "reviewBeforeSubmit": "Please review your request details before submitting:"
   },
+  "requests": {
+    "details": "Request Details",
+    "variableName": "Variable Name",
+    "date": "Date",
+    "pressureLevels": "Pressure Levels",
+    "areaCovered": "Area Covered",
+    "format": "Format",
+    "interpolation": "Interpolation",
+    "resolution": "Resolution",
+    "status": "Status",
+    "created": "Created",
+    "requestAgain": "Request Again",
+    "statuses": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "completed": "Completed",
+      "failed": "Failed"
+    }
+  },
   "profile": {
     "userMenu": "User menu",
     "viewProfile": "View Profile",
@@ -93,7 +112,20 @@
     "accountOptions": "Account Options",
     "editProfile": "Edit Profile",
     "changePassword": "Change Password",
-    "deleteAccount": "Delete Account"
+    "deleteAccount": "Delete Account",
+    "edit": "Edit",
+    "nameRequired": "Name is required",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Please enter a valid email address",
+    "viewRequests": "View my requests",
+    "deleteConfirmTitle": "Delete Account?",
+    "deleteConfirmMessage": "This action cannot be undone. This will permanently delete your account and remove all your data from our servers."
+  },
+  "settings": {
+    "title": "Settings",
+    "requestsHistory": "Request History",
+    "noRequests": "You haven't made any requests yet",
+    "makeRequest": "Make a request"
   },
   "requests-form": {
     "variableName": "Variable Name",
@@ -162,12 +194,19 @@
   "buttons": {
     "submit": "Submit",
     "cancel": "Cancel",
+    "Canceling": "Canceling...",
     "save": "Save",
+    "saving": "Saving...",
     "delete": "Delete",
+    "deleting": "Deleting...",
     "edit": "Edit",
     "back": "Back",
     "close": "Close",
     "next": "Next"
+  },
+  "toast": {
+    "success": "Success",
+    "error": "Error"
   },
   "errors": {
     "title": "Error",
@@ -175,5 +214,9 @@
     "login": "Login failed. Please check your credentials.",
     "register": "Registration failed. Please try again.",
     "submission": "Failed to submit request. Please try again."
+  },
+  "common": {
+    "loading": "Loading...",
+    "none": "None"
   }
 }
