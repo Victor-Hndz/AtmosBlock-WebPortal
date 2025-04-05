@@ -71,11 +71,6 @@ export class CreateRequestDto {
   @IsOptional()
   tracking?: boolean;
 
-  @ApiPropertyOptional({ description: "Enable debug mode", default: false })
-  @IsBoolean()
-  @IsOptional()
-  debug?: boolean;
-
   @ApiPropertyOptional({ description: "Skip compilation step", default: false })
   @IsBoolean()
   @IsOptional()

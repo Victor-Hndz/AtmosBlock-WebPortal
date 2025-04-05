@@ -162,8 +162,6 @@
     "options": "Options",
     "tracking": "Tracking",
     "trackingTooltip": "Enable tracking of request execution",
-    "debug": "Debug",
-    "debugTooltip": "Enable debug output during processing",
     "noCompile": "Skip Compilation",
     "noCompileTooltip": "Skip compilation step",
     "noExecute": "Skip Execution",

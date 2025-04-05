@@ -9,7 +9,7 @@ from utils.rabbitMQ.receive_messages import receive_messages
 from utils.rabbitMQ.send_message import send_message
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
-from utils.consts.consts import STATUS_OK, STATUS_ERROR, MESSAGE_NO_COMPILE, MESSAGE_DEBUG
+from utils.consts.consts import STATUS_OK, STATUS_ERROR, MESSAGE_NO_COMPILE
 
 
 def handle_message(body):
@@ -19,9 +19,7 @@ def handle_message(body):
     
     # print(f"\n\tMensaje recibido en exec handler: {message}")
     
-    if data["request_type"] == MESSAGE_DEBUG:
-        print("\n[ ] Se recibió un mensaje de debug")
-    elif data["request_type"] == MESSAGE_NO_COMPILE:
+    if data["request_type"] == MESSAGE_NO_COMPILE:
         print("\n[ ] Se recibió un mensaje de no compilar")
     else:
         print("\n[ ] Se recibió un mensaje de ejecución normal")

@@ -42,9 +42,6 @@ export class Request {
   @Column({ default: false })
   tracking: boolean;
 
-  @Column({ default: false })
-  debug: boolean;
-
   @Column({ default: false, name: "no_compile" })
   noCompile: boolean;
 

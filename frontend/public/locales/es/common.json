@@ -162,8 +162,6 @@
     "options": "Opciones",
     "tracking": "Seguimiento",
     "trackingTooltip": "Habilitar seguimiento de ejecución de solicitud",
-    "debug": "Depuración",
-    "debugTooltip": "Habilitar salida de depuración durante el procesamiento",
     "noCompile": "Omitir Compilación",
     "noCompileTooltip": "Omitir paso de compilación",
     "noExecute": "Omitir Ejecución",

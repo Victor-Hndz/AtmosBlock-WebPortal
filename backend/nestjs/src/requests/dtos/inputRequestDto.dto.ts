@@ -60,10 +60,6 @@ export class InputRequestDto {
 
   @IsBoolean()
   @IsOptional()
-  debug?: boolean;
-
-  @IsBoolean()
-  @IsOptional()
   noCompile?: boolean;
 
   @IsBoolean()

@@ -12,7 +12,7 @@ from utils.rabbitMQ.send_message import send_message
 from utils.rabbitMQ.receive_messages import receive_messages
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
-from utils.consts.consts import EXEC_FILE, STATUS_OK, STATUS_ERROR, MESSAGE_NO_COMPILE, MESSAGE_DEBUG
+from utils.consts.consts import EXEC_FILE, STATUS_OK, STATUS_ERROR, MESSAGE_NO_COMPILE
 
 
 class ConfigHandler:
@@ -33,7 +33,6 @@ class ConfigHandler:
         self.map_levels = None
         self.file_format = None
         self.tracking = None
-        self.debug = None
         self.no_compile = None
         self.no_execute = None
         self.no_maps = None
@@ -68,7 +67,6 @@ class ConfigHandler:
         self.map_levels = map_config["mapLevels"]
         self.file_format = map_config["fileFormat"]
         self.tracking = map_config["tracking"]
-        self.debug = map_config["debug"]
         self.no_compile = map_config["noCompile"]
         self.no_execute = map_config["noExecute"]
         self.no_maps = map_config["noMaps"]
@@ -229,15 +227,12 @@ class ConfigHandler:
 
         # Prepare execution command based on configuration
         cmd = self._prepare_execution_command(lat_range, lon_range)
-        debug_cmd = self._prepare_debug_command(lat_range, lon_range)
         
         print("\n[ ] Enviando mensaje a la cola de ejecución...")
         
         # Prepare data based on configuration
         if self.no_compile:
             data = {"request_type": MESSAGE_NO_COMPILE, "cmd": cmd}
-        elif self.debug:
-            data = {"request_type": MESSAGE_DEBUG, "cmd": debug_cmd}
         else:
             data = {"request_type": "", "cmd": cmd}
         
@@ -268,31 +263,7 @@ class ConfigHandler:
         else:
             return [EXEC_FILE, self.file_name, str(lat_range[0]), str(lat_range[1]), 
                     str(lon_range[0]), str(lon_range[1]), "1"]
-
-    def _prepare_debug_command(self, lat_range: List[int], lon_range: List[int]) -> List[str]:
-        """
-        Prepare the debug command based on configuration.
         
-        Args:
-            lat_range: Latitude range [min, max]
-            lon_range: Longitude range [min, max]
-            
-        Returns:
-            List of debug command arguments
-        """
-        if self.omp and not self.mpi:
-            return ["gdb", "--args", EXEC_FILE, self.file_name, str(lat_range[0]), str(lat_range[1]), 
-                    str(lon_range[0]), str(lon_range[1]), self.n_threads]
-        elif self.mpi and not self.omp:
-            return ["gdb", "--args", "mpirun", "-n", self.n_processes, EXEC_FILE, self.file_name, 
-                    str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), "1"]
-        elif self.omp and self.mpi:
-            return ["gdb", "--args", "mpirun", "-n", self.n_processes, EXEC_FILE, self.file_name, 
-                    str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), self.n_threads]
-        else:
-            return ["gdb", "--args", EXEC_FILE, self.file_name, str(lat_range[0]), str(lat_range[1]), 
-                    str(lon_range[0]), str(lon_range[1]), "1"]
-            
     def process_map_generation(self) -> None:
         """
         Generate maps based on the configuration.

@@ -102,24 +102,6 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                   </Switch.Root>
                 </div>
               </FormField>
-
-              <FormField
-                id="debug"
-                label={t("requests-form.debug")}
-                tooltip={t("requests-form.debugTooltip", "Enable debug output during processing")}
-              >
-                <div className="flex items-center h-5">
-                  <Switch.Root
-                    id="debug"
-                    checked={formData.debug || false}
-                    onCheckedChange={checked => updateFormField("debug", checked)}
-                    className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
-                  >
-                    <Switch.Thumb className="block w-4 h-4 bg-white rounded-full transition-transform duration-100 transform translate-x-0.5 will-change-transform data-[state=checked]:translate-x-5" />
-                  </Switch.Root>
-                </div>
-              </FormField>
-
               <FormField
                 id="noCompile"
                 label={t("requests-form.noCompile")}

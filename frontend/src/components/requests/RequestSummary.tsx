@@ -103,11 +103,6 @@ const RequestSummary: React.FC<RequestSummaryProps> = ({ formData, onPrevious })
                       {t("requests-form.tracking", "Tracking")}: {t("requests-form.enabled", "Enabled")}
                     </li>
                   )}
-                  {formData.debug && (
-                    <li>
-                      {t("requests-form.debug", "Debug")}: {t("requests-form.enabled", "Enabled")}
-                    </li>
-                  )}
                   {formData.noCompile && (
                     <li>
                       {t("requests-form.skipCompilation", "Skip Compilation")}: {t("requests-form.yes", "Yes")}

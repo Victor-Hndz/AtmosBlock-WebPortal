@@ -104,7 +104,6 @@ def process_message(body):
         "mapLevels": args["mapLevels"],
         "fileFormat": args["fileFormat"],
         "tracking": args["tracking"],
-        "debug": args["debug"],
         "noCompile": args["noCompile"],
         "noExecute": args["noExecute"],
         "noMaps": args["noMaps"],
