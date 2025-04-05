@@ -28,8 +28,6 @@ export interface Request {
     west: number;
   };
   format?: string;
-  interpolation?: string;
-  resolution?: string;
   status: RequestStatus;
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
@@ -74,8 +72,6 @@ export function hasSameContent(req1: Request, req2: Request): boolean {
 
   // Compare optional fields if present
   if (req1.format !== req2.format) return false;
-  if (req1.interpolation !== req2.interpolation) return false;
-  if (req1.resolution !== req2.resolution) return false;
 
   return true;
 }

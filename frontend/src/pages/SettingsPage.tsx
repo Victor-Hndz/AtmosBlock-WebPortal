@@ -197,20 +197,6 @@ const RequestItem: React.FC<RequestItemProps> = ({ group }) => {
                 </div>
               )}
 
-              {request.interpolation && (
-                <div>
-                  <p className="text-sm text-gray-500">{t("requests.interpolation")}</p>
-                  <p>{request.interpolation}</p>
-                </div>
-              )}
-
-              {request.resolution && (
-                <div>
-                  <p className="text-sm text-gray-500">{t("requests.resolution")}</p>
-                  <p>{request.resolution}</p>
-                </div>
-              )}
-
               <div>
                 <p className="text-sm text-gray-500">{t("requests.status")}</p>
                 <p className={`${formatRequestStatus(request.status)}`}>{t(`requests.statuses.${request.status}`)}</p>
