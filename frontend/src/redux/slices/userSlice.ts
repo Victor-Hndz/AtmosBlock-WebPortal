@@ -47,6 +47,12 @@ export const updateUserProfile = createAsyncThunk(
 
       const data = await response.json();
 
+      // If email was changed, the backend will return a new token
+      // Store the new token if provided
+      if (data.accessToken) {
+        localStorage.setItem("token", data.accessToken);
+      }
+
       // Update the stored auth data
       const authData = localStorage.getItem("auth");
       if (authData) {

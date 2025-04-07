@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, ConflictException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { User } from "../entities/user.entity";
+import { User, UserRole } from "../entities/user.entity";
 import { CreateUserDto } from "../dtos/create-user.dto";
 import { UpdateUserDto } from "../dtos/update-user.dto";
 import { UpdateProfileDto } from "../dtos/update-profile.dto";
@@ -35,7 +35,15 @@ export class UsersService {
       throw new ConflictException("Email already in use");
     }
 
-    const user = this.userRepository.create(createUserDto);
+    const user = this.userRepository.create();
+    // Set basic properties
+    user.name = createUserDto.name;
+    user.email = createUserDto.email;
+    user.role = createUserDto.role ?? UserRole.USER;
+
+    // Set password properly to trigger the password change flag
+    user.setPassword(createUserDto.password);
+
     return this.userRepository.save(user);
   }
 
@@ -49,7 +57,15 @@ export class UsersService {
       }
     }
 
+    // Handle password updates properly using the new setPassword method
+    if (updateUserDto.password) {
+      user.setPassword(updateUserDto.password);
+      delete updateUserDto.password; // Remove password from DTO to prevent double assignment
+    }
+
+    // Assign remaining properties
     Object.assign(user, updateUserDto);
+
     return this.userRepository.save(user);
   }
 
@@ -83,7 +99,10 @@ export class UsersService {
       }
     }
 
+    // Update only the provided fields without affecting the password
+    // Since UpdateProfileDto doesn't include password, this won't modify the password
     Object.assign(user, updateProfileDto);
+
     await this.userRepository.save(user);
 
     // Remove password from the returned object

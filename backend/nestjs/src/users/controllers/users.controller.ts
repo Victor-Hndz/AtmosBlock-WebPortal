@@ -8,12 +8,16 @@ import { Roles } from "../../auth/decorators/roles.decorator";
 import { UserRole } from "../entities/user.entity";
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from "@nestjs/swagger";
 import { UpdateProfileDto } from "../dtos/update-profile.dto";
+import { AuthService } from "../../auth/services/auth.service";
 
 @ApiTags("users")
 @ApiBearerAuth()
 @Controller("users")
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService
+  ) {}
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -37,8 +41,28 @@ export class UsersController {
   @ApiOperation({ summary: "Update own profile" })
   @ApiResponse({ status: 200, description: "The profile has been successfully updated." })
   @ApiResponse({ status: 409, description: "Email already in use." })
-  updateProfile(@Request() req, @Body() updateProfileDto: UpdateProfileDto) {
-    return this.usersService.updateProfile(req.user.id, updateProfileDto);
+  async updateProfile(@Request() req, @Body() updateProfileDto: UpdateProfileDto) {
+    // Update the user profile
+    const updatedUser = await this.usersService.updateProfile(req.user.id, updateProfileDto);
+
+    // If email was updated, we need to generate a new token
+    if (updateProfileDto.email && updateProfileDto.email !== req.user.email) {
+      // Create a payload for the JWT token
+      const payload = {
+        sub: updatedUser.id,
+        email: updatedUser.email,
+        role: updatedUser.role,
+      };
+
+      // Generate a new token and return both the updated user and the new token
+      return {
+        user: updatedUser,
+        accessToken: this.authService.generateToken(payload),
+      };
+    }
+
+    // If email wasn't changed, just return the updated user
+    return { user: updatedUser };
   }
 
   @Delete("profile")

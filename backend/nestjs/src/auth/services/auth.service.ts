@@ -79,6 +79,15 @@ export class AuthService {
     }
   }
 
+  /**
+   * Generates a JWT token for a user with the given payload
+   * @param payload The payload to include in the JWT token
+   * @returns The signed JWT token
+   */
+  generateToken(payload: { sub: string; email: string; role: string }): string {
+    return this.jwtService.sign(payload);
+  }
+
   validateToken(token: string) {
     try {
       return this.jwtService.verify(token);

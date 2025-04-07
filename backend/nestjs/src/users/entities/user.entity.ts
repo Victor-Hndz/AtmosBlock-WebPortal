@@ -52,9 +52,21 @@ export class User {
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
-    if (this.password) {
+    // Only hash the password if it has been modified
+    // This prevents password re-hashing when updating other fields
+    if (this.password && this.__has_password_changed__) {
       this.password = await bcrypt.hash(this.password, 10);
+      this.__has_password_changed__ = false;
     }
+  }
+
+  // Property to track if password has changed
+  private __has_password_changed__: boolean = false;
+
+  // Method to call when setting a new password
+  setPassword(password: string): void {
+    this.password = password;
+    this.__has_password_changed__ = true;
   }
 
   async validatePassword(password: string): Promise<boolean> {
