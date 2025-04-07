@@ -25,7 +25,8 @@ export const fetchUserRequests = createAsyncThunk("requests/fetchUserRequests", 
       return rejectWithValue("No authentication token found");
     }
 
-    const response = await fetch(`${API_URL}/api/requests`, {
+    // Updated to use the correct endpoint
+    const response = await fetch(`${API_URL}/api/requests/my-requests`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",

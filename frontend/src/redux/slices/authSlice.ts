@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { User } from "@/types/User";
+import { updateUserProfile } from "./userSlice";
 
 interface AuthState {
   user: User | null;
@@ -122,6 +123,11 @@ const authSlice = createSlice({
     clearError: state => {
       state.error = null;
     },
+    syncUserProfile: (state, action: PayloadAction<Partial<User>>) => {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+      }
+    },
   },
   extraReducers: builder => {
     // Login handling
@@ -190,8 +196,24 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string;
       });
+
+    // Handle profile updates from userSlice
+    builder.addCase(updateUserProfile.fulfilled, (state, action) => {
+      if (state.user && action.meta.arg) {
+        state.user = { ...state.user, ...action.meta.arg };
+
+        // Update the localStorage
+        localStorage.setItem(
+          "auth",
+          JSON.stringify({
+            user: state.user,
+            isAuthenticated: true,
+          })
+        );
+      }
+    });
   },
 });
 
-export const { clearError } = authSlice.actions;
+export const { clearError, syncUserProfile } = authSlice.actions;
 export default authSlice.reducer;
