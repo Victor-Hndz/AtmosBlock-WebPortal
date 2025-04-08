@@ -215,5 +215,42 @@
   "common": {
     "loading": "Cargando...",
     "none": "Ninguno"
+  },
+  "home": {
+    "hero": {
+      "title": "Procesamiento de Datos Rápido y Eficiente",
+      "subtitle": "Envía solicitudes, visualiza resultados y obtén información valiosa de tus datos meteorológicos con nuestra plataforma de procesamiento avanzado.",
+      "primaryCta": "Iniciar una Solicitud",
+      "secondaryCta": "Iniciar Sesión"
+    },
+    "features": {
+      "title": "Características Principales",
+      "feature1": {
+        "title": "Procesamiento de Datos",
+        "description": "Procesa datos meteorológicos de manera eficiente con nuestros recursos de cómputo de alto rendimiento."
+      },
+      "feature2": {
+        "title": "Visualización Interactiva",
+        "description": "Visualiza tus resultados con gráficos y mapas interactivos para una mejor comprensión."
+      },
+      "feature3": {
+        "title": "Seguimiento en Tiempo Real",
+        "description": "Sigue el progreso de tus solicitudes en tiempo real y recibe notificaciones cuando se completen."
+      }
+    },
+    "dataExamples": {
+      "title": "Explora Ejemplos de Datos",
+      "tab1": "Temperatura",
+      "tab2": "Presión",
+      "tab3": "Humedad",
+      "content1": "El procesamiento de datos de temperatura permite el análisis de patrones térmicos en diferentes regiones geográficas y periodos de tiempo. Nuestro sistema maneja mediciones de temperatura de varias fuentes y resoluciones de cuadrícula.",
+      "content2": "Los datos de niveles de presión proporcionan información crucial sobre las condiciones atmosféricas. Procesa datos de presión multinivel y genera mapas de visualización completos para análisis meteorológico.",
+      "content3": "El procesamiento de datos de humedad permite monitorizar el contenido de vapor de agua en la atmósfera. Analiza patrones de humedad para comprender mejor los sistemas de precipitación y las condiciones climáticas."
+    },
+    "cta": {
+      "title": "¿Listo para Empezar?",
+      "description": "Crea tu primera solicitud de procesamiento de datos y desbloquea el poder del análisis meteorológico avanzado.",
+      "buttonText": "Crear Solicitud Ahora"
+    }
   }
 }

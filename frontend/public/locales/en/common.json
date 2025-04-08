@@ -215,5 +215,42 @@
   "common": {
     "loading": "Loading...",
     "none": "None"
+  },
+  "home": {
+    "hero": {
+      "title": "Fast & Efficient Data Processing",
+      "subtitle": "Submit requests, visualize results, and gain valuable insights from your meteorological data with our advanced processing platform.",
+      "primaryCta": "Start a Request",
+      "secondaryCta": "Sign In"
+    },
+    "features": {
+      "title": "Key Features",
+      "feature1": {
+        "title": "Data Processing",
+        "description": "Process meteorological data efficiently with our high-performance computing resources."
+      },
+      "feature2": {
+        "title": "Interactive Visualization",
+        "description": "Visualize your results with interactive charts and maps for better understanding."
+      },
+      "feature3": {
+        "title": "Real-time Tracking",
+        "description": "Track the progress of your requests in real-time and receive notifications when completed."
+      }
+    },
+    "dataExamples": {
+      "title": "Explore Data Examples",
+      "tab1": "Temperature",
+      "tab2": "Pressure",
+      "tab3": "Humidity",
+      "content1": "Temperature data processing allows for analysis of thermal patterns across different geographic regions and time periods. Our system handles temperature measurements from various sources and grid resolutions.",
+      "content2": "Pressure level data provides crucial information about atmospheric conditions. Process multi-level pressure data and generate comprehensive visualization maps for meteorological analysis.",
+      "content3": "Humidity data processing enables monitoring of water vapor content in the atmosphere. Analyze humidity patterns to better understand precipitation systems and climate conditions."
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "description": "Create your first data processing request and unlock the power of advanced meteorological analysis.",
+      "buttonText": "Create Request Now"
+    }
   }
 }

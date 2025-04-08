@@ -1,71 +1,160 @@
 import React, { JSX } from "react";
-import { useSelector } from "react-redux";
-import * as Tabs from "@radix-ui/react-tabs";
-import * as Progress from "@radix-ui/react-progress";
-import * as HoverCard from "@radix-ui/react-hover-card";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import { Download, ArrowRight, BarChart, Database, CloudLightning } from "lucide-react";
 import * as Separator from "@radix-ui/react-separator";
-import * as Tooltip from "@radix-ui/react-tooltip";
-import { Users, Calendar, Award, Clock, TrendingUp, Info } from "lucide-react";
-import type { RootState } from "@/redux/store";
+import * as HoverCard from "@radix-ui/react-hover-card";
+import * as Tabs from "@radix-ui/react-tabs";
+import { useAppSelector } from "@/redux/hooks";
 
 /**
- * Interface for statistic card data
- */
-interface StatCardProps {
-  title: string;
-  value: string | number;
-  icon: React.ReactNode;
-  trend?: number;
-  color: string;
-}
-
-/**
- * Interface for activity item data
- */
-interface ActivityItemProps {
-  title: string;
-  description: string;
-  timestamp: string;
-  icon: React.ReactNode;
-}
-
-/**
- * StatCard Component
- * Displays a single statistic with icon and optional trend indicator
+ * HomePage component
+ * Landing page with introduction to the application features
  *
- * @param {StatCardProps} props - Component properties
- * @returns {JSX.Element} Statistic card component
+ * @returns JSX.Element - The rendered HomePage component
  */
-const StatCard: React.FC<StatCardProps> = ({ title, value, icon, trend, color }: StatCardProps): JSX.Element => {
+export default function HomePage(): JSX.Element {
+  const { t } = useTranslation();
+  const { isAuthenticated } = useAppSelector(state => state.auth);
+
+  return (
+    <div className="space-y-16 py-8">
+      {/* Hero Section */}
+      <section className="text-center">
+        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-slate-900">{t("home.hero.title")}</h1>
+        <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-8">{t("home.hero.subtitle")}</p>
+        <div className="flex justify-center gap-4 flex-wrap">
+          <Link
+            to="/requests"
+            className="px-6 py-3 rounded-lg bg-violet-600 text-white font-medium flex items-center gap-2 hover:bg-violet-700 transition-colors"
+          >
+            {t("home.hero.primaryCta")}
+            <ArrowRight size={16} />
+          </Link>
+          {!isAuthenticated && (
+            <Link
+              to="/auth"
+              className="px-6 py-3 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition-colors"
+            >
+              {t("home.hero.secondaryCta")}
+            </Link>
+          )}
+        </div>
+      </section>
+
+      <Separator.Root className="h-px bg-slate-200 w-full max-w-4xl mx-auto" />
+
+      {/* Features Section */}
+      <section>
+        <h2 className="text-3xl font-bold text-center mb-8 text-slate-900">{t("home.features.title")}</h2>
+        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <FeatureCard
+            icon={<Database className="h-8 w-8 text-violet-600" />}
+            title={t("home.features.feature1.title")}
+            description={t("home.features.feature1.description")}
+          />
+          <FeatureCard
+            icon={<BarChart className="h-8 w-8 text-violet-600" />}
+            title={t("home.features.feature2.title")}
+            description={t("home.features.feature2.description")}
+          />
+          <FeatureCard
+            icon={<CloudLightning className="h-8 w-8 text-violet-600" />}
+            title={t("home.features.feature3.title")}
+            description={t("home.features.feature3.description")}
+          />
+        </div>
+      </section>
+
+      {/* Data Examples Section */}
+      <section className="bg-slate-50 py-10 px-4 rounded-xl max-w-5xl mx-auto">
+        <h2 className="text-2xl font-bold text-center mb-6 text-slate-900">{t("home.dataExamples.title")}</h2>
+        <Tabs.Root defaultValue="tab1" className="w-full">
+          <Tabs.List className="flex border-b border-slate-200 mb-6">
+            <Tabs.Trigger
+              value="tab1"
+              className="px-4 py-2 text-slate-600 font-medium data-[state=active]:text-violet-600 data-[state=active]:border-b-2 data-[state=active]:border-violet-600"
+            >
+              {t("home.dataExamples.tab1")}
+            </Tabs.Trigger>
+            <Tabs.Trigger
+              value="tab2"
+              className="px-4 py-2 text-slate-600 font-medium data-[state=active]:text-violet-600 data-[state=active]:border-b-2 data-[state=active]:border-violet-600"
+            >
+              {t("home.dataExamples.tab2")}
+            </Tabs.Trigger>
+            <Tabs.Trigger
+              value="tab3"
+              className="px-4 py-2 text-slate-600 font-medium data-[state=active]:text-violet-600 data-[state=active]:border-b-2 data-[state=active]:border-violet-600"
+            >
+              {t("home.dataExamples.tab3")}
+            </Tabs.Trigger>
+          </Tabs.List>
+          <Tabs.Content value="tab1" className="p-4 bg-white rounded-lg shadow-sm">
+            <p className="text-slate-700">{t("home.dataExamples.content1")}</p>
+          </Tabs.Content>
+          <Tabs.Content value="tab2" className="p-4 bg-white rounded-lg shadow-sm">
+            <p className="text-slate-700">{t("home.dataExamples.content2")}</p>
+          </Tabs.Content>
+          <Tabs.Content value="tab3" className="p-4 bg-white rounded-lg shadow-sm">
+            <p className="text-slate-700">{t("home.dataExamples.content3")}</p>
+          </Tabs.Content>
+        </Tabs.Root>
+      </section>
+
+      {/* Call To Action Section */}
+      <section className="text-center bg-violet-50 py-12 px-4 rounded-xl max-w-5xl mx-auto">
+        <h2 className="text-3xl font-bold mb-4 text-slate-900">{t("home.cta.title")}</h2>
+        <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-8">{t("home.cta.description")}</p>
+        <Link
+          to="/requests"
+          className="px-6 py-3 rounded-lg bg-violet-600 text-white font-medium inline-flex items-center gap-2 hover:bg-violet-700 transition-colors"
+        >
+          <Download size={16} />
+          {t("home.cta.buttonText")}
+        </Link>
+      </section>
+    </div>
+  );
+}
+
+/**
+ * Feature card component properties
+ */
+interface FeatureCardProps {
+  /** Icon element to display */
+  icon: React.ReactNode;
+  /** Feature title */
+  title: string;
+  /** Feature description */
+  description: string;
+}
+
+/**
+ * FeatureCard component
+ * Displays a feature with icon, title, and description
+ *
+ * @param props - Component properties
+ * @returns JSX.Element - The rendered FeatureCard component
+ */
+const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) => {
   return (
     <HoverCard.Root>
       <HoverCard.Trigger asChild>
-        <div className={`bg-white rounded-lg shadow-sm p-4 border-l-4 ${color} hover:shadow-md transition-shadow`}>
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm font-medium text-gray-500">{title}</p>
-              <p className="text-2xl font-semibold mt-1">{value}</p>
-
-              {trend !== undefined && (
-                <div className="flex items-center mt-2">
-                  <span className={trend >= 0 ? "text-green-500" : "text-red-500"}>
-                    {trend >= 0 ? "+" : ""}
-                    {trend}%
-                  </span>
-                  <TrendingUp size={16} className={`ml-1 ${trend >= 0 ? "text-green-500" : "text-red-500"}`} />
-                </div>
-              )}
-            </div>
-            <div className="p-2 rounded-full bg-gray-100 text-gray-600">{icon}</div>
-          </div>
+        <div className="p-6 bg-white rounded-lg shadow-sm border border-slate-200 hover:shadow-md transition-shadow cursor-pointer">
+          <div className="mb-4">{icon}</div>
+          <h3 className="text-xl font-semibold mb-2 text-slate-800">{title}</h3>
+          <p className="text-slate-600">{description}</p>
         </div>
       </HoverCard.Trigger>
       <HoverCard.Portal>
-        <HoverCard.Content className="bg-white p-3 rounded-md shadow-lg border border-gray-200 w-60" sideOffset={5}>
+        <HoverCard.Content
+          className="p-4 bg-white rounded-lg shadow-md border border-slate-200 w-64 z-50"
+          sideOffset={5}
+        >
           <div className="flex flex-col gap-2">
-            <span className="font-medium text-sm text-gray-500">{title}</span>
-            <span className="font-bold text-lg">{value}</span>
-            <p className="text-xs text-gray-600">Last updated: {new Date().toLocaleTimeString()}</p>
+            <h4 className="text-sm font-semibold text-slate-900">{title}</h4>
+            <p className="text-xs text-slate-700">{description}</p>
           </div>
           <HoverCard.Arrow className="fill-white" />
         </HoverCard.Content>
@@ -73,166 +162,3 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, trend, color }:
     </HoverCard.Root>
   );
 };
-
-/**
- * ActivityItem Component
- * Displays a single activity item with icon
- *
- * @param {ActivityItemProps} props - Component properties
- * @returns {JSX.Element} Activity item component
- */
-const ActivityItem: React.FC<ActivityItemProps> = ({ title, description, timestamp, icon }) => {
-  return (
-    <div className="flex items-start gap-3 py-3">
-      <div className="p-2 rounded-full bg-blue-50 text-blue-600">{icon}</div>
-      <div className="flex-1">
-        <p className="font-medium text-gray-900">{title}</p>
-        <p className="text-sm text-gray-600">{description}</p>
-        <p className="text-xs text-gray-500 mt-1">{timestamp}</p>
-      </div>
-    </div>
-  );
-};
-
-/**
- * ProgressCard Component
- * Displays a progress indicator with label
- *
- * @param {object} props - Component properties
- * @returns {JSX.Element} Progress card component
- */
-const ProgressCard: React.FC<{ label: string; value: number; target: number }> = ({ label, value, target }) => {
-  const percentage = Math.min(Math.round((value / target) * 100), 100);
-
-  return (
-    <div className="bg-white rounded-lg shadow-sm p-4">
-      <div className="flex justify-between mb-2">
-        <span className="text-sm font-medium text-gray-700">{label}</span>
-        <Tooltip.Provider>
-          <Tooltip.Root>
-            <Tooltip.Trigger asChild>
-              <button className="text-gray-400 hover:text-gray-600">
-                <Info size={14} />
-              </button>
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content className="bg-gray-800 text-white text-xs px-2 py-1 rounded" sideOffset={5}>
-                Target: {target}
-                <Tooltip.Arrow className="fill-gray-800" />
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
-        </Tooltip.Provider>
-      </div>
-      <div className="flex items-end gap-2">
-        <span className="text-xl font-semibold">{value}</span>
-        <span className="text-xs text-gray-500 mb-1">/ {target}</span>
-      </div>
-      <Progress.Root className="h-2 w-full bg-gray-200 rounded-full overflow-hidden mt-2" value={percentage}>
-        <Progress.Indicator
-          className="h-full bg-blue-600 transition-transform duration-700 ease-in-out"
-          style={{ transform: `translateX(-${100 - percentage}%)` }}
-        />
-      </Progress.Root>
-      <span className="text-xs text-gray-500 mt-1">{percentage}% complete</span>
-    </div>
-  );
-};
-
-export default function Home() {
-  // Fetch user from Redux store - adjust this according to your Redux setup
-  const { user } = useSelector((state: RootState) => state.auth);
-
-  // Mock data - in a real app, these would come from the Redux store
-  const stats = [
-    { title: "Total Users", value: "1,249", icon: <Users size={20} />, trend: 12.5, color: "border-blue-500" },
-    { title: "Total Events", value: "42", icon: <Calendar size={20} />, trend: -2.4, color: "border-violet-500" },
-    { title: "Completion Rate", value: "89%", icon: <Award size={20} />, trend: 5.6, color: "border-green-500" },
-  ];
-
-  const recentActivities = [
-    {
-      title: "User Registration",
-      description: "New user registered via email signup",
-      timestamp: "2 hours ago",
-      icon: <Users size={18} />,
-    },
-    {
-      title: "Event Created",
-      description: "New community event was created",
-      timestamp: "Yesterday",
-      icon: <Calendar size={18} />,
-    },
-  ];
-
-  return (
-    <div className="bg-gray-100 p-6">
-      {/* Welcome Section */}
-      <div className="mb-6">
-        <h1 className="font-semibold text-2xl text-gray-800">👋 Welcome{user ? `, ${user.name}` : ""}</h1>
-        <p className="text-gray-600 mt-1">Here's what's happening with your platform today</p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        {stats.map(stat => (
-          <StatCard
-            key={stat.title}
-            title={stat.title}
-            value={stat.value}
-            icon={stat.icon}
-            trend={stat.trend}
-            color={stat.color}
-          />
-        ))}
-      </div>
-
-      {/* Progress Tracking */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <ProgressCard label="Weekly Target" value={42} target={50} />
-        <ProgressCard label="Monthly Goal" value={156} target={200} />
-      </div>
-
-      <Separator.Root className="h-px bg-gray-200 my-6" />
-
-      {/* Recent Activity */}
-      <Tabs.Root defaultValue="activity">
-        <Tabs.List className="flex border-b border-gray-200 mb-4">
-          <Tabs.Trigger
-            value="activity"
-            className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 data-[state=active]:text-blue-600 data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
-          >
-            Recent Activity
-          </Tabs.Trigger>
-          <Tabs.Trigger
-            value="notifications"
-            className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 data-[state=active]:text-blue-600 data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
-          >
-            Notifications
-          </Tabs.Trigger>
-        </Tabs.List>
-
-        <Tabs.Content value="activity" className="bg-white rounded-lg shadow-sm p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-medium">Latest Activities</h3>
-            <span className="text-sm text-gray-500 flex items-center gap-1">
-              <Clock size={14} /> Last 24 hours
-            </span>
-          </div>
-          {recentActivities.map((activity, index) => (
-            <React.Fragment key={activity.title}>
-              <ActivityItem {...activity} />
-              {index < recentActivities.length - 1 && <Separator.Root className="h-px bg-gray-100" />}
-            </React.Fragment>
-          ))}
-        </Tabs.Content>
-
-        <Tabs.Content value="notifications" className="bg-white rounded-lg shadow-sm p-4">
-          <div className="text-center py-6 text-gray-500">
-            <p>No new notifications at this time.</p>
-          </div>
-        </Tabs.Content>
-      </Tabs.Root>
-    </div>
-  );
-}
