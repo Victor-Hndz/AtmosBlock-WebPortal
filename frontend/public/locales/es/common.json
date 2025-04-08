@@ -252,5 +252,45 @@
       "description": "Crea tu primera solicitud de procesamiento de datos y desbloquea el poder del análisis meteorológico avanzado.",
       "buttonText": "Crear Solicitud Ahora"
     }
+  },
+  "about": {
+    "title": "Acerca del Proyecto FAST-IBAN",
+    "description": "Una plataforma moderna para el procesamiento y análisis de datos meteorológicos",
+    "projectOverview": "Descripción del Proyecto",
+    "projectDescription": "El proyecto FAST-IBAN es una solución integral diseñada para procesar, analizar y visualizar datos meteorológicos de manera eficiente. Utiliza técnicas de computación de alto rendimiento para proporcionar a investigadores y meteorólogos información valiosa de conjuntos de datos complejos.",
+    "technologies": "Tecnologías Utilizadas",
+    "techStack": {
+      "frontend": "React con TypeScript, Redux y Tailwind CSS para la interfaz de usuario",
+      "backend": "NestJS con TypeScript para la API y servicios de autenticación",
+      "processing": "C y python para cálculos numéricos de alto rendimiento y generación de mapas"
+    },
+    "links": {
+      "github": "Ver en GitHub",
+      "linkedin": "Conectar en LinkedIn",
+      "universityUM": "Universidad de Murcia",
+      "universityUMH": "Universidad UMH"
+    },
+    "contact": {
+      "title": "Contáctanos",
+      "description": "¿Tienes preguntas o sugerencias? Envíanos un mensaje y te responderemos lo antes posible.",
+      "form": {
+        "name": "Nombre",
+        "namePlaceholder": "Tu nombre",
+        "nameRequired": "Por favor, introduce tu nombre",
+        "email": "Correo electrónico",
+        "emailPlaceholder": "tu@correo.com",
+        "emailRequired": "Por favor, introduce tu correo electrónico",
+        "emailInvalid": "Por favor, introduce un correo electrónico válido",
+        "message": "Mensaje",
+        "messagePlaceholder": "Tu mensaje",
+        "messageRequired": "Por favor, introduce tu mensaje",
+        "send": "Enviar Mensaje",
+        "sending": "Enviando...",
+        "success": {
+          "title": "¡Mensaje enviado!",
+          "message": "Tu cliente de correo electrónico debería abrirse con un mensaje pre-completado. Por favor, envíalo para completar."
+        }
+      }
+    }
   }
 }

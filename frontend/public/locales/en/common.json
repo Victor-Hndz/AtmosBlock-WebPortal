@@ -252,5 +252,45 @@
       "description": "Create your first data processing request and unlock the power of advanced meteorological analysis.",
       "buttonText": "Create Request Now"
     }
+  },
+  "about": {
+    "title": "About FAST-IBAN Project",
+    "description": "A modern platform for meteorological data processing and analysis",
+    "projectOverview": "Project Overview",
+    "projectDescription": "The FAST-IBAN project is a comprehensive solution designed to process, analyze, and visualize meteorological data efficiently. It leverages high-performance computing techniques to provide researchers and meteorologists with valuable insights from complex datasets.",
+    "technologies": "Technologies Used",
+    "techStack": {
+      "frontend": "React with TypeScript, Redux, and Tailwind CSS for the user interface",
+      "backend": "NestJS with TypeScript for the API and authentication services",
+      "processing": "C and python for high-performance numerical calculations and map generation"
+    },
+    "links": {
+      "github": "View on GitHub",
+      "linkedin": "Connect on LinkedIn",
+      "universityUM": "Murcia University",
+      "universityUMH": "UMH University"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "description": "Have questions or suggestions? Send us a message and we'll get back to you as soon as possible.",
+      "form": {
+        "name": "Name",
+        "namePlaceholder": "Your name",
+        "nameRequired": "Please enter your name",
+        "email": "Email",
+        "emailPlaceholder": "your@email.com",
+        "emailRequired": "Please enter your email",
+        "emailInvalid": "Please enter a valid email address",
+        "message": "Message",
+        "messagePlaceholder": "Your message",
+        "messageRequired": "Please enter your message",
+        "send": "Send Message",
+        "sending": "Sending...",
+        "success": {
+          "title": "Message sent!",
+          "message": "Your email client should open with a pre-filled message. Please send it to complete."
+        }
+      }
+    }
   }
 }

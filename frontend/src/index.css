@@ -24,6 +24,16 @@
   /* Always use light color scheme */
   color-scheme: light;
 
+  /* University colors */
+  --um-primary: #002028;
+  --um-primary-hover: #0c3742;
+  --um-secondary: #e03b23;
+  --um-tertiary: #ede9e3;
+  --umh-primary: #bc2a30;
+  --umh-primary-hover: #e03b23;
+  --umh-secondary: #877974;
+  --umh-tertiary: #1c1c1b;
+
   /* Radix UI Slate colors integration - light theme values */
   --slate1: hsl(206, 30%, 98.8%);
   --slate2: hsl(210, 16.7%, 97.6%);

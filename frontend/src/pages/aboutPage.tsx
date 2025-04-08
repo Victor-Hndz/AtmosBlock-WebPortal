@@ -1,156 +1,232 @@
 import { JSX } from "react";
-import { Info, Target, History, Mail, Heart, Building } from "lucide-react";
-import * as Tabs from "@radix-ui/react-tabs";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Mail, ExternalLink, SendHorizontal, CheckCircle } from "lucide-react";
+import { FaLinkedin, FaGithub } from "react-icons/fa";
 import * as Separator from "@radix-ui/react-separator";
-import * as Tooltip from "@radix-ui/react-tooltip";
+import * as Form from "@radix-ui/react-form";
+import * as Toast from "@radix-ui/react-toast";
+import "./aboutPage.css";
 
 /**
- * About page component
- * Displays information about the company, team, mission, and history
+ * AboutPage component
+ * Provides information about the project and contact functionality
  *
- * @returns {JSX.Element} The rendered About page component
+ * @returns {JSX.Element} The AboutPage component
  */
-export default function About(): JSX.Element {
+const AboutPage: React.FC = (): JSX.Element => {
+  const { t } = useTranslation();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [toastOpen, setToastOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  /**
+   * Handles the contact form submission
+   * Opens email client with pre-filled information
+   *
+   * @param {React.FormEvent<HTMLFormElement>} e - Form submission event
+   */
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    // Create mailto link with form data
+    const subject = `Contact from ${name} via FAST-IBAN Project`;
+    const body = `Message from ${name} (${email}):\n\n${message}`;
+    const mailtoLink = `mailto:vic.hernandezs08@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    // Open email client
+    window.open(mailtoLink, "_blank");
+
+    // Show success toast and reset form
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setToastOpen(true);
+      setName("");
+      setEmail("");
+      setMessage("");
+    }, 500);
+  };
+
   return (
-    <div className="bg-gray-50 min-h-screen p-6">
-      <div className="max-w-4xl mx-auto">
-        <header className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-            <Info className="h-6 w-6 text-blue-600" aria-hidden="true" />
-            About Our Company
-          </h1>
-          <Separator.Root className="h-[1px] bg-gray-200 my-4" />
-          <p className="text-gray-600 max-w-2xl">
-            Learn about our company's mission, team, and history. We're dedicated to providing excellent service and
-            innovative solutions.
-          </p>
-        </header>
+    <div className="max-w-4xl mx-auto py-8 px-4">
+      {/* Project Information Section */}
+      <section className="mb-12">
+        <h1 className="text-3xl font-bold mb-4 text-slate-900">{t("about.title")}</h1>
+        <p className="text-lg text-slate-600 mb-6">{t("about.description")}</p>
 
-        <Tooltip.Provider>
-          <Tabs.Root defaultValue="company" className="w-full">
-            <Tabs.List className="flex border-b border-gray-200" aria-label="About sections">
-              {[
-                { id: "company", label: "Company", icon: <Building className="h-4 w-4" /> },
-                { id: "mission", label: "Mission", icon: <Target className="h-4 w-4" /> },
-                { id: "history", label: "History", icon: <History className="h-4 w-4" /> },
-              ].map(tab => (
-                <Tabs.Trigger
-                  key={tab.id}
-                  value={tab.id}
-                  className="px-4 py-2 flex items-center gap-2 text-gray-600 hover:text-blue-600 data-[state=active]:text-blue-600 data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
-                >
-                  {tab.icon}
-                  {tab.label}
-                </Tabs.Trigger>
-              ))}
-            </Tabs.List>
+        <div className="project-info-container">
+          <h2 className="text-xl font-semibold mb-3 text-slate-800">{t("about.projectOverview")}</h2>
+          <p className="text-slate-700 mb-4">{t("about.projectDescription")}</p>
 
-            <Tabs.Content value="company" className="pt-6">
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Our Company</h2>
-                <p className="text-gray-600 mb-4">
-                  Founded in 2010, our company has been at the forefront of innovation and excellence. We specialize in
-                  developing cutting-edge solutions that help businesses grow and thrive.
-                </p>
-                <p className="text-gray-600">
-                  With offices in major cities worldwide, we serve clients across various industries, delivering
-                  reliable products and exceptional service.
-                </p>
-              </div>
-            </Tabs.Content>
+          <h3 className="text-lg font-medium mt-6 mb-2 text-slate-800">{t("about.technologies")}</h3>
+          <ul className="list-disc pl-6 space-y-1 text-slate-700">
+            <li>{t("about.techStack.frontend")}</li>
+            <li>{t("about.techStack.backend")}</li>
+            <li>{t("about.techStack.processing")}</li>
+          </ul>
+        </div>
 
-            <Tabs.Content value="mission" className="pt-6">
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  Our Mission <Heart className="h-5 w-5 text-red-500" aria-hidden="true" />
-                </h2>
-                <p className="text-gray-600 mb-4">
-                  We are committed to delivering excellence in everything we do, providing innovative solutions that
-                  empower our clients and make a positive impact on the world.
-                </p>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2 mt-6">Core Values</h3>
-                <ul className="list-disc list-inside text-gray-600">
-                  <li className="mb-2">Innovation: We constantly seek new and better ways to solve problems</li>
-                  <li className="mb-2">Integrity: We act with honesty and transparency in all our dealings</li>
-                  <li className="mb-2">Excellence: We strive for the highest quality in our products and services</li>
-                  <li>Collaboration: We believe in the power of working together to achieve common goals</li>
-                </ul>
-              </div>
-            </Tabs.Content>
-
-            <Tabs.Content value="history" className="pt-6">
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Our History</h2>
-
-                <div className="space-y-6">
-                  {milestones.map(milestone => (
-                    <div key={milestone.year} className="flex">
-                      <div className="mr-4">
-                        <div className="bg-blue-100 text-blue-800 font-semibold px-3 py-1 rounded-full text-sm">
-                          {milestone.year}
-                        </div>
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-gray-900">{milestone.title}</h3>
-                        <p className="text-gray-600 mt-1">{milestone.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Tabs.Content>
-          </Tabs.Root>
-        </Tooltip.Provider>
-
-        <div className="mt-12 bg-blue-50 rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <Mail className="h-5 w-5 text-blue-600" aria-hidden="true" />
-            Contact Us
-          </h2>
-          <p className="text-gray-600 mb-2">Have questions or want to learn more? Get in touch with our team.</p>
+        {/* External Links */}
+        <div className="external-links-container">
           <a
-            href="mailto:info@company.com"
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
+            href="https://github.com/Victor-Hndz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-md hover:bg-slate-700 transition-colors"
           >
-            Send us an email
+            <FaGithub size={18} />
+            <span>{t("about.links.github")}</span>
+          </a>
+          <a
+            href="https://linkedin.com/in/víctor-hernández-sánchez-a19361239"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            <FaLinkedin size={18} />
+            <span>{t("about.links.linkedin")}</span>
+          </a>
+          <a
+            href="https://www.um.es"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 um-link rounded-md"
+          >
+            <ExternalLink size={18} />
+            <span>{t("about.links.universityUM")}</span>
+          </a>
+          <a
+            href="https://www.umh.es"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 umh-link rounded-md"
+          >
+            <ExternalLink size={18} />
+            <span>{t("about.links.universityUMH")}</span>
           </a>
         </div>
-      </div>
+      </section>
+
+      <Separator.Root className="h-px bg-slate-200 my-8" />
+
+      {/* Contact Form Section */}
+      <section>
+        <h2 className="text-2xl font-bold mb-6 text-slate-900">{t("about.contact.title")}</h2>
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+          <div className="flex items-start gap-2 mb-6 text-slate-600">
+            <Mail className="mt-1 flex-shrink-0" size={20} />
+            <p>{t("about.contact.description")}</p>
+          </div>
+
+          <Form.Root onSubmit={handleSubmit} className="space-y-4">
+            <Form.Field name="name" className="space-y-2">
+              <Form.Label className="text-sm font-medium text-slate-700">{t("about.contact.form.name")}</Form.Label>
+              <Form.Control asChild>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  placeholder={t("about.contact.form.namePlaceholder")}
+                />
+              </Form.Control>
+              <Form.Message match="valueMissing" className="text-sm text-red-600">
+                {t("about.contact.form.nameRequired")}
+              </Form.Message>
+            </Form.Field>
+
+            <Form.Field name="email" className="space-y-2">
+              <Form.Label className="text-sm font-medium text-slate-700">{t("about.contact.form.email")}</Form.Label>
+              <Form.Control asChild>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  placeholder={t("about.contact.form.emailPlaceholder")}
+                />
+              </Form.Control>
+              <Form.Message match="valueMissing" className="text-sm text-red-600">
+                {t("about.contact.form.emailRequired")}
+              </Form.Message>
+              <Form.Message match="typeMismatch" className="text-sm text-red-600">
+                {t("about.contact.form.emailInvalid")}
+              </Form.Message>
+            </Form.Field>
+
+            <Form.Field name="message" className="space-y-2">
+              <Form.Label className="text-sm font-medium text-slate-700">{t("about.contact.form.message")}</Form.Label>
+              <Form.Control asChild>
+                <textarea
+                  required
+                  value={message}
+                  onChange={e => setMessage(e.target.value)}
+                  rows={4}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  placeholder={t("about.contact.form.messagePlaceholder")}
+                />
+              </Form.Control>
+              <Form.Message match="valueMissing" className="text-sm text-red-600">
+                {t("about.contact.form.messageRequired")}
+              </Form.Message>
+            </Form.Field>
+
+            <Form.Submit asChild>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="flex items-center justify-center gap-2 w-full md:w-auto px-6 py-2 bg-violet-600 text-white font-medium rounded-md hover:bg-violet-700 transition-colors disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                    <span>{t("about.contact.form.sending")}</span>
+                  </>
+                ) : (
+                  <>
+                    <SendHorizontal size={18} />
+                    <span>{t("about.contact.form.send")}</span>
+                  </>
+                )}
+              </button>
+            </Form.Submit>
+          </Form.Root>
+        </div>
+      </section>
+
+      {/* Success Toast */}
+      <Toast.Provider swipeDirection="right">
+        <Toast.Root
+          className="bg-white rounded-md shadow-lg border border-slate-200 p-4 grid grid-cols-[auto_max-content] gap-x-4 items-center fixed bottom-4 right-4 data-[state=open]:animate-slideIn data-[state=closed]:animate-slideOut"
+          open={toastOpen}
+          onOpenChange={setToastOpen}
+          duration={3000}
+        >
+          <Toast.Title className="flex items-center gap-2 text-green-600 font-medium">
+            <CheckCircle size={18} />
+            {t("about.contact.form.success.title")}
+          </Toast.Title>
+          <Toast.Description className="text-slate-700 mt-1">
+            {t("about.contact.form.success.message")}
+          </Toast.Description>
+          <Toast.Action className="grid" asChild altText={t("buttons.close")}>
+            <button
+              className="absolute top-2 right-2 inline-flex items-center justify-center rounded-md p-1 text-slate-400 hover:text-slate-600 focus:outline-none focus:ring-2 focus:ring-violet-500"
+              aria-label={t("buttons.close")}
+            >
+              &times;
+            </button>
+          </Toast.Action>
+        </Toast.Root>
+        <Toast.Viewport className="fixed bottom-0 right-0 p-6 flex flex-col gap-2 w-96 max-w-[100vw] m-0 list-none z-50" />
+      </Toast.Provider>
     </div>
   );
-}
+};
 
-/**
- * Historical milestone type definition
- */
-interface Milestone {
-  year: string;
-  title: string;
-  description: string;
-}
-
-/**
- * Company milestones data
- */
-const milestones: Milestone[] = [
-  {
-    year: "2010",
-    title: "Company Founded",
-    description: "Our company was established with a vision to revolutionize the industry.",
-  },
-  {
-    year: "2015",
-    title: "International Expansion",
-    description: "We opened our first international office and began serving clients globally.",
-  },
-  {
-    year: "2018",
-    title: "Major Product Launch",
-    description: "Released our flagship product that became an industry standard.",
-  },
-  {
-    year: "2022",
-    title: "Sustainability Initiative",
-    description: "Launched comprehensive sustainability program with commitment to net zero emissions.",
-  },
-];
+export default AboutPage;
