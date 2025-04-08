@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import * as Toast from "@radix-ui/react-toast";
-import { fetchUserRequests } from "@/redux/slices/requestsSlice";
+import { fetchUserRequests } from "@/redux/slices/viewRequestsSlice";
 import { RequestGroup, groupRequestsByContent } from "@/types/Request";
 import { TFunction } from "i18next";
 
@@ -233,7 +233,7 @@ const SettingsPage: React.FC = () => {
   const { isAuthenticated, user } = useAppSelector(state => state.auth);
 
   // Get requests data
-  const { items: requests, isLoading, error } = useAppSelector(state => state.requests);
+  const { items: requests, isLoading, error } = useAppSelector(state => state.viewRequests);
 
   // Toast state
   const [toastOpen, setToastOpen] = useState(false);

@@ -12,7 +12,7 @@ import AdvancedSettingsForm from "@/components/requests/AdvancedSettingsForm";
 import RequestSummary from "@/components/requests/RequestSummary";
 import { useAuth } from "@/hooks/useAuth";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { updateFormField, submitRequest } from "@/redux/slices/requestsSlice";
+import { updateFormField, submitRequest } from "@/redux/slices/submitRequestsSlice";
 import "./requestsPage.css";
 
 /**
@@ -31,8 +31,8 @@ const RequestsPage: React.FC = () => {
 
   // Redux hooks - use selector shaping to prevent unnecessary re-renders
   const dispatch = useAppDispatch();
-  const formData = useAppSelector(state => state.requests.form);
-  const isSubmitting = useAppSelector(state => state.requests.isSubmitting);
+  const formData = useAppSelector(state => state.submitRequests.form);
+  const isSubmitting = useAppSelector(state => state.submitRequests.isSubmitting);
 
   // Authentication hook
   const { isAuthenticated } = useAuth();
@@ -50,79 +50,11 @@ const RequestsPage: React.FC = () => {
   );
 
   /**
-   * Transforms the form data into the format expected by the API
-   * Memoized to prevent unnecessary recalculations on re-renders
-   * @returns Transformed data ready for submission
-   */
-  const transformFormDataForSubmission = useCallback(() => {
-    if (!formData.variableName || !formData.years || !formData.months || !formData.days) {
-      throw new Error(t("errors.missingRequiredFields", "Missing required fields"));
-    }
-
-    // Convert selected year, month, day to numbers
-    const year = parseInt(formData.years[0], 10);
-    const month = formData.months[0] ? formData.months.indexOf(formData.months[0]) + 1 : 1; // Convert month name to number (1-12)
-    const day = parseInt(formData.days[0], 10);
-
-    // Convert pressure levels from strings to numbers
-    const numericPressureLevels =
-      formData.pressureLevels?.map(level => {
-        // Extract number from format like "500hPa"
-        return parseInt(level.replace(/\D/g, ""), 10);
-      }) || [];
-
-    // Create area covered object from the string selections
-    const areaCoveredObj = {
-      north: 90, // Default values
-      south: -90,
-      east: 180,
-      west: -180,
-    };
-
-    // Could be enhanced with actual coordinates based on the selected areas
-    if (formData.areaCovered?.includes("Northern Hemisphere")) {
-      areaCoveredObj.south = 0;
-    }
-    if (formData.areaCovered?.includes("Southern Hemisphere")) {
-      areaCoveredObj.north = 0;
-    }
-    if (formData.areaCovered?.includes("Europe")) {
-      areaCoveredObj.north = 75;
-      areaCoveredObj.south = 35;
-      areaCoveredObj.east = 40;
-      areaCoveredObj.west = -10;
-    }
-    // Add other regions as needed
-
-    return {
-      variableName: formData.variableName,
-      date: {
-        year,
-        month,
-        day,
-      },
-      pressureLevels: numericPressureLevels,
-      areaCovered: areaCoveredObj,
-      format: formData.fileFormat,
-    };
-  }, [
-    formData.variableName,
-    formData.years,
-    formData.months,
-    formData.days,
-    formData.pressureLevels,
-    formData.areaCovered,
-    formData.fileFormat,
-    t,
-  ]);
-
-  /**
    * Handles form submission
    */
   const handleSubmit = useCallback(() => {
     try {
-      const transformedData = transformFormDataForSubmission();
-      dispatch(submitRequest(transformedData))
+      dispatch(submitRequest(formData))
         .unwrap()
         .then(() => {
           setToastMessage(t("requests-titles.success"));
@@ -136,7 +68,7 @@ const RequestsPage: React.FC = () => {
       setToastMessage(`${t("errors.title")}: ${error instanceof Error ? error.message : t("errors.submission")}`);
       setToastOpen(true);
     }
-  }, [dispatch, t, transformFormDataForSubmission]);
+  }, [dispatch, t, formData]);
 
   /**
    * Clears all form fields

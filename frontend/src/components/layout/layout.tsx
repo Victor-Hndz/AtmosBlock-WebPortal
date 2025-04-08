@@ -1,5 +1,5 @@
 import React, { JSX } from "react";
-import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import { House, LogIn, Info, Menu, ListTodo, LucideProps } from "lucide-react";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import * as Separator from "@radix-ui/react-separator";
@@ -122,7 +122,6 @@ const MobileMenuItem: React.FC<{ item: NavItem }> = ({ item }: { item: NavItem }
  */
 const Layout: React.FC = (): JSX.Element => {
   const location = useLocation();
-  const navigate = useNavigate();
   const { t } = useTranslation();
   const { isAuthenticated, user } = useAppSelector(state => state.auth);
 
@@ -233,22 +232,6 @@ const Layout: React.FC = (): JSX.Element => {
                       {collapsibleItems.map(item => (
                         <MobileMenuItem key={item.path} item={item} />
                       ))}
-
-                      {/* Add logout option in mobile menu when authenticated */}
-                      {isAuthenticated && (
-                        <>
-                          <DropdownMenu.Separator className="h-px bg-gray-700 my-1" />
-                          <DropdownMenu.Item
-                            className="flex items-center p-2 text-white rounded-md hover:bg-gray-700 transition-colors duration-200"
-                            onSelect={() => {
-                              navigate("/profile");
-                            }}
-                          >
-                            <span className="mr-2">👤</span>
-                            <span>{t("profile.profile")}</span>
-                          </DropdownMenu.Item>
-                        </>
-                      )}
 
                       <DropdownMenu.Arrow className="fill-gray-800" />
                     </DropdownMenu.Content>
