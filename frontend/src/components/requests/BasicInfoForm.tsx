@@ -3,7 +3,7 @@ import * as Checkbox from "@radix-ui/react-checkbox";
 import { Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import FormField from "./FormField";
-import { RequestForm } from "@/redux/slices/requestsSlice";
+import { RequestForm } from "@/types/Request";
 
 interface BasicInfoFormProps {
   formData: RequestForm;
@@ -47,7 +47,7 @@ const availableHours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
 /**
  * Basic information form component for the first step of the request form
  */
-const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, updateFormField, onNext }) => {
+const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData = {} as RequestForm, updateFormField, onNext }) => {
   const { t } = useTranslation();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -58,23 +58,23 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, updateFormField
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.variableName) {
+    if (!formData?.variableName) {
       newErrors.variableName = t("requests-form.required");
     }
 
-    if (!formData.years?.length) {
+    if (!formData?.years?.length) {
       newErrors.years = t("requests-form.required");
     }
 
-    if (!formData.months?.length) {
+    if (!formData?.months?.length) {
       newErrors.months = t("requests-form.required");
     }
 
-    if (!formData.days?.length) {
+    if (!formData?.days?.length) {
       newErrors.days = t("requests-form.required");
     }
 
-    if (!formData.hours?.length) {
+    if (!formData?.hours?.length) {
       newErrors.hours = t("requests-form.required");
     }
 
@@ -102,7 +102,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, updateFormField
     value: string,
     checked: boolean | "indeterminate"
   ) => {
-    if (typeof checked !== "boolean") return;
+    if (typeof checked !== "boolean" || !formData) return;
 
     const currentValues = (formData[field] as string[]) || [];
     if (checked) {
@@ -129,7 +129,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, updateFormField
           <input
             id="variableName"
             type="text"
-            value={formData.variableName ?? ""}
+            value={formData?.variableName ?? ""}
             onChange={e => updateFormField("variableName", e.target.value)}
             className="mt-1.5 w-full rounded-md border border-slate-300 px-3 py-2 text-sm placeholder:text-slate-400 
                       focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
@@ -147,7 +147,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, updateFormField
               <label key={year} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
                 <Checkbox.Root
                   id={`year-${year}`}
-                  checked={formData.years?.includes(year) || false}
+                  checked={formData?.years?.includes(year) || false}
                   onCheckedChange={checked => handleCheckboxChange("years", year, checked)}
                   className="h-4 w-4 rounded border border-slate-300 bg-white
                             data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600 
@@ -174,7 +174,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, updateFormField
               <label key={month} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
                 <Checkbox.Root
                   id={`month-${month}`}
-                  checked={formData.months?.includes(month) || false}
+                  checked={formData?.months?.includes(month) || false}
                   onCheckedChange={checked => handleCheckboxChange("months", month, checked)}
                   className="h-4 w-4 rounded border border-slate-300 bg-white
                             data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600 
@@ -204,7 +204,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, updateFormField
               <label key={day} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
                 <Checkbox.Root
                   id={`day-${day}`}
-                  checked={formData.days?.includes(day) || false}
+                  checked={formData?.days?.includes(day) || false}
                   onCheckedChange={checked => handleCheckboxChange("days", day, checked)}
                   className="h-4 w-4 rounded border border-slate-300 bg-white
                             data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600 
@@ -231,7 +231,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, updateFormField
               <label key={hour} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
                 <Checkbox.Root
                   id={`hour-${hour}`}
-                  checked={formData.hours?.includes(hour) || false}
+                  checked={formData?.hours?.includes(hour) || false}
                   onCheckedChange={checked => handleCheckboxChange("hours", hour, checked)}
                   className="h-4 w-4 rounded border border-slate-300 bg-white
                             data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600 

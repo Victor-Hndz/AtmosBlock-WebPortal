@@ -4,7 +4,7 @@ import * as Select from "@radix-ui/react-select";
 import { ChevronDown, ChevronUp, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import FormField from "./FormField";
-import { RequestForm } from "@/redux/slices/requestsSlice";
+import { RequestForm } from "@/types/Request";
 
 interface AdvancedSettingsFormProps {
   formData: RequestForm;
@@ -23,7 +23,7 @@ const fileFormatOptions = ["NetCDF", "GRIB", "CSV", "JSON"];
  * Advanced settings form component for the third step of the request form
  */
 const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
-  formData,
+  formData = {} as RequestForm,
   updateFormField,
   advancedMode,
   onNext,
@@ -41,7 +41,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
           label={t("requests-form.fileFormat")}
           tooltip={t("requests-form.fileFormatTooltip", "Select the output file format for your data")}
         >
-          <Select.Root value={formData.fileFormat ?? ""} onValueChange={value => updateFormField("fileFormat", value)}>
+          <Select.Root value={formData?.fileFormat ?? ""} onValueChange={value => updateFormField("fileFormat", value)}>
             <Select.Trigger
               className="inline-flex items-center justify-between w-full px-3 py-2 text-sm border border-slate-300 
                         rounded-md shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 
@@ -91,7 +91,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                 <div className="flex items-center h-5">
                   <Switch.Root
                     id="tracking"
-                    checked={formData.tracking || false}
+                    checked={formData?.tracking || false}
                     onCheckedChange={checked => updateFormField("tracking", checked)}
                     className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
                   >
@@ -110,7 +110,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                 <div className="flex items-center h-5">
                   <Switch.Root
                     id="noCompile"
-                    checked={formData.noCompile || false}
+                    checked={formData?.noCompile || false}
                     onCheckedChange={checked => updateFormField("noCompile", checked)}
                     className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
                   >
@@ -127,7 +127,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                 <div className="flex items-center h-5">
                   <Switch.Root
                     id="noExecute"
-                    checked={formData.noExecute || false}
+                    checked={formData?.noExecute || false}
                     onCheckedChange={checked => updateFormField("noExecute", checked)}
                     className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
                   >
@@ -144,7 +144,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                 <div className="flex items-center h-5">
                   <Switch.Root
                     id="noMaps"
-                    checked={formData.noMaps || false}
+                    checked={formData?.noMaps || false}
                     onCheckedChange={checked => updateFormField("noMaps", checked)}
                     className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
                   >
@@ -161,7 +161,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                 <div className="flex items-center h-5">
                   <Switch.Root
                     id="animation"
-                    checked={formData.animation || false}
+                    checked={formData?.animation || false}
                     onCheckedChange={checked => updateFormField("animation", checked)}
                     className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
                   >
@@ -185,7 +185,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                   <div className="flex items-center h-5">
                     <Switch.Root
                       id="omp"
-                      checked={formData.omp || false}
+                      checked={formData?.omp || false}
                       onCheckedChange={checked => updateFormField("omp", checked)}
                       className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
                     >
@@ -194,7 +194,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                   </div>
                 </FormField>
 
-                {formData.omp && (
+                {formData?.omp && (
                   <FormField
                     id="nThreads"
                     label={t("requests-form.nThreads")}
@@ -203,7 +203,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                     <div className="flex items-center h-5">
                       <Switch.Root
                         id="nThreads"
-                        checked={formData.nThreads || false}
+                        checked={formData?.nThreads || false}
                         onCheckedChange={checked => updateFormField("nThreads", checked)}
                         className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
                       >
@@ -221,7 +221,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                   <div className="flex items-center h-5">
                     <Switch.Root
                       id="mpi"
-                      checked={formData.mpi || false}
+                      checked={formData?.mpi || false}
                       onCheckedChange={checked => updateFormField("mpi", checked)}
                       className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
                     >
@@ -230,7 +230,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                   </div>
                 </FormField>
 
-                {formData.mpi && (
+                {formData?.mpi && (
                   <FormField
                     id="nProces"
                     label={t("requests-form.nProces")}
@@ -239,7 +239,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                     <div className="flex items-center h-5">
                       <Switch.Root
                         id="nProces"
-                        checked={formData.nProces || false}
+                        checked={formData?.nProces || false}
                         onCheckedChange={checked => updateFormField("nProces", checked)}
                         className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
                       >

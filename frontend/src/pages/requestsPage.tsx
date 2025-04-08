@@ -12,7 +12,7 @@ import AdvancedSettingsForm from "@/components/requests/AdvancedSettingsForm";
 import RequestSummary from "@/components/requests/RequestSummary";
 import { useAuth } from "@/hooks/useAuth";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import updateFormField, { submitRequest } from "@/redux/slices/requestsSlice";
+import { updateFormField, submitRequest } from "@/redux/slices/requestsSlice";
 import "./requestsPage.css";
 
 /**
@@ -47,19 +47,82 @@ const RequestsPage: React.FC = () => {
   };
 
   /**
+   * Transforms the form data into the format expected by the API
+   * @returns Transformed data ready for submission
+   */
+  const transformFormDataForSubmission = () => {
+    if (!formData.variableName || !formData.years || !formData.months || !formData.days) {
+      throw new Error(t("errors.missingRequiredFields", "Missing required fields"));
+    }
+
+    // Convert selected year, month, day to numbers
+    const year = parseInt(formData.years[0], 10);
+    const month = formData.months[0] ? formData.months.indexOf(formData.months[0]) + 1 : 1; // Convert month name to number (1-12)
+    const day = parseInt(formData.days[0], 10);
+
+    // Convert pressure levels from strings to numbers
+    const numericPressureLevels =
+      formData.pressureLevels?.map(level => {
+        // Extract number from format like "500hPa"
+        return parseInt(level.replace(/\D/g, ""), 10);
+      }) || [];
+
+    // Create area covered object from the string selections
+    const areaCoveredObj = {
+      north: 90, // Default values
+      south: -90,
+      east: 180,
+      west: -180,
+    };
+
+    // Could be enhanced with actual coordinates based on the selected areas
+    if (formData.areaCovered?.includes("Northern Hemisphere")) {
+      areaCoveredObj.south = 0;
+    }
+    if (formData.areaCovered?.includes("Southern Hemisphere")) {
+      areaCoveredObj.north = 0;
+    }
+    if (formData.areaCovered?.includes("Europe")) {
+      areaCoveredObj.north = 75;
+      areaCoveredObj.south = 35;
+      areaCoveredObj.east = 40;
+      areaCoveredObj.west = -10;
+    }
+    // Add other regions as needed
+
+    return {
+      variableName: formData.variableName,
+      date: {
+        year,
+        month,
+        day,
+      },
+      pressureLevels: numericPressureLevels,
+      areaCovered: areaCoveredObj,
+      format: formData.fileFormat,
+    };
+  };
+
+  /**
    * Handles form submission
    */
   const handleSubmit = () => {
-    dispatch(submitRequest(formData))
-      .unwrap()
-      .then(() => {
-        setToastMessage(t("requests-titles.success"));
-        setToastOpen(true);
-      })
-      .catch(error => {
-        setToastMessage(`${t("errors.title")}: ${error.message || t("errors.submission")}`);
-        setToastOpen(true);
-      });
+    try {
+      const transformedData = transformFormDataForSubmission();
+      dispatch(submitRequest(transformedData))
+        .unwrap()
+        .then(() => {
+          setToastMessage(t("requests-titles.success"));
+          setToastOpen(true);
+        })
+        .catch(error => {
+          setToastMessage(`${t("errors.title")}: ${error.message || t("errors.submission")}`);
+          setToastOpen(true);
+        });
+    } catch (error) {
+      setToastMessage(`${t("errors.title")}: ${error instanceof Error ? error.message : t("errors.submission")}`);
+      setToastOpen(true);
+    }
   };
 
   /**

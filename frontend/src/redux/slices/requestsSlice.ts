@@ -1,16 +1,20 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { Request } from "@/types/Request";
+import { Request, RequestForm } from "@/types/Request";
 
 interface RequestsState {
   items: Request[];
   isLoading: boolean;
   error: string | null;
+  form: RequestForm;
+  isSubmitting: boolean;
 }
 
 const initialState: RequestsState = {
   items: [],
   isLoading: false,
   error: null,
+  form: {} as RequestForm,
+  isSubmitting: false,
 };
 
 const API_URL = "http://localhost:3000";
@@ -86,6 +90,12 @@ const requestsSlice = createSlice({
     clearRequestsError: state => {
       state.error = null;
     },
+    updateFormField: (state, action: PayloadAction<{ field: keyof RequestForm; value: any }>) => {
+      const { field, value } = action.payload;
+      if (state.form) {
+        state.form[field] = value;
+      }
+    },
   },
   extraReducers: builder => {
     // Fetch user requests
@@ -107,18 +117,23 @@ const requestsSlice = createSlice({
     builder
       .addCase(submitRequest.pending, state => {
         state.isLoading = true;
+        state.isSubmitting = true;
         state.error = null;
       })
       .addCase(submitRequest.fulfilled, (state, action: PayloadAction<Request>) => {
         state.isLoading = false;
+        state.isSubmitting = false;
         state.items.push(action.payload);
+        // Clear form data after successful submission
+        state.form = {} as RequestForm;
       })
       .addCase(submitRequest.rejected, (state, action) => {
         state.isLoading = false;
+        state.isSubmitting = false;
         state.error = action.payload as string;
       });
   },
 });
 
-export const { clearRequestsError } = requestsSlice.actions;
+export const { clearRequestsError, updateFormField } = requestsSlice.actions;
 export default requestsSlice.reducer;

@@ -3,7 +3,7 @@ import * as Checkbox from "@radix-ui/react-checkbox";
 import { Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import FormField from "./FormField";
-import { RequestForm } from "@/redux/slices/requestsSlice";
+import { RequestForm } from "@/types/Request";
 
 interface MapConfigFormProps {
   formData: RequestForm;
@@ -49,7 +49,12 @@ const mapLevelOptions = ["Surface", "Upper Air", "Both"];
 /**
  * Map configuration form component for the second step of the request form
  */
-const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField, onNext, onPrevious }) => {
+const MapConfigForm: React.FC<MapConfigFormProps> = ({
+  formData = {} as RequestForm,
+  updateFormField,
+  onNext,
+  onPrevious,
+}) => {
   const { t } = useTranslation();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -60,23 +65,23 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.pressureLevels?.length) {
+    if (!formData?.pressureLevels?.length) {
       newErrors.pressureLevels = t("requests-form.required");
     }
 
-    if (!formData.areaCovered?.length) {
+    if (!formData?.areaCovered?.length) {
       newErrors.areaCovered = t("requests-form.required");
     }
 
-    if (!formData.mapTypes?.length) {
+    if (!formData?.mapTypes?.length) {
       newErrors.mapTypes = t("requests-form.required");
     }
 
-    if (!formData.mapRanges?.length) {
+    if (!formData?.mapRanges?.length) {
       newErrors.mapRanges = t("requests-form.required");
     }
 
-    if (!formData.mapLevels?.length) {
+    if (!formData?.mapLevels?.length) {
       newErrors.mapLevels = t("requests-form.required");
     }
 
@@ -104,7 +109,7 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField
     value: string,
     checked: boolean | "indeterminate"
   ) => {
-    if (typeof checked !== "boolean") return;
+    if (typeof checked !== "boolean" || !formData) return;
 
     const currentValues = (formData[field] as string[]) || [];
     if (checked) {
@@ -136,7 +141,7 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField
               <label key={level} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
                 <Checkbox.Root
                   id={`level-${level}`}
-                  checked={formData.pressureLevels?.includes(level) || false}
+                  checked={formData?.pressureLevels?.includes(level) || false}
                   onCheckedChange={checked => handleCheckboxChange("pressureLevels", level, checked)}
                   className="h-4 w-4 rounded border border-slate-300 bg-white
                             data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600 
@@ -163,7 +168,7 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField
               <label key={area} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
                 <Checkbox.Root
                   id={`area-${area}`}
-                  checked={formData.areaCovered?.includes(area) || false}
+                  checked={formData?.areaCovered?.includes(area) || false}
                   onCheckedChange={checked => handleCheckboxChange("areaCovered", area, checked)}
                   className="h-4 w-4 rounded border border-slate-300 bg-white
                             data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600 
@@ -190,7 +195,7 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField
               <label key={type} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
                 <Checkbox.Root
                   id={`type-${type}`}
-                  checked={formData.mapTypes?.includes(type) || false}
+                  checked={formData?.mapTypes?.includes(type) || false}
                   onCheckedChange={checked => handleCheckboxChange("mapTypes", type, checked)}
                   className="h-4 w-4 rounded border border-slate-300 bg-white
                             data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600 
@@ -217,7 +222,7 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField
               <label key={range} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
                 <Checkbox.Root
                   id={`range-${range}`}
-                  checked={formData.mapRanges?.includes(range) || false}
+                  checked={formData?.mapRanges?.includes(range) || false}
                   onCheckedChange={checked => handleCheckboxChange("mapRanges", range, checked)}
                   className="h-4 w-4 rounded border border-slate-300 bg-white
                             data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600 
@@ -244,7 +249,7 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({ formData, updateFormField
               <label key={level} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
                 <Checkbox.Root
                   id={`level-${level}`}
-                  checked={formData.mapLevels?.includes(level) || false}
+                  checked={formData?.mapLevels?.includes(level) || false}
                   onCheckedChange={checked => handleCheckboxChange("mapLevels", level, checked)}
                   className="h-4 w-4 rounded border border-slate-300 bg-white
                             data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600 

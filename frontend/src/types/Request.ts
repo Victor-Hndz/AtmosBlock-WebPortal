@@ -9,6 +9,32 @@ export enum RequestStatus {
 }
 
 /**
+ * Form data structure for request creation
+ */
+export interface RequestForm {
+  variableName?: string;
+  years?: string[];
+  months?: string[];
+  days?: string[];
+  hours?: string[];
+  pressureLevels?: string[];
+  areaCovered?: string[];
+  mapTypes?: string[];
+  mapRanges?: string[];
+  mapLevels?: string[];
+  fileFormat?: string;
+  tracking?: boolean;
+  noCompile?: boolean;
+  noExecute?: boolean;
+  noMaps?: boolean;
+  animation?: boolean;
+  omp?: boolean;
+  nThreads?: boolean;
+  mpi?: boolean;
+  nProces?: boolean;
+}
+
+/**
  * Data structure for user requests
  */
 export interface Request {
