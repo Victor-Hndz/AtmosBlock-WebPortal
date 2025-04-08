@@ -13,11 +13,11 @@ export enum RequestStatus {
  */
 export interface RequestForm {
   variableName?: string;
+  pressureLevels?: string[];
   years?: string[];
   months?: string[];
   days?: string[];
   hours?: string[];
-  pressureLevels?: string[];
   areaCovered?: string[];
   mapTypes?: string[];
   mapRanges?: string[];
@@ -37,16 +37,16 @@ export interface RequestForm {
 /**
  * Data structure for user requests
  */
-export interface Request {
+export interface UserRequest {
   id: string;
   userId: string;
   variableName: string;
+  pressureLevels: number[];
   date: {
     year: number;
     month: number;
     day: number;
   };
-  pressureLevels: number[];
   areaCovered: {
     north: number;
     south: number;
@@ -63,7 +63,7 @@ export interface Request {
  * Represents a group of identical requests
  */
 export interface RequestGroup {
-  request: Request;
+  request: UserRequest;
   count: number;
 }
 
@@ -73,7 +73,7 @@ export interface RequestGroup {
  * @param req2 Second request
  * @returns True if the requests have identical content
  */
-export function hasSameContent(req1: Request, req2: Request): boolean {
+export function hasSameContent(req1: UserRequest, req2: UserRequest): boolean {
   // Compare variable names
   if (req1.variableName !== req2.variableName) return false;
 
@@ -107,7 +107,7 @@ export function hasSameContent(req1: Request, req2: Request): boolean {
  * @param requests Array of user requests
  * @returns Array of request groups
  */
-export function groupRequestsByContent(requests: Request[]): RequestGroup[] {
+export function groupRequestsByContent(requests: UserRequest[]): RequestGroup[] {
   // Sort requests by creation date (newest first)
   const sortedRequests = [...requests].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
