@@ -1,15 +1,15 @@
+import { JSX } from "react";
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import Home from "@/pages/homePage";
 import About from "@/pages/aboutPage";
 import NotFound from "@/pages/notFoundPage";
-import Layout from "@/components/layout/layout";
 import AuthPage from "@/pages/authPage";
-import { JSX } from "react";
 import RequestsPage from "@/pages/requestsPage";
-import { useAppSelector } from "@/redux/hooks";
-import ProtectedRoute from "@/components/shared/ProtectedRoute";
 import ProfilePage from "@/pages/ProfilePage";
-import SettingsPage from "./pages/SettingsPage";
+import SettingsPage from "@/pages/SettingsPage";
+import Layout from "@/components/layout/layout";
+import ProtectedRoute from "@/components/shared/ProtectedRoute";
+import { useAppSelector } from "@/redux/hooks";
 
 /**
  * Application router configuration
