@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import * as Label from "@radix-ui/react-label";
 import { HelpCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -33,6 +33,26 @@ const FormField: React.FC<FormFieldProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  // Memoize the tooltip button to prevent re-rendering on every keystroke
+  const tooltipButton = useMemo(() => {
+    if (!tooltip) return null;
+
+    const ariaLabel = t("navigation-tooltips.help", "Help");
+
+    return (
+      <Tooltip content={tooltip} delay={200}>
+        <button
+          type="button"
+          className="ml-1.5 rounded-full p-0.5 text-slate-400 hover:text-slate-600 
+                    focus:outline-none focus:ring-2 focus:ring-violet-500"
+          aria-label={ariaLabel}
+        >
+          <HelpCircle size={14} />
+        </button>
+      </Tooltip>
+    );
+  }, [tooltip, t]);
+
   return (
     <div className={`mb-4 ${className}`}>
       <div className="flex items-center mb-1.5">
@@ -41,18 +61,7 @@ const FormField: React.FC<FormFieldProps> = ({
           {required && <span className="text-red-500 ml-1">*</span>}
         </Label.Root>
 
-        {tooltip && (
-          <Tooltip content={tooltip} delay={200}>
-            <button
-              type="button"
-              className="ml-1.5 rounded-full p-0.5 text-slate-400 hover:text-slate-600 
-                        focus:outline-none focus:ring-2 focus:ring-violet-500"
-              aria-label={t("navigation-tooltips.help", "Help about {{label}}", { label })}
-            >
-              <HelpCircle size={14} />
-            </button>
-          </Tooltip>
-        )}
+        {tooltipButton}
       </div>
 
       {children}
@@ -62,4 +71,5 @@ const FormField: React.FC<FormFieldProps> = ({
   );
 };
 
-export default FormField;
+// Wrap the component with React.memo to prevent re-renders when props haven't changed
+export default React.memo(FormField);

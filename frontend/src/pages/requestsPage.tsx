@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import * as Switch from "@radix-ui/react-switch";
 import * as Separator from "@radix-ui/react-separator";
@@ -29,7 +29,7 @@ const RequestsPage: React.FC = () => {
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
-  // Redux hooks
+  // Redux hooks - use selector shaping to prevent unnecessary re-renders
   const dispatch = useAppDispatch();
   const formData = useAppSelector(state => state.requests.form);
   const isSubmitting = useAppSelector(state => state.requests.isSubmitting);
@@ -42,15 +42,19 @@ const RequestsPage: React.FC = () => {
    * @param {string} field - The field name to update
    * @param {any} value - The new value for the field
    */
-  const updateField = <K extends keyof typeof formData>(field: K, value: (typeof formData)[K]) => {
-    dispatch(updateFormField({ field, value }));
-  };
+  const updateField = useCallback(
+    <K extends keyof typeof formData>(field: K, value: (typeof formData)[K]) => {
+      dispatch(updateFormField({ field, value }));
+    },
+    [dispatch]
+  );
 
   /**
    * Transforms the form data into the format expected by the API
+   * Memoized to prevent unnecessary recalculations on re-renders
    * @returns Transformed data ready for submission
    */
-  const transformFormDataForSubmission = () => {
+  const transformFormDataForSubmission = useCallback(() => {
     if (!formData.variableName || !formData.years || !formData.months || !formData.days) {
       throw new Error(t("errors.missingRequiredFields", "Missing required fields"));
     }
@@ -101,12 +105,21 @@ const RequestsPage: React.FC = () => {
       areaCovered: areaCoveredObj,
       format: formData.fileFormat,
     };
-  };
+  }, [
+    formData.variableName,
+    formData.years,
+    formData.months,
+    formData.days,
+    formData.pressureLevels,
+    formData.areaCovered,
+    formData.fileFormat,
+    t,
+  ]);
 
   /**
    * Handles form submission
    */
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     try {
       const transformedData = transformFormDataForSubmission();
       dispatch(submitRequest(transformedData))
@@ -123,57 +136,120 @@ const RequestsPage: React.FC = () => {
       setToastMessage(`${t("errors.title")}: ${error instanceof Error ? error.message : t("errors.submission")}`);
       setToastOpen(true);
     }
-  };
+  }, [dispatch, t, transformFormDataForSubmission]);
 
   /**
    * Clears all form fields
    */
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
     // Using the local state approach for clearing form data
-    Object.keys(formData).forEach(key => {
+    const keys = Object.keys(formData);
+
+    // Batch all dispatch calls to prevent multiple renders
+    const updates = keys.reduce(
+      (acc, key) => {
+        const field = key as keyof typeof formData;
+        let value;
+
+        if (Array.isArray(formData[field])) {
+          value = [];
+        } else if (typeof formData[field] === "boolean") {
+          value = false;
+        } else {
+          value = "";
+        }
+
+        acc[field] = value;
+        return acc;
+      },
+      {} as Record<string, any>
+    );
+
+    // Perform a single dispatch with all updates
+    keys.forEach(key => {
       const field = key as keyof typeof formData;
-      let value;
-
-      if (Array.isArray(formData[field])) {
-        value = [];
-      } else if (typeof formData[field] === "boolean") {
-        value = false;
-      } else {
-        value = "";
-      }
-
-      updateField(field, value as (typeof formData)[keyof typeof formData]);
+      dispatch(
+        updateFormField({
+          field,
+          value: updates[field] as (typeof formData)[keyof typeof formData],
+        })
+      );
     });
 
     setToastMessage(t("requests-titles.clearSuccess", "Form cleared successfully"));
     setToastOpen(true);
-  };
+  }, [formData, dispatch, t]);
+
+  /**
+   * Navigation steps array to avoid recreating this on every render
+   */
+  const tabOrder = useMemo(() => ["basic-info", "map-config", "advanced-settings", "summary"], []);
 
   /**
    * Navigate to the next tab
    * @param {string} currentTab - The current tab ID
    */
-  const goToNextTab = (currentTab: string) => {
-    const tabOrder = ["basic-info", "map-config", "advanced-settings", "summary"];
-    const currentIndex = tabOrder.indexOf(currentTab);
+  const goToNextTab = useCallback(
+    (currentTab: string) => {
+      const currentIndex = tabOrder.indexOf(currentTab);
 
-    if (currentIndex < tabOrder.length - 1) {
-      setActiveTab(tabOrder[currentIndex + 1]);
-    }
-  };
+      if (currentIndex < tabOrder.length - 1) {
+        setActiveTab(tabOrder[currentIndex + 1]);
+      }
+    },
+    [tabOrder]
+  );
 
   /**
    * Navigate to the previous tab
    * @param {string} currentTab - The current tab ID
    */
-  const goToPreviousTab = (currentTab: string) => {
-    const tabOrder = ["basic-info", "map-config", "advanced-settings", "summary"];
-    const currentIndex = tabOrder.indexOf(currentTab);
+  const goToPreviousTab = useCallback(
+    (currentTab: string) => {
+      const currentIndex = tabOrder.indexOf(currentTab);
 
-    if (currentIndex > 0) {
-      setActiveTab(tabOrder[currentIndex - 1]);
-    }
-  };
+      if (currentIndex > 0) {
+        setActiveTab(tabOrder[currentIndex - 1]);
+      }
+    },
+    [tabOrder]
+  );
+
+  // Memoize form components to prevent needless re-renders
+  const basicInfoForm = useMemo(
+    () => <BasicInfoForm formData={formData} updateFormField={updateField} onNext={() => goToNextTab("basic-info")} />,
+    [formData, updateField, goToNextTab]
+  );
+
+  const mapConfigForm = useMemo(
+    () => (
+      <MapConfigForm
+        formData={formData}
+        updateFormField={updateField}
+        onNext={() => goToNextTab("map-config")}
+        onPrevious={() => goToPreviousTab("map-config")}
+      />
+    ),
+    [formData, updateField, goToNextTab, goToPreviousTab]
+  );
+
+  const advancedSettingsForm = useMemo(
+    () => (
+      <AdvancedSettingsForm
+        formData={formData}
+        updateFormField={updateField}
+        advancedMode={advancedMode}
+        onNext={() => goToNextTab("advanced-settings")}
+        onPrevious={() => goToPreviousTab("advanced-settings")}
+      />
+    ),
+    [formData, updateField, advancedMode, goToNextTab, goToPreviousTab]
+  );
+
+  const requestSummary = useMemo(
+    () => <RequestSummary formData={formData} onPrevious={() => goToPreviousTab("summary")} />,
+    [formData, goToPreviousTab]
+  );
 
   return (
     <div className="request-container container mx-auto px-4 sm:px-6 py-6 sm:py-8 bg-white shadow-lg rounded-xl">
@@ -246,27 +322,16 @@ const RequestsPage: React.FC = () => {
 
         <div className="form-container">
           <Tabs.Content value="basic-info" className="tab-content">
-            <BasicInfoForm formData={formData} updateFormField={updateField} onNext={() => goToNextTab("basic-info")} />
+            {basicInfoForm}
           </Tabs.Content>
           <Tabs.Content value="map-config" className="tab-content">
-            <MapConfigForm
-              formData={formData}
-              updateFormField={updateField}
-              onNext={() => goToNextTab("map-config")}
-              onPrevious={() => goToPreviousTab("map-config")}
-            />
+            {mapConfigForm}
           </Tabs.Content>
           <Tabs.Content value="advanced-settings" className="tab-content">
-            <AdvancedSettingsForm
-              formData={formData}
-              updateFormField={updateField}
-              advancedMode={advancedMode}
-              onNext={() => goToNextTab("advanced-settings")}
-              onPrevious={() => goToPreviousTab("advanced-settings")}
-            />
+            {advancedSettingsForm}
           </Tabs.Content>
           <Tabs.Content value="summary" className="tab-content">
-            <RequestSummary formData={formData} onPrevious={() => goToPreviousTab("summary")} />
+            {requestSummary}
 
             <Separator.Root className="h-px bg-slate-200 my-6" />
 
@@ -307,7 +372,7 @@ const RequestsPage: React.FC = () => {
           className="bg-white rounded-lg shadow-lg p-4 flex items-start gap-3 border border-slate-200 fixed bottom-4 right-4 max-w-sm"
           open={toastOpen}
           onOpenChange={setToastOpen}
-          duration={5000}
+          duration={3000}
         >
           <Toast.Title className="font-medium text-slate-900">
             {toastMessage.startsWith(t("errors.title")) ? t("errors.title") : t("requests-form.success", "Success")}
@@ -325,4 +390,4 @@ const RequestsPage: React.FC = () => {
   );
 };
 
-export default RequestsPage;
+export default React.memo(RequestsPage);

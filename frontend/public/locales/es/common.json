@@ -12,7 +12,8 @@
     "home": "Ir a la Página Principal",
     "requests": "Crear y gestionar tus solicitudes",
     "login": "Iniciar sesión en tu cuenta",
-    "about": "Conocer más sobre esta aplicación"
+    "about": "Conocer más sobre esta aplicación",
+    "help": "Ayuda"
   },
   "navigation-footer": {
     "about": "Acerca de"

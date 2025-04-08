@@ -12,7 +12,8 @@
     "home": "Go to Homepage",
     "requests": "Create and manage your requests",
     "login": "Sign in to your account",
-    "about": "Learn more about this application"
+    "about": "Learn more about this application",
+    "help": "Help"
   },
   "navigation-footer": {
     "about": "About"
