@@ -11,7 +11,7 @@ interface LanguageState {
  * Includes current language and available options
  */
 const initialState: LanguageState = {
-  currentLanguage: i18n.language || "en",
+  currentLanguage: i18n.language || "es",
   availableLanguages: [
     { code: "en", name: "English" },
     { code: "es", name: "Español" },

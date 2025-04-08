@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { User } from "@/types/User";
 import { updateUserProfile } from "./userSlice";
+import { API_URL_AUTH_LOGIN, API_URL_AUTH_REGISTER } from "@/consts/apiConsts";
 
 interface AuthState {
   user: User | null;
@@ -8,9 +9,6 @@ interface AuthState {
   isLoading: boolean;
   error: string | null;
 }
-
-// const url = process.env.PORT ?? "http://localhost:3000";
-const url = "http://localhost:3000";
 
 // Helper function to load initial state from localStorage
 const loadAuthState = (): AuthState => {
@@ -46,8 +44,7 @@ export const loginUser = createAsyncThunk(
   "auth/login",
   async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
     try {
-      // Replace with your actual API call
-      const response = await fetch(`${url}/api/auth/login`, {
+      const response = await fetch(API_URL_AUTH_LOGIN, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -77,7 +74,7 @@ export const registerUser = createAsyncThunk(
   "auth/register",
   async ({ name, email, password }: { name: string; email: string; password: string }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${url}/api/auth/register`, {
+      const response = await fetch(API_URL_AUTH_REGISTER, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),

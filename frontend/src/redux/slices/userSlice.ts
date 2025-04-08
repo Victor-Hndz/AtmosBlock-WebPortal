@@ -1,3 +1,4 @@
+import { API_URL_USERS_PROFILE } from "@/consts/apiConsts";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 interface UpdateProfileData {
@@ -17,8 +18,6 @@ const initialState: UserState = {
   successMessage: null,
 };
 
-const API_URL = "http://localhost:3000";
-
 /**
  * Update user profile (name, email)
  */
@@ -31,7 +30,7 @@ export const updateUserProfile = createAsyncThunk(
         return rejectWithValue("No authentication token found");
       }
 
-      const response = await fetch(`${API_URL}/api/users/profile`, {
+      const response = await fetch(API_URL_USERS_PROFILE, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -86,7 +85,7 @@ export const deleteUserAccount = createAsyncThunk("user/deleteAccount", async (_
       return rejectWithValue("No authentication token found");
     }
 
-    const response = await fetch(`${API_URL}/api/users/profile`, {
+    const response = await fetch(API_URL_USERS_PROFILE, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
