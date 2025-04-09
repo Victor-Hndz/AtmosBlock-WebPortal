@@ -186,7 +186,15 @@
     "generateAnimation": "Generar Animación",
     "openMP": "OpenMP",
     "useMultipleThreads": "Usar Múltiples Hilos",
-    "useMultipleProcesses": "Usar Múltiples Procesos"
+    "useMultipleProcesses": "Usar Múltiples Procesos",
+    "invalidFormat": "Formato no válido",
+    "valueTooShort": "El input es demasiado corto",
+    "valueTooLong": "El input es demasiado largo",
+    "invalidCoordinates": "Coordenadas no válidas",
+    "invalidNorthCoordinate": "La coordenada norte no es válida",
+    "invalidSouthCoordinate": "La coordenada sur no es válida",
+    "invalidEastCoordinate": "La coordenada este no es válida",
+    "invalidWestCoordinate": "La coordenada oeste no es válida"
   },
   "buttons": {
     "submit": "Enviar",

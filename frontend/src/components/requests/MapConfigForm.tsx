@@ -4,6 +4,7 @@ import { Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import FormField from "./FormField";
 import { RequestForm } from "@/types/Request";
+import { PRESSURE_LEVELS, MAP_TYPES, MAP_RANGES } from "@/consts/requestsConsts";
 
 interface MapConfigFormProps {
   formData: RequestForm;
@@ -11,41 +12,6 @@ interface MapConfigFormProps {
   onNext: () => void;
   onPrevious: () => void;
 }
-
-/**
- * Available pressure levels for selection
- */
-const pressureLevels = ["1000hPa", "850hPa", "700hPa", "500hPa", "300hPa", "200hPa", "100hPa"];
-
-/**
- * Available areas for selection
- */
-const areas = [
-  "Global",
-  "Northern Hemisphere",
-  "Southern Hemisphere",
-  "Europe",
-  "North America",
-  "South America",
-  "Asia",
-  "Africa",
-  "Australia",
-];
-
-/**
- * Available map types for selection
- */
-const mapTypes = ["Contour", "Filled Contour", "Vector", "StreamLine"];
-
-/**
- * Available map ranges for selection
- */
-const mapRanges = ["Auto", "Fixed", "Custom"];
-
-/**
- * Available map levels for selection
- */
-const mapLevels = ["Surface", "Isobaric", "Isentropic"];
 
 /**
  * Map configuration form component for the second step of the request form
@@ -141,7 +107,7 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({
         required
       >
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-1.5">
-          {pressureLevels.map(level => (
+          {PRESSURE_LEVELS.map(level => (
             <label key={level} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
               <Checkbox.Root
                 id={`level-${level}`}
@@ -175,7 +141,7 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({
         required
       >
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1.5">
-          {areas.map(area => (
+          {AREAS.map(area => (
             <label key={area} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
               <Checkbox.Root
                 id={`area-${area}`}
@@ -209,7 +175,7 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({
         required
       >
         <div className="grid grid-cols-2 gap-2 mt-1.5">
-          {mapTypes.map(type => (
+          {MAP_TYPES.map(type => (
             <label key={type} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
               <Checkbox.Root
                 id={`type-${type}`}
@@ -243,7 +209,7 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({
         required
       >
         <div className="grid grid-cols-3 gap-2 mt-1.5">
-          {mapRanges.map(range => (
+          {MAP_RANGES.map(range => (
             <label key={range} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
               <Checkbox.Root
                 id={`range-${range}`}
@@ -277,7 +243,7 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({
         required
       >
         <div className="grid grid-cols-3 gap-2 mt-1.5">
-          {mapLevels.map(level => (
+          {MAP_LEVELS.map(level => (
             <label key={level} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
               <Checkbox.Root
                 id={`map-level-${level}`}

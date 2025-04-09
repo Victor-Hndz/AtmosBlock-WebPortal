@@ -186,7 +186,15 @@
     "generateAnimation": "Generate Animation",
     "openMP": "OpenMP",
     "useMultipleThreads": "Use Multiple Threads",
-    "useMultipleProcesses": "Use Multiple Processes"
+    "useMultipleProcesses": "Use Multiple Processes",
+    "invalidFormat": "Invalid format",
+    "valueTooShort": "Input is too short",
+    "valueTooLong": "Input is too long",
+    "invalidCoordinates": "Invalid coordinates",
+    "invalidNorthCoordinate": "Invalid North coordinate",
+    "invalidSouthCoordinate": "Invalid South coordinate",
+    "invalidEastCoordinate": "Invalid East coordinate",
+    "invalidWestCoordinate": "Invalid West coordinate"
   },
   "buttons": {
     "submit": "Submit",

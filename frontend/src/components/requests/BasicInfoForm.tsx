@@ -4,6 +4,7 @@ import { Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import FormField from "./FormField";
 import { RequestForm } from "@/types/Request";
+import { AVAILABLE_YEARS, AVAILABLE_MONTHS, calculateAvailableDays, AVAILABLE_HOURS } from "@/consts/requestsConsts";
 
 interface BasicInfoFormProps {
   formData: RequestForm;
@@ -12,44 +13,16 @@ interface BasicInfoFormProps {
 }
 
 /**
- * Available years for selection
- */
-const availableYears = ["2020", "2021", "2022", "2023", "2024"];
-
-/**
- * Available months for selection
- */
-const availableMonths = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
-/**
- * Available days for selection
- */
-const availableDays = Array.from({ length: 31 }, (_, i) => `${i + 1}`);
-
-/**
- * Available hours for selection
- */
-const availableHours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
-
-/**
  * Basic information form component for the first step of the request form
  */
 const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData = {} as RequestForm, updateFormField, onNext }) => {
   const { t } = useTranslation();
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Calculate available days based on selected years and months
+  const availableDays = useMemo(() => {
+    return calculateAvailableDays(formData?.years || [], formData?.months || []);
+  }, [formData?.years, formData?.months]);
 
   /**
    * Validates the form fields before proceeding to the next step
@@ -146,7 +119,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData = {} as RequestF
         required
       >
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 mt-1.5">
-          {availableYears.map(year => (
+          {AVAILABLE_YEARS.map(year => (
             <label key={year} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
               <Checkbox.Root
                 id={`year-${year}`}
@@ -180,7 +153,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData = {} as RequestF
         required
       >
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-1.5">
-          {availableMonths.map(month => (
+          {AVAILABLE_MONTHS.map(month => (
             <label key={month} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
               <Checkbox.Root
                 id={`month-${month}`}
@@ -237,7 +210,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData = {} as RequestF
         </div>
       </FormField>
     ),
-    [formData?.days, errors.days, t, handleCheckboxChange]
+    [formData?.days, errors.days, t, handleCheckboxChange, availableDays]
   );
 
   // Memoize the hours checkboxes to prevent re-renders
@@ -251,7 +224,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData = {} as RequestF
         required
       >
         <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 mt-1.5">
-          {availableHours.map(hour => (
+          {AVAILABLE_HOURS.map(hour => (
             <label key={hour} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
               <Checkbox.Root
                 id={`hour-${hour}`}

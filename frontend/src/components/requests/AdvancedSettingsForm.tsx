@@ -5,6 +5,7 @@ import { ChevronDown, ChevronUp, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import FormField from "./FormField";
 import { RequestForm } from "@/types/Request";
+import { FILE_FORMAT_OPTIONS } from "@/consts/requestsConsts";
 
 interface AdvancedSettingsFormProps {
   formData: RequestForm;
@@ -13,11 +14,6 @@ interface AdvancedSettingsFormProps {
   onNext: () => void;
   onPrevious: () => void;
 }
-
-/**
- * Available file formats
- */
-const fileFormatOptions = ["NetCDF", "GRIB", "CSV", "JSON"];
 
 /**
  * Advanced settings form component for the third step of the request form
@@ -67,7 +63,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
                 <ChevronUp className="w-4 h-4" />
               </Select.ScrollUpButton>
               <Select.Viewport className="p-1">
-                {fileFormatOptions.map(format => (
+                {FILE_FORMAT_OPTIONS.map(format => (
                   <Select.Item
                     key={format}
                     value={format}
