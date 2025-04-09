@@ -72,10 +72,9 @@ const submitRequestsSlice = createSlice({
         state.isSubmitting = true;
         state.error = null;
       })
-      .addCase(submitRequest.fulfilled, (state, action: PayloadAction<RequestForm>) => {
+      .addCase(submitRequest.fulfilled, state => {
         state.isLoading = false;
         state.isSubmitting = false;
-        state.items.push(action.payload);
         // Clear form data after successful submission
         state.form = {} as RequestForm;
       })
