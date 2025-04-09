@@ -1,15 +1,15 @@
 import { useCallback } from "react";
-import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { updateFormField, submitRequest } from "@/redux/slices/submitRequestsSlice";
 import { RequestForm } from "@/types/Request";
+import { TFunction } from "i18next";
 
 /**
  * Custom hook to manage request form state and operations
+ * @param t - Translation function
  * @returns Object containing form data, submission state, and helper methods
  */
-export const useRequestForm = () => {
-  const { t } = useTranslation();
+export const useRequestForm = (t: TFunction) => {
   const dispatch = useAppDispatch();
 
   // Select only necessary parts of the state to prevent unnecessary re-renders

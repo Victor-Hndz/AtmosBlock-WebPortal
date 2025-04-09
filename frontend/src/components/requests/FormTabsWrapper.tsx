@@ -19,7 +19,7 @@ interface FormTabsWrapperProps {
 
 const FormTabsWrapper: React.FC<FormTabsWrapperProps> = ({ advancedMode, showToast, t }) => {
   // Custom hooks for form functionality
-  const { formData, isSubmitting, updateField, handleSubmit, clearForm, handleCheckboxChange } = useRequestForm();
+  const { formData, isSubmitting, updateField, handleSubmit, clearForm, handleCheckboxChange } = useRequestForm(t);
   const { activeTab, setActiveTab, goToNextTab, goToPreviousTab } = useRequestNavigation();
 
   // Handle form submission
