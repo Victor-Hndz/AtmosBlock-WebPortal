@@ -10,7 +10,11 @@ interface UseRequestFormReturn {
   updateField: <K extends keyof RequestForm>(field: K, value: RequestForm[K]) => void;
   handleSubmit: () => Promise<{ success: boolean; data?: any; error?: any; message: string }>;
   clearForm: () => { success: boolean; message: string };
-  handleCheckboxChange: <K extends keyof RequestForm>(field: K, value: string, checked: boolean | "indeterminate") => void;
+  handleCheckboxChange: <K extends keyof RequestForm>(
+    field: K,
+    value: string,
+    checked: boolean | "indeterminate"
+  ) => void;
 }
 
 /**
