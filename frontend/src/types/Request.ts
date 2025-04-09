@@ -29,9 +29,9 @@ export interface RequestForm {
   noMaps?: boolean;
   animation?: boolean;
   omp?: boolean;
-  nThreads?: boolean;
+  nThreads?: number;
   mpi?: boolean;
-  nProces?: boolean;
+  nProces?: number;
 }
 
 /**
