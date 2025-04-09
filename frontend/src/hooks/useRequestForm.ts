@@ -4,12 +4,21 @@ import { updateFormField, submitRequest } from "@/redux/slices/submitRequestsSli
 import { RequestForm } from "@/types/Request";
 import { TFunction } from "i18next";
 
+interface UseRequestFormReturn {
+  formData: RequestForm;
+  isSubmitting: boolean;
+  updateField: <K extends keyof RequestForm>(field: K, value: RequestForm[K]) => void;
+  handleSubmit: () => Promise<{ success: boolean; data?: any; error?: any; message: string }>;
+  clearForm: () => { success: boolean; message: string };
+  handleCheckboxChange: <K extends keyof RequestForm>(field: K, value: string, checked: boolean | "indeterminate") => void;
+}
+
 /**
  * Custom hook to manage request form state and operations
  * @param t - Translation function
  * @returns Object containing form data, submission state, and helper methods
  */
-export const useRequestForm = (t: TFunction) => {
+export const useRequestForm = (t: TFunction): UseRequestFormReturn => {
   const dispatch = useAppDispatch();
 
   // Select only necessary parts of the state to prevent unnecessary re-renders

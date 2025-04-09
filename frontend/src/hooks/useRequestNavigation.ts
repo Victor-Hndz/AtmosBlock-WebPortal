@@ -1,12 +1,19 @@
 import { useState, useCallback } from "react";
 import { REQUEST_FORM_STEPS } from "@/consts/requestsConsts";
 
+interface UseRequestNavigationReturn {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  goToNextTab: (currentTab: string) => void;
+  goToPreviousTab: (currentTab: string) => void;
+}
+
 /**
  * Custom hook to manage navigation between form steps
  * @param initialStep - The initial active step
  * @returns Object containing navigation state and methods
  */
-export const useRequestNavigation = (initialStep = REQUEST_FORM_STEPS[0]) => {
+export const useRequestNavigation = (initialStep = REQUEST_FORM_STEPS[0]): UseRequestNavigationReturn => {
   const [activeTab, setActiveTab] = useState(initialStep);
 
   /**

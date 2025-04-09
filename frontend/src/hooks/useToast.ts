@@ -8,11 +8,20 @@ interface ToastState {
   type: ToastType;
 }
 
+interface UseToastReturn extends ToastState {
+  setIsOpen: (isOpen: boolean) => void;
+  showToast: (message: string, type?: ToastType, title?: string) => void;
+  showSuccess: (message: string, title?: string) => void;
+  showError: (message: string, title?: string) => void;
+  showWarning: (message: string, title?: string) => void;
+  showInfo: (message: string, title?: string) => void;
+}
+
 /**
  * Custom hook for managing toast notifications
  * @returns {Object} Toast state and control methods
  */
-export const useToast = () => {
+export const useToast = (): UseToastReturn => {
   const [toast, setToast] = useState<ToastState>({
     isOpen: false,
     message: "",
