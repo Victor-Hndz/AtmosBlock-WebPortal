@@ -1,18 +1,17 @@
 import React, { useMemo } from "react";
-import { useTranslation } from "react-i18next";
 import { RequestForm } from "@/types/Request";
+import { TFunction } from "i18next";
 
 interface RequestSummaryProps {
   formData: RequestForm;
   onPrevious: () => void;
+  t: TFunction;
 }
 
 /**
  * Request summary component for the final step of the request form
  */
-const RequestSummary: React.FC<RequestSummaryProps> = ({ formData, onPrevious }) => {
-  const { t } = useTranslation();
-
+const RequestSummary: React.FC<RequestSummaryProps> = ({ formData, onPrevious, t }) => {
   // Memoize the summary content to prevent re-renders
   const summaryContent = useMemo(() => {
     // Process the form data for display
@@ -20,8 +19,6 @@ const RequestSummary: React.FC<RequestSummaryProps> = ({ formData, onPrevious })
     const months = formData.months?.join(", ") ?? "";
     const days = formData.days?.join(", ") ?? "";
     const hours = formData.hours?.join(", ") ?? "";
-    const pressureLevels = formData.pressureLevels?.join(", ") ?? t("common.none");
-    const areaCovered = formData.areaCovered?.join(", ") ?? t("common.none");
     const mapTypes = formData.mapTypes?.join(", ") ?? t("common.none");
     const mapRanges = formData.mapRanges?.join(", ") ?? t("common.none");
     const mapLevels = formData.mapLevels?.join(", ") ?? t("common.none");
@@ -51,11 +48,11 @@ const RequestSummary: React.FC<RequestSummaryProps> = ({ formData, onPrevious })
       },
       {
         label: t("requests-form.pressureLevels"),
-        value: pressureLevels,
+        value: formData.pressureLevels ?? t("common.none"),
       },
       {
         label: t("requests-form.areaCovered"),
-        value: areaCovered,
+        value: formData.areaCovered ?? t("common.none"),
       },
       {
         label: t("requests-form.mapTypes"),
