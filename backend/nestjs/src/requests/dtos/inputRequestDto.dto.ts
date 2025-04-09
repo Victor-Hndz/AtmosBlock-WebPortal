@@ -46,9 +46,9 @@ export class InputRequestDto {
   mapRanges: string[];
 
   @IsArray()
-  @IsNotEmpty()
   @IsString({ each: true })
-  mapLevels: string[];
+  @IsOptional()
+  mapLevels?: string[];
 
   @IsString()
   @IsOptional()

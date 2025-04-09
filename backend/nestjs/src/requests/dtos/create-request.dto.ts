@@ -57,9 +57,9 @@ export class CreateRequestDto {
 
   @ApiProperty({ description: "Map levels to use", type: [String] })
   @IsArray()
-  @IsNotEmpty()
   @IsString({ each: true })
-  mapLevels: string[];
+  @IsOptional()
+  mapLevels?: string[];
 
   @ApiPropertyOptional({ description: "File format for output" })
   @IsString()

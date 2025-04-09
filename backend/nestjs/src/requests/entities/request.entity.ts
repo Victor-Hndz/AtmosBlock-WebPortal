@@ -33,8 +33,8 @@ export class Request {
   @Column("text", { array: true, name: "map_types" })
   mapTypes: string[];
 
-  @Column("text", { array: true, name: "map_levels" })
-  mapLevels: string[];
+  @Column("text", { nullable: true, array: true, name: "map_levels", default: ["20"] })
+  mapLevels?: string[];
 
   @Column({ nullable: true, name: "file_format_selected" })
   fileFormat?: string;
