@@ -26,9 +26,15 @@ class ConfigHandler:
         """Initialize the configuration handler with default values."""
         # Configuration properties
         self.file_name = None
+        self.variable_name = None
+        self.pressure_level = None
+        self.years = None
+        self.months = None
+        self.days = None
+        self.hours = None
+        self.area_covered = None
         self.map_types = None
         self.map_ranges = None
-        self.area_covered = None
         self.map_levels = None
         self.file_format = None
         self.tracking = None
@@ -60,9 +66,15 @@ class ConfigHandler:
         # Extract configuration values
         map_config = config["MAP"]
         self.file_name = map_config["file"]
+        self.variable_name = map_config["variableName"]
+        self.pressure_level = map_config["pressureLevel"]
+        self.years = map_config["years"]
+        self.months = map_config["months"]
+        self.days = map_config["days"]
+        self.hours = map_config["hours"]
+        self.area_covered = map_config["areaCovered"]
         self.map_types = map_config["mapTypes"]
         self.map_ranges = map_config["mapRanges"]
-        self.area_covered = map_config["areaCovered"]
         self.map_levels = map_config["mapLevels"]
         self.file_format = map_config["fileFormat"]
         self.tracking = map_config["tracking"]
@@ -268,6 +280,12 @@ class ConfigHandler:
         
         data = {
             "file_name": self.file_name,
+            "variable_name": self.variable_name,
+            "pressure_level": self.pressure_level,
+            "years": self.years,
+            "months": self.months,
+            "days": self.days,
+            "hours": self.hours,
             "map_types": self.map_types,
             "map_ranges": self.map_ranges,
             "map_levels": self.map_levels,
