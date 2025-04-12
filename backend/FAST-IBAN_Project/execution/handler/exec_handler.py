@@ -13,7 +13,7 @@ from utils.consts.consts import STATUS_OK, STATUS_ERROR, MESSAGE_NO_COMPILE
 
 
 def handle_message(body):
-    """Process the message received by the handler, if it is a valid .yaml file, return it."""
+    """Process the message received by the general handler, and launch the algorithm execution."""
 
     raw_data = process_body(body)
     data = json.loads(raw_data)
