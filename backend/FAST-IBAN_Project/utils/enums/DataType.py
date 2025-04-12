@@ -1,8 +1,8 @@
-import enum
+from enum import Enum
 
-class DataType(enum.Enum):
-    TYPE1 = "comb"
-    TYPE2 = "disp"
-    TYPE3 = "cont"
-    TYPE4 = "forms"
-    
+
+class DataType(Enum):
+    TYPE_COMB = "comb"
+    TYPE_DISP = "disp"
+    TYPE_CONT = "cont"
+    TYPE_FORMS = "forms"

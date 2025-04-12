@@ -1,8 +1,8 @@
-import enum
+from enum import Enum
 
-class DataRange(enum.Enum):
-    RANGE1 = "max"
-    RANGE2 = "min"
-    RANGE3 = "both"
-    RANGE4 = "comb"
-    
+
+class DataRange(Enum):
+    RANGE_MAX = "max"
+    RANGE_MIN = "min"
+    RANGE_BOTH = "both"
+    RANGE_COMB = "comb"
