@@ -1,9 +1,7 @@
 import json
 
-def create_message(status, message, data):
-    """Crea un mensaje JSON para enviar a RabbitMQ.""" 
-    return  {
-        "status": status,
-        "message": message,
-        "data": json.dumps(data)
-    }
+
+def create_message(status: str, message: str, data: str | dict) -> dict:
+    """Create a message in JSON format to be sent to RabbitMQ."""
+
+    return {"status": status, "message": message, "data": json.dumps(data)}
