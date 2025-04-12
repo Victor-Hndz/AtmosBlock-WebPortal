@@ -4,9 +4,26 @@ EXEC_FILE = "./FAST-IBAN"
 
 # Lista de argumentos permitidos
 ARGUMENTS = [
-    "variableName", "pressureLevels", "years", "months", "days", "hours",
-    "areaCovered", "mapTypes", "mapRanges", "mapLevels", "fileFormat", "tracking", "noCompile", "noExecute", "noMaps", "animation", "omp", "mpi",
-    "nThreads", "nProces"
+    "variableName",
+    "pressureLevels",
+    "years",
+    "months",
+    "days",
+    "hours",
+    "areaCovered",
+    "mapTypes",
+    "mapRanges",
+    "mapLevels",
+    "fileFormat",
+    "tracking",
+    "noCompile",
+    "noExecute",
+    "noMaps",
+    "animation",
+    "omp",
+    "mpi",
+    "nThreads",
+    "nProces",
 ]
 
 STATUS_OK = "OK"
