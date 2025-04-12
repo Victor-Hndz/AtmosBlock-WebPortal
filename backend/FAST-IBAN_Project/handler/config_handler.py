@@ -5,7 +5,6 @@ from typing import List
 
 sys.path.append('/app/')
 
-from visualization.generate_maps import generate_maps as gm
 from utils.enums.DataType import DataType
 
 from utils.rabbitMQ.send_message import send_message
@@ -225,12 +224,10 @@ class ConfigHandler:
         
         print(f"\n[ ] Ejecutando el programa para el archivo: {self.file_name}")
 
-        # Prepare execution command based on configuration
-        cmd = self._prepare_execution_command(lat_range, lon_range)
+        cmd = self.prepare_execution_command(lat_range, lon_range)
         
         print("\n[ ] Enviando mensaje a la cola de ejecución...")
         
-        # Prepare data based on configuration
         if self.no_compile:
             data = {"request_type": MESSAGE_NO_COMPILE, "cmd": cmd}
         else:
@@ -240,7 +237,7 @@ class ConfigHandler:
         send_message(create_message(STATUS_OK, "", data), "execution", "execution.algorithm")
         receive_messages("notifications_queue", "notify.handler", callback=self.handle_execution_message)
 
-    def _prepare_execution_command(self, lat_range: List[int], lon_range: List[int]) -> List[str]:
+    def prepare_execution_command(self, lat_range: List[int], lon_range: List[int]) -> List[str]:
         """
         Prepare the execution command based on configuration.
         
@@ -268,33 +265,19 @@ class ConfigHandler:
         """
         Generate maps based on the configuration.
         """
-        print("\n[ ] Iniciando generación de mapas...")
         
-        # GENERATE MAPS
-        # Iterate over map types, ranges, and levels to generate maps
-        for map_type in self.map_types:
-            for map_range in self.map_ranges:
-                for map_level in self.map_levels:
-                    if map_type == DataType.TYPE1:
-                        gm.generate_contour_map()
-                    elif map_type == DataType.TYPE2:
-                        gm.generate_scatter_map()
-                    elif map_type == DataType.TYPE3:
-                        gm.generate_combined_map()
-                    elif map_type == DataType.TYPE4:
-                        gm.generate_formations_map()
-        
-                    
-        
-        self.maps_generated = True
-        
-        # Continue with next steps
-        if self.animation:
-            self.process_map_animation()
-        elif self.tracking:
-            self.process_formation_tracking()
-        else:
-            print("\n✅ Procesamiento completado.")
+        data = {
+            "file_name": self.file_name,
+            "map_types": self.map_types,
+            "map_ranges": self.map_ranges,
+            "map_levels": self.map_levels,
+            "file_format": self.file_format,
+            "area_covered": self.area_covered,
+        }
+       
+        # Send execution request and wait for response
+        send_message(create_message(STATUS_OK, "", data), "execution", "execution.visualization")
+        receive_messages("notifications_queue", "notify.handler", callback=self.handle_map_generation_message)
     
     def process_map_animation(self) -> None:
         """
