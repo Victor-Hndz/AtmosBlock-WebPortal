@@ -3,7 +3,7 @@ import yaml
 import sys
 import json
 
-sys.path.append('/app/')
+sys.path.append("/app/")
 
 from utils.api_request import request_data
 from utils.netcdf_editor import adapt_netcdf
@@ -15,126 +15,145 @@ from utils.rabbitMQ.create_message import create_message
 from utils.consts.consts import API_FOLDER, ARGUMENTS, STATUS_OK
 
 
-def load_args_from_file(file_path):
-    """Carga los argumentos desde un archivo YAML."""
-    try:
-        with open(file_path, "r") as file:
-            config = yaml.safe_load(file) or {}
-    except FileNotFoundError:
-        print(f"❌ Error: Archivo {file_path} no encontrado.")
-        sys.exit(1)
-    except yaml.YAMLError as e:
-        print(f"❌ Error al leer el YAML: {e}")
-        sys.exit(1)
-    
-    return {key: config.get(key, None) for key in ARGUMENTS}
+def format_range(values: list) -> str:
+    """Transform a list of values into a range if they are consecutive or list them."""
+
+    if not values:
+        return ""
+
+    values = sorted(map(int, values))
+    ranges = []
+    start = values[0]
+
+    for i in range(1, len(values)):
+        if values[i] != values[i - 1] + 1:
+            ranges.append((start, values[i - 1]))
+            start = values[i]
+
+    ranges.append((start, values[-1]))
+
+    return "-".join(f"{s:02d}" if s == e else f"{s:02d}-{e:02d}" for s, e in ranges)
 
 
-def mount_file_name(variable, pressure_levels, years, months, days, hours):
-    """Genera el nombre del archivo basado en los parámetros proporcionados."""
-    
-    def format_range(values):
-        """Convierte una lista de valores en un rango si son consecutivos o los lista."""
-        if not values:
-            return ""
-    
-        values = sorted(map(int, values))  # Convierte a enteros y ordena
-        ranges = []
-        start = values[0]
-        
-        for i in range(1, len(values)):
-            if values[i] != values[i - 1] + 1:
-                # Si hay una interrupción en la secuencia, almacena el rango
-                ranges.append((start, values[i - 1]))
-                start = values[i]
-        
-        ranges.append((start, values[-1]))  # Último rango
-        
-        return "-".join(f"{s:02d}" if s == e else f"{s:02d}-{e:02d}" for s, e in ranges)
-    
-    def format_list(values):
-        """Convierte valores en una lista a strings con ceros a la izquierda."""
-        return [f"{int(v):02d}" for v in values]
-    
-    # Asignar valores por defecto si alguno es None
-    variable = variable or ""
-    pressure_levels = pressure_levels or []
-    years = format_list(years or [])
-    months = format_list(months or [])
-    days = format_list(days or [])
-    hours = format_list(hours or [])
-
-    # Construcción del nombre del archivo
-    pressure_part = "-".join(pressure_levels) + "hPa" if len(pressure_levels) > 1 else pressure_levels[0] + "hPa"
-    year_part = "-".join(years)
-    month_part = "-".join(months)
-    day_part = f"({format_range(days)})"
-    hour_part = "-".join(hours) + "UTC"
-
-    return f"{API_FOLDER}/{variable}_{pressure_part}_{year_part}-{month_part}-{day_part}_{hour_part}.nc"
+def format_list(values: list) -> list:
+    """Transform a list of values into a list of strings with leading zeros."""
+    return [f"{int(v):02d}" for v in values]
 
 
-def process_message(body):
-    data = process_body(body)
-    config = json.loads(data)
-    args = {key: config.get(key, None) for key in ARGUMENTS}
-    
-    print("\n✅ Argumentos cargados y validados con éxito.\n")
-    print(f"Argumentos: {args}")
-    
-    file_name = mount_file_name(args["variableName"], args["pressureLevels"], args["years"], args["months"], args["days"], args["hours"])
-    
-    #buscar si el archivo existe
-    if not os.path.exists(file_name):
-        #llamar a la API y bajarlo
-        print(f"El archivo {file_name} no existe, se procederá a descargarlo.")
-        request_data(args["variableName"], args["years"], args["months"], args["days"], args["hours"], args["pressureLevels"], file_name)
-        print(f"\n✅ Archivo {file_name} descargado con éxito.")
-        
-    adapt_netcdf(file_name)
-    print(f"\n✅ Archivo {file_name} adaptado con éxito.")
-        
-    
-    # Crear el diccionario de configuración para cada mapa
-    configuration = {
-        "file": file_name,
-        "mapTypes": args["mapTypes"],
-        "mapRanges": args["mapRanges"],
-        "areaCovered": args["areaCovered"],
-        "mapLevels": args["mapLevels"],
-        "fileFormat": args["fileFormat"],
-        "tracking": args["tracking"],
-        "noCompile": args["noCompile"],
-        "noExecute": args["noExecute"],
-        "noMaps": args["noMaps"],
-        "animation": args["animation"],
-        "omp": args["omp"],
-        "mpi": args["mpi"],
-        "nThreads": args["nThreads"],
-        "nProces": args["nProces"]
-    }
+class Configurator:
+    """
+    Class for handling the configuration of the application.
 
-    # Escribir el archivo de configuración
-    configuration = {'MAP': configuration}
-    
-    # Escribir un archivo .yaml
-    try:
-        with open('config/config.yaml', 'w') as yamlfile:
-            yaml.dump(configuration, yamlfile, default_flow_style=False, sort_keys=False)
-        print("\n✅ Archivo de configuración .yaml creado exitosamente.\n")
-        send_message(create_message(STATUS_OK, "", "config/config.yaml"), "requests", "handler.start")
-        print("\n✅ Archivo de configuración .yaml enviado a la cola de RabbitMQ.\n")
-    except Exception as e:
-        print(f"\n❌ Error al escribir el archivo de configuración: {e}")
-        sys.exit(1)
+    This class is responsible for processing messages from RabbitMQ, validating arguments,
+    and generating the configuration file for the handler.
+    """
 
+    def __init__(self):
+        self.args = None
+        self.file_name = None
 
-def main():
-    # args = load_args_from_file(ARGS_FILE)
-    #inicilizar rabbitmq
-    init_rabbitmq()
-    receive_messages("config_queue", ["config.create"], process_message)
-    
+    def process_message(self, body: bytes) -> None:
+        """
+        Process a configuration message and begin the orchestration flow.
+
+        Args:
+            body: Raw message body from RabbitMQ
+        """
+
+        data = process_body(body)
+        config = json.loads(data)
+        self.args = {key: config.get(key, None) for key in ARGUMENTS}
+
+        print("\n✅ Argumentos cargados y validados con éxito.\n")
+        print(f"Argumentos: {self.args}")
+
+        self.mount_file_name()
+
+        if not os.path.exists(self.file_name):
+            # call to API for dowload the file
+            print(f"El archivo {self.file_name} no existe, se procederá a descargarlo.")
+            request_data(
+                self.args["variableName"],
+                self.args["years"],
+                self.args["months"],
+                self.args["days"],
+                self.args["hours"],
+                self.args["pressureLevels"],
+                self.file_name,
+            )
+            print(f"\n✅ Archivo {self.file_name} descargado con éxito.")
+
+        adapt_netcdf(self.file_name)
+        print(f"\n✅ Archivo {self.file_name} adaptado con éxito.")
+
+        # Create the configuration file
+        configuration = {
+            "file": self.file_name,
+            "mapTypes": self.args["mapTypes"],
+            "mapRanges": self.args["mapRanges"],
+            "areaCovered": self.args["areaCovered"],
+            "mapLevels": self.args["mapLevels"],
+            "fileFormat": self.args["fileFormat"],
+            "tracking": self.args["tracking"],
+            "noCompile": self.args["noCompile"],
+            "noExecute": self.args["noExecute"],
+            "noMaps": self.args["noMaps"],
+            "animation": self.args["animation"],
+            "omp": self.args["omp"],
+            "mpi": self.args["mpi"],
+            "nThreads": self.args["nThreads"],
+            "nProces": self.args["nProces"],
+        }
+        configuration = {"MAP": configuration}
+
+        # Write the .yaml file
+        try:
+            with open("config/config.yaml", "w") as yamlfile:
+                yaml.dump(
+                    configuration, yamlfile, default_flow_style=False, sort_keys=False
+                )
+
+            print("\n✅ Archivo de configuración .yaml creado exitosamente.\n")
+
+            send_message(
+                create_message(STATUS_OK, "", "config/config.yaml"),
+                "requests",
+                "handler.start",
+            )
+
+            print(
+                "\n✅ Archivo de configuración .yaml enviado a la cola de RabbitMQ.\n"
+            )
+        except Exception as e:
+            print(f"\n❌ Error al escribir el archivo de configuración: {e}")
+            sys.exit(1)
+
+    def mount_file_name(self):
+        """Generate the name of the file based on the parameters provided."""
+
+        # Asign default values
+        variable = self.args["variableName"] or ""
+        pressure_levels = self.args["pressureLevels"] or []
+        years = format_list(self.args["years"] or [])
+        months = format_list(self.args["months"] or [])
+        days = format_list(self.args["days"] or [])
+        hours = format_list(self.args["hours"] or [])
+
+        # Mount the new file name
+        pressure_part = (
+            "-".join(pressure_levels) + "hPa"
+            if len(pressure_levels) > 1
+            else pressure_levels[0] + "hPa"
+        )
+        year_part = "-".join(years)
+        month_part = "-".join(months)
+        day_part = f"({format_range(days)})"
+        hour_part = "-".join(hours) + "UTC"
+
+        return f"{API_FOLDER}/{variable}_{pressure_part}_{year_part}-{month_part}-{day_part}_{hour_part}.nc"
+
 
 if __name__ == "__main__":
-    main()
+    configurator = Configurator()
+    init_rabbitmq()
+    receive_messages("config_queue", ["config.create"], configurator.process_message)
