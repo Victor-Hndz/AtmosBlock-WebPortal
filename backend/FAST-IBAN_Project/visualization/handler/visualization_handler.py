@@ -5,23 +5,21 @@ import json
 
 from concurrent.futures import ThreadPoolExecutor
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+# sys.path.append('/app/')
 
-# from visualization.mapGeneration.generate_maps import generate_maps as gm
-
+from visualization.mapGeneration.generate_maps import MapGenerator
 from utils.rabbitMQ.receive_messages import receive_messages
 from utils.rabbitMQ.send_message import send_message
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
 from utils.consts.consts import STATUS_OK, STATUS_ERROR, MESSAGE_NO_COMPILE
-from utils.enums.DataType import DataType
 
 
 def handle_message(body):
     """Process the message received by the general handler, and launch the map generation."""
-    raw_data = process_body(body)
-    data = json.loads(raw_data)
-    # data = body
+    # raw_data = process_body(body)
+    # data = json.loads(raw_data)
+    data = body
 
     # the data comes like this:
     # data = {
@@ -43,16 +41,22 @@ def handle_message(body):
 
     def process_map_generation(year, month, day, hour, map_type, map_range, map_level):
         print(
-            f"\n[ ] Generando mapa para el año {year}, mes {month}, día {day}, hora {hour}, tipo de mapa {map_type}, rango {map_range}, nivel {map_level}..."
+            # f"\n[ ] Generando mapa para el año {year}, mes {month}, día {day}, hora {hour}, tipo de mapa {map_type}, rango {map_range}, nivel {map_level}..."
         )
-        # if map_type == DataType.TYPE_COMB:
-        #     gm.generate_contour_map()
-        # elif map_type == DataType.TYPE_DISP:
-        #     gm.generate_scatter_map()
-        # elif map_type == DataType.TYPE_COMB:
-        #     gm.generate_combined_map()
-        # elif map_type == DataType.TYPE_FORMS:
-        #     gm.generate_formations_map()
+        MapGenerator(
+            data["file_name"],
+            data["variable_name"],
+            data["pressure_level"],
+            year,
+            month,
+            day,
+            hour,
+            map_type,
+            map_range,
+            map_level,
+            data["file_format"],
+            data["area_covered"])
+            
 
     with ThreadPoolExecutor() as executor:
         futures = [
@@ -64,7 +68,7 @@ def handle_message(body):
                 hour,
                 map_type,
                 map_range,
-                map_level,
+                map_level
             )
             for year in data["years"]
             for month in data["months"]
@@ -79,21 +83,21 @@ def handle_message(body):
 
 
 if __name__ == "__main__":
-    receive_messages(
-        "execution_queue", "execution.visualization", callback=handle_message
-    )
-    # data = {
-    #     "file_name": "test.nc",
-    #     "variable_name": "geopotential",
-    #     "pressure_level": 850,
-    #     "years": [2020, 2021],
-    #     "months": [1, 2],
-    #     "days": [1, 2],
-    #     "hours": [0, 6, 12, 18],
-    #     "map_types": ["contour", "formations"],
-    #     "map_ranges": ["max"],
-    #     "map_levels": [20],
-    #     "file_format": "svg",
-    #     "area_covered": [90, -180, -90, 180],
-    # }
-    # handle_message(data)
+    # receive_messages(
+    #     "execution_queue", "execution.visualization", callback=handle_message
+    # )
+    data = {
+        "file_name": "C:\\Users\\Victor\\Desktop\\repos\\tfm\\backend\\FAST-IBAN_Project\\config\\data\\geopot_500hPa_2022-03-14_00-06-12-18UTC.nc",
+        "variable_name": "geopotential",
+        "pressure_level": 500,
+        "years": [2020],
+        "months": [1],
+        "days": [1],
+        "hours": [0, 6, 12, 18],
+        "map_types": ["cont"],
+        "map_ranges": ["max"],
+        "map_levels": [20],
+        "file_format": "svg",
+        "area_covered": [90, -180, -90, 180],
+    }
+    handle_message(data)

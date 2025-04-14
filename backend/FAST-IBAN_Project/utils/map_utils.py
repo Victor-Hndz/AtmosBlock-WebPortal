@@ -139,8 +139,6 @@ def obtain_csv_files(date: str, file: str) -> str:
         return None
     
     
-
-
 def extract_date(fecha: str, tiempo: int) -> str:
     """A partir de una cadena con una fecha completa y un instante de tiempo, saca una cadena con la fecha exacta correcta.
 

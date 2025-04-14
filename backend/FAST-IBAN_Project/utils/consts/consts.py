@@ -26,6 +26,12 @@ ARGUMENTS = [
     "nProces",
 ]
 
+VARIABLE_NAMES = {
+    "geopotential": "z",
+    "temperature": "t",
+    "u-component_of_wind": "u",
+}
+
 STATUS_OK = "OK"
 STATUS_ERROR = "ERROR"
 MESSAGE_NO_COMPILE = "NO_COMPILE"

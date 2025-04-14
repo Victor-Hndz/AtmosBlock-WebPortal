@@ -5,8 +5,6 @@ from typing import List
 
 sys.path.append('/app/')
 
-from utils.enums.DataType import DataType
-
 from utils.rabbitMQ.send_message import send_message
 from utils.rabbitMQ.receive_messages import receive_messages
 from utils.rabbitMQ.process_body import process_body
