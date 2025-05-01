@@ -1,10 +1,14 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from "typeorm";
 import { User } from "../../users/entities/user.entity";
+import { GeneratedFiles } from "../../generatedFiles/entities/generatedFiles.entity";
 
 @Entity("requests")
 export class Request {
   @PrimaryGeneratedColumn("uuid")
   id: string;
+
+  @Column({ name: "request_hash" })
+  requestHash: string;
 
   @Column({ name: "variable_name" })
   variableName: string;
@@ -66,13 +70,20 @@ export class Request {
   @Column({ nullable: true, name: "n_proces" })
   nProces?: number;
 
+  @Column({ name: "times_requested" })
+  timesRequested: number;
+
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
-  @ManyToOne(() => User, user => user.requests, { nullable: true })
-  @JoinColumn({ name: "user_id" })
-  user: User | null;
+  @CreateDateColumn({ name: "updated_at" })
+  updatedAt: Date;
 
-  @Column({ nullable: true, name: "user_id" })
-  userId: string | null;
+  @ManyToOne(() => User, user => user.requests, { onDelete: 'CASCADE', nullable: true })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+
+  @ManyToOne(() => GeneratedFiles, generatedFiles => generatedFiles.requests, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'generated_files_id' })
+  generatedFiles: GeneratedFiles;
 }

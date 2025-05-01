@@ -10,11 +10,9 @@ import {
 } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { Request } from "../../requests/entities/request.entity";
+import { UserRole } from "src/shared/enums/userRoleEnum.enum";
 
-export enum UserRole {
-  ADMIN = "admin",
-  USER = "user",
-}
+
 
 @Entity("users")
 export class User {
