@@ -173,6 +173,8 @@ services:
       minio:
         condition: service_healthy
     restart: unless-stopped
+    environment:
+      - TZ=Europe/Madrid
 
 volumes:
   out_data:
