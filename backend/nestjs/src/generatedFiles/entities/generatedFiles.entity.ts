@@ -13,9 +13,6 @@ export class GeneratedFiles {
   @Column("text", { array: true })
   files: string[];
 
-  @Column({ name: "times_requested" })
-  timesRequested: number;
-
   @Column({
     type: "enum",
     enum: GeneratedFilesStatusEnum,
