@@ -28,43 +28,21 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Function to update 'updated_at'
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-   NEW.updated_at = CURRENT_TIMESTAMP;
-   RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Trigger on users
-DROP TRIGGER IF EXISTS update_users_updated_at ON users;
-CREATE TRIGGER update_users_updated_at
-BEFORE UPDATE ON users
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
-
 -- Create generated_files table
 CREATE TABLE IF NOT EXISTS generated_files (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   request_hash TEXT NOT NULL UNIQUE,
   file_keys TEXT[] NOT NULL,  -- MinIO object keys
   status file_status NOT NULL DEFAULT 'pending',
-  ttl TIMESTAMP WITH TIME ZONE NOT NULL, -- Expiration datetime
+  expires_at TIMESTAMP WITH TIME ZONE DEFAULT (CURRENT_TIMESTAMP + INTERVAL '7 days'),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-DROP TRIGGER IF EXISTS update_generated_files_updated_at ON generated_files;
-CREATE TRIGGER update_generated_files_updated_at
-BEFORE UPDATE ON generated_files
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
-
 -- Create requests table
 CREATE TABLE IF NOT EXISTS requests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  request_hash TEXT NOT NULL, -- must match a hash from generated_files
+  request_hash TEXT NOT NULL,
   variable_name VARCHAR(100) NOT NULL,
   pressure_levels TEXT[] NOT NULL,
   years_selected TEXT[] NOT NULL,
@@ -89,16 +67,19 @@ CREATE TABLE IF NOT EXISTS requests (
   times_requested INTEGER NOT NULL DEFAULT 1,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
   generated_files_id UUID REFERENCES generated_files(id) ON DELETE CASCADE
 );
-
-DROP TRIGGER IF EXISTS update_requests_updated_at ON requests;
-CREATE TRIGGER update_requests_updated_at
-BEFORE UPDATE ON requests
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_requests_user_hash ON requests (user_id, request_hash);
 CREATE INDEX IF NOT EXISTS idx_generated_files_hash ON generated_files (request_hash);
+
+-- Create a user with admin role if not exists
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin@admin.com') THEN
+        INSERT INTO users (name, email, password, role)
+        VALUES ('Admin', 'admin@admin.com', 'admin', 'admin');
+    END IF;
+END $$;

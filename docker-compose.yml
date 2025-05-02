@@ -135,6 +135,25 @@ services:
       timeout: 5s
       retries: 5
 
+  init-postgres:
+    image: postgres:16-slim
+    container_name: init_postgres_container
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend/db:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+    restart: "no"
+    entrypoint: >
+      /bin/sh -c "
+        sleep 5;
+        psql -h postgres -U ${DB_USERNAME} -d ${DB_NAME} -f /docker-entrypoint-initdb.d/init-db.sql
+      "
+
   minio:
     image: minio/minio:latest
     container_name: minio
