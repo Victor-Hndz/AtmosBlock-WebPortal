@@ -1,9 +1,16 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { GeneratedFiles } from "../entities/generatedFiles.entity";
+import { Inject, Injectable } from "@nestjs/common";
+import { GeneratedFiles } from "@/generatedFiles/domain/entities/generatedFiles.entity";
+import { IGeneratedFilesRepository } from "../domain/repositories/generatedFiles.repository";
 
 @Injectable()
 export class GeneratedFilesService {
-  constructor() {} // private readonly requestRepository: Repository<Request>, // @InjectRepository(GeneratedFiles)
+  constructor(
+    @Inject("IGeneratedFilesRepository")
+    private readonly generatedFilesRepository: IGeneratedFilesRepository
+  ) {}
+
+  async update(generatedFiles: GeneratedFiles): Promise<GeneratedFiles> {
+    const updatedEntity = await this.generatedFilesRepository.update(generatedFiles);
+    return updatedEntity;
+  }
 }
