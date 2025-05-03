@@ -2,10 +2,11 @@ import { Module } from "@nestjs/common";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { UsersModule } from "./users/users.module";
 import { RequestsModule } from "./requests/requests.module";
-import { GeneratedFiles } from "./generatedFiles/entities/generatedFiles.entity";
 import { AuthModule } from "./auth/auth.module";
 import { ConfigModule } from "./config/config.module";
 import { DatabaseModule } from "./database/database.module";
+import { GeneratedFilesModule } from "./generatedFiles/generatedFiles.module";
+import { MinioModule } from "./minio/minio.module";
 
 @Module({
   imports: [
@@ -13,8 +14,9 @@ import { DatabaseModule } from "./database/database.module";
     DatabaseModule,
     UsersModule,
     RequestsModule,
+    MinioModule,
     AuthModule,
-    GeneratedFiles,
+    GeneratedFilesModule,
     ClientsModule.register([
       {
         name: "RABBITMQ_SERVICE",
