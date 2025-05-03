@@ -48,7 +48,6 @@ export class RequestsController {
   @ApiOperation({ summary: "Create a new request" })
   @ApiResponse({ status: 201, description: "The request has been successfully created." })
   create(@Body() createRequestDto: CreateRequestDto, @CurrentUser("id") userId: string) {
-    // Automatically associate the request with the logged-in user
     createRequestDto.userId = userId;
     return this.requestsService.create(createRequestDto);
   }
@@ -67,7 +66,7 @@ export class RequestsController {
   @ApiOperation({ summary: "Process a request" })
   @ApiResponse({ status: 201, description: "Request processed successfully." })
   async launchRequest(@Body() request: CreateRequestDto) {
-    const response = await this.requestsService.processRequest(request);
+    const response = await this.requestsService.create(request);
     return response;
   }
 }

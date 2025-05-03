@@ -2,6 +2,10 @@ import { IsString, IsBoolean, IsArray, ValidateIf, IsNotEmpty, IsOptional, IsUUI
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export class CreateRequestDto {
+  @ApiProperty({ description: "Hash of the request" })
+  @IsString()
+  requestHash?: string;
+
   @ApiProperty({ description: "Name of the variable to process" })
   @IsString()
   @IsNotEmpty()

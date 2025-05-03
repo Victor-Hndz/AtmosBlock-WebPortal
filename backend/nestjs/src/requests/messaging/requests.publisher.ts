@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { STATUS_OK } from "@/shared/consts/consts";
-import { Request } from "@/requests/domain/entities/request.entity";
+import { CreateRequestDto } from "../dtos/create-request.dto";
 
 @Injectable()
 export class RequestsPublisher {
@@ -9,7 +9,7 @@ export class RequestsPublisher {
 
   constructor(@Inject("RABBITMQ_SERVICE") private readonly client: ClientProxy) {}
 
-  sendRequestCreatedEvent(request: Request) {
+  sendRequestCreatedEvent(request: CreateRequestDto) {
     // Send it to exchange requests and routing key config.create
     this.client
       .connect()
