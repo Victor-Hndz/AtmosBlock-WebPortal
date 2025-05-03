@@ -4,6 +4,7 @@ import { ClientsModule, Transport } from "@nestjs/microservices";
 import { RequestsService } from "./services/requests.service";
 import { RequestsController } from "./controllers/requests.controller";
 import { RequestsPublisher } from "./messaging/requests.publisher";
+import { RequestsConsumer } from "./messaging/requests.consumer";
 import { RequestEntity } from "./persistence/entities/request.entity";
 import { GeneratedFilesModule } from "@/generatedFiles/generatedFiles.module";
 import { TypeOrmRequestRepository } from "./persistence/repositories/typeorm-request.repository";
@@ -33,6 +34,7 @@ import { TypeOrmRequestRepository } from "./persistence/repositories/typeorm-req
       useClass: TypeOrmRequestRepository,
     },
     RequestsPublisher,
+    RequestsConsumer,
   ],
   controllers: [RequestsController],
   exports: [RequestsService],

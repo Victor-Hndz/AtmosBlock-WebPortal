@@ -48,7 +48,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api/docs", app, document);
 
-  // Connect to RabbitMQ
+  // Connect to RabbitMQ for config queue (outgoing messages)
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
@@ -57,6 +57,20 @@ async function bootstrap() {
       queueOptions: { durable: true },
       noAck: false,
       prefetchCount: 1,
+    },
+  });
+
+  // Connect to RabbitMQ for result queue (incoming messages)
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [configService.get<string>("RABBITMQ_URL") ?? "amqp://admin:pass@localhost:5672"],
+      queue: configService.get<string>("RESULT_QUEUE") ?? "result_queue",
+      queueOptions: { durable: true },
+      noAck: false, // Enable manual acknowledgment
+      prefetchCount: 1,
+      exchange: "results", // Set the exchange for incoming results
+      routingKey: "result.done", // Set the routing key for the result queue
     },
   });
 
