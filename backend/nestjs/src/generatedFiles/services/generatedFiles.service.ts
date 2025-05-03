@@ -5,8 +5,5 @@ import { GeneratedFiles } from "../entities/generatedFiles.entity";
 
 @Injectable()
 export class GeneratedFilesService {
-  constructor(
-    // @InjectRepository(GeneratedFiles)
-    // private readonly requestRepository: Repository<Request>,
-  ) {}
+  constructor() {} // private readonly requestRepository: Repository<Request>, // @InjectRepository(GeneratedFiles)
 }

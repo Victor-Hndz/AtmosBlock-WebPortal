@@ -79,11 +79,11 @@ export class Request {
   @CreateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
-  @ManyToOne(() => User, user => user.requests, { onDelete: 'CASCADE', nullable: true })
-  @JoinColumn({ name: 'user_id' })
+  @ManyToOne(() => User, user => user.requests, { onDelete: "CASCADE", nullable: true })
+  @JoinColumn({ name: "user_id" })
   user: User;
 
-  @ManyToOne(() => GeneratedFiles, generatedFiles => generatedFiles.requests, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'generated_files_id' })
+  @ManyToOne(() => GeneratedFiles, generatedFiles => generatedFiles.requests, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "generated_files_id" })
   generatedFiles: GeneratedFiles;
 }
