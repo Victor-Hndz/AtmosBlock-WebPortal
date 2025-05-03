@@ -12,8 +12,6 @@ import * as bcrypt from "bcrypt";
 import { Request } from "../../requests/entities/request.entity";
 import { UserRole } from "src/shared/enums/userRoleEnum.enum";
 
-
-
 @Entity("users")
 export class User {
   @PrimaryGeneratedColumn("uuid")

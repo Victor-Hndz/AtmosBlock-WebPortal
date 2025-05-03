@@ -1,7 +1,6 @@
-import { Injectable, NotFoundException, ConflictException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { User, UserRole } from "../entities/user.entity";
+import { Injectable, Inject } from "@nestjs/common";
+import { User } from "../domain/entities/user.entity";
+import { IUserRepository } from "../domain/repositories/user.repository.interface";
 import { CreateUserDto } from "../dtos/create-user.dto";
 import { UpdateUserDto } from "../dtos/update-user.dto";
 import { UpdateProfileDto } from "../dtos/update-profile.dto";
@@ -9,104 +8,64 @@ import { UpdateProfileDto } from "../dtos/update-profile.dto";
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>
+    @Inject("IUserRepository")
+    private readonly userRepository: IUserRepository
   ) {}
 
   async findAll(): Promise<User[]> {
-    return this.userRepository.find();
+    return this.userRepository.findAll();
   }
 
   async findOne(id: string): Promise<User> {
-    const user = await this.userRepository.findOneBy({ id });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-    return user;
+    return this.userRepository.findOne(id);
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.userRepository.findOneBy({ email });
+    return this.userRepository.findByEmail(email);
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const existingUser = await this.findByEmail(createUserDto.email);
-    if (existingUser) {
-      throw new ConflictException("Email already in use");
-    }
+    const user = new User({
+      name: createUserDto.name,
+      email: createUserDto.email,
+      role: createUserDto.role,
+    });
 
-    const user = this.userRepository.create();
-    // Set basic properties
-    user.name = createUserDto.name;
-    user.email = createUserDto.email;
-    user.role = createUserDto.role ?? UserRole.USER;
-
-    // Set password properly to trigger the password change flag
-    user.setPassword(createUserDto.password);
-
-    return this.userRepository.save(user);
+    return this.userRepository.create(user, createUserDto.password);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.findOne(id);
+    const user = await this.userRepository.findOne(id);
 
-    if (updateUserDto.email && updateUserDto.email !== user.email) {
-      const existingUser = await this.findByEmail(updateUserDto.email);
-      if (existingUser) {
-        throw new ConflictException("Email already in use");
-      }
-    }
+    // Update properties if provided
+    if (updateUserDto.name) user.name = updateUserDto.name;
+    if (updateUserDto.email) user.email = updateUserDto.email;
+    if (updateUserDto.role) user.updateRole(updateUserDto.role);
+    // Special handling for password
+    let updatedUser = await this.userRepository.update(user);
 
-    // Handle password updates properly using the new setPassword method
     if (updateUserDto.password) {
-      user.setPassword(updateUserDto.password);
-      delete updateUserDto.password; // Remove password from DTO to prevent double assignment
+      updatedUser.setPassword(updateUserDto.password);
+      updatedUser = await this.userRepository.update(updatedUser);
     }
 
-    // Assign remaining properties
-    Object.assign(user, updateUserDto);
-
-    return this.userRepository.save(user);
+    return updatedUser;
   }
 
   async remove(id: string): Promise<void> {
-    const user = await this.findOne(id);
-    await this.userRepository.remove(user);
+    return this.userRepository.remove(id);
   }
 
   async findOneWithRequests(id: string): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: { id },
-      relations: ["requests"],
-    });
-
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-
-    // Remove password from the returned object
-    const { password, ...result } = user;
-    return result as User;
+    return this.userRepository.findOneWithRequests(id);
   }
 
   async updateProfile(id: string, updateProfileDto: UpdateProfileDto): Promise<User> {
-    const user = await this.findOne(id);
+    const user = await this.userRepository.findOne(id);
 
-    if (updateProfileDto.email && updateProfileDto.email !== user.email) {
-      const existingUser = await this.findByEmail(updateProfileDto.email);
-      if (existingUser) {
-        throw new ConflictException("Email already in use");
-      }
-    }
+    // Use domain method to update profile
+    user.updateProfile(updateProfileDto.name ?? user.name, updateProfileDto.email ?? user.email);
 
-    // Update only the provided fields without affecting the password
-    // Since UpdateProfileDto doesn't include password, this won't modify the password
-    Object.assign(user, updateProfileDto);
-
-    await this.userRepository.save(user);
-
-    // Remove password from the returned object
-    const { password, ...result } = user;
-    return result as User;
+    return this.userRepository.update(user);
   }
 }
