@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
-import { Request } from "../entities/request.entity";
-import { STATUS_OK } from "../../shared/consts/consts";
+import { STATUS_OK } from "@/shared/consts/consts";
+import { Request } from "@/requests/domain/entities/request.entity";
 
 @Injectable()
 export class RequestsPublisher {

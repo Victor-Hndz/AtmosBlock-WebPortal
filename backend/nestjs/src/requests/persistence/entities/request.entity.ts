@@ -1,9 +1,21 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from "typeorm";
-import { User } from "../../users/entities/user.entity";
-import { GeneratedFiles } from "../../generatedFiles/entities/generatedFiles.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  UpdateDateColumn,
+} from "typeorm";
+import { GeneratedFilesEntity } from "@/generatedFiles/persistence/entities/generatedFiles.entity";
+import { UserEntity } from "@/users/persistence/entities/user.entity";
 
-@Entity("requests")
-export class Request {
+/**
+ * Request persistence entity - represents a request in the database
+ * This is the entity used by TypeORM for database operations
+ */
+@Entity("users")
+export class RequestEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
@@ -76,14 +88,14 @@ export class Request {
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
-  @CreateDateColumn({ name: "updated_at" })
+  @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
-  @ManyToOne(() => User, user => user.requests, { onDelete: "CASCADE", nullable: true })
+  @ManyToOne(() => UserEntity, user => user.requests, { onDelete: "CASCADE", nullable: true })
   @JoinColumn({ name: "user_id" })
-  user: User;
+  user: UserEntity;
 
-  @ManyToOne(() => GeneratedFiles, generatedFiles => generatedFiles.requests, { onDelete: "CASCADE" })
+  @ManyToOne(() => GeneratedFilesEntity, generatedFiles => generatedFiles.requests, { onDelete: "CASCADE" })
   @JoinColumn({ name: "generated_files_id" })
-  generatedFiles: GeneratedFiles;
+  generatedFiles: GeneratedFilesEntity;
 }

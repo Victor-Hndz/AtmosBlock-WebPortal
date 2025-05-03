@@ -1,11 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards, Request } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from "@nestjs/common";
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from "@nestjs/swagger";
-import { RequestsService } from "../services/requests.service";
-import { CreateRequestDto } from "../dtos/create-request.dto";
-import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard";
-import { RolesGuard } from "../../auth/guards/roles.guard";
-import { Roles } from "../../auth/decorators/roles.decorator";
-import { UserRole } from "../../users/entities/user.entity";
+import { UserRole } from "@/shared/enums/userRoleEnum.enum";
+import { JwtAuthGuard } from "@/auth/guards/jwt-auth.guard";
+import { Roles } from "@/auth/decorators/roles.decorator";
+import { RolesGuard } from "@/auth/guards/roles.guard";
+import { RequestsService } from "@/requests/services/requests.service";
+import { CreateRequestDto } from "@/requests/dtos/create-request.dto";
+import { CurrentUser } from "@/shared/decorators/currentUserDecorator.decorator";
 
 @ApiTags("requests")
 @Controller("requests")
@@ -27,8 +28,8 @@ export class RequestsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get user's own requests" })
   @ApiResponse({ status: 200, description: "Return user's requests." })
-  findMyRequests(@Request() req) {
-    return this.requestsService.findAllByUser(req.user.id);
+  findMyRequests(@CurrentUser("id") userId: string) {
+    return this.requestsService.findAllByUser(userId);
   }
 
   @Get(":id")
@@ -46,9 +47,9 @@ export class RequestsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: "Create a new request" })
   @ApiResponse({ status: 201, description: "The request has been successfully created." })
-  create(@Body() createRequestDto: CreateRequestDto, @Request() req) {
+  create(@Body() createRequestDto: CreateRequestDto, @CurrentUser("id") userId: string) {
     // Automatically associate the request with the logged-in user
-    createRequestDto.userId = req.user.id;
+    createRequestDto.userId = userId;
     return this.requestsService.create(createRequestDto);
   }
 

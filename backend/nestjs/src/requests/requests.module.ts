@@ -4,13 +4,14 @@ import { ClientsModule, Transport } from "@nestjs/microservices";
 import { RequestsService } from "./services/requests.service";
 import { RequestsController } from "./controllers/requests.controller";
 import { RequestsPublisher } from "./messaging/requests.publisher";
-import { Request } from "./entities/request.entity";
-import { UsersModule } from "../users/users.module";
+import { RequestEntity } from "./persistence/entities/request.entity";
+import { GeneratedFilesModule } from "@/generatedFiles/generatedFiles.module";
+import { TypeOrmRequestRepository } from "./persistence/repositories/typeorm-request.repository";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Request]),
-    UsersModule,
+    TypeOrmModule.forFeature([RequestEntity]),
+    GeneratedFilesModule,
     ClientsModule.register([
       {
         name: "RABBITMQ_SERVICE",
@@ -25,7 +26,14 @@ import { UsersModule } from "../users/users.module";
       },
     ]),
   ],
-  providers: [RequestsService, RequestsPublisher],
+  providers: [
+    RequestsService,
+    {
+      provide: "IRequestRepository",
+      useClass: TypeOrmRequestRepository,
+    },
+    RequestsPublisher,
+  ],
   controllers: [RequestsController],
   exports: [RequestsService],
 })
