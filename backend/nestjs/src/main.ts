@@ -1,10 +1,11 @@
-import { NestFactory } from "@nestjs/core";
 import { ValidationPipe, BadRequestException, Logger } from "@nestjs/common";
-import { AppModule } from "./app.module";
+import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { ConfigService } from "@nestjs/config";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { HttpExceptionFilter } from "./shared/filters/http-exception.filter";
+import "module-alias/register";
+import { HttpExceptionFilter } from "@/shared/filters/http-exception.filter";
+import { AppModule } from "./app.module";
 
 async function bootstrap() {
   const logger = new Logger("Bootstrap");
