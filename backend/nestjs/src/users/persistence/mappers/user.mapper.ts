@@ -1,5 +1,5 @@
-import { User } from "../../domain/entities/user.entity";
-import { UserEntity } from "../entities/user.entity";
+import { User } from "@/users/domain/entities/user.entity";
+import { UserEntity } from "@/users/persistence/entities/user.entity";
 
 /**
  * User mapper - translates between domain and persistence entities

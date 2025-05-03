@@ -1,4 +1,4 @@
-import { User } from "../entities/user.entity";
+import { User } from "@/users/entities/user.entity";
 
 /**
  * User repository interface - defines the contract for user repository implementations

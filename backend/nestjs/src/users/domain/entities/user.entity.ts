@@ -1,6 +1,6 @@
 import * as argon2 from "argon2";
-import { UserRole } from "../../../shared/enums/userRoleEnum.enum";
-import { Request } from "../../../requests/entities/request.entity";
+import { UserRole } from "@/shared/enums/userRoleEnum.enum";
+import { Request } from "@/requests/entities/request.entity";
 
 /**
  * User domain entity - represents a user in the domain logic

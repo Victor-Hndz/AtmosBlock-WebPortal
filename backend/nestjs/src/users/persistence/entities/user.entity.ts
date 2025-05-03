@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm";
-import { Request } from "../../../requests/entities/request.entity";
-import { UserRole } from "../../../shared/enums/userRoleEnum.enum";
+import { UserRole } from "@/shared/enums/userRoleEnum.enum";
+import { Request } from "@/requests/entities/request.entity";
 
 /**
  * User persistence entity - represents a user in the database

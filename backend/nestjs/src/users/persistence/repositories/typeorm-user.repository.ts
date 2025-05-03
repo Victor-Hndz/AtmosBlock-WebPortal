@@ -1,10 +1,10 @@
+import { Repository } from "typeorm";
 import { Injectable, NotFoundException, ConflictException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { UserEntity } from "../entities/user.entity";
-import { User } from "../../domain/entities/user.entity";
-import { IUserRepository } from "../../domain/repositories/user.repository.interface";
-import { UserMapper } from "../mappers/user.mapper";
+import { UserEntity } from "@/users/persistence/entities/user.entity";
+import { User } from "@/users/domain/entities/user.entity";
+import { IUserRepository } from "@/users/domain/repositories/user.repository.interface";
+import { UserMapper } from "@/users/persistence/mappers/user.mapper";
 
 @Injectable()
 export class TypeOrmUserRepository implements IUserRepository {
