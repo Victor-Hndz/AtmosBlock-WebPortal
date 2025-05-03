@@ -1,9 +1,10 @@
 import { Injectable, UnauthorizedException, ConflictException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { UsersService } from "../../users/services/users.service";
-import { LoginDto } from "../dtos/login.dto";
-import { RegisterDto } from "../dtos/register.dto";
-import { CreateUserDto } from "../../users/dtos/create-user.dto";
+import { UserRole } from "@/shared/enums/userRoleEnum.enum";
+import { UsersService } from "@/users/services/users.service";
+import { LoginDto } from "@/auth/dtos/login.dto";
+import { RegisterDto } from "@/auth/dtos/register.dto";
+import { CreateUserDto } from "@/users/dtos/create-user.dto";
 
 @Injectable()
 export class AuthService {
@@ -23,10 +24,6 @@ export class AuthService {
 
     if (!isPasswordValid) {
       throw new UnauthorizedException("Invalid credentials");
-    }
-
-    if (!user.isActive) {
-      throw new UnauthorizedException("Account is inactive");
     }
 
     const payload = {
@@ -52,6 +49,7 @@ export class AuthService {
         name: registerDto.name,
         email: registerDto.email,
         password: registerDto.password,
+        role: UserRole.USER,
       };
 
       const user = await this.usersService.create(createUserDto);

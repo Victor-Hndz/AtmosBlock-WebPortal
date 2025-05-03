@@ -5,7 +5,7 @@ import { UpdateUserDto } from "../dtos/update-user.dto";
 import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../../auth/guards/roles.guard";
 import { Roles } from "../../auth/decorators/roles.decorator";
-import { UserRole } from "../entities/user.entity";
+import { UserRole } from "src/shared/enums/userRoleEnum.enum";
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from "@nestjs/swagger";
 import { UpdateProfileDto } from "../dtos/update-profile.dto";
 import { AuthService } from "../../auth/services/auth.service";

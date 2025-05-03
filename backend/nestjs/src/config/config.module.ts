@@ -22,6 +22,12 @@ import * as Joi from "joi";
         // RabbitMQ
         RABBITMQ_URL: Joi.string().required(),
         RABBITMQ_QUEUE: Joi.string().required(),
+        //MINIO
+        MINIO_ENDPOINT: Joi.string().required(),
+        MINIO_PORT: Joi.number().required(),
+        MINIO_USERNAME: Joi.string().required(),
+        MINIO_PASSWORD: Joi.string().required(),
+        MINIO_BUCKET: Joi.string().required(),
       }),
     }),
   ],
