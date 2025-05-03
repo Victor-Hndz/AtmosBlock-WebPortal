@@ -7,15 +7,6 @@ BEGIN
 END
 $$;
 
--- Create enum type for file status if not exists
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'file_status') THEN
-        CREATE TYPE file_status AS ENUM ('pending', 'success', 'failed');
-    END IF;
-END
-$$;
-
 -- Create users table
 CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -23,7 +14,6 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(255) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
   role user_role NOT NULL DEFAULT 'user',
-  is_active BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -32,8 +22,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS generated_files (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   request_hash TEXT NOT NULL UNIQUE,
-  file_keys TEXT[] NOT NULL,  -- MinIO object keys
-  status file_status NOT NULL DEFAULT 'pending',
+  files TEXT[] NOT NULL,  -- MinIO object keys
   expires_at TIMESTAMP WITH TIME ZONE DEFAULT (CURRENT_TIMESTAMP + INTERVAL '7 days'),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
