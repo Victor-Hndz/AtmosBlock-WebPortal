@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm";
 import { UserRole } from "@/shared/enums/userRoleEnum.enum";
-import { Request } from "@/requests/entities/request.entity";
+import { RequestEntity } from "@/requests/persistence/entities/request.entity";
 
 /**
  * User persistence entity - represents a user in the database
@@ -33,6 +33,6 @@ export class UserEntity {
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
-  @OneToMany(() => Request, request => request.user)
-  requests: Request[];
+  @OneToMany(() => RequestEntity, request => request.user)
+  requests: RequestEntity[];
 }

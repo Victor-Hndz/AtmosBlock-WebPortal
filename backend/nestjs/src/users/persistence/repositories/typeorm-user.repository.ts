@@ -63,7 +63,7 @@ export class TypeOrmUserRepository implements IUserRepository {
       await user.setPassword(user.password);
     }
 
-    const updatedEntity = UserMapper.toPersistence(user, existingEntity);
+    const updatedEntity = UserMapper.toPersistence(user);
     const savedEntity = await this.userRepository.save(updatedEntity);
 
     return UserMapper.toDomain(savedEntity);
