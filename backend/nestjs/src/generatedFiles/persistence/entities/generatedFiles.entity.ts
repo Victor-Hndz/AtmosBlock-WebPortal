@@ -1,9 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm";
-import { Request } from "../../requests/entities/request.entity";
-import { GeneratedFilesStatusEnum } from "src/shared/enums/generatedFilesStatusEnum.enum";
+import { RequestEntity } from "@/requests/persistence/entities/request.entity";
+import { GeneratedFilesStatusEnum } from "@/shared/enums/generatedFilesStatusEnum.enum";
 
 @Entity("generated_files")
-export class GeneratedFiles {
+export class GeneratedFilesEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
@@ -26,9 +26,9 @@ export class GeneratedFiles {
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
-  @UpdateDateColumn({ name: "expires_at" })
+  @Column({ name: "expires_at", type: "timestamp with time zone", nullable: false })
   expires_at: Date;
 
-  @OneToMany(() => Request, request => request.generatedFiles)
-  requests: Request[];
+  @OneToMany(() => RequestEntity, request => request.generatedFiles)
+  requests: RequestEntity[];
 }
