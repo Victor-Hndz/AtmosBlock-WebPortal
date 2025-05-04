@@ -22,10 +22,8 @@ dist = 1000 # km
 lat_km = 111.32 # km/deg
 R = 6371 # km
 
-files_dir = "out/"
-
 class MapGenerator:
-    def __init__(self, file_name, variable_name, pressure_level, year, month, day, hour, map_type, map_range, map_level, file_format, area_covered):
+    def __init__(self, file_name, variable_name, pressure_level, year, month, day, hour, map_type, map_range, map_level, file_format, area_covered, out_dir):
         self.file_name = file_name
         self.variable_name = variable_name
         self.pressure_level = pressure_level
@@ -38,6 +36,7 @@ class MapGenerator:
         self.map_level = map_level
         self.file_format = file_format
         self.area_covered = area_covered # N W S E
+        self.out_dir = out_dir
         
         self.init_generation()
         
@@ -110,12 +109,13 @@ class MapGenerator:
         plt.clabel(co, inline=True, fontsize=8)
         
         #visual_adds
+        self.visual_adds(fig, ax, co, self.map_type, variable_type, "v")
         
-        plt.show()
+        # plt.show()
         
-        print("Mapa generado. Guardando mapa...")
+        print("Map generated. Saving map...")
+        self.save_map()
         
-
     def adjust_lon(self, lon, z):
         """Convierte las longitudes de 0-360 a -180-180 y ajusta z para que coincida.
 
@@ -139,7 +139,6 @@ class MapGenerator:
         lon = np.array(lon)
         
         return lon, z
-
     
     def config_map(self):
         """Configura un mapa con los rangos de latitud y longitud especificados.
@@ -164,8 +163,71 @@ class MapGenerator:
         
         return fig, ax
 
+    def visual_adds(self, fig, ax, map_content, map_type, var_type, orientation):
+        lat_max, lon_min, lat_min, lon_max = self.area_covered
+        date = f"{self.year}-{self.month:02d}-{self.day:02d} {self.hour:02d}:00"
+        
+        # Añade títulos y etiquetas
+        if(map_type != None):
+            if var_type == 'z':
+                plt.title(f'{map_type} - Geopotential height at {self.pressure_level} - {date}', loc='center')
+            elif var_type == 't':
+                plt.title(f'{map_type} - Temperature at {self.pressure_level} - {date}', loc='center')
+        else:
+            plt.title(f'Variable at {self.pressure_level} - {date}', loc='center')
+        
+        # plt.xlabel('Longitude (deg)')
+        # plt.ylabel('Latitude (deg)')
 
+        if(map_content != None):
+            if(orientation == "v"):
+                cax = fig.add_axes([ax.get_position().x1+0.01,
+                            ax.get_position().y0,
+                            0.02,
+                            ax.get_position().height])
+                cbar = plt.colorbar(map, cax=cax, orientation='vertical') 
+            elif(orientation == "h"):
+                cax = fig.add_axes([(ax.get_position().x1 + ax.get_position().x0)/2 - (ax.get_position().width * 0.4)/2,
+                        ax.get_position().y0 - 0.12,
+                        ax.get_position().width * 0.4,
+                        0.02])
+                cbar = plt.colorbar(map, cax=cax, orientation='horizontal')
+            
+            if var_type == 'z':
+                cbar.set_label('Geopotential height (m)', fontsize=10)
+            elif var_type == 't':
+                cbar.set_label('Temperature (ºC)', fontsize=10)
+            
+            cbar.ax.tick_params(labelsize=10)
+        
+        ax.set_yticks(range(lat_min, lat_max+1, 10), crs=ccrs.PlateCarree())
+        ax.set_yticklabels([f'{deg}°' for deg in range(lat_min, lat_max+1, 10)])
+        
+        ax.set_xticks(range(lon_min, lon_max+1, 20), crs=ccrs.PlateCarree())
+        ax.set_xticklabels([f'{deg}°' for deg in range(lon_min, lon_max+1, 20)])
+    
+    def save_map(self):
+        date = f"{self.year}-{self.month:02d}-{self.day:02d} {self.hour:02d}:00"
+        
+        base_name = f"{self.out_dir}]/map_{self.variable_name}_{self.map_type}_{self.map_level}l_{date}"
+        extension = f".{self.file_format}"
 
+        cont = 0 
+        
+        # Generate a unique file name
+        while True: 
+            if cont == 0: 
+                file_saved = f"{base_name}{extension}" 
+            else: 
+                file_saved = f"{base_name}({cont}){extension}" 
+            if not os.path.exists(file_saved): 
+                break 
+            cont += 1 
+        
+        plt.savefig(file_saved) 
+        
+        print(f"Image saved in: {file_saved}") 
+    
 
 # def generate_contour_map(file, es_max, time, levels, lat_range, lon_range, file_format):
 #     # var_type = 't'
