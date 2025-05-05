@@ -11,9 +11,9 @@ RUN apt-get update && \
 # Set the working directory inside the container
 WORKDIR /app
 
-COPY ./handler /app/handler
+COPY ./visualization /app/visualization
 
-RUN pip install --no-cache-dir -r ./handler/requirements.txt
+RUN pip install --no-cache-dir -r ./visualization/requirements.txt
 
 # Copy project files to the container
 COPY ./utils /app/utils
@@ -22,4 +22,4 @@ COPY ./utils /app/utils
 RUN pip install --no-cache-dir -r ./utils/requirements.txt
 
 # Run the executable
-CMD [ "python", "handler/config_handler.py" ]
+CMD [ "python", "./visualization/handler/visualization_handler.py" ]
