@@ -4,6 +4,7 @@ EXEC_FILE = "./FAST-IBAN"
 
 # Lista de argumentos permitidos
 ARGUMENTS = [
+    "requestHash",
     "variableName",
     "pressureLevels",
     "years",
