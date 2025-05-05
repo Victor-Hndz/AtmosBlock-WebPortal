@@ -1,5 +1,4 @@
 import os
-import yaml
 import sys
 import json
 
@@ -87,8 +86,9 @@ class Configurator:
         print(f"\n✅ Archivo {self.file_name} adaptado con éxito.")
 
         # Create the configuration file
-        configuration = {
+        configuration_data = {
             "file": self.file_name,
+            "requestHash": self.args["requestHash"],
             "mapTypes": self.args["mapTypes"],
             "mapRanges": self.args["mapRanges"],
             "areaCovered": self.args["areaCovered"],
@@ -104,29 +104,19 @@ class Configurator:
             "nThreads": self.args["nThreads"],
             "nProces": self.args["nProces"],
         }
-        configuration = {"MAP": configuration}
 
-        # Write the .yaml file
-        try:
-            with open("config/config.yaml", "w") as yamlfile:
-                yaml.dump(
-                    configuration, yamlfile, default_flow_style=False, sort_keys=False
-                )
+        print("\n✅ Configuración lista.\n")
 
-            print("\n✅ Archivo de configuración .yaml creado exitosamente.\n")
+        send_message(
+            create_message(STATUS_OK, "", configuration_data),
+            "requests",
+            "handler.start",
+        )
 
-            send_message(
-                create_message(STATUS_OK, "", "config/config.yaml"),
-                "requests",
-                "handler.start",
-            )
+        print(
+            "\n✅ Archivo de configuración enviado a la cola de RabbitMQ.\n"
+        )
 
-            print(
-                "\n✅ Archivo de configuración .yaml enviado a la cola de RabbitMQ.\n"
-            )
-        except Exception as e:
-            print(f"\n❌ Error al escribir el archivo de configuración: {e}")
-            sys.exit(1)
 
     def mount_file_name(self):
         """Generate the name of the file based on the parameters provided."""
