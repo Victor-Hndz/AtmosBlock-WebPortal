@@ -5,14 +5,14 @@ import json
 
 from concurrent.futures import ThreadPoolExecutor
 
-# sys.path.append('/app/')
+sys.path.append('/app/')
 
 from visualization.mapGeneration.generate_maps import MapGenerator
 from utils.rabbitMQ.receive_messages import receive_messages
 from utils.rabbitMQ.send_message import send_message
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
-from utils.consts.consts import STATUS_OK, STATUS_ERROR, MESSAGE_NO_COMPILE
+from utils.consts.consts import STATUS_OK, STATUS_ERROR
 
 
 def handle_message(body):
