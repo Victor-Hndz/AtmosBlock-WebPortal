@@ -17,13 +17,14 @@ from utils.consts.consts import STATUS_OK, STATUS_ERROR, MESSAGE_NO_COMPILE
 
 def handle_message(body):
     """Process the message received by the general handler, and launch the map generation."""
-    # raw_data = process_body(body)
-    # data = json.loads(raw_data)
-    data = body
+    raw_data = process_body(body)
+    data = json.loads(raw_data)
+    # data = body
 
     # the data comes like this:
     # data = {
     #     "file_name": self.file_name,
+    #     "request_hash" = self.request_hash,
     #     "variable_name": self.variable_name,
     #     "pressure_level": self.pressure_level,
     #     "years": self.years,
@@ -45,6 +46,7 @@ def handle_message(body):
         )
         MapGenerator(
             data["file_name"],
+            data["request_hash"],
             data["variable_name"],
             data["pressure_level"],
             year,
@@ -78,26 +80,53 @@ def handle_message(body):
             for map_range in data["map_ranges"]
             for map_level in data["map_levels"]
         ]
-        for future in futures:
-            future.result()
+        try:
+            for future in futures:
+                future.result()
+        except Exception as e:
+            print(f"Error: {e}")
+            message = {"exec_status": STATUS_ERROR, "exec_message": str(e)}
+            send_message(
+                create_message(
+                    STATUS_OK,
+                    "",
+                    message,
+                ),
+                "notifications",
+                "notify.handler",
+            )
+            return False
+        
+    print("\n✅ Generación de mapas completada exitosamente.")
+    message = {"exec_status": STATUS_OK, "exec_message": "Map generation completed successfully."}
+    send_message(
+                create_message(
+                    STATUS_OK,
+                    "",
+                    message,
+                ),
+                "notifications",
+                "notify.handler",
+            )     
+    return True  
 
 
 if __name__ == "__main__":
-    # receive_messages(
-    #     "execution_queue", "execution.visualization", callback=handle_message
-    # )
-    data = {
-        "file_name": "C:\\Users\\Victor\\Desktop\\repos\\tfm\\backend\\FAST-IBAN_Project\\config\\data\\geopot_500hPa_2022-03-14_00-06-12-18UTC.nc",
-        "variable_name": "geopotential",
-        "pressure_level": 500,
-        "years": [2020],
-        "months": [1],
-        "days": [1],
-        "hours": [0, 6, 12, 18],
-        "map_types": ["cont"],
-        "map_ranges": ["max"],
-        "map_levels": [20],
-        "file_format": "svg",
-        "area_covered": [90, -180, -90, 180],
-    }
-    handle_message(data)
+    receive_messages(
+        "execution_queue", "execution.visualization", callback=handle_message
+    )
+    # data = {
+    #     "file_name": "C:\\Users\\Victor\\Desktop\\repos\\tfm\\backend\\FAST-IBAN_Project\\config\\data\\geopot_500hPa_2022-03-14_00-06-12-18UTC.nc",
+    #     "variable_name": "geopotential",
+    #     "pressure_level": 500,
+    #     "years": [2020],
+    #     "months": [1],
+    #     "days": [1],
+    #     "hours": [0, 6, 12, 18],
+    #     "map_types": ["cont"],
+    #     "map_ranges": ["max"],
+    #     "map_levels": [20],
+    #     "file_format": "svg",
+    #     "area_covered": [90, -180, -90, 180],
+    # }
+    # handle_message(data)

@@ -14,6 +14,8 @@ from scipy.spatial import ConvexHull
 # sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 # sys.path.append('/app/')
 from utils.enums.DataType import DataType
+from utils.minio.upload_files import upload_files_to_request_hash
+from utils.clean_folder_files import clean_directory
 from utils.consts.consts import VARIABLE_NAMES
 
 
@@ -22,9 +24,12 @@ dist = 1000 # km
 lat_km = 111.32 # km/deg
 R = 6371 # km
 
+OUT_DIR = "./out" # Directory to save the generated maps
+
 class MapGenerator:
-    def __init__(self, file_name, variable_name, pressure_level, year, month, day, hour, map_type, map_range, map_level, file_format, area_covered, out_dir):
+    def __init__(self, file_name, request_hash, variable_name, pressure_level, year, month, day, hour, map_type, map_range, map_level, file_format, area_covered):
         self.file_name = file_name
+        self.request_hash = request_hash
         self.variable_name = variable_name
         self.pressure_level = pressure_level
         self.year = year
@@ -36,7 +41,6 @@ class MapGenerator:
         self.map_level = map_level
         self.file_format = file_format
         self.area_covered = area_covered # N W S E
-        self.out_dir = out_dir
         
         self.init_generation()
         
@@ -209,7 +213,7 @@ class MapGenerator:
     def save_map(self):
         date = f"{self.year}-{self.month:02d}-{self.day:02d} {self.hour:02d}:00"
         
-        base_name = f"{self.out_dir}]/map_{self.variable_name}_{self.map_type}_{self.map_level}l_{date}"
+        base_name = f"{OUT_DIR+"/"+self.request_hash}]/map_{self.variable_name}_{self.map_type}_{self.map_level}l_{date}"
         extension = f".{self.file_format}"
 
         cont = 0 
@@ -225,6 +229,8 @@ class MapGenerator:
             cont += 1 
         
         plt.savefig(file_saved) 
+        upload_files_to_request_hash(self.request_hash, OUT_DIR+"/"+self.request_hash)
+        clean_directory(OUT_DIR+"/"+self.request_hash)
         
         print(f"Image saved in: {file_saved}") 
     
