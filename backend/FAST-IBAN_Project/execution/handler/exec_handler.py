@@ -9,6 +9,8 @@ from utils.rabbitMQ.receive_messages import receive_messages
 from utils.rabbitMQ.send_message import send_message
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
+from utils.minio.upload_files import upload_files_to_request_hash
+from utils.clean_folder_files import clean_directory
 from utils.consts.consts import STATUS_OK, STATUS_ERROR, MESSAGE_NO_COMPILE
 
 
@@ -58,6 +60,9 @@ def handle_message(body):
     if result.returncode == 0:
         print("\n✅ Ejecución exitosa.")
         message = {"exec_status": STATUS_OK, "exec_message": result.stdout}
+        #save the files in minio
+        upload_files_to_request_hash(data["request_hash"], local_folder="./out/"+data["request_hash"])
+        clean_directory("./out/"+data["request_hash"])
         send_message(
             create_message(STATUS_OK, "", message), "notifications", "notify.handler"
         )
