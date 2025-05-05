@@ -66,7 +66,6 @@ services:
     depends_on:
       - rabbitmq
       - configurator_module
-      - handler_module
     volumes:
       - config_data:/app/config
       - out_data:/app/out
@@ -76,17 +75,26 @@ services:
     networks:
       - app-network
 
-  # visualization_module:
-  #   build:
-  #     context: ./backend/FAST-IBAN_Project/
-  #     dockerfile: ./visualization/Dockerfile
-  #   container_name: visualization_container
-  #   volumes:
-  #     - ./backend/FAST-IBAN_Project:/app
-  #     - out_data:/app/out
-  #   stdin_open: true
-  #   tty: true
-  #   working_dir: /app
+  visualization_module:
+    build:
+      context: ./backend/FAST-IBAN_Project/
+      dockerfile: ./visualization/Dockerfile
+    container_name: visualization_container
+    env_file:
+      - .env
+    depends_on:
+      rabbitmq:
+        condition: service_started
+      configurator_module:
+        condition: service_healthy
+    volumes:
+      - config_data:/app/config
+      - out_data:/app/out
+    stdin_open: true
+    tty: true
+    working_dir: /app
+    networks:
+      - app-network
 
   # tracking_module:
   #   build:
@@ -187,9 +195,10 @@ services:
     command: server /data --console-address ":9001"
 
   minio-init:
-    image: minio/mc
+    image: minio/minio:latest
     depends_on:
-      - minio
+      minio:
+        condition: service_healthy
     entrypoint: >
       /bin/sh -c "
         sleep 5;
@@ -199,7 +208,7 @@ services:
 
   cron-cleanup:
     build:
-      context: ./cronjob-cleanup
+      context: ./cron_cleanup
     env_file:
       - .env
     depends_on:
