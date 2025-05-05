@@ -7,6 +7,15 @@ BEGIN
 END
 $$;
 
+-- Create enum type for user status if not exists
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'request_status') THEN
+        CREATE TYPE request_status AS ENUM ('cached', 'generating', 'expired', 'empty');
+    END IF;
+END
+$$;
+
 -- Create users table
 CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -32,6 +41,7 @@ CREATE TABLE IF NOT EXISTS generated_files (
 CREATE TABLE IF NOT EXISTS requests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   request_hash TEXT NOT NULL,
+  request_status request_status NOT NULL DEFAULT 'empty',
   variable_name VARCHAR(100) NOT NULL,
   pressure_levels TEXT[] NOT NULL,
   years_selected TEXT[] NOT NULL,
@@ -57,7 +67,7 @@ CREATE TABLE IF NOT EXISTS requests (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   user_id UUID REFERENCES users(id) ON DELETE SET NULL,
-  generated_files_id UUID REFERENCES generated_files(id) ON DELETE CASCADE
+  generated_files_id UUID REFERENCES generated_files(id) ON DELETE SET NULL
 );
 
 -- Indexes for performance
