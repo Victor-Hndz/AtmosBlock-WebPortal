@@ -33,7 +33,6 @@
 #define OFFSET "add_offset"
 #define LONG_NAME "long_name"
 
-#define OUT_DIR_NAME "out/"
 #define CONFIG_DIR_NAME "config/"
 #define CONFIG_FILE_NAME_LIN "config.yaml"
 #define CONFIG_FILE_NAME_WIN "config.conf"
@@ -53,6 +52,7 @@
 
 extern int NTIME, NLAT, NLON, LAT_LIM_MIN, LAT_LIM_MAX, LON_LIM_MIN, LON_LIM_MAX, N_THREADS;
 extern char* FILE_NAME;
+extern char OUT_DIR_NAME[NC_MAX_CHAR];
 
 /*STRUCTS*/
 enum Tipo_form{MAX, MIN, NO_TYPE};

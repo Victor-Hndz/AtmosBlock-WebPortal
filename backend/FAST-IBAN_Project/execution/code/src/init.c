@@ -2,6 +2,7 @@
 
 int LAT_LIM_MIN, LAT_LIM_MAX, LON_LIM_MIN, LON_LIM_MAX, N_THREADS;
 char* FILE_NAME;
+char OUT_DIR_NAME[NC_MAX_CHAR];
 
 
 /**
@@ -25,7 +26,7 @@ void process_entry(int argc, char **argv) {
         error_catcher_char = getcwd(cwd, sizeof(cwd));
     }
 
-    if (argc != 7) {
+    if (argc != 8) {
         //FILE_NAME = "config/data/geopot_500hPa_2019-06-26_00-06-12-18UTC.nc";
         //FILE_NAME = "config/data/geopot_500hPa_2003-08-(01-15)_00-06-12-18UTC.nc";
         FILE_NAME = "config/data/geopot_500hPa_2022-03-14_00-06-12-18UTC.nc";
@@ -33,6 +34,7 @@ void process_entry(int argc, char **argv) {
         LAT_LIM_MAX = 85;
         LON_LIM_MIN = -180;
         LON_LIM_MAX = 180;
+        OUT_DIR_NAME = "out/";
         N_THREADS = 40;
     } else {
         // char* input_file_name = argv[1];
@@ -42,7 +44,8 @@ void process_entry(int argc, char **argv) {
         LAT_LIM_MAX = atoi(argv[3]);
         LON_LIM_MIN = atoi(argv[4]);
         LON_LIM_MAX = atoi(argv[5]);
-        N_THREADS = atoi(argv[6]);
+        OUT_DIR_NAME = argv[6];
+        N_THREADS = atoi(argv[7]);
 
         // char temp[strlen(BASE_PATH) + strlen(input_file_name) +1];
         // snprintf(temp, sizeof(temp), "%s%s", BASE_PATH, input_file_name);
@@ -50,6 +53,7 @@ void process_entry(int argc, char **argv) {
         // FILE_NAME = temp;
 
         printf("FILE_NAME: %s\n", FILE_NAME);
+        printf("OUT_DIR_NAME: %s\n", OUT_DIR_NAME);
 
         if(strlen(FILE_NAME) > 255) {
             printf("Error: El nombre del archivo es demasiado largo.\n");
