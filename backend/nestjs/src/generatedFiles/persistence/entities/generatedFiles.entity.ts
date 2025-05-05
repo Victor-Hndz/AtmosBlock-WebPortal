@@ -1,6 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm";
 import { RequestEntity } from "@/requests/persistence/entities/request.entity";
-import { GeneratedFilesStatusEnum } from "@/shared/enums/generatedFilesStatusEnum.enum";
 
 @Entity("generated_files")
 export class GeneratedFilesEntity {
@@ -12,13 +11,6 @@ export class GeneratedFilesEntity {
 
   @Column("text", { array: true })
   files: string[];
-
-  @Column({
-    type: "enum",
-    enum: GeneratedFilesStatusEnum,
-    default: GeneratedFilesStatusEnum.PENDING,
-  })
-  status: GeneratedFilesStatusEnum;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
