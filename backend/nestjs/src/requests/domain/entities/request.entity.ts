@@ -1,3 +1,4 @@
+import { requestStatus } from "@/shared/enums/requestStatus.enum";
 import { GeneratedFiles } from "@/generatedFiles/domain/entities/generatedFiles.entity";
 import { User } from "@/users/domain/entities/user.entity";
 
@@ -7,6 +8,7 @@ import { User } from "@/users/domain/entities/user.entity";
 export class Request {
   id: string;
   requestHash: string;
+  requestStatus: requestStatus;
   variableName: string;
   pressureLevels: string[];
   years: string[];

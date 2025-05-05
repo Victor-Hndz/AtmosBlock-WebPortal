@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { GeneratedFilesEntity } from "@/generatedFiles/persistence/entities/generatedFiles.entity";
 import { UserEntity } from "@/users/persistence/entities/user.entity";
+import { requestStatus } from "@/shared/enums/requestStatus.enum";
 
 /**
  * Request persistence entity - represents a request in the database
@@ -21,6 +22,9 @@ export class RequestEntity {
 
   @Column({ name: "request_hash" })
   requestHash: string;
+
+  @Column({ name: "request_status", type: "enum", enum: requestStatus, default: requestStatus.EMPTY })
+  requestStatus: requestStatus;
 
   @Column({ name: "variable_name" })
   variableName: string;

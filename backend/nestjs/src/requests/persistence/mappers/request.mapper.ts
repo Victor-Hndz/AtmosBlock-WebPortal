@@ -14,6 +14,7 @@ export class RequestMapper {
     return new Request({
       id: requestEntity.id,
       requestHash: requestEntity.requestHash,
+      requestStatus: requestEntity.requestStatus,
       variableName: requestEntity.variableName,
       pressureLevels: requestEntity.pressureLevels,
       years: requestEntity.years,
@@ -50,6 +51,7 @@ export class RequestMapper {
 
     persistenceRequest.id = request.id;
     persistenceRequest.requestHash = request.requestHash;
+    persistenceRequest.requestStatus = request.requestStatus;
     persistenceRequest.variableName = request.variableName;
     persistenceRequest.pressureLevels = request.pressureLevels;
     persistenceRequest.years = request.years;

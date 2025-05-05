@@ -6,6 +6,7 @@ import { RequestsPublisher } from "@/requests/messaging/requests.publisher";
 import { IRequestRepository } from "@/requests/domain/repositories/request.repository.interface";
 import { GeneratedFilesService } from "@/generatedFiles/services/generatedFiles.service";
 import { STATUS_PROCESSING } from "@/shared/consts/consts";
+import { requestStatus } from "@/shared/enums/requestStatus.enum";
 
 @Injectable()
 export class RequestsService {
@@ -43,7 +44,7 @@ export class RequestsService {
 
     // Check if the request already exists
     const existingRequest = await this.requestRepository.findByRequestHash(requestHash);
-    if (existingRequest !== null) {
+    if (existingRequest !== null && existingRequest.requestStatus == requestStatus.CACHED) {
       // If it exists, increment the timesRequested
       existingRequest.timesRequested += 1;
 
@@ -53,8 +54,11 @@ export class RequestsService {
 
       await this.requestRepository.update(existingRequest);
       return existingRequest;
+    } else if (existingRequest === null) {
+      await this.requestRepository.create(createRequestDto.toRequest());
     }
-    //If not exists, emit a message to RabbitMQ
+
+    //If not exists and cached, emit a message to RabbitMQ for processing
     this.requestsPublisher.sendRequestCreatedEvent(createRequestDto);
     const message = { status: STATUS_PROCESSING, message: `Request sent to process with ID ${requestHash}` };
     return JSON.stringify(message);
@@ -114,7 +118,8 @@ export class RequestsService {
   }
 
   generateRequestHash(createRequestDto: CreateRequestDto): string {
-    const str = JSON.stringify(createRequestDto);
+    const { requestHash, userId, ...rest } = createRequestDto;
+    const str = JSON.stringify(rest);
     return createHash("sha256").update(str).digest("hex");
   }
 }

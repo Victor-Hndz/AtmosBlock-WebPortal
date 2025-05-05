@@ -1,5 +1,7 @@
 import { IsString, IsBoolean, IsArray, ValidateIf, IsNotEmpty, IsOptional, IsUUID, IsNumber } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { Request } from "@/requests/domain/entities/request.entity";
+import { requestStatus } from "@/shared/enums/requestStatus.enum";
 
 export class CreateRequestDto {
   @ApiProperty({ description: "Hash of the request" })
@@ -121,4 +123,13 @@ export class CreateRequestDto {
   @IsUUID()
   @IsOptional()
   userId?: string;
+
+  toRequest(): Request {
+    const request = new Request({
+      ...this,
+      requestStatus: requestStatus.GENERATING,
+      timesRequested: 1,
+    });
+    return request;
+  }
 }
