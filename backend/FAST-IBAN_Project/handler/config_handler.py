@@ -1,4 +1,3 @@
-import yaml
 import sys
 import json
 from typing import List
@@ -9,7 +8,11 @@ from utils.rabbitMQ.send_message import send_message
 from utils.rabbitMQ.receive_messages import receive_messages
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
+from utils.minio.upload_files import upload_files_to_request_hash
+from utils.clean_folder_files import clean_directory
 from utils.consts.consts import EXEC_FILE, STATUS_OK, STATUS_ERROR, MESSAGE_NO_COMPILE
+
+OUT_DIR = "./out"
 
 
 class ConfigHandler:
@@ -24,6 +27,7 @@ class ConfigHandler:
         """Initialize the configuration handler with default values."""
         # Configuration properties
         self.file_name = None
+        self.request_hash = None
         self.variable_name = None
         self.pressure_level = None
         self.years = None
@@ -49,41 +53,37 @@ class ConfigHandler:
         self.execution_completed = False
         self.maps_generated = False
 
-    def init(self, yaml_file: str) -> None:
+    def init(self, data) -> None:
         """
-        Initialize variables from a YAML configuration file.
+        Initialize variables from a configuration file.
         
         Args:
-            yaml_file: Path to the YAML configuration file
+            data: Configuration data in JSON format
         """
-        # Read the configuration file
-        with open(yaml_file, 'r') as yamlfile:
-            config = yaml.load(yamlfile, Loader=yaml.FullLoader)
-        print("\n✅ Archivo de configuración .yaml leído exitosamente.\n")
             
         # Extract configuration values
-        map_config = config["MAP"]
-        self.file_name = map_config["file"]
-        self.variable_name = map_config["variableName"]
-        self.pressure_level = map_config["pressureLevel"]
-        self.years = map_config["years"]
-        self.months = map_config["months"]
-        self.days = map_config["days"]
-        self.hours = map_config["hours"]
-        self.area_covered = map_config["areaCovered"]
-        self.map_types = map_config["mapTypes"]
-        self.map_ranges = map_config["mapRanges"]
-        self.map_levels = map_config["mapLevels"]
-        self.file_format = map_config["fileFormat"]
-        self.tracking = map_config["tracking"]
-        self.no_compile = map_config["noCompile"]
-        self.no_execute = map_config["noExecute"]
-        self.no_maps = map_config["noMaps"]
-        self.animation = map_config["animation"]
-        self.omp = map_config["omp"]
-        self.mpi = map_config["mpi"]
-        self.n_threads = map_config["nThreads"]
-        self.n_processes = map_config["nProces"]
+        self.file_name = data["file"]
+        self.request_hash = data["requestHash"]
+        self.variable_name = data["variableName"]
+        self.pressure_level = data["pressureLevel"]
+        self.years = data["years"]
+        self.months = data["months"]
+        self.days = data["days"]
+        self.hours = data["hours"]
+        self.area_covered = data["areaCovered"]
+        self.map_types = data["mapTypes"]
+        self.map_ranges = data["mapRanges"]
+        self.map_levels = data["mapLevels"]
+        self.file_format = data["fileFormat"]
+        self.tracking = data["tracking"]
+        self.no_compile = data["noCompile"]
+        self.no_execute = data["noExecute"]
+        self.no_maps = data["noMaps"]
+        self.animation = data["animation"]
+        self.omp = data["omp"]
+        self.mpi = data["mpi"]
+        self.n_threads = data["nThreads"]
+        self.n_processes = data["nProces"]
 
     def handle_config_message(self, body: bytes) -> None:
         """
@@ -92,18 +92,13 @@ class ConfigHandler:
         Args:
             body: Raw message body from RabbitMQ
         """
-        data = process_body(body)
-        yaml_file = json.loads(data)
-        print(f"\n✅ Mensaje recibido en handler: {yaml_file}")
-        
-        if not yaml_file.endswith(".yaml"):
-            print("\n❌ Mensaje inválido. Se esperaba un archivo .yaml existente.")
-            return 
-
+        raw_data = process_body(body)
+        data = json.loads(raw_data)
+        print(f"\n✅ Mensaje recibido en handler: {data}")
         print("\n✅ Archivo válido recibido. Iniciando procesamiento...")
         
         # Start the orchestration flow
-        self.init(yaml_file)
+        self.init(data)
         print(f"Archivo a procesar: {self.file_name}")
         self.execute_processing_pipeline()
 
@@ -147,6 +142,11 @@ class ConfigHandler:
             print(f"\n[ ] Se recibió un mensaje de ejecución: {message['exec_message']}")
             print("\n✅ Ejecución completada exitosamente.")
             self.execution_completed = True
+            
+        #save the files to minio and clean the directory
+        print("\n[ ] Guardando archivos en MinIO...")
+        upload_files_to_request_hash(self.request_hash, OUT_DIR)
+        clean_directory(OUT_DIR)
         
         # Continue with the next steps in the pipeline
         if not self.no_maps:
@@ -175,6 +175,7 @@ class ConfigHandler:
         
         print("\n✅ Generación de mapas completada exitosamente.")
         self.maps_generated = True
+        return
         
         # Continue with the next steps in the pipeline
         if self.animation:
@@ -239,9 +240,9 @@ class ConfigHandler:
         print("\n[ ] Enviando mensaje a la cola de ejecución...")
         
         if self.no_compile:
-            data = {"request_type": MESSAGE_NO_COMPILE, "cmd": cmd}
+            data = {"request_type": MESSAGE_NO_COMPILE, "cmd": cmd, "request_hash": self.request_hash}
         else:
-            data = {"request_type": "", "cmd": cmd}
+            data = {"request_type": "", "cmd": cmd, "request_hash": self.request_hash}
         
         # Send execution request and wait for response
         send_message(create_message(STATUS_OK, "", data), "execution", "execution.algorithm")
@@ -260,16 +261,16 @@ class ConfigHandler:
         """
         if self.omp and not self.mpi:
             return [EXEC_FILE, self.file_name, str(lat_range[0]), str(lat_range[1]), 
-                    str(lon_range[0]), str(lon_range[1]), self.n_threads]
+                    str(lon_range[0]), str(lon_range[1]), OUT_DIR+"/"+self.request_hash, self.n_threads]
         elif self.mpi and not self.omp:
             return ["mpirun", "-n", self.n_processes, EXEC_FILE, self.file_name, 
-                    str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), "1"]
+                    str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), OUT_DIR+"/"+self.request_hash, "1"]
         elif self.omp and self.mpi:
             return ["mpirun", "-n", self.n_processes, EXEC_FILE, self.file_name, 
-                    str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), self.n_threads]
+                    str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), OUT_DIR+"/"+self.request_hash, self.n_threads]
         else:
             return [EXEC_FILE, self.file_name, str(lat_range[0]), str(lat_range[1]), 
-                    str(lon_range[0]), str(lon_range[1]), "1"]
+                    str(lon_range[0]), str(lon_range[1]), OUT_DIR+"/"+self.request_hash, "1"]
         
     def process_map_generation(self) -> None:
         """
@@ -278,6 +279,7 @@ class ConfigHandler:
         
         data = {
             "file_name": self.file_name,
+            "request_hash": self.request_hash,
             "variable_name": self.variable_name,
             "pressure_level": self.pressure_level,
             "years": self.years,
@@ -334,6 +336,16 @@ class ConfigHandler:
         print("\n[ ] Simulando finalización de seguimiento de formaciones...")
         print("\n✅ Procesamiento completado.")
 
+    def send_finish_message(self) -> None:
+        """
+        Send a message indicating that the processing has finished.
+        """
+        # Save the files to MinIO and clean the directory
+        upload_files_to_request_hash(self.request_hash, OUT_DIR)
+        clean_directory(OUT_DIR)
+        
+        # message = {"exec_status": STATUS_OK, "exec_message": "Processing completed."}
+        # send_message(create_message(STATUS_OK, "", message), "notifications", "notify.handler")
 
 if __name__ == "__main__":
     handler = ConfigHandler()
