@@ -15,11 +15,11 @@ import { TypeOrmRequestRepository } from "./persistence/repositories/typeorm-req
     GeneratedFilesModule,
     ClientsModule.register([
       {
-        name: "RABBITMQ_SERVICE",
+        name: "RABBITMQ_CONFIG_SERVICE",
         transport: Transport.RMQ,
         options: {
           urls: [process.env.RABBITMQ_URL ?? "amqp://admin:pass@localhost:5672"],
-          queue: process.env.RABBITMQ_QUEUE ?? "config_queue",
+          queue: process.env.RABBITMQ_CONFIG_QUEUE ?? "config_queue",
           queueOptions: {
             durable: true,
           },

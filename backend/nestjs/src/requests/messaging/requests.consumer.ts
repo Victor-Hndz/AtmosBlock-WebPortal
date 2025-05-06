@@ -23,9 +23,6 @@ export class RequestsConsumer {
     } catch (error) {
       this.logger.error(`Error processing result.done message: ${error.message}`);
 
-      // You might want to handle errors differently, like rejecting the message
-      // or sending it to a dead letter queue. For now, we'll still acknowledge it
-      // to prevent it from being redelivered repeatedly
       const channel = context.getChannelRef();
       const originalMsg = context.getMessage();
       channel.ack(originalMsg);

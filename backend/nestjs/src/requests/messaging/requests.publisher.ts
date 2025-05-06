@@ -7,7 +7,7 @@ import { CreateRequestDto } from "../dtos/create-request.dto";
 export class RequestsPublisher {
   private readonly logger = new Logger(RequestsPublisher.name);
 
-  constructor(@Inject("RABBITMQ_SERVICE") private readonly client: ClientProxy) {}
+  constructor(@Inject("RABBITMQ_CONFIG_SERVICE") private readonly client: ClientProxy) {}
 
   sendRequestCreatedEvent(request: CreateRequestDto) {
     // Send it to exchange requests and routing key config.create

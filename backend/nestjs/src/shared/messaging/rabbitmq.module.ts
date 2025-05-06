@@ -6,7 +6,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
   imports: [
     ClientsModule.registerAsync([
       {
-        name: "RABBITMQ_SERVICE",
+        name: "RABBITMQ_CONFIG_SERVICE",
         imports: [ConfigModule],
         inject: [ConfigService],
         useFactory: (_configService: ConfigService) => ({
@@ -20,6 +20,6 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
       },
     ]),
   ],
-  exports: ["RABBITMQ_SERVICE"],
+  exports: ["RABBITMQ_CONFIG_SERVICE"],
 })
 export class RabbitMQModule {}

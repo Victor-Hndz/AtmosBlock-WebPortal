@@ -10,7 +10,7 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
 
   constructor(private readonly configService: ConfigService) {
     const rabbitMqUrl = this.configService.get<string>("RABBITMQ_URL");
-    const rabbitMqQueue = this.configService.get<string>("RABBITMQ_QUEUE");
+    const rabbitMqQueue = this.configService.get<string>("RABBITMQ_CONFIG_QUEUE");
 
     if (!rabbitMqUrl || !rabbitMqQueue) {
       throw new Error("RabbitMQ connection information is missing");
