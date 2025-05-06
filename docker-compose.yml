@@ -16,7 +16,7 @@ services:
       rabbitmq:
         condition: service_started
       minio:
-        condition: service_healthy
+        condition: service_started
     networks:
       - app-network
 
@@ -52,9 +52,9 @@ services:
       rabbitmq:
         condition: service_started
       configurator_module:
-        condition: service_healthy
+        condition: service_started
       minio:
-        condition: service_healthy
+        condition: service_started
     volumes:
       - config_data:/app/config
     stdin_open: true
@@ -74,9 +74,9 @@ services:
       rabbitmq:
         condition: service_started
       configurator_module:
-        condition: service_healthy
+        condition: service_started
       minio:
-        condition: service_healthy
+        condition: service_started
     volumes:
       - config_data:/app/config
       - out_data:/app/out
@@ -97,9 +97,9 @@ services:
       rabbitmq:
         condition: service_started
       configurator_module:
-        condition: service_healthy
+        condition: service_started
       minio:
-        condition: service_healthy
+        condition: service_started
     volumes:
       - config_data:/app/config
       - out_data:/app/out
@@ -133,6 +133,11 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   postgres:
     image: postgres:16
@@ -147,7 +152,7 @@ services:
       - "${DB_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/nestjs/db/init:/docker-entrypoint-initdb.d
+      # - ./backend/nestjs/db/init:/docker-entrypoint-initdb.d
     networks:
       - app-network
     healthcheck:
@@ -156,24 +161,24 @@ services:
       timeout: 5s
       retries: 5
 
-  init-postgres:
-    image: postgres:16
-    container_name: init_postgres_container
-    env_file:
-      - .env
-    depends_on:
-      postgres:
-        condition: service_healthy
-    volumes:
-      - ./backend/db:/docker-entrypoint-initdb.d
-    networks:
-      - app-network
-    restart: "no"
-    entrypoint: >
-      /bin/sh -c "
-        sleep 5;
-        PGPASSWORD=${DB_PASSWORD} psql -h postgres -U ${DB_USERNAME} -d ${DB_NAME} -f /docker-entrypoint-initdb.d/init-db.sql
-      "
+  # init-postgres:
+  #   image: postgres:16
+  #   container_name: init_postgres_container
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   volumes:
+  #     - ./backend/db:/docker-entrypoint-initdb.d
+  #   networks:
+  #     - app-network
+  #   restart: "no"
+  #   entrypoint: >
+  #     /bin/sh -c "
+  #       sleep 5;
+  #       PGPASSWORD=${DB_PASSWORD} psql -h postgres -U ${DB_USERNAME} -d ${DB_NAME} -f /docker-entrypoint-initdb.d/init-db.sql
+  #     "
 
   adminer:
     image: adminer
@@ -211,7 +216,7 @@ services:
     image: minio/minio:latest
     depends_on:
       minio:
-        condition: service_healthy
+        condition: service_started
     entrypoint: >
       /bin/sh -c "
         sleep 5;
@@ -222,16 +227,19 @@ services:
   cron-cleanup:
     build:
       context: ./cron_cleanup
+      dockerfile: Dockerfile
     env_file:
       - .env
     depends_on:
       postgres:
         condition: service_healthy
       minio:
-        condition: service_healthy
+        condition: service_started
     restart: unless-stopped
     environment:
       - TZ=Europe/Madrid
+    networks:
+      - app-network
 
 volumes:
   out_data:
