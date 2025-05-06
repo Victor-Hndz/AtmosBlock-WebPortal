@@ -15,7 +15,7 @@ import { requestStatus } from "@/shared/enums/requestStatus.enum";
  * Request persistence entity - represents a request in the database
  * This is the entity used by TypeORM for database operations
  */
-@Entity("users")
+@Entity("requests")
 export class RequestEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
@@ -86,7 +86,7 @@ export class RequestEntity {
   @Column({ nullable: true, name: "n_proces" })
   nProces?: number;
 
-  @Column({ name: "times_requested" })
+  @Column({ name: "times_requested", default: 1 })
   timesRequested: number;
 
   @CreateDateColumn({ name: "created_at" })
@@ -95,11 +95,11 @@ export class RequestEntity {
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
-  @ManyToOne(() => UserEntity, user => user.requests, { onDelete: "CASCADE", nullable: true })
+  @ManyToOne(() => UserEntity, user => user.requests, { onDelete: "SET NULL", nullable: true })
   @JoinColumn({ name: "user_id" })
-  user: UserEntity;
+  user?: UserEntity;
 
-  @ManyToOne(() => GeneratedFilesEntity, generatedFiles => generatedFiles.requests, { onDelete: "CASCADE" })
+  @ManyToOne(() => GeneratedFilesEntity, generatedFiles => generatedFiles.requests, { onDelete: "SET NULL", nullable: true })
   @JoinColumn({ name: "generated_files_id" })
   generatedFiles: GeneratedFilesEntity;
 }
