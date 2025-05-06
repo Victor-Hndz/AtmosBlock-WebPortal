@@ -1,8 +1,7 @@
 #include "../libraries/init.h"
 
 int LAT_LIM_MIN, LAT_LIM_MAX, LON_LIM_MIN, LON_LIM_MAX, N_THREADS;
-char* FILE_NAME;
-char OUT_DIR_NAME[NC_MAX_CHAR];
+char* FILE_NAME, *OUT_DIR_NAME;
 
 
 /**

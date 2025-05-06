@@ -51,8 +51,7 @@
 #define INF (1.0E+30)
 
 extern int NTIME, NLAT, NLON, LAT_LIM_MIN, LAT_LIM_MAX, LON_LIM_MIN, LON_LIM_MAX, N_THREADS;
-extern char* FILE_NAME;
-extern char OUT_DIR_NAME[NC_MAX_CHAR];
+extern char* FILE_NAME, *OUT_DIR_NAME;
 
 /*STRUCTS*/
 enum Tipo_form{MAX, MIN, NO_TYPE};
