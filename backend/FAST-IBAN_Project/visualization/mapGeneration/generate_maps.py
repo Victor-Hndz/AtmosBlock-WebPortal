@@ -11,8 +11,8 @@ from collections import namedtuple
 from scipy.spatial import ConvexHull
 
 
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-sys.path.append('../app/')
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
 from utils.enums.DataType import DataType
 from utils.minio.upload_files import upload_files_to_request_hash
 from utils.clean_folder_files import clean_directory

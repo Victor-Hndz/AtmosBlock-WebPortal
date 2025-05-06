@@ -22,4 +22,4 @@ COPY ./utils /app/utils
 RUN pip install --no-cache-dir -r ./utils/requirements.txt
 
 # Run the executable
-CMD [ "python", "./visualization/handler/visualization_handler.py" ]
+CMD [ "python", "visualization/handler/visualization_handler.py" ]
