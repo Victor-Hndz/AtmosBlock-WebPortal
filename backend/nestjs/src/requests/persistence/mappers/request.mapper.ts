@@ -39,7 +39,9 @@ export class RequestMapper {
       createdAt: requestEntity.createdAt,
       updatedAt: requestEntity.updatedAt,
       user: requestEntity.user ? UserMapper.toDomain(requestEntity.user) : undefined,
-      generatedFiles: GeneratedFilesMapper.toDomain(requestEntity.generatedFiles),
+      generatedFiles: requestEntity.generatedFiles
+        ? GeneratedFilesMapper.toDomain(requestEntity.generatedFiles)
+        : undefined,
     });
   }
 

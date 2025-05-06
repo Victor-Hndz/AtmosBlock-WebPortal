@@ -5,6 +5,7 @@ import { requestStatus } from "@/shared/enums/requestStatus.enum";
 
 export class CreateRequestDto {
   @ApiProperty({ description: "Hash of the request" })
+  @IsOptional()
   @IsString()
   requestHash?: string;
 
