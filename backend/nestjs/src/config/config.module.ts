@@ -24,6 +24,7 @@ import * as Joi from "joi";
         RABBITMQ_QUEUE: Joi.string().required(),
         //MINIO
         MINIO_ENDPOINT: Joi.string().required(),
+        MINIO_HOST: Joi.string().required(),
         MINIO_PORT: Joi.number().required(),
         MINIO_USER: Joi.string().required(),
         MINIO_PASSWORD: Joi.string().required(),
