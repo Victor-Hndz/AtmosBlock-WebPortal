@@ -139,14 +139,9 @@ class ConfigHandler:
             print(f"\t❌ Error: {message['exec_message']}")
             return
         elif message["exec_status"] == STATUS_OK:
-            print(f"\n[ ] Se recibió un mensaje de ejecución: {message['exec_message']}")
+            # print(f"\n[ ] Se recibió un mensaje de ejecución: {message['exec_message']}")
             print("\n✅ Ejecución completada exitosamente.")
             self.execution_completed = True
-            
-        #save the files to minio and clean the directory
-        print("\n[ ] Guardando archivos en MinIO...")
-        upload_files_to_request_hash(self.request_hash, OUT_DIR)
-        clean_directory(OUT_DIR)
         
         # Continue with the next steps in the pipeline
         if not self.no_maps:
@@ -175,7 +170,6 @@ class ConfigHandler:
         
         print("\n✅ Generación de mapas completada exitosamente.")
         self.maps_generated = True
-        return
         
         # Continue with the next steps in the pipeline
         if self.animation:
@@ -294,6 +288,7 @@ class ConfigHandler:
         }
        
         # Send execution request and wait for response
+        print("\n[ ] Enviando mensaje a la cola de generación de mapas...")
         send_message(create_message(STATUS_OK, "", data), "execution", "execution.visualization")
         receive_messages("notifications_queue", "notify.handler", callback=self.handle_map_generation_message)
     

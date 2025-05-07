@@ -46,6 +46,11 @@ def handle_message(body):
         else:
             print(stderr)
             print("\n❌ Error al ejecutar el build:")
+            message = {"exec_status": STATUS_ERROR, "exec_message": "Error al compilar"}
+            send_message(
+                create_message(STATUS_OK, "", message), "notifications", "notify.handler"
+            )
+            return False
 
     run_cmd = data["cmd"]
 
@@ -62,6 +67,7 @@ def handle_message(body):
         message = {"exec_status": STATUS_OK, "exec_message": result.stdout}
         #save the files in minio
         upload_files_to_request_hash(data["request_hash"], local_folder="./out/"+data["request_hash"])
+        print("\n[ ] Archivos subidos a minio.")
         clean_directory("./out/"+data["request_hash"])
         send_message(
             create_message(STATUS_OK, "", message), "notifications", "notify.handler"
