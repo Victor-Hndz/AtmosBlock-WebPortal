@@ -17,6 +17,7 @@ minio_client = Minio(
 )
 
 def upload_files_to_request_hash(request_hash: str, local_folder: str = "./out"):
+    print(f"Uploading files to MinIO bucket '{MINIO_BUCKET}' under request hash '{request_hash}'...")
     if not minio_client.bucket_exists(MINIO_BUCKET):
         minio_client.make_bucket(MINIO_BUCKET)
 
@@ -24,7 +25,7 @@ def upload_files_to_request_hash(request_hash: str, local_folder: str = "./out")
         local_path = os.path.join(local_folder, filename)
         if os.path.isfile(local_path):
             object_name = f"{request_hash}/{filename}"
-            print(f"Uploading {local_path} to {MINIO_BUCKET}/{object_name}")
+            # print(f"Uploading {local_path} to {MINIO_BUCKET}/{object_name}")
             minio_client.fput_object(MINIO_BUCKET, object_name, local_path)
 
     print("✅ All files uploaded successfully.")
