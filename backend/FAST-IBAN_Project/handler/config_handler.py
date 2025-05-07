@@ -261,16 +261,16 @@ class ConfigHandler:
         """
         if self.omp and not self.mpi:
             return [EXEC_FILE, self.file_name, str(lat_range[0]), str(lat_range[1]), 
-                    str(lon_range[0]), str(lon_range[1]), OUT_DIR+"/"+self.request_hash, self.n_threads]
+                    str(lon_range[0]), str(lon_range[1]), OUT_DIR+"/"+self.request_hash+"/", self.n_threads]
         elif self.mpi and not self.omp:
             return ["mpirun", "-n", self.n_processes, EXEC_FILE, self.file_name, 
-                    str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), OUT_DIR+"/"+self.request_hash, "1"]
+                    str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), OUT_DIR+"/"+self.request_hash+"/", "1"]
         elif self.omp and self.mpi:
             return ["mpirun", "-n", self.n_processes, EXEC_FILE, self.file_name, 
-                    str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), OUT_DIR+"/"+self.request_hash, self.n_threads]
+                    str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), OUT_DIR+"/"+self.request_hash+"/", self.n_threads]
         else:
             return [EXEC_FILE, self.file_name, str(lat_range[0]), str(lat_range[1]), 
-                    str(lon_range[0]), str(lon_range[1]), OUT_DIR+"/"+self.request_hash, "1"]
+                    str(lon_range[0]), str(lon_range[1]), OUT_DIR+"/"+self.request_hash+"/", "1"]
         
     def process_map_generation(self) -> None:
         """
