@@ -30,12 +30,15 @@ def receive_messages(queue_name, routing_key, callback):
             else:
                 body_pattern = body_dict
             # print(f"body pattern: {body_pattern}")
-            if method.routing_key in routing_key or body_pattern in routing_key:
-                # print(f"\n✅ Mensaje recibido en '{queue_name}': {body}")
+            print(f"method.routing key: {method.routing_key}")
+            print(f"routing key: {routing_key}")
+            print(f"body_pattern: {body_pattern}")
+            if method.routing_key in routing_key or (body_pattern and any(body_pattern in rk for rk in routing_key)):
+                print(f"\n✅ Mensaje recibido en '{queue_name}': {body}")
                 callback(body)  # Llamar a la función del usuario
                 ch.basic_ack(delivery_tag=method.delivery_tag)  # Confirmar recepción
             else:
-                # print(f"\n[ ] Mensaje descartado: {body}")
+                print(f"\n[ ] Mensaje descartado: {body}")
                 ch.basic_nack(delivery_tag=method.delivery_tag)  # Rechazar mensaje
 
         channel.basic_consume(queue=queue_name, on_message_callback=on_message)

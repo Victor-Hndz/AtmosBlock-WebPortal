@@ -29,6 +29,7 @@ def send_message(body, exchange, routing_key):
             body=message,
             properties=pika.BasicProperties(
                 delivery_mode=2,
+                expiration="5000",  # 5 seconds
             ),
         )
 
