@@ -211,6 +211,8 @@ services:
     volumes:
       - minio_data:/data
     command: server /data --console-address ":9001"
+    networks:
+      - app-network
 
   minio-init:
     image: minio/minio:latest
