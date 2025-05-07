@@ -67,7 +67,6 @@ class Configurator:
         print(f"Argumentos: {self.args}")
 
         self.mount_file_name()
-        print(f"\n✅ Nombre del archivo generado: {self.file_name}")
 
         if not os.path.exists(self.file_name):
             # call to API for dowload the file
