@@ -78,6 +78,7 @@ class Configurator:
                 self.args["days"],
                 self.args["hours"],
                 self.args["pressureLevels"],
+                self.args["areaCovered"],
                 self.file_name,
             )
             print(f"\n✅ Archivo {self.file_name} descargado con éxito.")
