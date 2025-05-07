@@ -135,7 +135,7 @@ void init_files(char* filename, char* filename2, char* log_file, char* speed_fil
     char fecha[20];
     snprintf(fecha, sizeof(fecha), "%02d-%02d-%04d_%02d-%02d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min);
 
-    buffer_size = strlen(file_path) + strlen(long_name) + strlen(temp) + strlen(fecha) + 20;
+    buffer_size = strlen(file_path) + strlen(long_name) + strlen(temp) + strlen(fecha) + EXTRA_STR_SIZE;
     snprintf(filename, buffer_size, "%s%s_selected_%s_%sUTC.csv", file_path, long_name, temp, fecha);
     FILE *fp = fopen(filename, "w");
     if (fp == NULL) {
@@ -144,8 +144,8 @@ void init_files(char* filename, char* filename2, char* log_file, char* speed_fil
     }
     fprintf(fp, "time,latitude,longitude,z,type,cluster,centroid_lat,centroid_lon\n");
     fclose(fp);
-
-    buffer_size = strlen(file_path) + strlen(long_name) + strlen(temp) + strlen(fecha) + 20;
+    
+    buffer_size = strlen(file_path) + strlen(long_name) + strlen(temp) + strlen(fecha) + EXTRA_STR_SIZE;
     snprintf(filename2, buffer_size, "%s%s_formations_%s_%sUTC.csv", file_path, long_name, temp, fecha);
     fp = fopen(filename2, "w");
     if (fp == NULL) {
@@ -155,7 +155,7 @@ void init_files(char* filename, char* filename2, char* log_file, char* speed_fil
     fprintf(fp, "time,max_id,min1_id,min2_id,type\n");
     fclose(fp);
 
-    buffer_size = strlen(file_path) + strlen(temp) + strlen(fecha) + strlen(N_THREADS) + 20;
+    buffer_size = strlen(file_path) + strlen(temp) + strlen(fecha) + EXTRA_STR_SIZE;
     snprintf(log_file, buffer_size, "%slog_%s_%sUTC_%dhilos.txt", file_path, temp, fecha, N_THREADS);
     fp = fopen(log_file, "w");
     if (fp == NULL) {
@@ -165,7 +165,7 @@ void init_files(char* filename, char* filename2, char* log_file, char* speed_fil
     fprintf(fp, "Log prints and errors of the execution:\n");
     fclose(fp);
 
-    buffer_size = strlen(file_path) + strlen(temp) + strlen(fecha) + strlen(N_THREADS) + 20;
+    buffer_size = strlen(file_path) + strlen(temp) + strlen(fecha) + EXTRA_STR_SIZE;
     snprintf(speed_file, buffer_size, "%sspeed_%s_%sUTC_%dhilos.csv", file_path, temp, fecha, N_THREADS);
     fp = fopen(speed_file, "w");
     if (fp == NULL) {
