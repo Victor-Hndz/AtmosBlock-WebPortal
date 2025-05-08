@@ -82,6 +82,19 @@ def handle_message(body):
         try:
             for future in futures:
                 future.result()
+            
+            print("\n✅ Generación de mapas completada exitosamente.")
+            message = {"exec_status": STATUS_OK, "exec_message": "Map generation completed successfully."}
+            send_message(
+                        create_message(
+                            STATUS_OK,
+                            "",
+                            message,
+                        ),
+                        "notifications",
+                        "notify.handler",
+                    )     
+            return True  
         except Exception as e:
             print(f"Error: {e}")
             message = {"exec_status": STATUS_ERROR, "exec_message": str(e)}
@@ -95,19 +108,6 @@ def handle_message(body):
                 "notify.handler",
             )
             return False
-        
-    print("\n✅ Generación de mapas completada exitosamente.")
-    message = {"exec_status": STATUS_OK, "exec_message": "Map generation completed successfully."}
-    send_message(
-                create_message(
-                    STATUS_OK,
-                    "",
-                    message,
-                ),
-                "notifications",
-                "notify.handler",
-            )     
-    return True  
 
 
 if __name__ == "__main__":
