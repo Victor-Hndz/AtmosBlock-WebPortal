@@ -14,12 +14,12 @@ export class RequestsPublisher {
     this.client
       .connect()
       .then(() => {
-        const message = {
+        const data = {
           status: STATUS_OK,
           message: "New request created",
-          data: JSON.stringify(request),
+          content: JSON.stringify(request),
         };
-        this.client.emit("config.create", message);
+        this.client.emit("config.create", data);
         this.logger.log("✅ Message sent to RabbitMQ");
       })
       .catch(err => {

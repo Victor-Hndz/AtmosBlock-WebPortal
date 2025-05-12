@@ -1,6 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Ctx, EventPattern, Payload, RmqContext } from "@nestjs/microservices";
 import { RequestsService } from "../services/requests.service";
+import { MessageContent } from "@/shared/interfaces/messageContentInterface.interface";
 
 @Injectable()
 export class RequestsConsumer {
@@ -9,7 +10,7 @@ export class RequestsConsumer {
   constructor(private readonly requestsService: RequestsService) {}
 
   @EventPattern("result.done")
-  async handleResultDone(@Payload() data: any, @Ctx() context: RmqContext) {
+  async handleResultDone(@Payload() data: MessageContent, @Ctx() context: RmqContext) {
     try {
       this.logger.log(`Received result.done message: ${JSON.stringify(data)}`);
 
