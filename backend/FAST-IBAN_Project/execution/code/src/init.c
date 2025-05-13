@@ -1,8 +1,7 @@
 #include "../libraries/init.h"
 
 int LAT_LIM_MIN, LAT_LIM_MAX, LON_LIM_MIN, LON_LIM_MAX, N_THREADS;
-char* FILE_NAME;
-char OUT_DIR_NAME[NC_MAX_CHAR];
+char* FILE_NAME, *OUT_DIR_NAME;
 
 
 /**
@@ -89,9 +88,9 @@ void process_entry(int argc, char **argv) {
  */
 void init_files(char* filename, char* filename2, char* log_file, char* speed_file, char* long_name) {
     char cwd[NC_MAX_CHAR];
-    char file_path[NC_MAX_CHAR];
     char* error_catcher_char, *p;
     int error_catcher_int;
+    size_t buffer_size;
     error_catcher_char = getcwd(cwd, sizeof(cwd));
 
     //extract the last part of the path
@@ -102,7 +101,19 @@ void init_files(char* filename, char* filename2, char* log_file, char* speed_fil
         error_catcher_char = getcwd(cwd, sizeof(cwd));
     }
 
-    snprintf(file_path, sizeof(file_path), "%s/%s", cwd, OUT_DIR_NAME);
+    buffer_size = strlen(cwd) + strlen(OUT_DIR_NAME) + 2;
+    char file_path[buffer_size];
+
+    snprintf(file_path, buffer_size, "%s/%s", cwd, OUT_DIR_NAME);
+    printf("File path: %s\n", file_path);
+
+    // Check if the directory exists, if not create it.
+    if (access(file_path, F_OK) == -1) {
+        if (mkdir(file_path, 0777) == -1) {
+            perror("Error creating directory");
+            exit(EXIT_FAILURE);
+        }
+    }
 
     // FILE_NAME extract the last part of the path
     p = strrchr(FILE_NAME, '/');
@@ -122,25 +133,45 @@ void init_files(char* filename, char* filename2, char* log_file, char* speed_fil
     struct tm tm = *localtime(&t);
 
     char fecha[20];
-    sprintf(fecha, "%02d-%02d-%04d_%02d-%02d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min);
+    snprintf(fecha, sizeof(fecha), "%02d-%02d-%04d_%02d-%02d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min);
 
-    sprintf(filename, "%s%s_selected_%s_%sUTC.csv", file_path, long_name, temp, fecha);
+    buffer_size = strlen(file_path) + strlen(long_name) + strlen(temp) + strlen(fecha) + EXTRA_STR_SIZE;
+    snprintf(filename, buffer_size, "%s%s_selected_%s_%sUTC.csv", file_path, long_name, temp, fecha);
     FILE *fp = fopen(filename, "w");
+    if (fp == NULL) {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
     fprintf(fp, "time,latitude,longitude,z,type,cluster,centroid_lat,centroid_lon\n");
     fclose(fp);
-
-    sprintf(filename2, "%s%s_formations_%s_%sUTC.csv", file_path, long_name, temp, fecha);
+    
+    buffer_size = strlen(file_path) + strlen(long_name) + strlen(temp) + strlen(fecha) + EXTRA_STR_SIZE;
+    snprintf(filename2, buffer_size, "%s%s_formations_%s_%sUTC.csv", file_path, long_name, temp, fecha);
     fp = fopen(filename2, "w");
+    if (fp == NULL) {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
     fprintf(fp, "time,max_id,min1_id,min2_id,type\n");
     fclose(fp);
 
-    sprintf(log_file, "%slog_%s_%sUTC_%dhilos.txt", file_path, temp, fecha, N_THREADS);
+    buffer_size = strlen(file_path) + strlen(temp) + strlen(fecha) + EXTRA_STR_SIZE;
+    snprintf(log_file, buffer_size, "%slog_%s_%sUTC_%dhilos.txt", file_path, temp, fecha, N_THREADS);
     fp = fopen(log_file, "w");
+    if (fp == NULL) {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
     fprintf(fp, "Log prints and errors of the execution:\n");
     fclose(fp);
 
-    sprintf(speed_file, "%sspeed_%s_%sUTC_%dhilos.csv", file_path, temp, fecha, N_THREADS);
+    buffer_size = strlen(file_path) + strlen(temp) + strlen(fecha) + EXTRA_STR_SIZE;
+    snprintf(speed_file, buffer_size, "%sspeed_%s_%sUTC_%dhilos.csv", file_path, temp, fecha, N_THREADS);
     fp = fopen(speed_file, "w");
+    if (fp == NULL) {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
     fprintf(fp, "part,instant,time_elapsed\n");
     fclose(fp);
 }

@@ -19,11 +19,24 @@ import { MinioModule } from "./minio/minio.module";
     GeneratedFilesModule,
     ClientsModule.register([
       {
-        name: "RABBITMQ_SERVICE",
+        name: "RABBITMQ_CONFIG_SERVICE",
         transport: Transport.RMQ,
         options: {
           urls: [process.env.RABBITMQ_URL ?? "amqp://admin:pass@localhost:5672"],
-          queue: process.env.RABBITMQ_QUEUE ?? "config_queue",
+          queue: process.env.RABBITMQ_CONFIG_QUEUE ?? "config_queue",
+          queueOptions: {
+            durable: true,
+          },
+        },
+      },
+    ]),
+    ClientsModule.register([
+      {
+        name: "RABBITMQ_RESULTS_SERVICE",
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.RABBITMQ_URL ?? "amqp://admin:pass@localhost:5672"],
+          queue: process.env.RABBITMQ_RESULTS_QUEUE ?? "results_queue",
           queueOptions: {
             durable: true,
           },

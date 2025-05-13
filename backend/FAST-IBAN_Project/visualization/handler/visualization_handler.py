@@ -40,30 +40,28 @@ def handle_message(body):
 
     print("\n[ ] Iniciando generación de mapas...")
 
-    def process_map_generation(year, month, day, hour, map_type, map_range, map_level):
-        print(
-            # f"\n[ ] Generando mapa para el año {year}, mes {month}, día {day}, hora {hour}, tipo de mapa {map_type}, rango {map_range}, nivel {map_level}..."
-        )
+    def process_map_generation(pressure_level, year, month, day, hour, map_type, map_range, map_level):
         MapGenerator(
             data["file_name"],
             data["request_hash"],
             data["variable_name"],
-            data["pressure_level"],
+            float(pressure_level),
             year,
             month,
             day,
             hour,
             map_type,
             map_range,
-            map_level,
+            int(map_level),
             data["file_format"],
-            data["area_covered"])
+            [float(area) for area in data["area_covered"]])
             
 
     with ThreadPoolExecutor() as executor:
         futures = [
             executor.submit(
                 process_map_generation,
+                pressure_level,
                 year,
                 month,
                 day,
@@ -72,6 +70,7 @@ def handle_message(body):
                 map_range,
                 map_level
             )
+            for pressure_level in data["pressure_level"]
             for year in data["years"]
             for month in data["months"]
             for day in data["days"]
@@ -83,6 +82,19 @@ def handle_message(body):
         try:
             for future in futures:
                 future.result()
+            
+            print("\n✅ Generación de mapas completada exitosamente.")
+            message = {"exec_status": STATUS_OK, "exec_message": "Map generation completed successfully."}
+            send_message(
+                        create_message(
+                            STATUS_OK,
+                            "",
+                            message,
+                        ),
+                        "notifications",
+                        "notify.handler",
+                    )     
+            return True  
         except Exception as e:
             print(f"Error: {e}")
             message = {"exec_status": STATUS_ERROR, "exec_message": str(e)}
@@ -96,19 +108,6 @@ def handle_message(body):
                 "notify.handler",
             )
             return False
-        
-    print("\n✅ Generación de mapas completada exitosamente.")
-    message = {"exec_status": STATUS_OK, "exec_message": "Map generation completed successfully."}
-    send_message(
-                create_message(
-                    STATUS_OK,
-                    "",
-                    message,
-                ),
-                "notifications",
-                "notify.handler",
-            )     
-    return True  
 
 
 if __name__ == "__main__":

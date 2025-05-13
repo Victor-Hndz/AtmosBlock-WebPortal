@@ -41,9 +41,11 @@ export class RequestsService {
     //Generate the requestHash
     const requestHash = this.generateRequestHash(createRequestDto);
     createRequestDto.requestHash = requestHash;
+    this.logger.log(`Creating request with hash: ${requestHash}`);
 
     // Check if the request already exists
     const existingRequest = await this.requestRepository.findByRequestHash(requestHash);
+    this.logger.log(`Existing request: ${JSON.stringify(existingRequest)}`);
     if (existingRequest !== null && existingRequest.requestStatus == requestStatus.CACHED) {
       // If it exists, increment the timesRequested
       existingRequest.timesRequested += 1;
@@ -61,6 +63,7 @@ export class RequestsService {
     //If not exists and cached, emit a message to RabbitMQ for processing
     this.requestsPublisher.sendRequestCreatedEvent(createRequestDto);
     const message = { status: STATUS_PROCESSING, message: `Request sent to process with ID ${requestHash}` };
+    this.logger.log(`Request sent to process: ${JSON.stringify(message)}`);
     return JSON.stringify(message);
   }
 

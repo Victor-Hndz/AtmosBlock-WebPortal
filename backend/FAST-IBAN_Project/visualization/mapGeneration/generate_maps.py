@@ -5,18 +5,22 @@ import matplotlib.patheffects as path_effects
 import cartopy.crs as ccrs 
 import cartopy as cartopy 
 import numpy as np
+import xarray as xr
 import pandas as pd
 import sys
 from collections import namedtuple
+from datetime import datetime, timedelta
 from scipy.spatial import ConvexHull
 
 
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-sys.path.append('../app/')
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
 from utils.enums.DataType import DataType
 from utils.minio.upload_files import upload_files_to_request_hash
 from utils.clean_folder_files import clean_directory
-from utils.consts.consts import VARIABLE_NAMES
+from utils.rabbitMQ.send_message import send_message
+from utils.rabbitMQ.create_message import create_message
+from utils.consts.consts import VARIABLE_NAMES, STATUS_OK
 
 
 g_0 = 9.80665 # m/s^2
@@ -25,6 +29,62 @@ lat_km = 111.32 # km/deg
 R = 6371 # km
 
 OUT_DIR = "./out" # Directory to save the generated maps
+
+
+def date_from_nc(nc_file: str) -> str:
+    """Extrae la fecha de un archivo netCDF.
+
+    Args:
+        nc_file (str): Ruta del archivo netCDF.
+
+    Returns:
+        str: Cadena con la fecha extraída.
+    """
+    # Abrir el archivo netCDF y cargar los datos
+    ds = xr.open_dataset(nc_file)
+
+    # Extraer las fechas del conjunto de datos
+    return ds.time.values
+
+def from_nc_to_date(date: str) -> str:
+    """Extrae la fecha exacta de una cadena con la fecha de un archivo netCDF.
+
+    Args:
+        date (str): Cadena con la fecha del archivo netCDF.
+
+    Returns:
+        str: Cadena con la fecha exacta extraída.
+    """
+    date = date[:-4]
+    fecha_datetime = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%f")
+    
+   # Obtener el día inicial
+    day_start = fecha_datetime.day
+    
+    # Obtener el último día del mes
+    next_month = (fecha_datetime.replace(day=28) + timedelta(days=4)).replace(day=1)
+    day_end = (next_month - timedelta(days=1)).day
+    
+    # if day_start == day_end:
+    #     return fecha_datetime.strftime("%Y-%m-%d_%HUTC")
+    # else:
+    #     return fecha_datetime.strftime(f"%Y-%m-({day_start}-{day_end})_%HUTC")
+    return fecha_datetime.strftime("%Y-%m-%d_%HUTC")
+
+def from_elements_to_date(year: str, month: str, day: str, hour: str) -> str:
+    """Convierte los elementos de fecha y hora en una cadena de fecha.
+
+    Args:
+        year (str): Año.
+        month (str): Mes.
+        day (str): Día.
+        hour (str): Hora.
+
+    Returns:
+        str: Cadena con la fecha formateada.
+    """
+    #format: YYYY-MM-DD_HHUTC 
+    return f"{int(year):04d}-{int(month):02d}-{int(day):02d}_{int(hour):02d}UTC"
 
 class MapGenerator:
     def __init__(self, file_name, request_hash, variable_name, pressure_level, year, month, day, hour, map_type, map_range, map_level, file_format, area_covered):
@@ -68,17 +128,30 @@ class MapGenerator:
             if self.variable_name.lower() == key.lower():
                 variable_type = value
                 
-        print(f"Variable: {self.variable_name} -> {variable_type}")
+        # print(f"Variable: {self.variable_name} -> {variable_type}")
         
         if variable_type is None:
             print("Error: variable no válida")
             return
         
         nc_file = nc.Dataset(self.file_name, 'r')
+        dates_nc = date_from_nc(self.file_name)
+        corrected_dates = [from_nc_to_date(str(date)) for date in dates_nc]
+        actual_date = from_elements_to_date(self.year, self.month, self.day, self.hour)
+        
+        #from corrected_dates, obtain the index of the date that is equal to actual_date
+        if actual_date not in corrected_dates:
+            print(f"Error: la fecha {actual_date} no se encuentra en el archivo netCDF")
+            return
+        
+        time_index = corrected_dates.index(actual_date)
+        
         lat = nc_file.variables['latitude'][:]
         lon = nc_file.variables['longitude'][:]
         variable = nc_file.variables[variable_type][:]
         nc_file.close()
+        
+        variable = variable[time_index]
         
         # Ajustar valores mayores a 180 restando 360
         if max(lon) > 180:
@@ -87,6 +160,7 @@ class MapGenerator:
         
         #Adapt lat,lon and variable to the selected area. The area_covered is a list of 4 values: [lat_max, lon_min, lat_min, lon_max]
         lat_max, lon_min, lat_min, lon_max = self.area_covered
+
         # print(f"Area covered: {self.area_covered}")
         # print(f"Latitudes max: {lat_max}, min: {lat_min}")
         # print(f"Longitudes max: {lon_max}, min: {lon_min}")
@@ -98,10 +172,11 @@ class MapGenerator:
         lon = lon[lon_idx]
         variable = variable[..., lat_idx[:, None], lon_idx]  # broadcasting sobre lat/lon
 
-        print("Max value latitudes: ", lat.max())
-        print("Min value latitudes: ", lat.min())
-        print("Max value longitudes: ", lon.max())
-        print("Min value longitudes: ", lon.min())
+
+        # print("Max value latitudes: ", lat.max())
+        # print("Min value latitudes: ", lat.min())
+        # print("Max value longitudes: ", lon.max())
+        # print("Min value longitudes: ", lon.min())
         
         fig, ax = self.config_map()
         
@@ -113,12 +188,14 @@ class MapGenerator:
         plt.clabel(co, inline=True, fontsize=8)
         
         #visual_adds
-        self.visual_adds(fig, ax, co, self.map_type, variable_type, "v")
+        self.visual_adds(fig, ax, co, self.map_type, variable_type, "v", actual_date)
         
         # plt.show()
         
         print("Map generated. Saving map...")
-        self.save_map()
+        self.save_map(actual_date)
+
+        return True
         
     def adjust_lon(self, lon, z):
         """Convierte las longitudes de 0-360 a -180-180 y ajusta z para que coincida.
@@ -167,9 +244,8 @@ class MapGenerator:
         
         return fig, ax
 
-    def visual_adds(self, fig, ax, map_content, map_type, var_type, orientation):
+    def visual_adds(self, fig, ax, map_content, map_type, var_type, orientation, date):
         lat_max, lon_min, lat_min, lon_max = self.area_covered
-        date = f"{self.year}-{self.month:02d}-{self.day:02d} {self.hour:02d}:00"
         
         # Añade títulos y etiquetas
         if(map_type != None):
@@ -189,13 +265,13 @@ class MapGenerator:
                             ax.get_position().y0,
                             0.02,
                             ax.get_position().height])
-                cbar = plt.colorbar(map, cax=cax, orientation='vertical') 
+                cbar = plt.colorbar(map_content, cax=cax, orientation='vertical')
             elif(orientation == "h"):
                 cax = fig.add_axes([(ax.get_position().x1 + ax.get_position().x0)/2 - (ax.get_position().width * 0.4)/2,
                         ax.get_position().y0 - 0.12,
                         ax.get_position().width * 0.4,
                         0.02])
-                cbar = plt.colorbar(map, cax=cax, orientation='horizontal')
+                cbar = plt.colorbar(map_content, cax=cax, orientation='horizontal')
             
             if var_type == 'z':
                 cbar.set_label('Geopotential height (m)', fontsize=10)
@@ -203,17 +279,19 @@ class MapGenerator:
                 cbar.set_label('Temperature (ºC)', fontsize=10)
             
             cbar.ax.tick_params(labelsize=10)
-        
-        ax.set_yticks(range(lat_min, lat_max+1, 10), crs=ccrs.PlateCarree())
-        ax.set_yticklabels([f'{deg}°' for deg in range(lat_min, lat_max+1, 10)])
-        
-        ax.set_xticks(range(lon_min, lon_max+1, 20), crs=ccrs.PlateCarree())
-        ax.set_xticklabels([f'{deg}°' for deg in range(lon_min, lon_max+1, 20)])
+
+        yticks = np.arange(np.floor(lat_min / 10) * 10, np.ceil(lat_max / 10) * 10 + 1, 10)
+        xticks = np.arange(np.floor(lon_min / 20) * 20, np.ceil(lon_max / 20) * 20 + 1, 20)
+
+        ax.set_yticks(yticks, crs=ccrs.PlateCarree())
+        ax.set_yticklabels([f'{deg:.0f}°' for deg in yticks])
+
+        ax.set_xticks(xticks, crs=ccrs.PlateCarree())
+        ax.set_xticklabels([f'{deg:.0f}°' for deg in xticks])
     
-    def save_map(self):
-        date = f"{self.year}-{self.month:02d}-{self.day:02d} {self.hour:02d}:00"
+    def save_map(self, date):
         
-        base_name = f"{OUT_DIR}]/{self.request_hash}]/map_{self.variable_name}_{self.map_type}_{self.map_level}l_{date}"
+        base_name = f"{OUT_DIR}/{self.request_hash}/map_{self.variable_name}_{self.map_type}_{self.map_level}l_{date}"
         extension = f".{self.file_format}"
 
         cont = 0 

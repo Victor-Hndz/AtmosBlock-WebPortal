@@ -21,7 +21,8 @@ import * as Joi from "joi";
         JWT_EXPIRATION: Joi.string().required(),
         // RabbitMQ
         RABBITMQ_URL: Joi.string().required(),
-        RABBITMQ_QUEUE: Joi.string().required(),
+        RABBITMQ_CONFIG_QUEUE: Joi.string().required(),
+        RABBITMQ_RESULT_QUEUE: Joi.string().required(),
         //MINIO
         MINIO_ENDPOINT: Joi.string().required(),
         MINIO_HOST: Joi.string().required(),

@@ -53,7 +53,7 @@ async function bootstrap() {
     transport: Transport.RMQ,
     options: {
       urls: [configService.get<string>("RABBITMQ_URL") ?? "amqp://admin:pass@localhost:5672"],
-      queue: configService.get<string>("RABBITMQ_QUEUE") ?? "config_queue",
+      queue: configService.get<string>("RABBITMQ_CONFIG_QUEUE") ?? "config_queue",
       queueOptions: { durable: true },
       noAck: false,
       prefetchCount: 1,
@@ -65,12 +65,10 @@ async function bootstrap() {
     transport: Transport.RMQ,
     options: {
       urls: [configService.get<string>("RABBITMQ_URL") ?? "amqp://admin:pass@localhost:5672"],
-      queue: configService.get<string>("RESULT_QUEUE") ?? "result_queue",
+      queue: configService.get<string>("RABBITMQ_RESULTS_QUEUE") ?? "results_queue",
       queueOptions: { durable: true },
-      noAck: false, // Enable manual acknowledgment
+      noAck: false,
       prefetchCount: 1,
-      exchange: "results", // Set the exchange for incoming results
-      routingKey: "result.done", // Set the routing key for the result queue
     },
   });
 

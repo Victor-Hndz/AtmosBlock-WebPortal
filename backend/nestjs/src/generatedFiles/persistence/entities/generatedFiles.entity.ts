@@ -21,6 +21,6 @@ export class GeneratedFilesEntity {
   @Column({ name: "expires_at", type: "timestamp with time zone", nullable: false })
   expires_at: Date;
 
-  @OneToMany(() => RequestEntity, request => request.generatedFiles)
-  requests: RequestEntity[];
+  @OneToMany(() => RequestEntity, request => request.generatedFiles, { nullable: true })
+  requests?: RequestEntity[];
 }

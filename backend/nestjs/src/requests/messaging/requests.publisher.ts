@@ -7,19 +7,19 @@ import { CreateRequestDto } from "../dtos/create-request.dto";
 export class RequestsPublisher {
   private readonly logger = new Logger(RequestsPublisher.name);
 
-  constructor(@Inject("RABBITMQ_SERVICE") private readonly client: ClientProxy) {}
+  constructor(@Inject("RABBITMQ_CONFIG_SERVICE") private readonly client: ClientProxy) {}
 
   sendRequestCreatedEvent(request: CreateRequestDto) {
     // Send it to exchange requests and routing key config.create
     this.client
       .connect()
       .then(() => {
-        const message = {
+        const data = {
           status: STATUS_OK,
           message: "New request created",
-          data: JSON.stringify(request),
+          content: JSON.stringify(request),
         };
-        this.client.emit("config.create", message);
+        this.client.emit("config.create", data);
         this.logger.log("✅ Message sent to RabbitMQ");
       })
       .catch(err => {

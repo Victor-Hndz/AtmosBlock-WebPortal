@@ -6,7 +6,7 @@ DOWNLOAD_FORMAT = "unarchived"
 DATA_FORMAT = "netcdf"
 
 
-def request_data(variable, years, months, days, hours, pressure_levels, file_name):
+def request_data(variable, years, months, days, hours, pressure_levels, area_covered, file_name):
     """Request data from the CDS API and save it to a file."""
 
     try:
@@ -20,7 +20,7 @@ def request_data(variable, years, months, days, hours, pressure_levels, file_nam
             "pressure_level": pressure_levels,
             "data_format": DATA_FORMAT,
             "download_format": DOWNLOAD_FORMAT,
-            "area": [90, -180, -90, 180],  # North, West, South, East. Global coverage
+            "area": area_covered
         }
         print(f"Request: {request}")
 

@@ -78,6 +78,7 @@ class Configurator:
                 self.args["days"],
                 self.args["hours"],
                 self.args["pressureLevels"],
+                self.args["areaCovered"],
                 self.file_name,
             )
             print(f"\n✅ Archivo {self.file_name} descargado con éxito.")
@@ -89,9 +90,15 @@ class Configurator:
         configuration_data = {
             "file": self.file_name,
             "requestHash": self.args["requestHash"],
+            "variableName": self.args["variableName"],
+            "pressureLevel": self.args["pressureLevels"],
+            "years": self.args["years"],
+            "months": self.args["months"],
+            "days": self.args["days"],
+            "hours": self.args["hours"],
+            "areaCovered": self.args["areaCovered"],
             "mapTypes": self.args["mapTypes"],
             "mapRanges": self.args["mapRanges"],
-            "areaCovered": self.args["areaCovered"],
             "mapLevels": self.args["mapLevels"],
             "fileFormat": self.args["fileFormat"],
             "tracking": self.args["tracking"],
@@ -140,7 +147,7 @@ class Configurator:
         day_part = f"({format_range(days)})"
         hour_part = "-".join(hours) + "UTC"
 
-        return f"{API_FOLDER}/{variable}_{pressure_part}_{year_part}-{month_part}-{day_part}_{hour_part}.nc"
+        self.file_name = f"{API_FOLDER}/{variable}_{pressure_part}_{year_part}-{month_part}-{day_part}_{hour_part}.nc"
 
 
 if __name__ == "__main__":
