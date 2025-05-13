@@ -42,7 +42,7 @@ const FormTabsWrapper: React.FC<FormTabsWrapperProps> = ({ advancedMode, showToa
         updateFormField={updateField}
         handleCheckboxChange={handleCheckboxChange}
         advancedMode={advancedMode}
-        onNext={() => goToNextTab("basic-info")}
+        onNext={() => goToNextTab("basicInfo")}
         t={t}
       />
     ),
@@ -56,8 +56,8 @@ const FormTabsWrapper: React.FC<FormTabsWrapperProps> = ({ advancedMode, showToa
         updateFormField={updateField}
         handleCheckboxChange={handleCheckboxChange}
         advancedMode={advancedMode}
-        onNext={() => goToNextTab("map-config")}
-        onPrevious={() => goToPreviousTab("map-config")}
+        onNext={() => goToNextTab("mapConfig")}
+        onPrevious={() => goToPreviousTab("mapConfig")}
         t={t}
       />
     ),
@@ -71,8 +71,8 @@ const FormTabsWrapper: React.FC<FormTabsWrapperProps> = ({ advancedMode, showToa
         updateFormField={updateField}
         handleCheckboxChange={handleCheckboxChange}
         advancedMode={advancedMode}
-        onNext={() => goToNextTab("additional-settings")}
-        onPrevious={() => goToPreviousTab("additional-settings")}
+        onNext={() => goToNextTab("additionalSettings")}
+        onPrevious={() => goToPreviousTab("additionalSettings")}
         t={t}
       />
     ),
@@ -95,13 +95,13 @@ const FormTabsWrapper: React.FC<FormTabsWrapperProps> = ({ advancedMode, showToa
       </Tabs.List>
 
       <div className="form-container">
-        <Tabs.Content value="basic-info" className="tab-content">
+        <Tabs.Content value="basicInfo" className="tab-content">
           {basicInfoForm}
         </Tabs.Content>
-        <Tabs.Content value="map-config" className="tab-content">
+        <Tabs.Content value="mapConfig" className="tab-content">
           {mapConfigForm}
         </Tabs.Content>
-        <Tabs.Content value="additional-settings" className="tab-content">
+        <Tabs.Content value="additionalSettings" className="tab-content">
           {additionalSettingsForm}
         </Tabs.Content>
         <Tabs.Content value="summary" className="tab-content">

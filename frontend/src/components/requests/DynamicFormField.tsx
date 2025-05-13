@@ -11,6 +11,7 @@ import { RequestForm } from "@/types/Request";
 import { shouldShowField } from "@/consts/formFieldsConfig";
 import { calculateAvailableDays } from "@/consts/requestsConsts";
 import FieldWrapper from "./FieldWrapper";
+import { capitalize } from "@/utils/utilities";
 
 interface DynamicFormFieldProps {
   config: FormFieldConfig;
@@ -178,14 +179,20 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
 
       case InputType.SELECT:
         return (
-          <Select.Root value={value || ""} onValueChange={value => updateField(config.name, value as any)}>
+          <Select.Root value={value ?? ""} onValueChange={value => updateField(config.name, value as any)}>
             <Select.Trigger
               className="inline-flex items-center justify-between w-full px-3 py-2 text-sm border border-slate-300 
                       rounded-md shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 
                       focus:border-violet-500"
               aria-label={config.label ? t(config.label as any) : config.name}
             >
-              <Select.Value placeholder={config.placeholder ? t(config.placeholder as any) : "Select an option"} />
+              <Select.Value
+                placeholder={
+                  config.placeholder
+                    ? t(config.placeholder as any)
+                    : t("requests-form.selectPlaceholder", "Select an option")
+                }
+              />
               <Select.Icon>
                 <ChevronDown className="w-4 h-4 text-slate-500" />
               </Select.Icon>
@@ -366,7 +373,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
         const placeholderMessage =
           !canShowDaysOptions && config.name === "days"
             ? t("requests-form.selectYearsAndMonthsFirst", "Select years and months first")
-            : t(`requests-form.select${config.name}`, `Select ${config.name}`);
+            : t(`requests-form.select${capitalize(config.name)}`, `Select ${config.name}`);
 
         return (
           <div className="mt-1.5 space-y-3">

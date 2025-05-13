@@ -6,7 +6,7 @@
 /**
  * Tab order for the multi-step form
  */
-export const REQUEST_FORM_STEPS = ["basic-info", "map-config", "additional-settings", "summary"];
+export const REQUEST_FORM_STEPS = ["basicInfo", "mapConfig", "additionalSettings", "summary"];
 
 /**
  * Available variable names for selection
