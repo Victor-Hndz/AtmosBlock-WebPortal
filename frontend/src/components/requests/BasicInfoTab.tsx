@@ -26,7 +26,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
   handleCheckboxChange,
   advancedMode,
   onNext,
-  t
+  t,
 }) => {
   return (
     <PopulateFormTab

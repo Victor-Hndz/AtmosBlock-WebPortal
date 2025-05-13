@@ -28,7 +28,7 @@ const MapConfigTab: React.FC<MapConfigTabProps> = ({
   advancedMode,
   onNext,
   onPrevious,
-  t
+  t,
 }) => {
   return (
     <PopulateFormTab

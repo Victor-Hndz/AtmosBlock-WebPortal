@@ -46,7 +46,7 @@ const FormTabsWrapper: React.FC<FormTabsWrapperProps> = ({ advancedMode, showToa
         t={t}
       />
     ),
-    [formData, updateField, handleCheckboxChange, advancedMode, goToNextTab]
+    [formData, updateField, handleCheckboxChange, advancedMode, goToNextTab, t]
   );
 
   const mapConfigForm = useMemo(
@@ -61,7 +61,7 @@ const FormTabsWrapper: React.FC<FormTabsWrapperProps> = ({ advancedMode, showToa
         t={t}
       />
     ),
-    [formData, updateField, handleCheckboxChange, advancedMode, goToNextTab, goToPreviousTab]
+    [formData, updateField, handleCheckboxChange, advancedMode, goToNextTab, goToPreviousTab, t]
   );
 
   const additionalSettingsForm = useMemo(
@@ -76,12 +76,12 @@ const FormTabsWrapper: React.FC<FormTabsWrapperProps> = ({ advancedMode, showToa
         t={t}
       />
     ),
-    [formData, updateField, handleCheckboxChange, advancedMode, goToNextTab, goToPreviousTab]
+    [formData, updateField, handleCheckboxChange, advancedMode, goToNextTab, goToPreviousTab, t]
   );
 
   const requestSummary = useMemo(
     () => <RequestSummary formData={formData} onPrevious={() => goToPreviousTab("summary")} t={t} />,
-    [formData, goToPreviousTab]
+    [formData, goToPreviousTab, t]
   );
 
   return (
