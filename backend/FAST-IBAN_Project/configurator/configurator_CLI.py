@@ -9,6 +9,7 @@ from utils.netcdf_editor import adapt_netcdf
 from utils.rabbitMQ.rabbitmq import RabbitMQ
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
+from utils.rabbitMQ.rabbit_consts import CONFIG_QUEUE, REQUESTS_EXCHANGE, HANDLER_START_KEY
 from utils.consts.consts import API_FOLDER, ARGUMENTS, STATUS_OK
 
 
@@ -45,12 +46,9 @@ class Configurator:
     and generating the configuration file for the handler.
     """
 
-    def __init__(self, rabbitmq: RabbitMQ):
+    def __init__(self):
         self.args = None
         self.file_name = None
-        self.rabbitmq = rabbitmq
-        self.publish_queue = "requests"
-        self.publish_routing_key = "handler.start"
 
     def process_message(self, body: bytes) -> None:
         """
@@ -115,9 +113,9 @@ class Configurator:
         print("\n✅ Configuración lista.\n")
 
         message = create_message(self.publish_routing_key, STATUS_OK, "", configuration_data)
-        self.rabbitmq.publish(
-            self.publish_queue, 
-            self.publish_routing_key,
+        rabbitmq.publish(
+            REQUESTS_EXCHANGE,
+            HANDLER_START_KEY,
             message
         )
 
@@ -151,5 +149,5 @@ class Configurator:
 
 if __name__ == "__main__":
     rabbitmq = RabbitMQ()
-    configurator = Configurator(rabbitmq=rabbitmq)
-    rabbitmq.consume("config_queue", configurator.process_message)
+    configurator = Configurator()
+    rabbitmq.consume(CONFIG_QUEUE, configurator.process_message)
