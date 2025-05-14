@@ -8,17 +8,18 @@ from concurrent.futures import ThreadPoolExecutor
 sys.path.append('/app/')
 
 from visualization.mapGeneration.generate_maps import MapGenerator
-from utils.rabbitMQ.receive_messages import receive_messages
-from utils.rabbitMQ.send_message import send_message
+from utils.rabbitMQ.rabbitmq import RabbitMQ
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
+from utils.rabbitMQ.rabbit_consts import NOTIFICATIONS_EXCHANGE, NOTIFY_HANDLER_KEY, EXECUTION_VISUALIZATION_QUEUE
+
 from utils.consts.consts import STATUS_OK, STATUS_ERROR
+
 
 
 def handle_message(body):
     """Process the message received by the general handler, and launch the map generation."""
-    raw_data = process_body(body)
-    data = json.loads(raw_data)
+    data = process_body(body)
     # data = body
 
     # the data comes like this:
@@ -85,34 +86,37 @@ def handle_message(body):
             
             print("\n✅ Generación de mapas completada exitosamente.")
             message = {"exec_status": STATUS_OK, "exec_message": "Map generation completed successfully."}
-            send_message(
+            rabbitmq.publish(
+                        NOTIFICATIONS_EXCHANGE,
+                        NOTIFY_HANDLER_KEY,
                         create_message(
+                            NOTIFY_HANDLER_KEY,
                             STATUS_OK,
                             "",
                             message,
-                        ),
-                        "notifications",
-                        "notify.handler",
+                        )
                     )     
             return True  
         except Exception as e:
             print(f"Error: {e}")
             message = {"exec_status": STATUS_ERROR, "exec_message": str(e)}
-            send_message(
+            rabbitmq.publish(
+                NOTIFICATIONS_EXCHANGE,
+                NOTIFY_HANDLER_KEY,
                 create_message(
+                    NOTIFY_HANDLER_KEY,
                     STATUS_OK,
                     "",
                     message,
-                ),
-                "notifications",
-                "notify.handler",
+                )
             )
             return False
 
 
 if __name__ == "__main__":
-    receive_messages(
-        "execution_queue", "execution.visualization", callback=handle_message
+    rabbitmq = RabbitMQ()
+    rabbitmq.consume(
+        EXECUTION_VISUALIZATION_QUEUE, callback=handle_message
     )
     # data = {
     #     "file_name": "C:\\Users\\Victor\\Desktop\\repos\\tfm\\backend\\FAST-IBAN_Project\\config\\data\\geopot_500hPa_2022-03-14_00-06-12-18UTC.nc",
