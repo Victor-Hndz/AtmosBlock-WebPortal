@@ -1,10 +1,9 @@
 import pika
-import os
 import logging
 import time
 from typing import Dict, List, Optional, Tuple
-from dotenv import load_dotenv
 from utils.rabbitMQ.start_conection import start_connection
+from utils.rabbitMQ.rabbit_consts import RABBITMQ_HOST, RABBITMQ_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD, EXCHANGES, QUEUES, MAX_RETRIES, RETRY_DELAY
 
 
 # Configure logging
@@ -13,55 +12,6 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger("rabbitmq_init")
-
-load_dotenv()
-
-# RabbitMQ connection settings
-RABBITMQ_HOST = os.getenv("RABBITMQ_HOST", "rabbitmq")
-RABBITMQ_PORT = int(os.getenv("RABBITMQ_PORT", 5672))
-RABBITMQ_USER = os.getenv("RABBITMQ_DEFAULT_USER", "guest")
-RABBITMQ_PASSWORD = os.getenv("RABBITMQ_DEFAULT_PASS", "guest")
-
-# Define exchanges and their types
-EXCHANGES = {
-    "requests": "topic",
-    "execution": "topic",
-    "results": "direct",
-    "notifications": "direct",
-}
-
-# Define queues, their exchanges, and routing keys
-QUEUES = {
-    "config_queue": {
-        "exchange": "requests",
-        "routing_keys": ["config.create", "handler.start"]
-    },
-    "execution_queue": {
-        "exchange": "execution",
-        "routing_keys": [
-            "execution.algorithm",
-            "execution.visualization",
-            "execution.animation",
-            "execution.tracking",
-        ]
-    },
-    "results_queue": {
-        "exchange": "results", 
-        "routing_keys": ["web.results"]
-    },
-    "notifications_queue": {
-        "exchange": "notifications",
-        "routing_keys": ["notify.handler"]
-    },
-    "message_confirmations": {
-        "exchange": "",  # Default exchange for direct routing
-        "routing_keys": ["message_confirmations"]
-    }
-}
-
-# Max retries for connection attempts
-MAX_RETRIES = 5
-RETRY_DELAY = 5  # seconds
 
 
 def wait_for_rabbitmq() -> Tuple[Optional[pika.BlockingConnection], Optional[pika.channel.Channel]]:
@@ -171,12 +121,15 @@ def setup_queue(
         return False
 
 
-def init_rabbitmq() -> bool:
+def init_rabbitmq() -> Tuple[bool, Optional[pika.BlockingConnection], Optional[pika.channel.Channel]]:
     """
     Initialize exchanges and queues in RabbitMQ.
     
     Returns:
-        bool: True if initialization was successful, False otherwise
+        tuple: (success, connection, channel)
+            - success: True if initialization was successful, False otherwise
+            - connection: The RabbitMQ connection if successful, None otherwise
+            - channel: The RabbitMQ channel if successful, None otherwise
     """
     logger.info("Initializing RabbitMQ...")
     
@@ -185,13 +138,13 @@ def init_rabbitmq() -> bool:
     
     if not channel:
         logger.error("Failed to establish connection to RabbitMQ. Aborting.")
-        return False
+        return False, None, None
 
     # Set up exchanges
     for exchange, exchange_type in EXCHANGES.items():
         if not setup_exchange(channel, exchange, exchange_type):
             connection.close()
-            return False
+            return False, None, None
 
     # Set up queues
     for queue, config in QUEUES.items():
@@ -203,19 +156,26 @@ def init_rabbitmq() -> bool:
             config.get("arguments")
         ):
             connection.close()
-            return False
+            return False, None, None
 
-    # Close connection when done
-    connection.close()
     logger.info("RabbitMQ initialization completed successfully.")
-    return True
+    return True, connection, channel
 
 
-# Allow running this module directly to initialize RabbitMQ
-if __name__ == "__main__":
-    success = init_rabbitmq()
+def launch_rabbitmq_init() -> Tuple[Optional[pika.BlockingConnection], Optional[pika.channel.Channel]]:
+    """
+    Initialize RabbitMQ exchanges and queues, and return the connection and channel.
+    
+    Returns:
+        tuple: (connection, channel) if successful
+        
+    Raises:
+        SystemExit: If initialization fails
+    """
+    success, connection, channel = init_rabbitmq()
     if success:
         logger.info("RabbitMQ queues and exchanges have been initialized successfully.")
+        return connection, channel
     else:
         logger.error("Failed to initialize RabbitMQ queues and exchanges.")
         exit(1)

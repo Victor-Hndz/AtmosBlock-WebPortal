@@ -1,5 +1,4 @@
 import json
-import uuid
 import logging
 from typing import Dict, Any
 
@@ -25,24 +24,15 @@ def create_message(routing_key: str, status: str, message: str, content: Any) ->
         Dict containing the formatted message
     """
     
-    # Convert content to JSON string if it's a dict or list
-    if isinstance(content, (dict, list)):
-        try:
-            content_str = json.dumps(content)
-        except TypeError as e:
-            logger.warning(f"Could not serialize content to JSON: {e}")
-            content_str = str(content)
-    else:
-        content_str = content
         
     message_body = {
         "pattern": routing_key,
         "data": {
             "status": status,
             "message": message,
-            "content": content_str,
+            "content": content,
         }
     }
     
     logger.debug(f"Created message: {message_body}")
-    return message_body
+    return json.dumps(message_body)

@@ -6,9 +6,7 @@ sys.path.append("/app/")
 
 from utils.api_request import request_data
 from utils.netcdf_editor import adapt_netcdf
-from utils.rabbitMQ.send_message import send_message
-from utils.rabbitMQ.receive_messages import receive_messages
-from utils.rabbitMQ.init_rabbit import init_rabbitmq
+from utils.rabbitMQ.rabbitmq import RabbitMQ
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
 from utils.consts.consts import API_FOLDER, ARGUMENTS, STATUS_OK
@@ -47,9 +45,12 @@ class Configurator:
     and generating the configuration file for the handler.
     """
 
-    def __init__(self):
+    def __init__(self, rabbitmq: RabbitMQ):
         self.args = None
         self.file_name = None
+        self.rabbitmq = rabbitmq
+        self.publish_queue = "requests"
+        self.publish_routing_key = "handler.start"
 
     def process_message(self, body: bytes) -> None:
         """
@@ -59,8 +60,7 @@ class Configurator:
             body: Raw message body from RabbitMQ
         """
 
-        data = process_body(body)
-        config = json.loads(data)
+        config = process_body(body)
         self.args = {key: config.get(key, None) for key in ARGUMENTS}
 
         print("\n✅ Argumentos cargados y validados con éxito.\n")
@@ -114,15 +114,14 @@ class Configurator:
 
         print("\n✅ Configuración lista.\n")
 
-        send_message(
-            create_message(STATUS_OK, "", configuration_data),
-            "requests",
-            "handler.start",
+        message = create_message(self.publish_routing_key, STATUS_OK, "", configuration_data)
+        self.rabbitmq.publish(
+            self.publish_queue, 
+            self.publish_routing_key,
+            message
         )
 
-        print(
-            "\n✅ Archivo de configuración enviado a la cola de RabbitMQ.\n"
-        )
+        print("\n✅ Archivo de configuración enviado a la cola de RabbitMQ.\n")
 
 
     def mount_file_name(self):
@@ -151,6 +150,6 @@ class Configurator:
 
 
 if __name__ == "__main__":
-    configurator = Configurator()
-    init_rabbitmq()
-    receive_messages("config_queue", ["config.create"], configurator.process_message)
+    rabbitmq = RabbitMQ()
+    configurator = Configurator(rabbitmq=rabbitmq)
+    rabbitmq.consume("config_queue", configurator.process_message)

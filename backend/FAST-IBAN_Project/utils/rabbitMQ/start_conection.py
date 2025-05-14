@@ -51,7 +51,7 @@ def start_connection(credentials, host, port, virtual_host="/", heartbeat=600, b
 
         except Exception as e:
             attempt += 1
-            logger.warning(f"Failed to connect to RabbitMQ (Attempt {attempt}/{max_retries}): {repr(e)}")
+            # logger.warning(f"Failed to connect to RabbitMQ (Attempt {attempt}/{max_retries}): {repr(e)}")
             if attempt < max_retries:
                 logger.info("Retrying in 5 seconds...")
                 time.sleep(5)
