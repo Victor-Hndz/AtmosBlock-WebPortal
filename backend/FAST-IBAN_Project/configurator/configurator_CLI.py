@@ -112,7 +112,7 @@ class Configurator:
 
         print("\n✅ Configuración lista.\n")
 
-        message = create_message(self.publish_routing_key, STATUS_OK, "", configuration_data)
+        message = create_message(HANDLER_START_KEY, STATUS_OK, "", configuration_data)
         rabbitmq.publish(
             REQUESTS_EXCHANGE,
             HANDLER_START_KEY,
