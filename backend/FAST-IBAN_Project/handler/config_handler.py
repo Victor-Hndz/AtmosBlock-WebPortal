@@ -4,10 +4,10 @@ from typing import List
 
 sys.path.append('/app/')
 
-from utils.rabbitMQ.send_message import send_message
-from utils.rabbitMQ.receive_messages import receive_messages
+from utils.rabbitMQ.rabbitmq import RabbitMQ
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
+from utils.rabbitMQ.rabbit_consts import HANDLER_QUEUE, NOTIFICATIONS_QUEUE, EXECUTION_EXCHANGE, EXECUTION_ALGORITHM_KEY, EXECUTION_VISUALIZATION_KEY, EXECUTION_ANIMATION_KEY, EXECUTION_TRACKING_KEY
 from utils.minio.upload_files import upload_files_to_request_hash
 from utils.clean_folder_files import clean_directory
 from utils.consts.consts import EXEC_FILE, STATUS_OK, STATUS_ERROR, MESSAGE_NO_COMPILE
@@ -53,6 +53,7 @@ class ConfigHandler:
         self.execution_completed = False
         self.maps_generated = False
 
+
     def init(self, data) -> None:
         """
         Initialize variables from a configuration file.
@@ -92,8 +93,7 @@ class ConfigHandler:
         Args:
             body: Raw message body from RabbitMQ
         """
-        raw_data = process_body(body)
-        data = json.loads(raw_data)
+        data = process_body(body)
         print(f"\n✅ Mensaje recibido en handler: {data}")
         print("\n✅ Archivo válido recibido. Iniciando procesamiento...")
         
@@ -131,8 +131,7 @@ class ConfigHandler:
         Args:
             body: Raw message body from RabbitMQ
         """
-        data = process_body(body)
-        message = json.loads(data)
+        message = process_body(body)
         
         if message["exec_status"] == STATUS_ERROR:
             print("\n❌ Error al ejecutar el programa.")
@@ -160,8 +159,7 @@ class ConfigHandler:
         Args:
             body: Raw message body from RabbitMQ
         """
-        data = process_body(body)
-        message = json.loads(data)
+        message = process_body(body)
         
         if message["exec_status"] == STATUS_ERROR:
             print("\n❌ Error al generar los mapas.")
@@ -239,8 +237,9 @@ class ConfigHandler:
             data = {"request_type": "", "cmd": cmd, "request_hash": self.request_hash}
         
         # Send execution request and wait for response
-        send_message(create_message(STATUS_OK, "", data), "execution", "execution.algorithm")
-        receive_messages("notifications_queue", "notify.handler", callback=self.handle_execution_message)
+        message = create_message("execution.algorithm", STATUS_OK, "", data)
+        rabbitmq.publish(EXECUTION_EXCHANGE, EXECUTION_ALGORITHM_KEY, message)
+        rabbitmq.consume(NOTIFICATIONS_QUEUE, callback=self.handle_execution_message)
 
     def prepare_execution_command(self, lat_range: List[int], lon_range: List[int]) -> List[str]:
         """
@@ -289,8 +288,9 @@ class ConfigHandler:
        
         # Send execution request and wait for response
         print("\n[ ] Enviando mensaje a la cola de generación de mapas...")
-        send_message(create_message(STATUS_OK, "", data), "execution", "execution.visualization")
-        receive_messages("notifications_queue", "notify.handler", callback=self.handle_map_generation_message)
+        message = create_message("execution.visualization", STATUS_OK, "", data)
+        rabbitmq.publish(EXECUTION_EXCHANGE, EXECUTION_VISUALIZATION_KEY, message)
+        rabbitmq.consume(NOTIFICATIONS_QUEUE, callback=self.handle_map_generation_message)
     
     def process_map_animation(self) -> None:
         """
@@ -303,7 +303,7 @@ class ConfigHandler:
         
         # This would be implemented to send a message to the animation service
         # send_message(create_message(STATUS_OK, "", data), "animation", "animation.generate")
-        # receive_messages("animation_notifications", "notify.animation", callback=self.handle_animation_message)
+        # receive_messages("animation_notifications", callback=self.handle_animation_message)
         
         # Temporary placeholder for the implementation
         print("\n[ ] Simulando finalización de generación de animación...")
@@ -325,7 +325,7 @@ class ConfigHandler:
         
         # This would be implemented to send a message to the tracking service
         # send_message(create_message(STATUS_OK, "", data), "tracking", "tracking.process")
-        # receive_messages("tracking_notifications", "notify.tracking", callback=self.handle_tracking_message)
+        # receive_messages("tracking_notifications", callback=self.handle_tracking_message)
         
         # Temporary placeholder for the implementation
         print("\n[ ] Simulando finalización de seguimiento de formaciones...")
@@ -343,5 +343,6 @@ class ConfigHandler:
         # send_message(create_message(STATUS_OK, "", message), "notifications", "notify.handler")
 
 if __name__ == "__main__":
+    rabbitmq = RabbitMQ()
     handler = ConfigHandler()
-    receive_messages("config_queue", "handler.start", callback=handler.handle_config_message)
+    rabbitmq.consume(HANDLER_QUEUE, callback=handler.handle_config_message)
