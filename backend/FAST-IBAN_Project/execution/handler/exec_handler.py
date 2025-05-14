@@ -5,10 +5,10 @@ import json
 
 sys.path.append("/app/")
 
-from utils.rabbitMQ.receive_messages import receive_messages
-from utils.rabbitMQ.send_message import send_message
+from utils.rabbitMQ.rabbitmq import RabbitMQ
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
+from utils.rabbitMQ.rabbit_consts import NOTIFICATIONS_EXCHANGE, NOTIFY_HANDLER_KEY, EXECUTION_ALGORITHM_QUEUE
 from utils.minio.upload_files import upload_files_to_request_hash
 from utils.clean_folder_files import clean_directory
 from utils.consts.consts import STATUS_OK, STATUS_ERROR, MESSAGE_NO_COMPILE
@@ -47,8 +47,8 @@ def handle_message(body):
             print(stderr)
             print("\n❌ Error al ejecutar el build:")
             message = {"exec_status": STATUS_ERROR, "exec_message": "Error al compilar"}
-            send_message(
-                create_message(STATUS_OK, "", message), "notifications", "notify.handler"
+            rabbitmq.publish(
+                NOTIFICATIONS_EXCHANGE, NOTIFY_HANDLER_KEY, create_message(NOTIFY_HANDLER_KEY, STATUS_OK, "", message)
             )
             return False
 
@@ -69,18 +69,19 @@ def handle_message(body):
         upload_files_to_request_hash(data["request_hash"], local_folder="./out/"+data["request_hash"])
         print("\n[ ] Archivos subidos a minio.")
         clean_directory("./out/"+data["request_hash"])
-        send_message(
-            create_message(STATUS_OK, "", message), "notifications", "notify.handler"
+        rabbitmq.publish(
+            NOTIFICATIONS_EXCHANGE, NOTIFY_HANDLER_KEY, create_message(NOTIFY_HANDLER_KEY, STATUS_OK, "", message)
         )
         return True
     else:
         print("\n❌ Ejecución fallida.")
         message = {"exec_status": STATUS_ERROR, "exec_message": result.stderr}
-        send_message(
-            create_message(STATUS_OK, "", message), "notifications", "notify.handler"
+        rabbitmq.publish(
+            NOTIFICATIONS_EXCHANGE, NOTIFY_HANDLER_KEY, create_message(NOTIFY_HANDLER_KEY, STATUS_OK, "", message)
         )
         return False
 
 
 if __name__ == "__main__":
-    receive_messages("execution_queue", "execution.algorithm", callback=handle_message)
+    rabbitmq = RabbitMQ()
+    rabbitmq.consume(EXECUTION_ALGORITHM_QUEUE, callback=handle_message)
