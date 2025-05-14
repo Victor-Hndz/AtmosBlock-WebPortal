@@ -50,23 +50,26 @@ def wait_for_rabbitmq() -> Tuple[Optional[pika.BlockingConnection], Optional[pik
     return None, None
 
 
-def setup_exchange(channel: pika.channel.Channel, exchange: str, exchange_type: str) -> bool:
+def setup_exchange(channel: pika.channel.Channel, exchange: str, exchange_config: Dict) -> bool:
     """
     Create an exchange with the specified type.
     
     Args:
         channel: RabbitMQ channel
         exchange: Exchange name
-        exchange_type: Type of exchange (direct, topic, fanout, etc.)
+        exchange_config: Exchange configuration including type and durability
         
     Returns:
         bool: True if successful, False otherwise
     """
     try:
+        exchange_type = exchange_config["type"]
+        durable = exchange_config.get("durable", True)
+        
         channel.exchange_declare(
             exchange=exchange, 
             exchange_type=exchange_type, 
-            durable=True
+            durable=durable
         )
         logger.info(f"Exchange '{exchange}' created ({exchange_type})")
         return True
@@ -79,17 +82,17 @@ def setup_queue(
     channel: pika.channel.Channel, 
     queue_name: str, 
     exchange: str, 
-    routing_keys: List[str],
+    routing_key: str,
     arguments: Dict = None
 ) -> bool:
     """
-    Create a queue and bind it to an exchange with routing keys.
+    Create a queue and bind it to an exchange with a routing key.
     
     Args:
         channel: RabbitMQ channel
         queue_name: Name of the queue
         exchange: Exchange to bind to
-        routing_keys: List of routing keys for this queue
+        routing_key: Routing key for this queue
         arguments: Optional queue arguments
         
     Returns:
@@ -103,17 +106,16 @@ def setup_queue(
             arguments=arguments
         )
         
-        # Bind to each routing key
-        for routing_key in routing_keys:
-            if exchange:  # Only bind if exchange is specified
-                channel.queue_bind(
-                    exchange=exchange, 
-                    queue=queue_name, 
-                    routing_key=routing_key
-                )
-                logger.info(f"Queue '{queue_name}' bound to '{exchange}' with routing key '{routing_key}'")
-            else:
-                logger.info(f"Queue '{queue_name}' created (no exchange binding)")
+        # Bind to the routing key
+        if exchange:  # Only bind if exchange is specified
+            channel.queue_bind(
+                exchange=exchange, 
+                queue=queue_name, 
+                routing_key=routing_key
+            )
+            logger.info(f"Queue '{queue_name}' bound to '{exchange}' with routing key '{routing_key}'")
+        else:
+            logger.info(f"Queue '{queue_name}' created (no exchange binding)")
                 
         return True
     except Exception as e:
@@ -141,19 +143,23 @@ def init_rabbitmq() -> Tuple[bool, Optional[pika.BlockingConnection], Optional[p
         return False, None, None
 
     # Set up exchanges
-    for exchange, exchange_type in EXCHANGES.items():
-        if not setup_exchange(channel, exchange, exchange_type):
+    for exchange_name, exchange_config in EXCHANGES.items():
+        if not setup_exchange(channel, exchange_name, exchange_config):
             connection.close()
             return False, None, None
 
     # Set up queues
-    for queue, config in QUEUES.items():
+    for queue_name, queue_config in QUEUES.items():
+        exchange_name = queue_config.get("exchange", "")
+        routing_key = queue_config.get("routing_key", "")
+        arguments = queue_config.get("arguments", None)
+        
         if not setup_queue(
             channel, 
-            queue, 
-            config["exchange"], 
-            config["routing_keys"],
-            config.get("arguments")
+            queue_name, 
+            exchange_name, 
+            routing_key,
+            arguments
         ):
             connection.close()
             return False, None, None

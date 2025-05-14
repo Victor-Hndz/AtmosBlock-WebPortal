@@ -15,22 +15,26 @@ EXECUTION_EXCHANGE = "execution_exchange"
 NOTIFICATIONS_EXCHANGE = "notifications_exchange"
 RESULTS_EXCHANGE = "results_exchange"
 
+# Exchange types
+TOPIC_EXCHANGE = "topic"
+DIRECT_EXCHANGE = "direct"
+
 # Exchanges definition (durable topic/direct exchanges)
 EXCHANGES = {
     REQUESTS_EXCHANGE: {
-        "type": "topic",
+        "type": TOPIC_EXCHANGE,
         "durable": True
     },
     EXECUTION_EXCHANGE: {
-        "type": "topic",
+        "type": TOPIC_EXCHANGE,
         "durable": True
     },
     NOTIFICATIONS_EXCHANGE: {
-        "type": "direct",
+        "type": DIRECT_EXCHANGE,
         "durable": True
     },
     RESULTS_EXCHANGE: {
-        "type": "direct",
+        "type": DIRECT_EXCHANGE,
         "durable": True
     }
 }
