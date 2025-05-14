@@ -18,8 +18,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 from utils.enums.DataType import DataType
 from utils.minio.upload_files import upload_files_to_request_hash
 from utils.clean_folder_files import clean_directory
-from utils.rabbitMQ.send_message import send_message
-from utils.rabbitMQ.create_message import create_message
 from utils.consts.consts import VARIABLE_NAMES, STATUS_OK
 
 

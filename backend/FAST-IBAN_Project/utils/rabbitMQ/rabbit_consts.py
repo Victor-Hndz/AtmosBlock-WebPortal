@@ -9,45 +9,97 @@ RABBITMQ_PORT = int(os.getenv("RABBITMQ_PORT", 5672))
 RABBITMQ_USER = os.getenv("RABBITMQ_DEFAULT_USER", "guest")
 RABBITMQ_PASSWORD = os.getenv("RABBITMQ_DEFAULT_PASS", "guest")
 
-# Define exchanges and their types
-EXCHANGES = {
-    "requests": "topic",
-    "execution": "topic",
-    "results": "direct",
-    "notifications": "direct",
-}
+# Exchange names
+REQUESTS_EXCHANGE = "requests_exchange"
+EXECUTION_EXCHANGE = "execution_exchange"
+NOTIFICATIONS_EXCHANGE = "notifications_exchange"
+RESULTS_EXCHANGE = "results_exchange"
 
-# Define queues, their exchanges, and routing keys
-QUEUES = {
-    "config_queue": {
-        "exchange": "requests",
-        "routing_keys": ["config.create", "handler.start"]
+# Exchanges definition (durable topic/direct exchanges)
+EXCHANGES = {
+    REQUESTS_EXCHANGE: {
+        "type": "topic",
+        "durable": True
     },
-    "execution_queue": {
-        "exchange": "execution",
-        "routing_keys": [
-            "execution.algorithm",
-            "execution.visualization",
-            "execution.animation",
-            "execution.tracking",
-        ]
+    EXECUTION_EXCHANGE: {
+        "type": "topic",
+        "durable": True
     },
-    "results_queue": {
-        "exchange": "results", 
-        "routing_keys": ["web.results"]
+    NOTIFICATIONS_EXCHANGE: {
+        "type": "direct",
+        "durable": True
     },
-    "notifications_queue": {
-        "exchange": "notifications",
-        "routing_keys": ["notify.handler"]
-    },
-    "message_confirmations": {
-        "exchange": "",  # Default exchange for direct routing
-        "routing_keys": ["message_confirmations"]
+    RESULTS_EXCHANGE: {
+        "type": "direct",
+        "durable": True
     }
 }
 
-# Max retries for connection attempts
+# Queue names
+CONFIG_QUEUE = "config_queue"
+HANDLER_QUEUE = "handler_queue"
+EXECUTION_ALGORITHM_QUEUE = "execution_algorithm_queue"
+EXECUTION_VISUALIZATION_QUEUE = "execution_visualization_queue"
+EXECUTION_ANIMATION_QUEUE = "execution_animation_queue"
+EXECUTION_TRACKING_QUEUE = "execution_tracking_queue"
+NOTIFICATIONS_QUEUE = "notifications_queue"
+RESULTS_QUEUE = "results_queue"
+
+# Routing keys
+CONFIG_CREATE_KEY = "config.create"
+HANDLER_START_KEY = "handler.start"
+EXECUTION_ALGORITHM_KEY = "execution.algorithm"
+EXECUTION_VISUALIZATION_KEY = "execution.visualization"
+EXECUTION_ANIMATION_KEY = "execution.animation"
+EXECUTION_TRACKING_KEY = "execution.tracking"
+NOTIFY_HANDLER_KEY = "notify.handler"
+RESULTS_DONE_KEY = "results.done"
+
+# Each queue is bound to a single exchange and one routing key
+QUEUES = {
+    # Requests
+    CONFIG_QUEUE: {
+        "exchange": REQUESTS_EXCHANGE,
+        "routing_key": CONFIG_CREATE_KEY
+    },
+    HANDLER_QUEUE: {
+        "exchange": REQUESTS_EXCHANGE,
+        "routing_key": HANDLER_START_KEY
+    },
+
+    # Execution
+    EXECUTION_ALGORITHM_QUEUE: {
+        "exchange": EXECUTION_EXCHANGE,
+        "routing_key": EXECUTION_ALGORITHM_KEY
+    },
+    EXECUTION_VISUALIZATION_QUEUE: {
+        "exchange": EXECUTION_EXCHANGE,
+        "routing_key": EXECUTION_VISUALIZATION_KEY
+    },
+    EXECUTION_ANIMATION_QUEUE: {
+        "exchange": EXECUTION_EXCHANGE,
+        "routing_key": EXECUTION_ANIMATION_KEY
+    },
+    EXECUTION_TRACKING_QUEUE: {
+        "exchange": EXECUTION_EXCHANGE,
+        "routing_key": EXECUTION_TRACKING_KEY
+    },
+    
+    # Notifications
+    NOTIFICATIONS_QUEUE: {
+        "exchange": NOTIFICATIONS_EXCHANGE,
+        "routing_key": NOTIFY_HANDLER_KEY
+    },
+
+    # Results
+    RESULTS_QUEUE: {
+        "exchange": RESULTS_EXCHANGE,
+        "routing_key": RESULTS_DONE_KEY
+    },
+}
+
+# Message and connection settings
+MESSAGE_TTL = 5000  # in milliseconds
+MESSAGE_PERSISTENT = 2  # DeliveryMode: 2 = persistent
 MAX_RETRIES = 5
-RETRY_DELAY = 5  # seconds
-MESSAGE_TTL = 5000  # Message Time-To-Live in milliseconds
-MESSAGE_PERSISTENT = 2  # Make message persistent
+RETRY_DELAY = 5  # in seconds
