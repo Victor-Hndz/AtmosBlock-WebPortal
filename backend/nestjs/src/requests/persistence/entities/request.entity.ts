@@ -99,7 +99,10 @@ export class RequestEntity {
   @JoinColumn({ name: "user_id" })
   user?: UserEntity;
 
-  @ManyToOne(() => GeneratedFilesEntity, generatedFiles => generatedFiles.requests, { onDelete: "SET NULL", nullable: true })
+  @ManyToOne(() => GeneratedFilesEntity, generatedFiles => generatedFiles.requests, {
+    onDelete: "SET NULL",
+    nullable: true,
+  })
   @JoinColumn({ name: "generated_files_id" })
   generatedFiles: GeneratedFilesEntity;
 }
