@@ -7,6 +7,7 @@ import { ConfigModule } from "./config/config.module";
 import { DatabaseModule } from "./database/database.module";
 import { GeneratedFilesModule } from "./generatedFiles/generatedFiles.module";
 import { MinioModule } from "./minio/minio.module";
+import { ProgressModule } from "./progress/progress.module";
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { MinioModule } from "./minio/minio.module";
     MinioModule,
     AuthModule,
     GeneratedFilesModule,
+    ProgressModule,
     ClientsModule.register([
       {
         name: "RABBITMQ_CONFIG_SERVICE",
@@ -37,6 +39,19 @@ import { MinioModule } from "./minio/minio.module";
         options: {
           urls: [process.env.RABBITMQ_URL ?? "amqp://admin:pass@localhost:5672"],
           queue: process.env.RABBITMQ_RESULTS_QUEUE ?? "results_queue",
+          queueOptions: {
+            durable: true,
+          },
+        },
+      },
+    ]),
+    ClientsModule.register([
+      {
+        name: "RABBITMQ_PROGRESS_SERVICE",
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.RABBITMQ_URL ?? "amqp://admin:pass@localhost:5672"],
+          queue: process.env.RABBITMQ_PROGRESS_QUEUE ?? "progress_queue",
           queueOptions: {
             durable: true,
           },

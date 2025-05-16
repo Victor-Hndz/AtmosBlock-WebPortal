@@ -59,13 +59,24 @@ async function bootstrap() {
       prefetchCount: 1,
     },
   });
-
   // Connect to RabbitMQ for result queue (incoming messages)
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
       urls: [configService.get<string>("RABBITMQ_URL") ?? "amqp://admin:pass@localhost:5672"],
       queue: configService.get<string>("RABBITMQ_RESULTS_QUEUE") ?? "results_queue",
+      queueOptions: { durable: true },
+      noAck: false,
+      prefetchCount: 1,
+    },
+  });
+
+  // Connect to RabbitMQ for progress queue (incoming messages)
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [configService.get<string>("RABBITMQ_URL") ?? "amqp://admin:pass@localhost:5672"],
+      queue: configService.get<string>("RABBITMQ_PROGRESS_QUEUE") ?? "progress_queue",
       queueOptions: { durable: true },
       noAck: false,
       prefetchCount: 1,
