@@ -1,6 +1,6 @@
 import React, { JSX } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { House, LogIn, Info, Menu, ListTodo, LucideProps } from "lucide-react";
+import { House, LogIn, Info, Menu, ListTodo, Activity, LucideProps } from "lucide-react";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import * as Separator from "@radix-ui/react-separator";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -29,6 +29,7 @@ interface NavItem {
     | "navigation-header.home"
     | "navigation-header.requests"
     | "navigation-header.login"
+    | "navigation-header.progress"
     | "navigation-footer.about"
     | "language.switchLanguage";
   /** Icon component to display */
@@ -38,6 +39,7 @@ interface NavItem {
     | "navigation-tooltips.home"
     | "navigation-tooltips.requests"
     | "navigation-tooltips.login"
+    | "navigation-tooltips.progress"
     | "navigation-tooltips.about";
   /** Position of the item in the menu (left/right/center) */
   position?: "l" | "r" | "c";
@@ -140,6 +142,14 @@ const Layout: React.FC = (): JSX.Element => {
       labelKey: "navigation-header.requests",
       icon: ListTodo,
       tooltipKey: "navigation-tooltips.requests",
+      position: "l",
+      collapse: true,
+    },
+    {
+      path: "/progress",
+      labelKey: "navigation-header.progress",
+      icon: Activity,
+      tooltipKey: "navigation-tooltips.progress",
       position: "l",
       collapse: true,
     },
