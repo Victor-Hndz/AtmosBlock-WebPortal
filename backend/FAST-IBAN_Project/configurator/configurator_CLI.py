@@ -1,6 +1,6 @@
 import os
 import sys
-import json
+import asyncio
 
 sys.path.append("/app/")
 
@@ -46,11 +46,12 @@ class Configurator:
     and generating the configuration file for the handler.
     """
 
-    def __init__(self):
+    def __init__(self, rabbitmq_client: RabbitMQ):
         self.args = None
         self.file_name = None
+        self.rabbitmq = rabbitmq_client
 
-    def process_message(self, body: bytes) -> None:
+    async def process_message(self, body: bytes) -> None:
         """
         Process a configuration message and begin the orchestration flow.
 
@@ -113,14 +114,13 @@ class Configurator:
         print("\n✅ Configuración lista.\n")
 
         message = create_message(HANDLER_START_KEY, STATUS_OK, "", configuration_data)
-        rabbitmq.publish(
+        await self.rabbitmq.publish(
             REQUESTS_EXCHANGE,
             HANDLER_START_KEY,
             message
         )
 
         print("\n✅ Archivo de configuración enviado a la cola de RabbitMQ.\n")
-
 
     def mount_file_name(self):
         """Generate the name of the file based on the parameters provided."""
@@ -148,6 +148,26 @@ class Configurator:
 
 
 if __name__ == "__main__":
-    rabbitmq = RabbitMQ()
-    configurator = Configurator()
-    rabbitmq.consume(CONFIG_QUEUE, configurator.process_message)
+    async def main():
+        # Initialize the RabbitMQ connection
+        rabbitmq_client = RabbitMQ()
+        await rabbitmq_client.initialize()
+        
+        # Initialize the configurator with the RabbitMQ client
+        configurator = Configurator(rabbitmq_client)
+        
+        # Start consuming messages
+        await rabbitmq_client.consume(CONFIG_QUEUE, callback=configurator.process_message)
+        
+        # Keep the application running
+        try:
+            # Run forever
+            await asyncio.Future()
+        except KeyboardInterrupt:
+            print("Shutting down...")
+        finally:
+            # Close the connection when done
+            await rabbitmq_client.close()
+    
+    # Run the async main function
+    asyncio.run(main())
