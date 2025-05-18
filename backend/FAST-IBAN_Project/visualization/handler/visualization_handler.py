@@ -2,105 +2,112 @@ import subprocess
 import sys
 import os
 import json
-
-from concurrent.futures import ThreadPoolExecutor
+import asyncio
+import multiprocessing as mp
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+import time
 
 sys.path.append('/app/')
 
-from visualization.mapGeneration.generate_maps import MapGenerator
+from visualization.mapGeneration.generate_maps import generate_map_parallel
 from utils.rabbitMQ.rabbitmq import RabbitMQ
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
-from utils.rabbitMQ.rabbit_consts import NOTIFICATIONS_EXCHANGE, NOTIFY_HANDLER_KEY, EXECUTION_VISUALIZATION_QUEUE
+from utils.rabbitMQ.rabbit_consts import NOTIFICATIONS_EXCHANGE, NOTIFY_HANDLER_KEY, EXECUTION_VISUALIZATION_QUEUE, NOTIFY_VISUALIZATION
 
 from utils.consts.consts import STATUS_OK, STATUS_ERROR
 
+# Directory for map output
+OUT_DIR = "./out"
 
-
-def handle_message(body):
+async def handle_message(body, rabbitmq_client):
     """Process the message received by the general handler, and launch the map generation."""
     data = process_body(body)
-    # data = body
-
-    # the data comes like this:
-    # data = {
-    #     "file_name": self.file_name,
-    #     "request_hash" = self.request_hash,
-    #     "variable_name": self.variable_name,
-    #     "pressure_level": self.pressure_level,
-    #     "years": self.years,
-    #     "months": self.months,
-    #     "days": self.days,
-    #     "hours": self.hours,
-    #     "map_types": self.map_types,
-    #     "map_ranges": self.map_ranges,
-    #     "map_levels": self.map_levels,
-    #     "file_format": self.file_format,
-    #     "area_covered": self.area_covered,
-    # }
-
+    
     print("\n[ ] Iniciando generación de mapas...")
-
-    def process_map_generation(pressure_level, year, month, day, hour, map_type, map_range, map_level):
-        MapGenerator(
-            data["file_name"],
-            data["request_hash"],
-            data["variable_name"],
-            float(pressure_level),
-            year,
-            month,
-            day,
-            hour,
-            map_type,
-            map_range,
-            int(map_level),
-            data["file_format"],
-            [float(area) for area in data["area_covered"]])
+    
+    # Create output directory if it doesn't exist
+    os.makedirs(f"{OUT_DIR}/{data['request_hash']}", exist_ok=True)
+    
+    # Prepare arguments for parallel processing
+    map_tasks = []
+    for pressure_level in data["pressure_level"]:
+        for year in data["years"]:
+            for month in data["months"]:
+                for day in data["days"]:
+                    for hour in data["hours"]:
+                        for map_type in data["map_types"]:
+                            for map_range in data["map_ranges"]:
+                                for map_level in data["map_levels"]:
+                                    map_tasks.append((
+                                        data["file_name"],
+                                        data["request_hash"],
+                                        data["variable_name"],
+                                        pressure_level,
+                                        year,
+                                        month,
+                                        day,
+                                        hour,
+                                        map_type,
+                                        map_range,
+                                        map_level,
+                                        data["file_format"],
+                                        data["area_covered"]
+                                    ))
+    
+    # Use ProcessPoolExecutor for true parallel processing
+    start_time = time.time()
+    results = []
+    
+    # Determine optimal number of processes
+    num_cpus = min(os.cpu_count() or 2, 8)  # Use up to 8 processes
+    
+    print(f"Starting map generation with {num_cpus} processes for {len(map_tasks)} maps...")
+    try:
+        # Use process pool for true parallelism
+        with ProcessPoolExecutor(max_workers=num_cpus) as executor:
+            # Submit all tasks
+            futures = [executor.submit(generate_map_parallel, task) for task in map_tasks]
             
-
-    with ThreadPoolExecutor() as executor:
-        futures = [
-            executor.submit(
-                process_map_generation,
-                pressure_level,
-                year,
-                month,
-                day,
-                hour,
-                map_type,
-                map_range,
-                map_level
-            )
-            for pressure_level in data["pressure_level"]
-            for year in data["years"]
-            for month in data["months"]
-            for day in data["days"]
-            for hour in data["hours"]
-            for map_type in data["map_types"]
-            for map_range in data["map_ranges"]
-            for map_level in data["map_levels"]
-        ]
-        try:
+            # Process results as they complete
             for future in futures:
-                future.result()
-            
+                try:
+                    result = future.result()
+                    results.append(result)
+                except Exception as e:
+                    print(f"Error in map generation task: {e}")
+                    results.append(False)
+                    
+        end_time = time.time()
+        duration = end_time - start_time
+        maps_per_second = len(map_tasks) / duration if duration > 0 else 0
+        
+        print(f"Map generation completed in {duration:.2f} seconds ({maps_per_second:.2f} maps/sec)")
+        
+        # Check if all maps were generated successfully
+        if all(results) and results:
             print("\n✅ Generación de mapas completada exitosamente.")
-            message = {"exec_status": STATUS_OK, "exec_message": "Map generation completed successfully."}
-            rabbitmq.publish(
-                        NOTIFICATIONS_EXCHANGE,
-                        NOTIFY_HANDLER_KEY,
-                        create_message(
-                            NOTIFY_HANDLER_KEY,
-                            STATUS_OK,
-                            "",
-                            message,
-                        )
-                    )     
-            return True  
-        except Exception as e:
-            print(f"Error: {e}")
-            message = {"exec_status": STATUS_ERROR, "exec_message": str(e)}
-            rabbitmq.publish(
+            message = {
+                "request_type": NOTIFY_VISUALIZATION,
+                "exec_status": STATUS_OK, 
+                "exec_message": f"Map generation completed successfully. Generated {len(results)} maps in {duration:.2f} seconds."
+            }
+            await rabbitmq_client.publish(
+                NOTIFICATIONS_EXCHANGE,
+                NOTIFY_HANDLER_KEY,
+                create_message(
+                    NOTIFY_HANDLER_KEY,
+                    STATUS_OK,
+                    "",
+                    message,
+                )
+            )     
+            return True
+        else:
+            error_msg = f"Failed to generate {results.count(False)} of {len(results)} maps"
+            print(f"Error: {error_msg}")
+            message = { "request_type": NOTIFY_VISUALIZATION, "exec_status": STATUS_ERROR, "exec_message": error_msg}
+            await rabbitmq_client.publish(
                 NOTIFICATIONS_EXCHANGE,
                 NOTIFY_HANDLER_KEY,
                 create_message(
@@ -111,25 +118,52 @@ def handle_message(body):
                 )
             )
             return False
+            
+    except Exception as e:
+        error_msg = f"Error in map generation: {str(e)}"
+        print(f"Error: {error_msg}")
+        message = { "request_type": NOTIFY_VISUALIZATION, "exec_status": STATUS_ERROR, "exec_message": error_msg}
+        await rabbitmq_client.publish(
+            NOTIFICATIONS_EXCHANGE,
+            NOTIFY_HANDLER_KEY,
+            create_message(
+                NOTIFY_HANDLER_KEY,
+                STATUS_OK,
+                "",
+                message,
+            )
+        )
+        return False
 
 
 if __name__ == "__main__":
-    rabbitmq = RabbitMQ()
-    rabbitmq.consume(
-        EXECUTION_VISUALIZATION_QUEUE, callback=handle_message
-    )
-    # data = {
-    #     "file_name": "C:\\Users\\Victor\\Desktop\\repos\\tfm\\backend\\FAST-IBAN_Project\\config\\data\\geopot_500hPa_2022-03-14_00-06-12-18UTC.nc",
-    #     "variable_name": "geopotential",
-    #     "pressure_level": 500,
-    #     "years": [2020],
-    #     "months": [1],
-    #     "days": [1],
-    #     "hours": [0, 6, 12, 18],
-    #     "map_types": ["cont"],
-    #     "map_ranges": ["max"],
-    #     "map_levels": [20],
-    #     "file_format": "svg",
-    #     "area_covered": [90, -180, -90, 180],
-    # }
-    # handle_message(data)
+    # Set multiprocessing start method
+    mp.set_start_method('spawn', force=True)
+    
+    async def main():
+        # Initialize the RabbitMQ connection
+        rabbitmq_client = RabbitMQ()
+        await rabbitmq_client.initialize()
+        
+        # Create a wrapper to pass the rabbitmq client to the handler
+        async def message_handler(body):
+            return await handle_message(body, rabbitmq_client)
+        
+        # Start consuming messages
+        await rabbitmq_client.consume(
+            EXECUTION_VISUALIZATION_QUEUE, 
+            callback=message_handler
+        )
+        
+        # Keep the application running
+        try:
+            # Run forever
+            await asyncio.Future()
+        except KeyboardInterrupt:
+            print("Shutting down...")
+        finally:
+            # Close the connection when done
+            await rabbitmq_client.close()
+    
+    # Run the async main function
+    asyncio.run(main())
