@@ -107,3 +107,10 @@ MESSAGE_TTL = 5000  # in milliseconds
 MESSAGE_PERSISTENT = 2  # DeliveryMode: 2 = persistent
 MAX_RETRIES = 5
 RETRY_DELAY = 5  # in seconds
+
+
+#REQUEST TYPES
+NOTIFY_EXECUTION = "notify_execution"
+NOTIFY_VISUALIZATION = "notify_visualization"
+NOTIFY_ANIMATION = "notify_animation"
+NOTIFY_TRACKING = "notify_tracking"
