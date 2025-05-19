@@ -10,12 +10,11 @@ logging.basicConfig(
 logger = logging.getLogger("message_creator")
 
 
-def create_message(routing_key: str, status: str, message: str, content: Any) -> Dict[str, Any]:
+def create_message(status: str, message: str, content: Any) -> Dict[str, Any]:
     """
     Create a standardized message in format to be sent to RabbitMQ.
     
     Args:
-        routing_key: Routing key for the message.
         status: Status code of the message (e.g., "OK", "ERROR")
         message: Human-readable message describing the content
         content: Payload data (will be serialized if needed)
@@ -26,12 +25,9 @@ def create_message(routing_key: str, status: str, message: str, content: Any) ->
     
         
     message_body = {
-        "pattern": routing_key,
-        "data": {
-            "status": status,
-            "message": message,
-            "content": content,
-        }
+        "status": status,
+        "message": message,
+        "content": content,
     }
     
     logger.debug(f"Created message: {message_body}")

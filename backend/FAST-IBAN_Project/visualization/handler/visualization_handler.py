@@ -4,7 +4,7 @@ import os
 import json
 import asyncio
 import multiprocessing as mp
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 import time
 
 sys.path.append('/app/')
@@ -96,7 +96,6 @@ async def handle_message(body, rabbitmq_client):
                 NOTIFICATIONS_EXCHANGE,
                 NOTIFY_HANDLER_KEY,
                 create_message(
-                    NOTIFY_HANDLER_KEY,
                     STATUS_OK,
                     "",
                     message,
@@ -111,7 +110,6 @@ async def handle_message(body, rabbitmq_client):
                 NOTIFICATIONS_EXCHANGE,
                 NOTIFY_HANDLER_KEY,
                 create_message(
-                    NOTIFY_HANDLER_KEY,
                     STATUS_OK,
                     "",
                     message,
@@ -127,7 +125,6 @@ async def handle_message(body, rabbitmq_client):
             NOTIFICATIONS_EXCHANGE,
             NOTIFY_HANDLER_KEY,
             create_message(
-                NOTIFY_HANDLER_KEY,
                 STATUS_OK,
                 "",
                 message,

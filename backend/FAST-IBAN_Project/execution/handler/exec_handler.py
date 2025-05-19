@@ -49,7 +49,7 @@ async def handle_message(body, rabbitmq_client):
             await rabbitmq_client.publish(
                 NOTIFICATIONS_EXCHANGE, 
                 NOTIFY_HANDLER_KEY, 
-                create_message(NOTIFY_HANDLER_KEY, STATUS_OK, "", message)
+                create_message(STATUS_OK, "", message)
             )
             return False
 
@@ -73,7 +73,7 @@ async def handle_message(body, rabbitmq_client):
         await rabbitmq_client.publish(
             NOTIFICATIONS_EXCHANGE, 
             NOTIFY_HANDLER_KEY, 
-            create_message(NOTIFY_HANDLER_KEY, STATUS_OK, "", message)
+            create_message(STATUS_OK, "", message)
         )
         return True
     else:
@@ -82,7 +82,7 @@ async def handle_message(body, rabbitmq_client):
         await rabbitmq_client.publish(
             NOTIFICATIONS_EXCHANGE, 
             NOTIFY_HANDLER_KEY, 
-            create_message(NOTIFY_HANDLER_KEY, STATUS_OK, "", message)
+            create_message(STATUS_OK, "", message)
         )
         return False
 
