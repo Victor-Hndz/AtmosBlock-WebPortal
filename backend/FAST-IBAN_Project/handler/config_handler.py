@@ -1,13 +1,14 @@
 import sys
 import json
 from typing import List
+import asyncio
 
 sys.path.append('/app/')
 
 from utils.rabbitMQ.rabbitmq import RabbitMQ
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
-from utils.rabbitMQ.rabbit_consts import HANDLER_QUEUE, NOTIFICATIONS_QUEUE, EXECUTION_EXCHANGE, EXECUTION_ALGORITHM_KEY, EXECUTION_VISUALIZATION_KEY, EXECUTION_ANIMATION_KEY, EXECUTION_TRACKING_KEY
+from utils.rabbitMQ.rabbit_consts import HANDLER_QUEUE, NOTIFICATIONS_QUEUE, EXECUTION_EXCHANGE, EXECUTION_ALGORITHM_KEY, EXECUTION_VISUALIZATION_KEY, EXECUTION_ANIMATION_KEY, EXECUTION_TRACKING_KEY, NOTIFY_EXECUTION, NOTIFY_VISUALIZATION, NOTIFY_ANIMATION, NOTIFY_TRACKING
 from utils.minio.upload_files import upload_files_to_request_hash
 from utils.clean_folder_files import clean_directory
 from utils.consts.consts import EXEC_FILE, STATUS_OK, STATUS_ERROR, MESSAGE_NO_COMPILE
@@ -23,8 +24,16 @@ class ConfigHandler:
     in sequence, and manages communication between different components.
     """
     
-    def __init__(self):
-        """Initialize the configuration handler with default values."""
+    def __init__(self, rabbitmq_client: RabbitMQ):
+        """
+        Initialize the configuration handler with default values.
+        
+        Args:
+            rabbitmq_client: RabbitMQ client instance for messaging
+        """
+        # Store the RabbitMQ client
+        self.rabbitmq = rabbitmq_client
+        
         # Configuration properties
         self.file_name = None
         self.request_hash = None
@@ -86,7 +95,7 @@ class ConfigHandler:
         self.n_threads = data["nThreads"]
         self.n_processes = data["nProces"]
 
-    def handle_config_message(self, body: bytes) -> None:
+    async def handle_config_message(self, body: bytes) -> None:
         """
         Process a configuration message and begin the orchestration flow.
         
@@ -100,15 +109,15 @@ class ConfigHandler:
         # Start the orchestration flow
         self.init(data)
         print(f"Archivo a procesar: {self.file_name}")
-        self.execute_processing_pipeline()
+        await self.execute_processing_pipeline()
 
-    def execute_processing_pipeline(self) -> None:
+    async def execute_processing_pipeline(self) -> None:
         """
         Main orchestration method that executes the processing steps in sequence.
         """
         # Step 1: Process the input file and execute the algorithm
         if not self.no_execute:
-            self.process_file()
+            await self.process_file()
             # The execution callback will trigger the next steps
         else:
             print("\n⏩ Ejecución omitida por configuración.")
@@ -116,15 +125,35 @@ class ConfigHandler:
             
             # Continue with next steps if execution is skipped
             if not self.no_maps:
-                self.process_map_generation()
+                await self.process_map_generation()
             elif self.animation:
-                self.process_map_animation()
+                await self.process_map_animation()
             elif self.tracking:
-                self.process_formation_tracking()
+                await self.process_formation_tracking()
             else:
                 print("\n✅ Procesamiento completado.")
 
-    def handle_execution_message(self, body: bytes) -> None:
+    async def handle_general_notification_message(self, body: bytes) -> None:
+        """
+        Handle general notification messages.
+        
+        Args:
+            body: Raw message body from RabbitMQ
+        """
+        data = process_body(body)
+        print(f"\n[ ] Mensaje de notificación recibido: {data}")
+        
+        # Process the message based on its type
+        if data["request_type"] == NOTIFY_EXECUTION:
+            await self.handle_execution_message(body)
+        elif data["request_type"] == NOTIFY_VISUALIZATION:
+            await self.handle_map_generation_message(body)
+        elif data["request_type"] == NOTIFY_ANIMATION:
+            await self.handle_animation_message(body)
+        elif data["request_type"] == NOTIFY_TRACKING:
+            await self.handle_tracking_message(body)
+    
+    async def handle_execution_message(self, body: bytes) -> None:
         """
         Handle execution completion messages and proceed to the next step.
         
@@ -144,15 +173,15 @@ class ConfigHandler:
         
         # Continue with the next steps in the pipeline
         if not self.no_maps:
-            self.process_map_generation()
+            await self.process_map_generation()
         elif self.animation:
-            self.process_map_animation()
+            await self.process_map_animation()
         elif self.tracking:
-            self.process_formation_tracking()
+            await self.process_formation_tracking()
         else:
             print("\n✅ Procesamiento completado.")
 
-    def handle_map_generation_message(self, body: bytes) -> None:
+    async def handle_map_generation_message(self, body: bytes) -> None:
         """
         Handle map generation completion messages and proceed to the next step.
         
@@ -160,6 +189,7 @@ class ConfigHandler:
             body: Raw message body from RabbitMQ
         """
         message = process_body(body)
+        print("\n[ ] Se recibió un mensaje de generación de mapas.")
         
         if message["exec_status"] == STATUS_ERROR:
             print("\n❌ Error al generar los mapas.")
@@ -171,13 +201,13 @@ class ConfigHandler:
         
         # Continue with the next steps in the pipeline
         if self.animation:
-            self.process_map_animation()
+            await self.process_map_animation()
         elif self.tracking:
-            self.process_formation_tracking()
+            await self.process_formation_tracking()
         else:
             print("\n✅ Procesamiento completado.")
 
-    def handle_animation_message(self, body: bytes) -> None:
+    async def handle_animation_message(self, body: bytes) -> None:
         """
         Handle animation completion messages and proceed to the next step.
         
@@ -196,11 +226,11 @@ class ConfigHandler:
         
         # Continue with the next step if needed
         if self.tracking:
-            self.process_formation_tracking()
+            await self.process_formation_tracking()
         else:
             print("\n✅ Procesamiento completado.")
     
-    def handle_tracking_message(self, body: bytes) -> None:
+    async def handle_tracking_message(self, body: bytes) -> None:
         """
         Handle tracking completion messages.
         
@@ -218,7 +248,7 @@ class ConfigHandler:
         print("\n✅ Seguimiento de formaciones completado exitosamente.")
         print("\n✅ Procesamiento completado.")
 
-    def process_file(self) -> None:
+    async def process_file(self) -> None:
         """
         Process the configuration file and execute the algorithm.
         """
@@ -238,8 +268,8 @@ class ConfigHandler:
         
         # Send execution request and wait for response
         message = create_message("execution.algorithm", STATUS_OK, "", data)
-        rabbitmq.publish(EXECUTION_EXCHANGE, EXECUTION_ALGORITHM_KEY, message)
-        rabbitmq.consume(NOTIFICATIONS_QUEUE, callback=self.handle_execution_message)
+        await self.rabbitmq.publish(EXECUTION_EXCHANGE, EXECUTION_ALGORITHM_KEY, message)
+        await self.rabbitmq.consume(NOTIFICATIONS_QUEUE, callback=self.handle_general_notification_message)
 
     def prepare_execution_command(self, lat_range: List[int], lon_range: List[int]) -> List[str]:
         """
@@ -265,7 +295,7 @@ class ConfigHandler:
             return [EXEC_FILE, self.file_name, str(lat_range[0]), str(lat_range[1]), 
                     str(lon_range[0]), str(lon_range[1]), OUT_DIR+"/"+self.request_hash+"/", "1"]
         
-    def process_map_generation(self) -> None:
+    async def process_map_generation(self) -> None:
         """
         Generate maps based on the configuration.
         """
@@ -289,10 +319,10 @@ class ConfigHandler:
         # Send execution request and wait for response
         print("\n[ ] Enviando mensaje a la cola de generación de mapas...")
         message = create_message("execution.visualization", STATUS_OK, "", data)
-        rabbitmq.publish(EXECUTION_EXCHANGE, EXECUTION_VISUALIZATION_KEY, message)
-        rabbitmq.consume(NOTIFICATIONS_QUEUE, callback=self.handle_map_generation_message)
+        await self.rabbitmq.publish(EXECUTION_EXCHANGE, EXECUTION_VISUALIZATION_KEY, message)
+        await self.rabbitmq.consume(NOTIFICATIONS_QUEUE, callback=self.handle_general_notification_message)
     
-    def process_map_animation(self) -> None:
+    async def process_map_animation(self) -> None:
         """
         Generate animation based on maps.
         """
@@ -302,19 +332,19 @@ class ConfigHandler:
         print("\n[ ] Iniciando generación de animación...")
         
         # This would be implemented to send a message to the animation service
-        # send_message(create_message(STATUS_OK, "", data), "animation", "animation.generate")
-        # receive_messages("animation_notifications", callback=self.handle_animation_message)
+        # await send_message(create_message(STATUS_OK, "", data), "animation", "animation.generate")
+        # await receive_messages("animation_notifications", callback=self.handle_animation_message)
         
         # Temporary placeholder for the implementation
         print("\n[ ] Simulando finalización de generación de animación...")
         
         # Continue with next steps
         if self.tracking:
-            self.process_formation_tracking()
+            await self.process_formation_tracking()
         else:
             print("\n✅ Procesamiento completado.")
     
-    def process_formation_tracking(self) -> None:
+    async def process_formation_tracking(self) -> None:
         """
         Track formations based on the configuration.
         """
@@ -324,14 +354,14 @@ class ConfigHandler:
         print("\n[ ] Iniciando seguimiento de formaciones...")
         
         # This would be implemented to send a message to the tracking service
-        # send_message(create_message(STATUS_OK, "", data), "tracking", "tracking.process")
-        # receive_messages("tracking_notifications", callback=self.handle_tracking_message)
+        # await send_message(create_message(STATUS_OK, "", data), "tracking", "tracking.process")
+        # await receive_messages("tracking_notifications", callback=self.handle_tracking_message)
         
         # Temporary placeholder for the implementation
         print("\n[ ] Simulando finalización de seguimiento de formaciones...")
         print("\n✅ Procesamiento completado.")
 
-    def send_finish_message(self) -> None:
+    async def send_finish_message(self) -> None:
         """
         Send a message indicating that the processing has finished.
         """
@@ -340,9 +370,30 @@ class ConfigHandler:
         clean_directory(OUT_DIR)
         
         # message = {"exec_status": STATUS_OK, "exec_message": "Processing completed."}
-        # send_message(create_message(STATUS_OK, "", message), "notifications", "notify.handler")
+        # await send_message(create_message(STATUS_OK, "", message), "notifications", "notify.handler")
 
+# Update the main entry point to use asyncio
 if __name__ == "__main__":
-    rabbitmq = RabbitMQ()
-    handler = ConfigHandler()
-    rabbitmq.consume(HANDLER_QUEUE, callback=handler.handle_config_message)
+    async def main():
+        # Initialize the RabbitMQ connection
+        rabbitmq_client = RabbitMQ()
+        await rabbitmq_client.initialize()
+        
+        # Initialize the handler with the RabbitMQ client
+        handler = ConfigHandler(rabbitmq_client)
+        
+        # Start consuming messages
+        await rabbitmq_client.consume(HANDLER_QUEUE, callback=handler.handle_config_message)
+        
+        # Keep the application running
+        try:
+            # Run forever
+            await asyncio.Future()
+        except KeyboardInterrupt:
+            print("Shutting down...")
+        finally:
+            # Close the connection when done
+            await rabbitmq_client.close()
+    
+    # Run the async main function
+    asyncio.run(main())

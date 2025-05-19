@@ -1,6 +1,8 @@
-import pika
 import json
 import logging
+import asyncio
+import aio_pika
+from typing import Callable, Any
 from utils.rabbitMQ.init_rabbit import launch_rabbitmq_init
 from utils.rabbitMQ.rabbit_consts import MESSAGE_TTL, MESSAGE_PERSISTENT
 
@@ -13,61 +15,71 @@ logger = logging.getLogger("rabbitmq")
 
 class RabbitMQ:
     def __init__(self):
-        self.connection, self.channel = launch_rabbitmq_init()
+        self.connection = None
+        self.channel = None
+        self.consumer_tasks = []
+        
+    async def initialize(self):
+        """Initialize the RabbitMQ connection and channel asynchronously"""
+        self.connection, self.channel = await launch_rabbitmq_init()
+        return self.connection is not None and self.channel is not None
 
-    def close(self):
+    async def close(self):
+        """Close the RabbitMQ connection asynchronously"""
         if self.connection and not self.connection.is_closed:
-            self.connection.close()
+            await self.connection.close()
+            logger.info("RabbitMQ connection closed")
             
-    def _callback_wrapper(self, callback):
+    async def _callback_wrapper(self, message: aio_pika.IncomingMessage, callback: Callable):
         """
         Create a wrapper for the callback function that extracts the body and passes it to the user callback.
         
         Args:
-            callback: User-provided callback function that processes just the message body
-            
-        Returns:
-            Function that can be used as a pika callback
+            message: aio-pika message object
+            callback: User-provided callback function that processes the message body
         """
-        def wrapper(ch, method, properties, body):
+        async with message.process():
             try:
-                logger.info(f"Received message on {method.routing_key}")
-                logger.debug(f"Message properties: {properties}")
-                logger.debug(f"Message body: {body}")
-                # Call the provided callback with just the body
-                callback(body)
-                
+                body = message.body
+                if asyncio.iscoroutinefunction(callback):
+                    await callback(body)
+                else:
+                    callback(body)
             except Exception as e:
                 logger.error(f"Error processing message: {str(e)}")
-            
-        return wrapper
+                # Message is automatically rejected if an exception occurs
 
-    def consume(self, queue_name, callback):
+    async def consume(self, queue_name: str, callback: Callable[[bytes], Any], prefetch_count: int = 10):
         """
-        Start consuming messages from the specified queue.
+        Start consuming messages from the specified queue asynchronously.
         
         Args:
             queue_name: Name of the queue to consume from
-            callback: Function that takes a message body as its parameter
+            callback: Function or coroutine that takes a message body as its parameter
+            prefetch_count: Number of messages to prefetch
         """
         if not self.channel:
             raise Exception("Connection is not established.")
-            
-        # Wrap the user callback to handle pika's callback interface
-        wrapped_callback = self._callback_wrapper(callback)
         
-        self.channel.basic_consume(
-            queue=queue_name, 
-            on_message_callback=wrapped_callback, 
-            auto_ack=True
+        # Set QoS
+        await self.channel.set_qos(prefetch_count=prefetch_count)
+        
+        # Declare the queue (in case it doesn't exist yet)
+        queue = await self.channel.declare_queue(queue_name, durable=True, passive=True)
+        
+        # Start consuming
+        consumer_tag = f"consumer-{queue_name}-{id(self)}"
+        await queue.consume(
+            lambda message: self._callback_wrapper(message, callback),
+            consumer_tag=consumer_tag
         )
         
-        logger.info(f"Started consuming from queue: {queue_name}")
-        self.channel.start_consuming()
+        logger.info(f"Started consuming from queue: {queue_name} with tag: {consumer_tag}")
+        return consumer_tag
 
-    def publish(self, exchange, routing_key, message):
+    async def publish(self, exchange: str, routing_key: str, message: Any):
         """
-        Publish a message to the specified exchange with the given routing key.
+        Publish a message to the specified exchange with the given routing key asynchronously.
         
         Args:
             exchange: Exchange name
@@ -80,14 +92,18 @@ class RabbitMQ:
         # If message is not a string, convert it to JSON
         if not isinstance(message, str):
             message = json.dumps(message)
-            
-        self.channel.basic_publish(
-            exchange=exchange,
-            routing_key=routing_key,
-            body=message,
-            properties=pika.BasicProperties(
-                delivery_mode=MESSAGE_PERSISTENT,  # Make message persistent
-                expiration=str(MESSAGE_TTL),
-            )
+        
+        # Get the exchange object
+        exchange_obj = await self.channel.get_exchange(exchange)
+        
+        # Publish the message
+        await exchange_obj.publish(
+            aio_pika.Message(
+                body=message.encode(),
+                delivery_mode=MESSAGE_PERSISTENT,
+                expiration=MESSAGE_TTL
+            ),
+            routing_key=routing_key
         )
+        
         logger.info(f"Published message to exchange '{exchange}' with routing key '{routing_key}'")

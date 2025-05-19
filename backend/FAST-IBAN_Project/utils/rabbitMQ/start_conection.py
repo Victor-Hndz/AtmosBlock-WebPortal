@@ -1,6 +1,7 @@
-import pika
-import time
+import aio_pika
 import logging
+import asyncio
+from typing import Tuple, Optional
 
 # Configure logging
 logging.basicConfig(
@@ -10,12 +11,21 @@ logging.basicConfig(
 logger = logging.getLogger("rabbitmq_connection")
 
 
-def start_connection(credentials, host, port, virtual_host="/", heartbeat=600, blocked_connection_timeout=300):
+async def start_connection(
+    login: str, 
+    password: str, 
+    host: str, 
+    port: int, 
+    virtual_host: str = "/", 
+    heartbeat: int = 600, 
+    blocked_connection_timeout: int = 300
+) -> Tuple[Optional[aio_pika.Connection], Optional[aio_pika.Channel]]:
     """
-    Establishes a connection to RabbitMQ using the provided credentials.
+    Establishes an asynchronous connection to RabbitMQ.
     
     Args:
-        credentials: RabbitMQ authentication credentials
+        login: RabbitMQ username
+        password: RabbitMQ password
         host: RabbitMQ server hostname
         port: RabbitMQ server port
         virtual_host: Virtual host to connect to
@@ -30,31 +40,28 @@ def start_connection(credentials, host, port, virtual_host="/", heartbeat=600, b
 
     while attempt < max_retries:
         try:
-            parameters = pika.ConnectionParameters(
-                host=host,
-                port=port,
-                credentials=credentials,
-                virtual_host=virtual_host,
+            connection_string = f"amqp://{login}:{password}@{host}:{port}/{virtual_host}"
+            connection = await aio_pika.connect_robust(
+                connection_string,
                 heartbeat=heartbeat,
-                blocked_connection_timeout=blocked_connection_timeout
+                timeout=blocked_connection_timeout
             )
-
-            connection = pika.BlockingConnection(parameters)
-            channel = connection.channel()
+            
+            channel = await connection.channel()
             
             # Validate the connection is open
-            if not connection.is_open or not channel.is_open:
-                raise pika.exceptions.AMQPConnectionError("Connection or channel not open")
+            if connection.is_closed or channel.is_closed:
+                raise aio_pika.exceptions.AMQPError("Connection or channel not open")
                 
             logger.info(f"Successfully connected to RabbitMQ at {host}:{port}")
             return connection, channel
 
         except Exception as e:
             attempt += 1
-            # logger.warning(f"Failed to connect to RabbitMQ (Attempt {attempt}/{max_retries}): {repr(e)}")
+            logger.warning(f"Failed to connect to RabbitMQ (Attempt {attempt}/{max_retries}): {repr(e)}")
             if attempt < max_retries:
                 logger.info("Retrying in 5 seconds...")
-                time.sleep(5)
+                await asyncio.sleep(5)
             else:
                 logger.error("Maximum connection attempts reached. Aborting.")
                 return None, None

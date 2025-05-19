@@ -7,6 +7,7 @@ import { IRequestRepository } from "@/requests/domain/repositories/request.repos
 import { GeneratedFilesService } from "@/generatedFiles/services/generatedFiles.service";
 import { STATUS_PROCESSING } from "@/shared/consts/consts";
 import { requestStatus } from "@/shared/enums/requestStatus.enum";
+import { MessageContent } from "@/shared/interfaces/messageContentInterface.interface";
 
 @Injectable()
 export class RequestsService {
@@ -71,53 +72,53 @@ export class RequestsService {
     await this.requestRepository.remove(id);
   }
 
-  async processResultMessage(message: any): Promise<void> {
+  async processResultMessage(message: MessageContent): Promise<void> {
     this.logger.log(`Processing result message: ${JSON.stringify(message)}`);
+    //WIP
+    // try {
+    //   // Extract data from the message
+    //   const { requestHash, resultData, errorMessage } = message;
 
-    try {
-      // Extract data from the message
-      const { requestHash, resultData, errorMessage } = message;
+    //   if (!requestHash) {
+    //     this.logger.error("Invalid message: missing requestHash");
+    //     return;
+    //   }
 
-      if (!requestHash) {
-        this.logger.error("Invalid message: missing requestHash");
-        return;
-      }
+    //   // Find the request by hash
+    //   const request = await this.requestRepository.findByRequestHash(requestHash);
 
-      // Find the request by hash
-      const request = await this.requestRepository.findByRequestHash(requestHash);
+    //   if (!request) {
+    //     this.logger.warn(`Request with hash ${requestHash} not found`);
+    //     return;
+    //   }
 
-      if (!request) {
-        this.logger.warn(`Request with hash ${requestHash} not found`);
-        return;
-      }
+    //   // If there's an error message, log it
+    //   if (errorMessage) {
+    //     this.logger.error(`Error processing request ${requestHash}: ${errorMessage}`);
+    //   }
 
-      // If there's an error message, log it
-      if (errorMessage) {
-        this.logger.error(`Error processing request ${requestHash}: ${errorMessage}`);
-      }
+    //   // If there's result data, update the request's generated files
+    //   if (resultData) {
+    //     // Assuming resultData contains paths or information about generated files
+    //     const generatedFiles = request.generatedFiles || {};
 
-      // If there's result data, update the request's generated files
-      if (resultData) {
-        // Assuming resultData contains paths or information about generated files
-        const generatedFiles = request.generatedFiles || {};
+    //     // Update the generated files with information from resultData
+    //     // This will depend on your data structure
+    //     generatedFiles.files = resultData.files ?? [];
+    //     generatedFiles.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days TTL
 
-        // Update the generated files with information from resultData
-        // This will depend on your data structure
-        generatedFiles.files = resultData.files ?? [];
-        generatedFiles.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days TTL
+    //     // Update generated files in the database
+    //     await this.generatedFilesService.update(generatedFiles);
+    //   }
 
-        // Update generated files in the database
-        await this.generatedFilesService.update(generatedFiles);
-      }
+    //   // Update the request in the database
+    //   await this.requestRepository.update(request);
 
-      // Update the request in the database
-      await this.requestRepository.update(request);
-
-      this.logger.log(`Successfully processed result for request ${requestHash}`);
-    } catch (error) {
-      this.logger.error(`Error processing result message: ${error.message}`);
-      throw error;
-    }
+    //   this.logger.log(`Successfully processed result for request ${requestHash}`);
+    // } catch (error) {
+    //   this.logger.error(`Error processing result message: ${error.message}`);
+    //   throw error;
+    // }
   }
 
   generateRequestHash(createRequestDto: CreateRequestDto): string {
