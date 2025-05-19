@@ -1,6 +1,5 @@
 import { ValidationPipe, BadRequestException, Logger } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
-import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { ConfigService } from "@nestjs/config";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import "module-alias/register";
@@ -47,41 +46,7 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api/docs", app, document);
-
-  // Connect to RabbitMQ for config queue (outgoing messages)
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.RMQ,
-    options: {
-      urls: [configService.get<string>("RABBITMQ_URL") ?? "amqp://admin:pass@localhost:5672"],
-      queue: configService.get<string>("RABBITMQ_CONFIG_QUEUE") ?? "config_queue",
-      queueOptions: { durable: true },
-      noAck: false,
-      prefetchCount: 1,
-    },
-  });
-  // Connect to RabbitMQ for result queue (incoming messages)
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.RMQ,
-    options: {
-      urls: [configService.get<string>("RABBITMQ_URL") ?? "amqp://admin:pass@localhost:5672"],
-      queue: configService.get<string>("RABBITMQ_RESULTS_QUEUE") ?? "results_queue",
-      queueOptions: { durable: true },
-      noAck: false,
-      prefetchCount: 1,
-    },
-  });
-
-  // Connect to RabbitMQ for progress queue (incoming messages)
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.RMQ,
-    options: {
-      urls: [configService.get<string>("RABBITMQ_URL") ?? "amqp://admin:pass@localhost:5672"],
-      queue: configService.get<string>("RABBITMQ_PROGRESS_QUEUE") ?? "progress_queue",
-      queueOptions: { durable: true },
-      noAck: false,
-      prefetchCount: 1,
-    },
-  });
+  // No need to connect microservices as we're using direct AMQP connections now
 
   // Handle graceful shutdown
   const signals = ["SIGTERM", "SIGINT"];
@@ -96,8 +61,6 @@ async function bootstrap() {
       process.exit(0);
     });
   });
-
-  await app.startAllMicroservices();
   const port = configService.get<number>("PORT") ?? 3000;
   await app.listen(port);
 
