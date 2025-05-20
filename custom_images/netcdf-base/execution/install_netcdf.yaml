@@ -1,0 +1,96 @@
+---
+- name: Install NetCDF and dependencies
+  hosts: localhost
+  become: yes
+
+  vars:
+    zlib_version: "1.3.1"
+    hdf5_version: "1.14.3"
+    netcdf_version: "4.9.2"
+    install_dir: "/usr/local"
+
+  tasks:
+    - name: Ensure required packages are installed
+      apt:
+        name:
+          - build-essential
+          - libcurl4-openssl-dev
+          - libxml2-dev
+        state: present
+        update_cache: yes
+
+    - name: Download and install ZLIB
+      block:
+        - name: Download ZLIB source
+          get_url:
+            url: "https://zlib.net/zlib-1.3.1.tar.gz"
+            dest: "/tmp/zlib-1.3.1.tar.gz"
+            mode: "0644"
+
+        - name: Extract ZLIB source
+          unarchive:
+            src: "/tmp/zlib-{{ zlib_version }}.tar.gz"
+            dest: "/tmp"
+            remote_src: yes
+
+        - name: Install ZLIB
+          shell: |
+            ./configure --prefix={{ install_dir }}
+            make
+            make install
+          args:
+            chdir: "/tmp/zlib-{{ zlib_version }}"
+
+    - name: Download and install HDF5
+      block:
+        - name: Download HDF5 source
+          get_url:
+            url: "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.14/hdf5-{{ hdf5_version }}/src/hdf5-{{ hdf5_version }}.tar.gz"
+            dest: "/tmp/hdf5-{{ hdf5_version }}.tar.gz"
+
+        - name: Extract HDF5
+          unarchive:
+            src: "/tmp/hdf5-{{ hdf5_version }}.tar.gz"
+            dest: "/tmp"
+            remote_src: yes
+
+        - name: Install HDF5
+          shell: |
+            ./configure --enable-shared --enable-hl --prefix={{ install_dir }}/hdf5-{{ hdf5_version }}
+            make -j2
+            make install
+          args:
+            chdir: "/tmp/hdf5-{{ hdf5_version }}"
+
+    - name: Update .bashrc for HDF5
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/.bashrc"
+        line: "export HDF5_DIR={{ install_dir }}/hdf5-{{ hdf5_version }}"
+        state: present
+
+    - name: Download and install NetCDF
+      block:
+        - name: Download NetCDF source
+          get_url:
+            url: "https://github.com/Unidata/netcdf-c/archive/refs/tags/v{{ netcdf_version }}.tar.gz"
+            dest: "/tmp/netcdf-{{ netcdf_version }}.tar.gz"
+
+        - name: Extract NetCDF
+          unarchive:
+            src: "/tmp/netcdf-{{ netcdf_version }}.tar.gz"
+            dest: "/tmp"
+            remote_src: yes
+
+        - name: Install NetCDF
+          shell: |
+            CPPFLAGS=-I{{ install_dir }}/hdf5-{{ hdf5_version }}/include LDFLAGS=-L{{ install_dir }}/hdf5-{{ hdf5_version }}/lib ./configure --enable-netcdf-4 --enable-shared --enable-dap --prefix={{ install_dir }}
+            make
+            make install
+          args:
+            chdir: "/tmp/netcdf-c-{{ netcdf_version }}"
+
+    - name: Update .bashrc for NetCDF
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/.bashrc"
+        line: "export NETCDF4_DIR={{ install_dir }}"
+        state: present
