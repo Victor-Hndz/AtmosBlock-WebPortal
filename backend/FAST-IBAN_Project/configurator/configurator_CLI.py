@@ -9,7 +9,7 @@ from utils.netcdf_editor import adapt_netcdf
 from utils.rabbitMQ.rabbitmq import RabbitMQ
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
-from utils.rabbitMQ.rabbit_consts import CONFIG_QUEUE, REQUESTS_EXCHANGE, HANDLER_START_KEY
+from utils.rabbitMQ.rabbit_consts import CONFIG_QUEUE, REQUESTS_EXCHANGE, HANDLER_START_KEY, PROGRESS_EXCHANGE, PROGRESS_UPDATE_KEY
 from utils.consts.consts import API_FOLDER, ARGUMENTS, STATUS_OK
 
 
@@ -64,6 +64,15 @@ class Configurator:
 
         print("\n✅ Argumentos cargados y validados con éxito.\n")
         print(f"Argumentos: {self.args}")
+        
+        progress = {"increment": 1, "message": "CONFIG: argumentos recibidos con éxito."}
+        message = create_message(STATUS_OK, "", progress)
+        print(f"Mensaje: {message}")
+        await self.rabbitmq.publish(
+            PROGRESS_EXCHANGE,
+            PROGRESS_UPDATE_KEY,
+            message
+        )
 
         self.mount_file_name()
 
@@ -81,9 +90,26 @@ class Configurator:
                 self.file_name,
             )
             print(f"\n✅ Archivo {self.file_name} descargado con éxito.")
+            
+        progress = {"increment": 1, "message": "CONFIG: descarga del archivo NetCDF realizada con éxito."}
+        message = create_message(STATUS_OK, "", progress)
+        await self.rabbitmq.publish(
+            PROGRESS_EXCHANGE,
+            PROGRESS_UPDATE_KEY,
+            message
+        )
+
 
         adapt_netcdf(self.file_name)
         print(f"\n✅ Archivo {self.file_name} adaptado con éxito.")
+        
+        progress = {"increment": 1, "message": "CONFIG: Fichero NetCDF adaptado con éxito."}
+        message = create_message(STATUS_OK, "", progress)
+        await self.rabbitmq.publish(
+            PROGRESS_EXCHANGE,
+            PROGRESS_UPDATE_KEY,
+            message
+        )
 
         # Create the configuration file
         configuration_data = {
@@ -113,7 +139,7 @@ class Configurator:
 
         print("\n✅ Configuración lista.\n")
 
-        message = create_message(HANDLER_START_KEY, STATUS_OK, "", configuration_data)
+        message = create_message(STATUS_OK, "", configuration_data)
         await self.rabbitmq.publish(
             REQUESTS_EXCHANGE,
             HANDLER_START_KEY,

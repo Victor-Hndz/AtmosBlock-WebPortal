@@ -19,7 +19,7 @@ def process_body(body):
     try:
         data = json.loads(body_str)
         print(f"Data: {data}")
-        content = data.get("data", {}).get("content", {})
+        content = data.get("content", {})
         print(f"Content: {content}")
         
         # If content is already a dictionary, return it directly

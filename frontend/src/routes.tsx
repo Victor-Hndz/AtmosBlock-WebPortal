@@ -7,6 +7,7 @@ import AuthPage from "@/pages/authPage";
 import RequestsPage from "@/pages/requestsPage";
 import ProfilePage from "@/pages/ProfilePage";
 import SettingsPage from "@/pages/SettingsPage";
+import ProgressPage from "@/pages/ProgressPage";
 import Layout from "@/components/layout/layout";
 import ProtectedRoute from "@/components/shared/ProtectedRoute";
 import { useAppSelector } from "@/redux/hooks";
@@ -26,6 +27,7 @@ function AppRoutes(): JSX.Element {
         { path: "", element: <Home /> },
         { path: "about", element: <About /> },
         { path: "requests", element: <RequestsPage /> },
+        { path: "progress", element: <ProgressPage /> },
         { path: "auth", element: isAuthenticated ? <Navigate to="/" replace /> : <AuthPage /> },
         {
           path: "profile",

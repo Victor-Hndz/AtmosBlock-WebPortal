@@ -6,14 +6,16 @@
   "navigation-header": {
     "home": "Home",
     "requests": "Requests",
-    "login": "Login"
+    "login": "Login",
+    "progress": "Progress"
   },
   "navigation-tooltips": {
     "home": "Go to Homepage",
     "requests": "Create and manage your requests",
     "login": "Sign in to your account",
     "about": "Learn more about this application",
-    "help": "Help"
+    "help": "Help",
+    "progress": "View real-time progress updates"
   },
   "navigation-footer": {
     "about": "About"
@@ -314,5 +316,29 @@
         }
       }
     }
+  },
+  "progress": {
+    "title": "Progress Monitor",
+    "subtitle": "Real-time visualization of server-side process updates",
+    "demoTitle": "Progress Demonstration",
+    "liveTab": "Live Progress",
+    "demoTab": "How It Works",
+    "liveTitle": "Real-Time Process Updates",
+    "howItWorks": "How the Progress Bar Works",
+    "connecting": "Connecting to server...",
+    "waiting": "Waiting for updates...",
+    "simulating": "Simulation in progress...",
+    "useSimulator": "Use simulator (for testing)",
+    "connectPrompt": "Connect to the server to see real-time progress updates.",
+    "connect": "Connect to Server",
+    "restart": "Restart",
+    "explanation1": "This progress bar connects to a server-sent events (SSE) endpoint that streams real-time updates from background processes.",
+    "explanation2": "The server processes complex tasks such as data generation or long computations, sending progress updates through a RabbitMQ message queue.",
+    "explanation3": "As progress updates arrive, the bar fills up and displays status messages, providing real-time feedback on server-side operations.",
+    "technicalDetails": "Technical Implementation",
+    "techDetail1": "Server-Sent Events (SSE) for real-time communication",
+    "techDetail2": "RabbitMQ for message queuing",
+    "techDetail3": "Radix UI components for accessible UI",
+    "techDetail4": "React for state management and UI updates"
   }
 }

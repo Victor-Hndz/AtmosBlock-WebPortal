@@ -14,6 +14,7 @@ REQUESTS_EXCHANGE = "requests_exchange"
 EXECUTION_EXCHANGE = "execution_exchange"
 NOTIFICATIONS_EXCHANGE = "notifications_exchange"
 RESULTS_EXCHANGE = "results_exchange"
+PROGRESS_EXCHANGE = "progress_exchange"
 
 # Exchange types
 TOPIC_EXCHANGE = "topic"
@@ -34,7 +35,11 @@ EXCHANGES = {
         "durable": True
     },
     RESULTS_EXCHANGE: {
-        "type": DIRECT_EXCHANGE,
+        "type": TOPIC_EXCHANGE,
+        "durable": True
+    },
+    PROGRESS_EXCHANGE: {
+        "type": TOPIC_EXCHANGE,
         "durable": True
     }
 }
@@ -48,6 +53,7 @@ EXECUTION_ANIMATION_QUEUE = "execution_animation_queue"
 EXECUTION_TRACKING_QUEUE = "execution_tracking_queue"
 NOTIFICATIONS_QUEUE = "notifications_queue"
 RESULTS_QUEUE = "results_queue"
+PROGRESS_QUEUE = "progress_queue"
 
 # Routing keys
 CONFIG_CREATE_KEY = "config.create"
@@ -58,6 +64,7 @@ EXECUTION_ANIMATION_KEY = "execution.animation"
 EXECUTION_TRACKING_KEY = "execution.tracking"
 NOTIFY_HANDLER_KEY = "notify.handler"
 RESULTS_DONE_KEY = "results.done"
+PROGRESS_UPDATE_KEY = "progress.update"
 
 # Each queue is bound to a single exchange and one routing key
 QUEUES = {
@@ -100,6 +107,12 @@ QUEUES = {
         "exchange": RESULTS_EXCHANGE,
         "routing_key": RESULTS_DONE_KEY
     },
+    
+    # Progress
+    PROGRESS_QUEUE: {
+        "exchange": PROGRESS_EXCHANGE,
+        "routing_key": PROGRESS_UPDATE_KEY
+    }
 }
 
 # Message and connection settings

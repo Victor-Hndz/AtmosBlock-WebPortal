@@ -267,7 +267,7 @@ class ConfigHandler:
             data = {"request_type": "", "cmd": cmd, "request_hash": self.request_hash}
         
         # Send execution request and wait for response
-        message = create_message("execution.algorithm", STATUS_OK, "", data)
+        message = create_message(STATUS_OK, "", data)
         await self.rabbitmq.publish(EXECUTION_EXCHANGE, EXECUTION_ALGORITHM_KEY, message)
         await self.rabbitmq.consume(NOTIFICATIONS_QUEUE, callback=self.handle_general_notification_message)
 
@@ -318,7 +318,7 @@ class ConfigHandler:
        
         # Send execution request and wait for response
         print("\n[ ] Enviando mensaje a la cola de generación de mapas...")
-        message = create_message("execution.visualization", STATUS_OK, "", data)
+        message = create_message(STATUS_OK, "", data)
         await self.rabbitmq.publish(EXECUTION_EXCHANGE, EXECUTION_VISUALIZATION_KEY, message)
         await self.rabbitmq.consume(NOTIFICATIONS_QUEUE, callback=self.handle_general_notification_message)
     

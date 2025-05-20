@@ -1,32 +1,43 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { Ctx, EventPattern, Payload, RmqContext } from "@nestjs/microservices";
+import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { RequestsService } from "../services/requests.service";
 import { MessageContent } from "@/shared/interfaces/messageContentInterface.interface";
+import { RabbitMQExchanges, RabbitMQQueues, RabbitMQRoutingKeys } from "@/shared/enums/rabbitmqQueues.enum";
+import { AmqpConsumerService } from "@/shared/messaging/amqp-consumer.service";
 
 @Injectable()
-export class RequestsConsumer {
+export class RequestsConsumer implements OnModuleInit {
   private readonly logger = new Logger(RequestsConsumer.name);
 
-  constructor(private readonly requestsService: RequestsService) {}
+  constructor(
+    private readonly requestsService: RequestsService,
+    private readonly amqpConsumerService: AmqpConsumerService
+  ) {}
 
-  @EventPattern("result.done")
-  async handleResultDone(@Payload() data: MessageContent, @Ctx() context: RmqContext) {
-    try {
-      this.logger.log(`Received result.done message: ${JSON.stringify(data)}`);
+  /**
+   * Register message handlers when module initializes
+   */
+  async onModuleInit() {
+    this.setupResultDoneConsumer();
+  }
 
-      // Process the received result
-      await this.requestsService.processResultMessage(data);
-
-      // Acknowledge the message
-      const channel = context.getChannelRef();
-      const originalMsg = context.getMessage();
-      channel.ack(originalMsg);
-    } catch (error) {
-      this.logger.error(`Error processing result.done message: ${error.message}`);
-
-      const channel = context.getChannelRef();
-      const originalMsg = context.getMessage();
-      channel.ack(originalMsg);
-    }
+  /**
+   * Set up consumer for result.done messages
+   */
+  private setupResultDoneConsumer() {
+    this.amqpConsumerService.registerHandler(
+      RabbitMQRoutingKeys.RESULT_DONE,
+      RabbitMQQueues.RESULT_QUEUE,
+      RabbitMQExchanges.RESULT_EXCHANGE,
+      async (data: MessageContent) => {
+        try {
+          this.logger.log(`Received results.done message: ${JSON.stringify(data)}`);
+          await this.requestsService.processResultMessage(data);
+        } catch (error) {
+          this.logger.error(`Error processing results.done message: ${error.message}`);
+          this.logger.error(error.stack);
+          // The AmqpConsumerService will handle the acknowledgment
+        }
+      }
+    );
   }
 }

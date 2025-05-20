@@ -47,7 +47,7 @@ export class RequestsService {
     // Check if the request already exists
     const existingRequest = await this.requestRepository.findByRequestHash(requestHash);
     this.logger.log(`Existing request: ${JSON.stringify(existingRequest)}`);
-    if (existingRequest !== null && existingRequest.requestStatus == requestStatus.CACHED) {
+    if (existingRequest !== null && existingRequest.requestStatus === requestStatus.CACHED) {
       // If it exists, increment the timesRequested
       existingRequest.timesRequested += 1;
 

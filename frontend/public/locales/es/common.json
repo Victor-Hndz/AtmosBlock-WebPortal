@@ -6,14 +6,16 @@
   "navigation-header": {
     "home": "Inicio",
     "requests": "Solicitudes",
-    "login": "Iniciar sesión"
+    "login": "Iniciar sesión",
+    "progress": "Progreso"
   },
   "navigation-tooltips": {
     "home": "Ir a la Página Principal",
     "requests": "Crear y gestionar tus solicitudes",
     "login": "Iniciar sesión en tu cuenta",
     "about": "Conocer más sobre esta aplicación",
-    "help": "Ayuda"
+    "help": "Ayuda",
+    "progress": "Ver actualizaciones de progreso en tiempo real"
   },
   "navigation-footer": {
     "about": "Acerca de"
@@ -314,5 +316,29 @@
         }
       }
     }
+  },
+  "progress": {
+    "title": "Monitor de Progreso",
+    "subtitle": "Visualización en tiempo real de actualizaciones de procesos del servidor",
+    "demoTitle": "Demostración de Progreso",
+    "liveTab": "Progreso en Vivo",
+    "demoTab": "Cómo Funciona",
+    "liveTitle": "Actualizaciones de Proceso en Tiempo Real",
+    "howItWorks": "Cómo Funciona la Barra de Progreso",
+    "connecting": "Conectando al servidor...",
+    "waiting": "Esperando actualizaciones...",
+    "simulating": "Simulación en progreso...",
+    "useSimulator": "Usar simulador (para pruebas)",
+    "connectPrompt": "Conéctate al servidor para ver actualizaciones de progreso en tiempo real.",
+    "connect": "Conectar al Servidor",
+    "restart": "Reiniciar",
+    "explanation1": "Esta barra de progreso se conecta a un endpoint de eventos del servidor (SSE) que transmite actualizaciones en tiempo real de procesos en segundo plano.",
+    "explanation2": "El servidor procesa tareas complejas como generación de datos o cálculos largos, enviando actualizaciones de progreso a través de una cola de mensajes RabbitMQ.",
+    "explanation3": "Conforme llegan las actualizaciones de progreso, la barra se va llenando y muestra mensajes de estado, proporcionando feedback en tiempo real de las operaciones del servidor.",
+    "technicalDetails": "Implementación Técnica",
+    "techDetail1": "Server-Sent Events (SSE) para comunicación en tiempo real",
+    "techDetail2": "RabbitMQ para la cola de mensajes",
+    "techDetail3": "Componentes Radix UI para una interfaz accesible",
+    "techDetail4": "React para gestión de estado y actualizaciones de UI"
   }
 }

@@ -18,11 +18,11 @@ import * as Joi from "joi";
         DB_NAME: Joi.string().required(),
         // JWT
         JWT_SECRET: Joi.string().required(),
-        JWT_EXPIRATION: Joi.string().required(),
-        // RabbitMQ
+        JWT_EXPIRATION: Joi.string().required(), // RabbitMQ
         RABBITMQ_URL: Joi.string().required(),
         RABBITMQ_CONFIG_QUEUE: Joi.string().required(),
         RABBITMQ_RESULT_QUEUE: Joi.string().required(),
+        RABBITMQ_PROGRESS_QUEUE: Joi.string().default("progress_queue"),
         //MINIO
         MINIO_ENDPOINT: Joi.string().required(),
         MINIO_HOST: Joi.string().required(),
