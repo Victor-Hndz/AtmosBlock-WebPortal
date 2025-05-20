@@ -37,6 +37,17 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
     [updateFormField]
   );
 
+  /**
+   * Memoized handler for updating numeric input fields
+   */
+  const handleNumericChange = useCallback(
+    <K extends keyof RequestForm>(field: K, value: string) => {
+      const numValue = value === "" ? "" : parseInt(value, 10);
+      updateFormField(field, numValue as unknown as RequestForm[K]);
+    },
+    [updateFormField]
+  );
+
   // Memoize the file format section to prevent re-renders
   const fileFormatSection = useMemo(
     () => (
@@ -103,7 +114,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
             <div className="flex items-center h-5">
               <Switch.Root
                 id="tracking"
-                checked={formData?.tracking || false}
+                checked={formData?.tracking ?? false}
                 onCheckedChange={checked => handleSwitchChange("tracking", checked)}
                 className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
               >
@@ -115,32 +126,15 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
             </div>
           </FormField>
           <FormField
-            id="noCompile"
-            label={t("requests-form.noCompile")}
-            tooltip={t("requests-form.noCompileTooltip", "Skip compilation step")}
+            id="noData"
+            label={t("requests-form.noData")}
+            tooltip={t("requests-form.noDataTooltip", "Receive no data files")}
           >
             <div className="flex items-center h-5">
               <Switch.Root
-                id="noCompile"
-                checked={formData?.noCompile || false}
-                onCheckedChange={checked => handleSwitchChange("noCompile", checked)}
-                className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
-              >
-                <Switch.Thumb className="block w-4 h-4 bg-white rounded-full transition-transform duration-100 transform translate-x-0.5 will-change-transform data-[state=checked]:translate-x-5" />
-              </Switch.Root>
-            </div>
-          </FormField>
-
-          <FormField
-            id="noExecute"
-            label={t("requests-form.noExecute")}
-            tooltip={t("requests-form.noExecuteTooltip", "Skip execution step")}
-          >
-            <div className="flex items-center h-5">
-              <Switch.Root
-                id="noExecute"
-                checked={formData?.noExecute || false}
-                onCheckedChange={checked => handleSwitchChange("noExecute", checked)}
+                id="noData"
+                checked={formData?.noData ?? false}
+                onCheckedChange={checked => handleSwitchChange("noData", checked)}
                 className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
               >
                 <Switch.Thumb className="block w-4 h-4 bg-white rounded-full transition-transform duration-100 transform translate-x-0.5 will-change-transform data-[state=checked]:translate-x-5" />
@@ -156,7 +150,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
             <div className="flex items-center h-5">
               <Switch.Root
                 id="noMaps"
-                checked={formData?.noMaps || false}
+                checked={formData?.noMaps ?? false}
                 onCheckedChange={checked => handleSwitchChange("noMaps", checked)}
                 className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
               >
@@ -173,7 +167,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
             <div className="flex items-center h-5">
               <Switch.Root
                 id="animation"
-                checked={formData?.animation || false}
+                checked={formData?.animation ?? false}
                 onCheckedChange={checked => handleSwitchChange("animation", checked)}
                 className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
               >
@@ -197,7 +191,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
               <div className="flex items-center h-5">
                 <Switch.Root
                   id="omp"
-                  checked={formData?.omp || false}
+                  checked={formData?.omp ?? false}
                   onCheckedChange={checked => handleSwitchChange("omp", checked)}
                   className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
                 >
@@ -210,18 +204,19 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
               <FormField
                 id="nThreads"
                 label={t("requests-form.nThreads")}
-                tooltip={t("requests-form.nThreadsTooltip", "Enable multithreading")}
+                tooltip={t("requests-form.nThreadsTooltip", "Number of threads to use")}
               >
-                <div className="flex items-center h-5">
-                  <Switch.Root
-                    id="nThreads"
-                    checked={formData?.nThreads || false}
-                    onCheckedChange={checked => handleSwitchChange("nThreads", checked)}
-                    className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
-                  >
-                    <Switch.Thumb className="block w-4 h-4 bg-white rounded-full transition-transform duration-100 transform translate-x-0.5 will-change-transform data-[state=checked]:translate-x-5" />
-                  </Switch.Root>
-                </div>
+                <input
+                  id="nThreads"
+                  type="number"
+                  min="1"
+                  value={formData?.nThreads ?? ""}
+                  onChange={e => handleNumericChange("nThreads", e.target.value)}
+                  className="block w-full px-3 py-2 text-sm border border-slate-300 rounded-md 
+                           shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 
+                           focus:border-violet-500"
+                  placeholder="Number of threads"
+                />
               </FormField>
             )}
 
@@ -233,7 +228,7 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
               <div className="flex items-center h-5">
                 <Switch.Root
                   id="mpi"
-                  checked={formData?.mpi || false}
+                  checked={formData?.mpi ?? false}
                   onCheckedChange={checked => handleSwitchChange("mpi", checked)}
                   className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
                 >
@@ -246,18 +241,19 @@ const AdvancedSettingsForm: React.FC<AdvancedSettingsFormProps> = ({
               <FormField
                 id="nProces"
                 label={t("requests-form.nProces")}
-                tooltip={t("requests-form.nProcesTooltip", "Enable multi-process execution")}
+                tooltip={t("requests-form.nProcesTooltip", "Number of processes to use")}
               >
-                <div className="flex items-center h-5">
-                  <Switch.Root
-                    id="nProces"
-                    checked={formData?.nProces || false}
-                    onCheckedChange={checked => handleSwitchChange("nProces", checked)}
-                    className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
-                  >
-                    <Switch.Thumb className="block w-4 h-4 bg-white rounded-full transition-transform duration-100 transform translate-x-0.5 will-change-transform data-[state=checked]:translate-x-5" />
-                  </Switch.Root>
-                </div>
+                <input
+                  id="nProces"
+                  type="number"
+                  min="1"
+                  value={formData?.nProces ?? ""}
+                  onChange={e => handleNumericChange("nProces", e.target.value)}
+                  className="block w-full px-3 py-2 text-sm border border-slate-300 rounded-md 
+                           shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 
+                           focus:border-violet-500"
+                  placeholder="Number of processes"
+                />
               </FormField>
             )}
           </div>

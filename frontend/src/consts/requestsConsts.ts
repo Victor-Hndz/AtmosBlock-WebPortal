@@ -134,9 +134,19 @@ export const AVAILABLE_HOURS = Array.from({ length: 24 }, (_, i) => `${i.toStrin
 export const MAP_TYPES = ["Contour", "Dispersion", "Combined", "Formations"];
 
 /**
+ * Available map areas for selection
+ */
+export const MAP_AREAS = ["North", "South", "East", "West"];
+
+/**
  * Available map ranges for selection
  */
 export const MAP_RANGES = ["MAX", "MIN", "BOTH", "COMB"];
+
+/**
+ * Available map levels for selection
+ */
+export const MAP_LEVELS = ["10", "15", "20", "25", "30"];
 
 /**
  * Available file formats for selection

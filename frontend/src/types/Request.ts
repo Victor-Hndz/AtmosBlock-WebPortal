@@ -23,10 +23,9 @@ export interface RequestForm {
   mapRanges?: string[];
   mapLevels?: string[];
   fileFormat?: string;
-  tracking?: boolean;
-  noCompile?: boolean;
-  noExecute?: boolean;
   noMaps?: boolean;
+  noData?: boolean;
+  tracking?: boolean;
   animation?: boolean;
   omp?: boolean;
   nThreads?: number;

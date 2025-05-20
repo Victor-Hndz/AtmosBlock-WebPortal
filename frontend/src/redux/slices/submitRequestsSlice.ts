@@ -39,7 +39,7 @@ export const submitRequest = createAsyncThunk(
 
       if (!response.ok) {
         const error = await response.json();
-        return rejectWithValue(error.message || "Failed to submit request");
+        return rejectWithValue(error.message ?? "Failed to submit request");
       }
 
       const data = await response.json();

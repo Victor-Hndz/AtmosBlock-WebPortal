@@ -88,8 +88,7 @@ const RequestSummary: React.FC<RequestSummaryProps> = ({ formData, onPrevious, t
 
         {/* Advanced options summary (only shown if enabled) */}
         {(formData.tracking ||
-          formData.noCompile ||
-          formData.noExecute ||
+          formData.noData ||
           formData.noMaps ||
           formData.animation ||
           formData.omp ||
@@ -106,15 +105,9 @@ const RequestSummary: React.FC<RequestSummaryProps> = ({ formData, onPrevious, t
                   <div className="text-sm text-slate-600">{t("requests-form.enabled", "Enabled")}</div>
                 </div>
               )}
-              {formData.noCompile && (
+              {formData.noData && (
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="text-sm font-medium text-slate-700">{t("requests-form.skipCompilation")}:</div>
-                  <div className="text-sm text-slate-600">{t("requests-form.yes", "Yes")}</div>
-                </div>
-              )}
-              {formData.noExecute && (
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="text-sm font-medium text-slate-700">{t("requests-form.skipExecution")}:</div>
+                  <div className="text-sm font-medium text-slate-700">{t("requests-form.skipData")}:</div>
                   <div className="text-sm text-slate-600">{t("requests-form.yes", "Yes")}</div>
                 </div>
               )}

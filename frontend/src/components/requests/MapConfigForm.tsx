@@ -4,7 +4,7 @@ import { Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import FormField from "./FormField";
 import { RequestForm } from "@/types/Request";
-import { PRESSURE_LEVELS, MAP_TYPES, MAP_RANGES } from "@/consts/requestsConsts";
+import { PRESSURE_LEVELS, MAP_TYPES, MAP_RANGES, MAP_AREAS, MAP_LEVELS } from "@/consts/requestsConsts";
 
 interface MapConfigFormProps {
   formData: RequestForm;
@@ -141,7 +141,7 @@ const MapConfigForm: React.FC<MapConfigFormProps> = ({
         required
       >
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1.5">
-          {AREAS.map(area => (
+          {MAP_AREAS.map(area => (
             <label key={area} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
               <Checkbox.Root
                 id={`area-${area}`}
