@@ -1,5 +1,7 @@
-# Base image with build tools and libraries
 FROM python:3.11-slim
+
+# Set the working directory inside the container
+WORKDIR /app
 
 # Install Ansible and required tools and update dependencies
 RUN apt-get update && \
@@ -8,18 +10,19 @@ RUN apt-get update && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/*
 
-# Set the working directory inside the container
-WORKDIR /app
+
+COPY ./handler/requirements.txt /app/handler/requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip \
+	pip install --no-cache-dir -r ./handler/requirements.txt
 
 COPY ./handler /app/handler
 
-RUN pip install --no-cache-dir -r ./handler/requirements.txt
+# Copy and install utils dependencies
+COPY ./utils/requirements.txt /app/utils/requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --no-cache-dir -r utils/requirements.txt
 
-# Copy project files to the container
 COPY ./utils /app/utils
-
-# Install required Python packages
-RUN pip install --no-cache-dir -r ./utils/requirements.txt
 
 # Run the executable
 CMD [ "python", "handler/config_handler.py" ]

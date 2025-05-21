@@ -1,5 +1,7 @@
-# Base image with build tools and libraries
 FROM victorhndz/netcdf-base:latest
+
+# Set the working directory inside the container
+WORKDIR /app
 
 # Set up environment variables
 ENV DEBIAN_FRONTEND=noninteractive
@@ -22,24 +24,16 @@ RUN apt-get update && apt-get install -y \
     && pip install --upgrade pip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory inside the container
-WORKDIR /app
-
 # Copy project files to the container
 COPY ./execution/code /app
 COPY ./execution/handler /app/handler
 
-# Copy project files to the container
-COPY ./utils /app/utils
+# Copy and install utils dependencies
+COPY ./utils/requirements.txt /app/utils/requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --no-cache-dir -r utils/requirements.txt
 
-# Install required Python packages
-RUN pip install --no-cache-dir -r ./utils/requirements.txt
+COPY ./utils /app/utils
 
 # Run the executable
 CMD [ "python3", "handler/exec_handler.py" ]
-
-# Run CMake to configure the project and build the project
-# RUN cmake . && make
-
-# # Run the executable
-# CMD [ "./execution/FAST-IBAN" ]

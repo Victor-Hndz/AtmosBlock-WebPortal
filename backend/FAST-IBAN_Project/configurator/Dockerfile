@@ -1,38 +1,46 @@
-# Base image with build tools and libraries
 FROM python:3.11-slim
 
-# Install Ansible and required tools and update dependencies
-RUN apt-get update && \
-	apt-get install -y python3-pip \
-	&& pip install --upgrade pip && \
-	apt-get clean && \
-	rm -rf /var/lib/apt/lists/*
-
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-RUN mkdir -p /app/config/data
+# Install system dependencies and upgrade pip in one layer
+RUN apt-get update && \
+    apt-get install -y python3-pip && \
+    pip install --upgrade pip && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
+# Copy and install configurator dependencies first to leverage cache
+COPY ./configurator/requirements.txt /app/configurator/requirements.txt
+
+# Use BuildKit cache for pip (if enabled)
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --no-cache-dir -r configurator/requirements.txt
+
+# Copy configurator code after installing its requirements
 COPY ./configurator /app/configurator
 
-RUN pip install --no-cache-dir -r ./configurator/requirements.txt
+# Copy and install utils dependencies
+COPY ./utils/requirements.txt /app/utils/requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --no-cache-dir -r utils/requirements.txt
 
-# Copy project files to the container
+# Copy utils code
 COPY ./utils /app/utils
 
-# Install required Python packages
-RUN pip install --no-cache-dir -r ./utils/requirements.txt
+# Create necessary directory
+RUN mkdir -p /app/config/data
 
-# Load environment variables from build arguments
+# Build arguments (used only at build time)
 ARG CDSAPI_URL
 ARG CDSAPI_KEY
 
-# Export variables as environment variables
+# Set environment variables for runtime
 ENV CDSAPI_URL=${CDSAPI_URL}
 ENV CDSAPI_KEY=${CDSAPI_KEY}
 
-# Set up the CDS API personal access token inside the container
-RUN echo "url: $CDSAPI_URL\nkey: $CDSAPI_KEY" > /root/.cdsapirc
+# Configure CDS API access
+RUN echo -e "url: ${CDSAPI_URL}\nkey: ${CDSAPI_KEY}" > /root/.cdsapirc
 
-# Run the executable
-CMD [ "python", "configurator/configurator_CLI.py" ]
+# Default command
+CMD ["python", "configurator/configurator_CLI.py"]

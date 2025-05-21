@@ -13,3 +13,4 @@ RUN npm run build
 EXPOSE ${PORT}
 
 CMD ["npm", "run", "start:prod"]
+# CMD ["npm", "run", "start:dev"]
