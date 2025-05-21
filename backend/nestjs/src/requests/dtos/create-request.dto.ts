@@ -77,16 +77,11 @@ export class CreateRequestDto {
   @IsBoolean()
   @IsOptional()
   tracking?: boolean;
-
-  @ApiPropertyOptional({ description: "Skip compilation step", default: false })
+  
+  @ApiPropertyOptional({ description: "Skip data generation", default: false })
   @IsBoolean()
   @IsOptional()
-  noCompile?: boolean;
-
-  @ApiPropertyOptional({ description: "Skip execution step", default: false })
-  @IsBoolean()
-  @IsOptional()
-  noExecute?: boolean;
+  noData?: boolean;
 
   @ApiPropertyOptional({ description: "Skip map generation", default: false })
   @IsBoolean()

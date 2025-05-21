@@ -27,8 +27,7 @@ export class RequestMapper {
       mapLevels: requestEntity.mapLevels,
       fileFormat: requestEntity.fileFormat,
       tracking: requestEntity.tracking,
-      noCompile: requestEntity.noCompile,
-      noExecute: requestEntity.noExecute,
+      noData: requestEntity.noData,
       noMaps: requestEntity.noMaps,
       animation: requestEntity.animation,
       omp: requestEntity.omp,
@@ -66,8 +65,7 @@ export class RequestMapper {
     persistenceRequest.mapLevels = request.mapLevels;
     persistenceRequest.fileFormat = request.fileFormat;
     persistenceRequest.tracking = request.tracking;
-    persistenceRequest.noCompile = request.noCompile;
-    persistenceRequest.noExecute = request.noExecute;
+    persistenceRequest.noData = request.noData;
     persistenceRequest.noMaps = request.noMaps;
     persistenceRequest.animation = request.animation;
     persistenceRequest.omp = request.omp;

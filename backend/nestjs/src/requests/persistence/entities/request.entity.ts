@@ -62,11 +62,8 @@ export class RequestEntity {
   @Column({ default: false })
   tracking: boolean;
 
-  @Column({ default: false, name: "no_compile" })
-  noCompile: boolean;
-
-  @Column({ default: false, name: "no_execute" })
-  noExecute: boolean;
+  @Column({ default: false, name: "no_data" })
+  noData: boolean;
 
   @Column({ default: false, name: "no_maps" })
   noMaps: boolean;

@@ -21,8 +21,7 @@ export class Request {
   mapLevels?: string[];
   fileFormat?: string;
   tracking: boolean;
-  noCompile: boolean;
-  noExecute: boolean;
+  noData: boolean;
   noMaps: boolean;
   animation: boolean;
   omp: boolean;
