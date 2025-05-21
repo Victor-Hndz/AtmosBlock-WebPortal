@@ -35,7 +35,9 @@ def generate_env_file():
     RABBITMQ_DEFAULT_USER="admin"
     RABBITMQ_DEFAULT_PASS="{rabbitmq_password}"
     RABBITMQ_URL="amqp://admin:{rabbitmq_password}@rabbitmq:5672"
-    RABBITMQ_QUEUE="config_queue"
+    RABBITMQ_CONFIG_QUEUE="config_queue"
+    RABBITMQ_RESULT_QUEUE="result_queue"
+    RABBITMQ_PROGRESS_QUEUE="progress_queue"
 
     # Database
     DB_HOST="postgres"
@@ -53,11 +55,12 @@ def generate_env_file():
     JWT_EXPIRATION="1d"
 
     #MINIO
-    MINIO_ENDPOINT=minio:9000
+    MINIO_BUCKET="generated-files"
+    MINIO_HOST="minio"
     MINIO_PORT=9000
+    MINIO_ENDPOINT=minio:9000
     MINIO_USER="minio_access_key"
     MINIO_PASSWORD="{minio_password}"
-    MINIO_BUCKET="generated"
     '''
     
     # Check if .env file already exists
