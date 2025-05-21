@@ -3,6 +3,7 @@
 set -euo pipefail
 
 CLEAN_MODE=false
+FRONTEND_MODE=false
 
 # Comprobamos si se ha pasado la opción --clean
 if [[ "${1:-}" == "--clean" ]]; then
@@ -45,3 +46,16 @@ docker-compose up -d
 echo ""
 echo "🚀 Todos los servicios están levantados."
 echo "📡 Usa 'docker-compose logs -f' para ver los logs en tiempo real."
+
+# Comprobamos si se ha pasado la opción --clean
+if [[ "${2:-}" == "--front" ]]; then
+  FRONTEND_MODE=true
+fi
+
+if $FRONTEND_MODE; then
+  if [[ ! -x "./frontend_build.sh" ]]; then
+    echo "❌ El archivo ./frontend_build.sh no existe o no es ejecutable."
+    exit 1
+  fi
+  ./frontend_build.sh
+fi
