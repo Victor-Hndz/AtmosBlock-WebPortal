@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule as NestConfigModule } from "@nestjs/config";
-import * as Joi from "joi";
+import Joi from "joi";
 
 @Module({
   imports: [
@@ -18,7 +18,8 @@ import * as Joi from "joi";
         DB_NAME: Joi.string().required(),
         // JWT
         JWT_SECRET: Joi.string().required(),
-        JWT_EXPIRATION: Joi.string().required(), // RabbitMQ
+        JWT_EXPIRATION: Joi.string().required(),
+        // RabbitMQ
         RABBITMQ_URL: Joi.string().required(),
         RABBITMQ_CONFIG_QUEUE: Joi.string().required(),
         RABBITMQ_RESULT_QUEUE: Joi.string().required(),
