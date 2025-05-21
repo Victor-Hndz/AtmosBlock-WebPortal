@@ -1,8 +1,8 @@
+import "module-alias/register";
 import { ValidationPipe, BadRequestException, Logger } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { ConfigService } from "@nestjs/config";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import "module-alias/register";
 import { HttpExceptionFilter } from "@/shared/filters/http-exception.filter";
 import { AppModule } from "./app.module";
 
@@ -44,9 +44,9 @@ async function bootstrap() {
     .setVersion("1.0")
     .addBearerAuth()
     .build();
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api/docs", app, document);
-  // No need to connect microservices as we're using direct AMQP connections now
 
   // Handle graceful shutdown
   const signals = ["SIGTERM", "SIGINT"];
@@ -61,6 +61,7 @@ async function bootstrap() {
       process.exit(0);
     });
   });
+
   const port = configService.get<number>("PORT") ?? 3000;
   await app.listen(port);
 
