@@ -1,7 +1,10 @@
 {
   "name": "frontend",
+  "version": "1.0.0",
+  "description": "",
+  "author": "victor.hernandezs@um.es",
   "private": true,
-  "version": "0.0.0",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "vite",
