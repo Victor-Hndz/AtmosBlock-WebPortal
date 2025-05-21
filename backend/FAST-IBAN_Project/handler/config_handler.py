@@ -11,7 +11,7 @@ from utils.rabbitMQ.create_message import create_message
 from utils.rabbitMQ.rabbit_consts import HANDLER_QUEUE, NOTIFICATIONS_QUEUE, EXECUTION_EXCHANGE, EXECUTION_ALGORITHM_KEY, EXECUTION_VISUALIZATION_KEY, EXECUTION_ANIMATION_KEY, EXECUTION_TRACKING_KEY, NOTIFY_EXECUTION, NOTIFY_VISUALIZATION, NOTIFY_ANIMATION, NOTIFY_TRACKING
 from utils.minio.upload_files import upload_files_to_request_hash
 from utils.clean_folder_files import clean_directory
-from utils.consts.consts import EXEC_FILE, STATUS_OK, STATUS_ERROR, MESSAGE_NO_DATA
+from utils.consts.consts import EXEC_FILE, STATUS_OK, STATUS_ERROR
 
 OUT_DIR = "./out"
 
