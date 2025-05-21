@@ -11,7 +11,7 @@ from utils.rabbitMQ.create_message import create_message
 from utils.rabbitMQ.rabbit_consts import NOTIFICATIONS_EXCHANGE, NOTIFY_HANDLER_KEY, EXECUTION_ALGORITHM_QUEUE, NOTIFY_EXECUTION
 from utils.minio.upload_files import upload_files_to_request_hash
 from utils.clean_folder_files import clean_directory
-from utils.consts.consts import STATUS_OK, STATUS_ERROR, MESSAGE_NO_COMPILE
+from utils.consts.consts import STATUS_OK, STATUS_ERROR, MESSAGE_NO_DATA
 
 
 async def handle_message(body, rabbitmq_client):
@@ -19,39 +19,33 @@ async def handle_message(body, rabbitmq_client):
 
     data = process_body(body)
 
-    if data["request_type"] == MESSAGE_NO_COMPILE:
-        print("\n[ ] Se recibió un mensaje de no compilar")
+    os.makedirs("build", exist_ok=True)
+
+    subprocess.run(["cmake", ".."], cwd="build")
+
+    build_cmd = ["cmake", "--build", "."]
+    process = subprocess.Popen(
+        build_cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        cwd="build",
+    )
+    stdout, stderr = process.communicate()
+
+    if process.returncode == 0:
+        print(stdout)
+        print("\n✅ Build completado exitosamente.")
     else:
-        print("\n[ ] Se recibió un mensaje de ejecución normal")
-
-    if data["request_type"] != MESSAGE_NO_COMPILE:
-        os.makedirs("build", exist_ok=True)
-
-        subprocess.run(["cmake", ".."], cwd="build")
-
-        build_cmd = ["cmake", "--build", "."]
-        process = subprocess.Popen(
-            build_cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            cwd="build",
+        print(stderr)
+        print("\n❌ Error al ejecutar el build:")
+        message = {"request_type": NOTIFY_EXECUTION, "exec_status": STATUS_ERROR, "exec_message": "Error al compilar"}
+        await rabbitmq_client.publish(
+            NOTIFICATIONS_EXCHANGE, 
+            NOTIFY_HANDLER_KEY, 
+            create_message(STATUS_OK, "", message)
         )
-        stdout, stderr = process.communicate()
-
-        if process.returncode == 0:
-            print(stdout)
-            print("\n✅ Build completado exitosamente.")
-        else:
-            print(stderr)
-            print("\n❌ Error al ejecutar el build:")
-            message = {"request_type": NOTIFY_EXECUTION, "exec_status": STATUS_ERROR, "exec_message": "Error al compilar"}
-            await rabbitmq_client.publish(
-                NOTIFICATIONS_EXCHANGE, 
-                NOTIFY_HANDLER_KEY, 
-                create_message(STATUS_OK, "", message)
-            )
-            return False
+        return False
 
     run_cmd = data["cmd"]
 
@@ -66,10 +60,12 @@ async def handle_message(body, rabbitmq_client):
     if result.returncode == 0:
         print("\n✅ Ejecución exitosa.")
         message = {"request_type": NOTIFY_EXECUTION, "exec_status": STATUS_OK, "exec_message": "Ejecutado correctamente"}
+        
         #save the files in minio
         upload_files_to_request_hash(data["request_hash"], local_folder="./out/"+data["request_hash"])
         print("\n[ ] Archivos subidos a minio.")
         clean_directory("./out/"+data["request_hash"])
+        
         await rabbitmq_client.publish(
             NOTIFICATIONS_EXCHANGE, 
             NOTIFY_HANDLER_KEY, 

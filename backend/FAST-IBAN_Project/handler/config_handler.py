@@ -11,7 +11,7 @@ from utils.rabbitMQ.create_message import create_message
 from utils.rabbitMQ.rabbit_consts import HANDLER_QUEUE, NOTIFICATIONS_QUEUE, EXECUTION_EXCHANGE, EXECUTION_ALGORITHM_KEY, EXECUTION_VISUALIZATION_KEY, EXECUTION_ANIMATION_KEY, EXECUTION_TRACKING_KEY, NOTIFY_EXECUTION, NOTIFY_VISUALIZATION, NOTIFY_ANIMATION, NOTIFY_TRACKING
 from utils.minio.upload_files import upload_files_to_request_hash
 from utils.clean_folder_files import clean_directory
-from utils.consts.consts import EXEC_FILE, STATUS_OK, STATUS_ERROR, MESSAGE_NO_COMPILE
+from utils.consts.consts import EXEC_FILE, STATUS_OK, STATUS_ERROR, MESSAGE_NO_DATA
 
 OUT_DIR = "./out"
 
@@ -49,8 +49,7 @@ class ConfigHandler:
         self.map_levels = None
         self.file_format = None
         self.tracking = None
-        self.no_compile = None
-        self.no_execute = None
+        self.no_data = None
         self.no_maps = None
         self.animation = None
         self.omp = None
@@ -86,8 +85,7 @@ class ConfigHandler:
         self.map_levels = data["mapLevels"]
         self.file_format = data["fileFormat"]
         self.tracking = data["tracking"]
-        self.no_compile = data["noCompile"]
-        self.no_execute = data["noExecute"]
+        self.no_data = data["noData"]
         self.no_maps = data["noMaps"]
         self.animation = data["animation"]
         self.omp = data["omp"]
@@ -109,29 +107,7 @@ class ConfigHandler:
         # Start the orchestration flow
         self.init(data)
         print(f"Archivo a procesar: {self.file_name}")
-        await self.execute_processing_pipeline()
-
-    async def execute_processing_pipeline(self) -> None:
-        """
-        Main orchestration method that executes the processing steps in sequence.
-        """
-        # Step 1: Process the input file and execute the algorithm
-        if not self.no_execute:
-            await self.process_file()
-            # The execution callback will trigger the next steps
-        else:
-            print("\n⏩ Ejecución omitida por configuración.")
-            self.execution_completed = True
-            
-            # Continue with next steps if execution is skipped
-            if not self.no_maps:
-                await self.process_map_generation()
-            elif self.animation:
-                await self.process_map_animation()
-            elif self.tracking:
-                await self.process_formation_tracking()
-            else:
-                print("\n✅ Procesamiento completado.")
+        await self.process_file()
 
     async def handle_general_notification_message(self, body: bytes) -> None:
         """
@@ -261,10 +237,7 @@ class ConfigHandler:
         
         print("\n[ ] Enviando mensaje a la cola de ejecución...")
         
-        if self.no_compile:
-            data = {"request_type": MESSAGE_NO_COMPILE, "cmd": cmd, "request_hash": self.request_hash}
-        else:
-            data = {"request_type": "", "cmd": cmd, "request_hash": self.request_hash}
+        data = {"cmd": cmd, "request_hash": self.request_hash}
         
         # Send execution request and wait for response
         message = create_message(STATUS_OK, "", data)
