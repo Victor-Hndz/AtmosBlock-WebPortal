@@ -4,8 +4,7 @@ services:
       context: ./backend/nestjs
       dockerfile: Dockerfile
     container_name: nest_api_container
-    env_file:
-      - .env
+    env_file: .env
     environment:
       DB_HOST: postgres
     ports:
@@ -19,6 +18,7 @@ services:
         condition: service_started
     networks:
       - app-network
+    restart: unless-stopped
 
   configurator_module:
     build:
@@ -28,11 +28,10 @@ services:
         CDSAPI_URL: ${CDSAPI_URL}
         CDSAPI_KEY: ${CDSAPI_KEY}
     container_name: configurator_container
+    env_file: .env
     depends_on:
       rabbitmq:
         condition: service_started
-    env_file:
-      - .env
     volumes:
       - config_data:/app/config
     stdin_open: true
@@ -40,14 +39,14 @@ services:
     working_dir: /app
     networks:
       - app-network
+    restart: unless-stopped
 
   handler_module:
     build:
       context: ./backend/FAST-IBAN_Project/
       dockerfile: ./handler/Dockerfile
     container_name: handler_container
-    env_file:
-      - .env
+    env_file: .env
     depends_on:
       rabbitmq:
         condition: service_started
@@ -60,14 +59,14 @@ services:
     working_dir: /app
     networks:
       - app-network
+    restart: unless-stopped
 
   execution_module:
     build:
       context: ./backend/FAST-IBAN_Project/
       dockerfile: ./execution/Dockerfile
     container_name: execution_container
-    env_file:
-      - .env
+    env_file: .env
     depends_on:
       rabbitmq:
         condition: service_started
@@ -83,14 +82,14 @@ services:
     working_dir: /app
     networks:
       - app-network
+    restart: unless-stopped
 
   visualization_module:
     build:
       context: ./backend/FAST-IBAN_Project/
       dockerfile: ./visualization/Dockerfile
     container_name: visualization_container
-    env_file:
-      - .env
+    env_file: .env
     depends_on:
       rabbitmq:
         condition: service_started
@@ -106,27 +105,15 @@ services:
     working_dir: /app
     networks:
       - app-network
-
-  # tracking_module:
-  #   build:
-  #     context: ./backend/FAST-IBAN_Project/
-  #     dockerfile: ./tracking/Dockerfile
-  #   container_name: tracking_container
-  #   volumes:
-  #     - ./backend/FAST-IBAN_Project:/app
-  #     - out_data:/app/out
-  #   stdin_open: true
-  #   tty: true
-  #   working_dir: /app
+    restart: unless-stopped
 
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq_container
-    env_file:
-      - .env
+    env_file: .env
     ports:
-      - ${RABBITMQ_PORT}:${RABBITMQ_PORT}
-      - ${RABBITMQ_MANAGEMENT_PORT}:${RABBITMQ_MANAGEMENT_PORT}
+      - "${RABBITMQ_PORT}:${RABBITMQ_PORT}"
+      - "${RABBITMQ_MANAGEMENT_PORT}:${RABBITMQ_MANAGEMENT_PORT}"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
@@ -136,12 +123,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   postgres:
     image: postgres:16
     container_name: postgres_container
-    env_file:
-      - .env
+    env_file: .env
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -150,7 +137,6 @@ services:
       - "${DB_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # - ./backend/nestjs/db/init:/docker-entrypoint-initdb.d
     networks:
       - app-network
     healthcheck:
@@ -158,48 +144,27 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  # init-postgres:
-  #   image: postgres:16
-  #   container_name: init_postgres_container
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #   volumes:
-  #     - ./backend/db:/docker-entrypoint-initdb.d
-  #   networks:
-  #     - app-network
-  #   restart: "no"
-  #   entrypoint: >
-  #     /bin/sh -c "
-  #       sleep 5;
-  #       PGPASSWORD=${DB_PASSWORD} psql -h postgres -U ${DB_USERNAME} -d ${DB_NAME} -f /docker-entrypoint-initdb.d/init-db.sql
-  #     "
+    restart: unless-stopped
 
   adminer:
     image: adminer
     container_name: adminer
-    restart: always
-    env_file:
-      - .env
-    depends_on:
-      postgres:
-        condition: service_healthy
+    env_file: .env
     ports:
       - "8082:8080"
     environment:
       ADMINER_DEFAULT_SERVER: postgres_container
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - app-network
+    restart: unless-stopped
 
   minio:
     image: minio/minio:latest
     container_name: minio
-    restart: always
-    env_file:
-      - .env
+    env_file: .env
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -211,6 +176,7 @@ services:
     command: server /data --console-address ":9001"
     networks:
       - app-network
+    restart: unless-stopped
 
   minio-init:
     image: minio/minio:latest
@@ -223,35 +189,31 @@ services:
         mc alias set local http://${MINIO_ENDPOINT} ${MINIO_USER} ${MINIO_PASSWORD} &&
         mc mb local/${MINIO_BUCKET}
       "
+    networks:
+      - app-network
 
   cron-cleanup:
     build:
       context: ./cron_cleanup
       dockerfile: Dockerfile
-    env_file:
-      - .env
+    env_file: .env
     depends_on:
       postgres:
         condition: service_healthy
       minio:
         condition: service_started
-    restart: unless-stopped
     environment:
       - TZ=Europe/Madrid
     networks:
       - app-network
+    restart: unless-stopped
 
 volumes:
   out_data:
-    driver: local
   config_data:
-    driver: local
   rabbitmq_data:
-    driver: local
   postgres_data:
-    driver: local
   minio_data:
-    driver: local
 
 networks:
   app-network:

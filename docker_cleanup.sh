@@ -2,7 +2,14 @@
 
 set -euo pipefail
 
-echo "🔴 ATENCIÓN: Este script eliminará TODO de Docker (contenedores, imágenes, volúmenes, redes)."
+DELETE_VOLUMES=false
+
+# Verifica si se pasó el flag --volumes
+if [[ "${1:-}" == "--volumes" ]]; then
+  DELETE_VOLUMES=true
+fi
+
+echo "🔴 ATENCIÓN: Este script eliminará TODO de Docker (contenedores, imágenes, redes${DELETE_VOLUMES:+, volúmenes})."
 read -p "¿Estás seguro de continuar? (sí/yes para continuar): " confirm
 
 if [[ "$confirm" != "si" && "$confirm" != "sí" && "$confirm" != "s" && "$confirm" != "yes" && "$confirm" != "y" ]]; then
@@ -17,14 +24,22 @@ docker ps -a -q | xargs -r docker rm -f
 echo "🧼 Eliminando todas las imágenes..."
 docker image ls -aq | xargs -r docker rmi -f
 
-echo "🪣 Eliminando todos los volúmenes..."
-docker volume ls -q | xargs -r docker volume rm
+if $DELETE_VOLUMES; then
+  echo "🪣 Eliminando todos los volúmenes..."
+  docker volume ls -q | xargs -r docker volume rm
+else
+  echo "⚠️ Volúmenes conservados (no se pasó la opción --volumes)."
+fi
 
 echo "🌐 Eliminando todas las redes personalizadas..."
 docker network ls --filter "type=custom" -q | xargs -r docker network rm
 
-echo "🧹 Ejecutando 'docker system prune' completo (incluye volúmenes e imágenes)..."
-docker system prune -a --volumes -f
+echo "🧹 Ejecutando 'docker system prune'..."
+if $DELETE_VOLUMES; then
+  docker system prune -a --volumes -f
+else
+  docker system prune -a -f
+fi
 
 echo "✅ Docker limpiado completamente."
 echo
