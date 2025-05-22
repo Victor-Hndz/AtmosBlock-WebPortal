@@ -13,6 +13,7 @@ from visualization.mapGeneration.generate_maps import generate_map_parallel
 from utils.rabbitMQ.rabbitmq import RabbitMQ
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
+from utils.rabbitMQ.notify_updates import notify_update
 from utils.rabbitMQ.rabbit_consts import NOTIFICATIONS_EXCHANGE, NOTIFY_HANDLER_KEY, EXECUTION_VISUALIZATION_QUEUE, NOTIFY_VISUALIZATION
 
 from utils.consts.consts import STATUS_OK, STATUS_ERROR
@@ -25,6 +26,7 @@ async def handle_message(body, rabbitmq_client):
     data = process_body(body)
     
     print("\n[ ] Iniciando generación de mapas...")
+    notify_update(rabbitmq_client, 1, "MAPS: Iniciando generación de mapas.")
     
     # Create output directory if it doesn't exist
     os.makedirs(f"{OUT_DIR}/{data['request_hash']}", exist_ok=True)
@@ -62,6 +64,8 @@ async def handle_message(body, rabbitmq_client):
     # Determine optimal number of processes
     num_cpus = min(os.cpu_count() or 2, 8)  # Use up to 8 processes
     
+    cont = 0
+    
     print(f"Starting map generation with {num_cpus} processes for {len(map_tasks)} maps...")
     try:
         # Use process pool for true parallelism
@@ -72,8 +76,11 @@ async def handle_message(body, rabbitmq_client):
             # Process results as they complete
             for future in futures:
                 try:
+                    cont += 1
+                    notify_update(rabbitmq_client, 1, f"MAPS: Generando mapa{cont} de {len(map_tasks)}.")
                     result = future.result()
                     results.append(result)
+                    notify_update(rabbitmq_client, 1, "MAPS: Mapa generado con éxito.")
                 except Exception as e:
                     print(f"Error in map generation task: {e}")
                     results.append(False)
