@@ -18,7 +18,7 @@ from utils.consts.consts import STATUS_OK, STATUS_ERROR
 async def handle_message(body, rabbitmq_client):
     """Process the message received by the general handler, and launch the algorithm execution."""
     
-    notify_update(rabbitmq_client, 1, "EXEC: Compilando algoritmo.")
+    await notify_update(rabbitmq_client, 1, "EXEC: Compilando algoritmo.")
 
     data = process_body(body)
 
@@ -52,7 +52,7 @@ async def handle_message(body, rabbitmq_client):
 
     run_cmd = data["cmd"]
 
-    notify_update(rabbitmq_client, 1, "EXEC: Ejecutando algoritmo.")
+    await notify_update(rabbitmq_client, 1, "EXEC: Ejecutando algoritmo.")
         
     print("\n[ ] Ejecutando comando: ", run_cmd)
     result = subprocess.run(run_cmd, capture_output=True, text=True, cwd="build")

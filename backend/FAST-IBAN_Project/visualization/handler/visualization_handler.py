@@ -26,7 +26,7 @@ async def handle_message(body, rabbitmq_client):
     data = process_body(body)
     
     print("\n[ ] Iniciando generación de mapas...")
-    notify_update(rabbitmq_client, 1, "MAPS: Iniciando generación de mapas.")
+    await notify_update(rabbitmq_client, 1, "MAPS: Iniciando generación de mapas.")
     
     # Create output directory if it doesn't exist
     os.makedirs(f"{OUT_DIR}/{data['request_hash']}", exist_ok=True)
@@ -77,10 +77,10 @@ async def handle_message(body, rabbitmq_client):
             for future in futures:
                 try:
                     cont += 1
-                    notify_update(rabbitmq_client, 1, f"MAPS: Generando mapa{cont} de {len(map_tasks)}.")
+                    await notify_update(rabbitmq_client, 1, f"MAPS: Generando mapa{cont} de {len(map_tasks)}.")
                     result = future.result()
                     results.append(result)
-                    notify_update(rabbitmq_client, 1, "MAPS: Mapa generado con éxito.")
+                    await notify_update(rabbitmq_client, 1, "MAPS: Mapa generado con éxito.")
                 except Exception as e:
                     print(f"Error in map generation task: {e}")
                     results.append(False)

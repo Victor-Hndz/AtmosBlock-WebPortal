@@ -66,7 +66,7 @@ class Configurator:
         print("\n✅ Argumentos cargados y validados con éxito.\n")
         print(f"Argumentos: {self.args}")
         
-        notify_update(self.rabbitmq, 1, "CONFIG: argumentos recibidos con éxito.")
+        await notify_update(self.rabbitmq, 1, "CONFIG: argumentos recibidos con éxito.")
 
         self.mount_file_name()
 
@@ -85,13 +85,13 @@ class Configurator:
             )
             print(f"\n✅ Archivo {self.file_name} descargado con éxito.")
             
-        notify_update(self.rabbitmq, 1, "CONFIG: descarga del archivo NetCDF realizada con éxito.")
+        await notify_update(self.rabbitmq, 1, "CONFIG: descarga del archivo NetCDF realizada con éxito.")
 
 
         adapt_netcdf(self.file_name)
         print(f"\n✅ Archivo {self.file_name} adaptado con éxito.")
         
-        notify_update(self.rabbitmq, 1, "CONFIG: Fichero NetCDF adaptado con éxito.")
+        await notify_update(self.rabbitmq, 1, "CONFIG: Fichero NetCDF adaptado con éxito.")
 
         # Create the configuration file
         configuration_data = {
