@@ -11,6 +11,7 @@ from utils.rabbitMQ.create_message import create_message
 from utils.rabbitMQ.rabbit_consts import HANDLER_QUEUE, NOTIFICATIONS_QUEUE, EXECUTION_EXCHANGE, EXECUTION_ALGORITHM_KEY, EXECUTION_VISUALIZATION_KEY, EXECUTION_ANIMATION_KEY, EXECUTION_TRACKING_KEY, NOTIFY_EXECUTION, NOTIFY_VISUALIZATION, NOTIFY_ANIMATION, NOTIFY_TRACKING
 from utils.minio.upload_files import upload_files_to_request_hash
 from utils.clean_folder_files import clean_directory
+from utils.rabbitMQ.notify_results import notify_result
 from utils.consts.consts import EXEC_FILE, STATUS_OK, STATUS_ERROR
 
 OUT_DIR = "./out"
@@ -156,6 +157,7 @@ class ConfigHandler:
             await self.process_formation_tracking()
         else:
             print("\n✅ Procesamiento completado.")
+            notify_result(self.rabbitmq, "Processing completed successfully.")
 
     async def handle_map_generation_message(self, body: bytes) -> None:
         """
@@ -182,6 +184,7 @@ class ConfigHandler:
             await self.process_formation_tracking()
         else:
             print("\n✅ Procesamiento completado.")
+            notify_result(self.rabbitmq, "Processing completed successfully.")
 
     async def handle_animation_message(self, body: bytes) -> None:
         """
@@ -205,6 +208,7 @@ class ConfigHandler:
             await self.process_formation_tracking()
         else:
             print("\n✅ Procesamiento completado.")
+            notify_result(self.rabbitmq, "Processing completed successfully.")
     
     async def handle_tracking_message(self, body: bytes) -> None:
         """
@@ -223,6 +227,7 @@ class ConfigHandler:
         
         print("\n✅ Seguimiento de formaciones completado exitosamente.")
         print("\n✅ Procesamiento completado.")
+        notify_result(self.rabbitmq, "Processing completed successfully.")
 
     async def process_file(self) -> None:
         """
@@ -316,6 +321,7 @@ class ConfigHandler:
             await self.process_formation_tracking()
         else:
             print("\n✅ Procesamiento completado.")
+            notify_result(self.rabbitmq, "Processing completed successfully.")
     
     async def process_formation_tracking(self) -> None:
         """
@@ -333,6 +339,7 @@ class ConfigHandler:
         # Temporary placeholder for the implementation
         print("\n[ ] Simulando finalización de seguimiento de formaciones...")
         print("\n✅ Procesamiento completado.")
+        notify_result(self.rabbitmq, "Processing completed successfully.")
 
     async def send_finish_message(self) -> None:
         """
