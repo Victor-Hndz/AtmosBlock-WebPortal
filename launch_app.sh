@@ -22,7 +22,7 @@ if $CLEAN_MODE; then
     echo "❌ El archivo docker_cleanup.sh no existe o no es ejecutable."
     exit 1
   fi
-  ./docker_cleanup.sh --volumes
+  ./docker_cleanup.sh
 fi
 
 export DOCKER_BUILDKIT=1
