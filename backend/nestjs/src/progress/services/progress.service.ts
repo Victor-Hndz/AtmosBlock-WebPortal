@@ -1,11 +1,12 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Subject } from "rxjs";
 import { ProgressEvent } from "../domain/progress.interface";
+import { MAX_PROGRESS } from "@/shared/consts/consts";
 
 @Injectable()
 export class ProgressService {
   private readonly logger = new Logger(ProgressService.name);
-  private readonly MAX_PROGRESS = 100; // Maximum progress value
+  private actualProgress = 0;
   private progressSubject = new Subject<ProgressEvent>();
   public readonly progress$ = this.progressSubject.asObservable();
 
@@ -17,10 +18,12 @@ export class ProgressService {
     this.logger.log(`Progress update: ${JSON.stringify(progressEvent)}`);
 
     // Ensure the increment is valid
-    if (progressEvent.increment < 0 || progressEvent.increment > this.MAX_PROGRESS) {
+    if (progressEvent.increment < 0 || progressEvent.increment > MAX_PROGRESS) {
       this.logger.warn(`Invalid progress increment: ${progressEvent.increment}`);
       return;
     }
+    this.actualProgress += progressEvent.increment;
+    progressEvent.increment = this.actualProgress;
 
     // Emit the progress event to all subscribers
     this.progressSubject.next(progressEvent);
