@@ -77,7 +77,7 @@ export class CreateRequestDto {
   @IsBoolean()
   @IsOptional()
   tracking?: boolean;
-  
+
   @ApiPropertyOptional({ description: "Skip data generation", default: false })
   @IsBoolean()
   @IsOptional()

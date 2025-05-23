@@ -9,7 +9,7 @@ export class GeneratedFilesMapper {
       files: entity.files,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
-      expiresAt: entity.expires_at,
+      expiresAt: entity.expiresAt,
     });
   }
 
@@ -19,7 +19,7 @@ export class GeneratedFilesMapper {
     entity.id = domain.id;
     entity.requestHash = domain.requestHash;
     entity.files = domain.files;
-    entity.expires_at = domain.expiresAt;
+    entity.expiresAt = domain.expiresAt;
 
     return entity;
   }

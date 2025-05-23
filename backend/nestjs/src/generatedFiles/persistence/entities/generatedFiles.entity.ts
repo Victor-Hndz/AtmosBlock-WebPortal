@@ -9,8 +9,11 @@ export class GeneratedFilesEntity {
   @Column({ name: "request_hash" })
   requestHash: string;
 
-  @Column("text", { array: true })
+  @Column("text", { array: true, default: [] })
   files: string[];
+
+  @Column({ type: "enum", enum: ["pending", "processing", "complete", "error"], default: "pending" })
+  status: string;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
@@ -18,8 +21,11 @@ export class GeneratedFilesEntity {
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
-  @Column({ name: "expires_at", type: "timestamp with time zone", nullable: false })
-  expires_at: Date;
+  @Column({ name: "generated_at", type: "timestamp with time zone", nullable: true })
+  generatedAt: Date;
+
+  @Column({ name: "expires_at", type: "timestamp with time zone", nullable: true })
+  expiresAt: Date;
 
   @OneToMany(() => RequestEntity, request => request.generatedFiles, { nullable: true })
   requests?: RequestEntity[];
