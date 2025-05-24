@@ -2,12 +2,34 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <!-- <link rel="icon" type="image/svg+xml" href="/vite.svg" /> -->
+    <link rel="icon" type="icon" href="/public/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Request form page</title>
+    <meta name="description" content="FAST-IBAN Portal for weather data requests" />
+    <meta name="keywords" content="FAST-IBAN, weather data, requests, portal, blockings, blockage, atmospheric" />
+    <meta name="author" content="FAST-IBAN Team" />
+    <title>FAST-IBAN Portal</title>
+    <!-- Add critical CSS for initial loading -->
+    <style>
+      .loader-spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(0, 32, 40, 0.1);
+        border-radius: 50%;
+        border-top-color: #002028;
+        animation: spin 1s ease-in-out infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Initial loading indicator -->
+      <div class="loader-spinner"></div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
