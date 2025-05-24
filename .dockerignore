@@ -2,6 +2,8 @@
 .git
 .gitignore
 
+**/scripts/
+
 # Docker files
 .dockerignore
 **/Dockerfile
