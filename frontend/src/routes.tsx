@@ -15,8 +15,16 @@ const ProfilePage = lazy(() => import("@/pages/ProfilePage"));
 const SettingsPage = lazy(() => import("@/pages/SettingsPage"));
 const ResultsPage = lazy(() => import("@/pages/ResultsPage"));
 
-// Simple loading component while lazy components load
-const LoadingFallback = () => <div className="flex items-center justify-center h-screen">Loading...</div>;
+
+// Simple loading spinner component
+const LoadingFallback = () => (
+  <div className="flex flex-col items-center justify-center h-screen text-violet-500">
+    <div className="w-12 h-12 border-4 border-violet-400 rounded-full border-t-transparent animate-spin mb-4"></div>
+    <p className="text-sm">Cargando aplicación...</p>
+  </div>
+);
+
+
 
 /**
  * Component to handle redirect to results page after submission
