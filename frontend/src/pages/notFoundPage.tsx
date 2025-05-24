@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import * as Separator from "@radix-ui/react-separator";
 import { AlertTriangle, Home, ArrowLeft } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 /**
  * NotFoundPage component - Displays when a user attempts to access a non-existent route
@@ -11,6 +12,8 @@ import { AlertTriangle, Home, ArrowLeft } from "lucide-react";
  */
 const NotFoundPage: React.FC = (): React.ReactElement => {
   const navigate = useNavigate();
+
+  const { t } = useTranslation();
 
   /**
    * Handles navigation back to the previous page
@@ -27,7 +30,7 @@ const NotFoundPage: React.FC = (): React.ReactElement => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
         <AlertDialog.Root defaultOpen>
           <AlertDialog.Content className="p-6">
@@ -36,13 +39,13 @@ const NotFoundPage: React.FC = (): React.ReactElement => {
             </div>
 
             <AlertDialog.Title className="text-2xl font-bold text-center text-gray-900 mb-2">
-              404 - Page Not Found
+              {t("notFound.title", "Page Not Found")}
             </AlertDialog.Title>
 
             <Separator.Root className="h-px bg-gray-200 my-4" />
 
             <AlertDialog.Description className="text-gray-600 text-center mb-6">
-              The page you're looking for doesn't exist or has been moved.
+              {t("notFound.message", "The page you are looking for does not exist.")}
             </AlertDialog.Description>
 
             <div className="flex justify-center space-x-4">
@@ -52,7 +55,7 @@ const NotFoundPage: React.FC = (): React.ReactElement => {
                 aria-label="Go back to previous page"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Go Back
+                {t("notFound.goBack", "Go Back")}
               </button>
 
               <button
@@ -61,7 +64,7 @@ const NotFoundPage: React.FC = (): React.ReactElement => {
                 aria-label="Go to home page"
               >
                 <Home className="w-4 h-4 mr-2" />
-                Home
+                {t("notFound.goHome", "Go Home")}
               </button>
             </div>
           </AlertDialog.Content>
