@@ -1,16 +1,40 @@
-import { JSX } from "react";
-import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
-import Home from "@/pages/homePage";
-import About from "@/pages/aboutPage";
-import NotFound from "@/pages/notFoundPage";
-import AuthPage from "@/pages/authPage";
-import RequestsPage from "@/pages/requestsPage";
-import ProfilePage from "@/pages/ProfilePage";
-import SettingsPage from "@/pages/SettingsPage";
-import ProgressPage from "@/pages/ProgressPage";
+import { JSX, useEffect, Suspense, lazy } from "react";
+import { createBrowserRouter, Navigate, RouterProvider, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/layout";
 import ProtectedRoute from "@/components/shared/ProtectedRoute";
-import { useAppSelector } from "@/redux/hooks";
+import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { clearRequestHash } from "@/redux/slices/submitRequestsSlice";
+
+// Use lazy loading for route components to improve initial load performance
+const Home = lazy(() => import("@/pages/homePage"));
+const About = lazy(() => import("@/pages/aboutPage"));
+const NotFound = lazy(() => import("@/pages/notFoundPage"));
+const AuthPage = lazy(() => import("@/pages/authPage"));
+const RequestsPage = lazy(() => import("@/pages/requestsPage"));
+const ProfilePage = lazy(() => import("@/pages/ProfilePage"));
+const SettingsPage = lazy(() => import("@/pages/SettingsPage"));
+const ResultsPage = lazy(() => import("@/pages/ResultsPage"));
+
+// Simple loading component while lazy components load
+const LoadingFallback = () => <div className="flex items-center justify-center h-screen">Loading...</div>;
+
+/**
+ * Component to handle redirect to results page after submission
+ */
+function RequestSubmissionHandler() {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const requestHash = useAppSelector(state => state.submitRequests.requestHash);
+
+  useEffect(() => {
+    if (requestHash) {
+      navigate(`/results?requestHash=${requestHash}`);
+      dispatch(clearRequestHash());
+    }
+  }, [requestHash, navigate, dispatch]);
+
+  return null;
+}
 
 /**
  * Application router configuration
@@ -24,16 +48,60 @@ function AppRoutes(): JSX.Element {
       path: "/",
       element: <Layout />,
       children: [
-        { path: "", element: <Home /> },
-        { path: "about", element: <About /> },
-        { path: "requests", element: <RequestsPage /> },
-        { path: "progress", element: <ProgressPage /> },
-        { path: "auth", element: isAuthenticated ? <Navigate to="/" replace /> : <AuthPage /> },
+        {
+          path: "",
+          element: (
+            <Suspense fallback={<LoadingFallback />}>
+              <Home />
+            </Suspense>
+          ),
+        },
+        {
+          path: "about",
+          element: (
+            <Suspense fallback={<LoadingFallback />}>
+              <About />
+            </Suspense>
+          ),
+        },
+        {
+          path: "requests",
+          element: (
+            <Suspense fallback={<LoadingFallback />}>
+              <>
+                <RequestsPage />
+                <RequestSubmissionHandler />
+              </>
+            </Suspense>
+          ),
+        },
+        {
+          path: "results",
+          element: (
+            <ProtectedRoute>
+              <Suspense fallback={<LoadingFallback />}>
+                <ResultsPage />
+              </Suspense>
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "auth",
+          element: isAuthenticated ? (
+            <Navigate to="/" replace />
+          ) : (
+            <Suspense fallback={<LoadingFallback />}>
+              <AuthPage />
+            </Suspense>
+          ),
+        },
         {
           path: "profile",
           element: (
             <ProtectedRoute>
-              <ProfilePage />
+              <Suspense fallback={<LoadingFallback />}>
+                <ProfilePage />
+              </Suspense>
             </ProtectedRoute>
           ),
         },
@@ -41,13 +109,22 @@ function AppRoutes(): JSX.Element {
           path: "settings",
           element: (
             <ProtectedRoute>
-              <SettingsPage />
+              <Suspense fallback={<LoadingFallback />}>
+                <SettingsPage />
+              </Suspense>
             </ProtectedRoute>
           ),
         },
       ],
     },
-    { path: "*", element: <NotFound /> },
+    {
+      path: "*",
+      element: (
+        <Suspense fallback={<LoadingFallback />}>
+          <NotFound />
+        </Suspense>
+      ),
+    },
   ]);
 
   return <RouterProvider router={router} />;
