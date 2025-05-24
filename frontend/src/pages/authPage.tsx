@@ -20,7 +20,7 @@ const PasswordRequirements: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <Tooltip.Provider>
+    <Tooltip.Provider delayDuration={200} skipDelayDuration={200}>
       <Tooltip.Root>
         <Tooltip.Trigger asChild>
           <button
