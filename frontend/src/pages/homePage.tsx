@@ -1,7 +1,7 @@
 import React, { JSX } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Download, ArrowRight, BarChart, Database, CloudLightning } from "lucide-react";
+import { Download, ArrowRight, BarChart, Database } from "lucide-react";
 import * as Separator from "@radix-ui/react-separator";
 import * as HoverCard from "@radix-ui/react-hover-card";
 import * as Tabs from "@radix-ui/react-tabs";
@@ -47,7 +47,7 @@ export default function HomePage(): JSX.Element {
       {/* Features Section */}
       <section>
         <h2 className="text-3xl font-bold text-center mb-8 text-slate-900">{t("home.features.title")}</h2>
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           <FeatureCard
             icon={<Database className="h-8 w-8 text-violet-600" />}
             title={t("home.features.feature1.title")}
@@ -57,11 +57,6 @@ export default function HomePage(): JSX.Element {
             icon={<BarChart className="h-8 w-8 text-violet-600" />}
             title={t("home.features.feature2.title")}
             description={t("home.features.feature2.description")}
-          />
-          <FeatureCard
-            icon={<CloudLightning className="h-8 w-8 text-violet-600" />}
-            title={t("home.features.feature3.title")}
-            description={t("home.features.feature3.description")}
           />
         </div>
       </section>
@@ -83,21 +78,12 @@ export default function HomePage(): JSX.Element {
             >
               {t("home.dataExamples.tab2")}
             </Tabs.Trigger>
-            <Tabs.Trigger
-              value="tab3"
-              className="px-4 py-2 text-slate-600 font-medium data-[state=active]:text-violet-600 data-[state=active]:border-b-2 data-[state=active]:border-violet-600"
-            >
-              {t("home.dataExamples.tab3")}
-            </Tabs.Trigger>
           </Tabs.List>
           <Tabs.Content value="tab1" className="p-4 bg-white rounded-lg shadow-sm">
             <p className="text-slate-700">{t("home.dataExamples.content1")}</p>
           </Tabs.Content>
           <Tabs.Content value="tab2" className="p-4 bg-white rounded-lg shadow-sm">
             <p className="text-slate-700">{t("home.dataExamples.content2")}</p>
-          </Tabs.Content>
-          <Tabs.Content value="tab3" className="p-4 bg-white rounded-lg shadow-sm">
-            <p className="text-slate-700">{t("home.dataExamples.content3")}</p>
           </Tabs.Content>
         </Tabs.Root>
       </section>
