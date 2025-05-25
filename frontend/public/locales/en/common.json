@@ -146,6 +146,7 @@
     "hours": "Hours",
     "hoursTooltip": "Select one or more hours for the data",
     "pressureLevels": "Pressure Levels",
+    "selectpressureLevels": "Select Pressure Levels",
     "pressureLevelsAdvanced": "Pressure Levels",
     "pressureLevelsTooltip": "Select one pressure level for your data visualization",
     "pressureLevelsAdvancedTooltip": "Select one or more pressure levels for the data",
@@ -153,8 +154,6 @@
     "areaCoveredTooltip": "Select the geographical areas to be covered",
     "mapTypes": "Map Types",
     "mapTypesTooltip": "Select the types of maps to generate",
-    "mapRanges": "Map Ranges",
-    "mapRangesTooltip": "Select the range options for your maps",
     "mapLevels": "Map Levels",
     "mapLevelsTooltip": "Select the vertical levels for your maps",
     "useDefaultArea": "Use Default Area",
@@ -205,7 +204,8 @@
     "invalidEastCoordinate": "Invalid East coordinate",
     "invalidWestCoordinate": "Invalid West coordinate",
     "noOptionsAvailable": "No options available",
-    "selectPlaceholder": "Select an option"
+    "selectPlaceholder": "Select an option",
+    "itemsSelected": "items selected"
   },
   "buttons": {
     "submit": "Submit",
@@ -253,20 +253,14 @@
       "feature2": {
         "title": "Interactive Visualization",
         "description": "Visualize your results with interactive charts and maps for better understanding."
-      },
-      "feature3": {
-        "title": "Real-time Tracking",
-        "description": "Track the progress of your requests in real-time and receive notifications when completed."
       }
     },
     "dataExamples": {
       "title": "Explore Data Examples",
       "tab1": "Temperature",
-      "tab2": "Pressure",
-      "tab3": "Humidity",
+      "tab2": "Geopotential",
       "content1": "Temperature data processing allows for analysis of thermal patterns across different geographic regions and time periods. Our system handles temperature measurements from various sources and grid resolutions.",
-      "content2": "Pressure level data provides crucial information about atmospheric conditions. Process multi-level pressure data and generate comprehensive visualization maps for meteorological analysis.",
-      "content3": "Humidity data processing enables monitoring of water vapor content in the atmosphere. Analyze humidity patterns to better understand precipitation systems and climate conditions."
+      "content2": "Pressure level data provides crucial information about atmospheric conditions. Process multi-level pressure data and generate comprehensive visualization maps for meteorological analysis."
     },
     "cta": {
       "title": "Ready to Get Started?",
@@ -276,14 +270,14 @@
   },
   "about": {
     "title": "About FAST-IBAN Project",
-    "description": "A modern platform for meteorological data processing and analysis",
+    "description": "A modern platform for meteorological data processing and analysis.",
     "projectOverview": "Project Overview",
     "projectDescription": "The FAST-IBAN project is a comprehensive solution designed to process, analyze, and visualize meteorological data efficiently. It leverages high-performance computing techniques to provide researchers and meteorologists with valuable insights from complex datasets.",
     "technologies": "Technologies Used",
     "techStack": {
-      "frontend": "React with TypeScript, Redux, and Tailwind CSS for the user interface",
-      "backend": "NestJS with TypeScript for the API and authentication services",
-      "processing": "C and python for high-performance numerical calculations and map generation"
+      "frontend": "React with TypeScript, Redux, and Tailwind CSS for the user interface.",
+      "backend": "NestJS with TypeScript for the API and authentication services.",
+      "processing": "C and python for high-performance numerical calculations and map generation."
     },
     "links": {
       "github": "View on GitHub",
@@ -337,5 +331,31 @@
     "techDetail2": "RabbitMQ for message queuing",
     "techDetail3": "Radix UI components for accessible UI",
     "techDetail4": "React for state management and UI updates"
+  },
+  "notFound": {
+    "title": "404 - Page Not Found",
+    "message": "The page you're looking for doesn't exist or has been moved.",
+    "goHome": "Home",
+    "goBack": "Go Back"
+  },
+  "months-list": {
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December"
+  },
+  "mapTypes-list": {
+    "cont": "Contour",
+    "disp": "Dispersion",
+    "comb": "Combined Cont. + Disp.",
+    "forms": "Formations"
   }
 }
