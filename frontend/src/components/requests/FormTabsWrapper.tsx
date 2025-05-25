@@ -6,10 +6,9 @@ import * as Separator from "@radix-ui/react-separator";
 import { useRequestForm } from "@/hooks/useRequestForm";
 import { useRequestNavigation } from "@/hooks/useRequestNavigation";
 import RequestSummary from "@/components/requests/RequestSummary";
-import BasicInfoTab from "@/components/requests/BasicInfoTab";
-import MapConfigTab from "@/components/requests/MapConfigTab";
-import AdditionalSettingsTab from "@/components/requests/AdditionalSettingsTab";
 import { REQUEST_FORM_STEPS } from "@/consts/requestsConsts";
+import PopulateFormTab from "./PopulateFormTab";
+import { TabPlace } from "@/types/FormField";
 
 interface FormTabsWrapperProps {
   advancedMode: boolean;
@@ -37,7 +36,8 @@ const FormTabsWrapper: React.FC<FormTabsWrapperProps> = ({ advancedMode, showToa
   // Memoize form components to prevent needless re-renders
   const basicInfoForm = useMemo(
     () => (
-      <BasicInfoTab
+      <PopulateFormTab
+        tabName={TabPlace.BASIC_INFO}
         formData={formData}
         updateFormField={updateField}
         handleCheckboxChange={handleCheckboxChange}
@@ -51,7 +51,8 @@ const FormTabsWrapper: React.FC<FormTabsWrapperProps> = ({ advancedMode, showToa
 
   const mapConfigForm = useMemo(
     () => (
-      <MapConfigTab
+      <PopulateFormTab
+        tabName={TabPlace.MAP_CONFIG}
         formData={formData}
         updateFormField={updateField}
         handleCheckboxChange={handleCheckboxChange}
@@ -66,7 +67,8 @@ const FormTabsWrapper: React.FC<FormTabsWrapperProps> = ({ advancedMode, showToa
 
   const additionalSettingsForm = useMemo(
     () => (
-      <AdditionalSettingsTab
+      <PopulateFormTab
+        tabName={TabPlace.ADDITIONAL_SETTINGS}
         formData={formData}
         updateFormField={updateField}
         handleCheckboxChange={handleCheckboxChange}
