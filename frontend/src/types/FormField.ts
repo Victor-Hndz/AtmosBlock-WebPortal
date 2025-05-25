@@ -46,6 +46,7 @@ export interface FormFieldConfig {
   inputType: InputType;
   tabPlace: TabPlace;
   advancedField: boolean;
+  showInAdvancedMode: boolean;
   optionalField: boolean;
   label?: string;
   placeholder?: string;
