@@ -11,18 +11,18 @@ export const REQUEST_FORM_STEPS = ["basicInfo", "mapConfig", "additionalSettings
 /**
  * Available variable names for selection
  */
-export const VARIABLE_NAME_OPTIONS = ["Geopotential", "Temperature"];
+export const VARIABLE_NAME_OPTIONS = ["geopotential", "temperature"];
 
 /**
  * Available pressure levels for selection
  */
-export const PRESSURE_LEVELS = ["1000hPa", "550hPa", "500hPa", "300hPa", "100hPa", "10hPa"];
+export const PRESSURE_LEVELS = ["1000", "550", "500", "300", "100", "10"];
 
 /**
  * Available pressure levels for advanced selection
  * Ordered in descending numerical value
  */
-export const PRESSURE_LEVELS_ADVANCED = [...PRESSURE_LEVELS, "850hPa", "700hPa", "200hPa", "50hPa"].sort((a, b) => {
+export const PRESSURE_LEVELS_ADVANCED = [...PRESSURE_LEVELS, "850", "700", "200", "50"].sort((a, b) => {
   const numA = parseInt(a);
   const numB = parseInt(b);
   return numB - numA;
@@ -30,33 +30,35 @@ export const PRESSURE_LEVELS_ADVANCED = [...PRESSURE_LEVELS, "850hPa", "700hPa",
 
 /**
  * Available years for selection
+ * From 2000 to the previous year (actual year - 1)
  */
-export const AVAILABLE_YEARS = Array.from({ length: new Date().getFullYear() - 2000 + 1 }, (_, i) => `${1992 + i}`);
+export const AVAILABLE_YEARS = Array.from({ length: new Date().getFullYear() - 2000 }, (_, i) => `${2000 + i}`);
 
 /**
- * Available years for selection
+ * Available years for advanced selection
+ * From 1940 to the previous year (actual year - 1)
  */
 export const AVAILABLE_YEARS_ADVANCED = Array.from(
-  { length: new Date().getFullYear() - 1940 + 1 },
-  (_, i) => `${1992 + i}`
+  { length: new Date().getFullYear() - 1940 },
+  (_, i) => `${1940 + i}`
 );
 
 /**
  * Available months for selection
  */
 export const AVAILABLE_MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
 ];
 
 /**
@@ -126,22 +128,17 @@ export const calculateAvailableDays = (selectedYears: string[], selectedMonths: 
 /**
  * Available hours for selection
  */
-export const AVAILABLE_HOURS = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, "0")}:00`);
+export const AVAILABLE_HOURS = Array.from({ length: 24 }, (_, i) => i.toString());
 
 /**
  * Available map types for selection
  */
-export const MAP_TYPES = ["Contour", "Dispersion", "Combined", "Formations"];
+export const MAP_TYPES = ["cont", "disp", "comb", "forms"];
 
 /**
  * Available map areas for selection
  */
 export const MAP_AREAS = ["North", "South", "East", "West"];
-
-/**
- * Available map ranges for selection
- */
-export const MAP_RANGES = ["MAX", "MIN", "BOTH", "COMB"];
 
 /**
  * Available map levels for selection
@@ -151,7 +148,7 @@ export const MAP_LEVELS = ["10", "15", "20", "25", "30"];
 /**
  * Available file formats for selection
  */
-export const FILE_FORMAT_OPTIONS = ["SVG", "PNG", "JPG", "JPEG", "PDF"];
+export const FILE_FORMAT_OPTIONS = ["svg", "png", "jpg", "jpeg", "pdf"];
 
 /**
  * Toast duration in milliseconds

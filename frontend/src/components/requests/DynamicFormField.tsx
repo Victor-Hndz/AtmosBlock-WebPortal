@@ -3,7 +3,19 @@ import * as Checkbox from "@radix-ui/react-checkbox";
 import * as Select from "@radix-ui/react-select";
 import * as Switch from "@radix-ui/react-switch";
 import * as Popover from "@radix-ui/react-popover";
-import { Check, ChevronDown, ChevronUp, Calendar, Clock, CalendarDays, X } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Calendar,
+  Clock,
+  CalendarDays,
+  X,
+  ArrowUp,
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormFieldConfig, InputType } from "@/types/FormField";
@@ -75,7 +87,6 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
           down: value[2],
           right: value[3],
         });
-        setUseDefaultArea(false);
       }
     }
     // Handle pressure levels as array
@@ -85,8 +96,12 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
         const pressureArray = value.split(",").map(v => v.trim());
         updateField("pressureLevels", pressureArray as any);
       }
+      // If it's empty, initialize with empty array
+      else if (!Array.isArray(value)) {
+        updateField("pressureLevels", [] as any);
+      }
     }
-  }, [config.inputType, config.name, value, updateField]);
+  }, [config.inputType, config.name, value, config.defaultValue, updateField]);
 
   // Handle clearing selected days when years or months change
   useEffect(() => {
@@ -178,8 +193,27 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
         );
 
       case InputType.SELECT:
+        // Handle array values for pressure levels field
+        let selectValue = value;
+
+        // If value is an array, extract the first value for the select component
+        if (Array.isArray(value) && config.name === "pressureLevels" || config.name === "mapLevels") {
+          selectValue = value.length > 0 ? value[0] : "";
+        }
+
+        // Handle value changes for array-type fields
+        const handleSelectChange = (newValue: string) => {
+          if (config.name === "pressureLevels" || config.name === "mapLevels") {
+            // Maintain array format for pressure levels
+            updateField(config.name, [newValue] as any);
+          } else {
+            // Normal handling for other fields
+            updateField(config.name, newValue as any);
+          }
+        };
+
         return (
-          <Select.Root value={value ?? ""} onValueChange={value => updateField(config.name, value as any)}>
+          <Select.Root value={selectValue ?? ""} onValueChange={handleSelectChange}>
             <Select.Trigger
               className="inline-flex items-center justify-between w-full px-3 py-2 text-sm border border-slate-300 
                       rounded-md shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 
@@ -238,58 +272,83 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
         };
 
         return (
-          <Popover.Root open={isMultiselectOpen} onOpenChange={setIsMultiselectOpen}>
-            <Popover.Trigger asChild>
-              <button
-                type="button"
-                className="inline-flex items-center justify-between w-full mt-1.5 px-3 py-2 text-sm border border-slate-300 
-                        rounded-md shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 
-                        focus:border-violet-500"
-              >
-                <span className="truncate">
-                  {selectedOptions.length > 0
-                    ? `${selectedOptions.length} ${t("common.selected", "selected")}`
-                    : t("common.selectOptions", "Select options")}
-                </span>
-                <ChevronDown className="w-4 h-4 text-slate-500" />
-              </button>
-            </Popover.Trigger>
-            <Popover.Portal>
-              <Popover.Content
-                className="bg-white p-3 rounded-md shadow-lg border border-slate-200 w-72 max-h-60 overflow-y-auto z-50"
-                sideOffset={5}
-                align="start"
-              >
-                <div className="space-y-2">
-                  {config.options?.map(option => (
-                    <div key={option.value} className="flex items-center gap-2">
-                      <Checkbox.Root
-                        id={`${config.id}-${option.value}`}
-                        checked={selectedOptions.includes(option.value)}
-                        onCheckedChange={() => handleMultiselectToggle(option.value)}
-                        className="h-4 w-4 rounded border border-slate-300 bg-white
+          <div className="mt-1.5 space-y-3">
+            <Popover.Root open={isMultiselectOpen} onOpenChange={setIsMultiselectOpen}>
+              <Popover.Trigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-between w-full px-3 py-2 text-sm border border-slate-300 
+                          rounded-md shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 
+                          focus:border-violet-500 disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200"
+                >
+                  <span className="inline-flex items-center">
+                    <span className="truncate">
+                      {selectedOptions.length === 0
+                        ? t(
+                            config.placeholder ? config.placeholder : `requests-form.select${config.name}`,
+                            config.placeholder ? t(config.placeholder as any) : `Select ${config.name}`
+                          )
+                        : selectedOptions.length <= 2
+                          ? selectedOptions
+                              .map(val => config.options?.find(opt => opt.value === val)?.label || val)
+                              .join(", ")
+                          : selectedOptions.length +
+                            " " +
+                            t("requests-form.itemsSelected", {
+                              count: selectedOptions.length,
+                              defaultValue: "{{count}} selected",
+                            })}
+                    </span>
+                  </span>
+                  <ChevronDown className="w-4 h-4 text-slate-500" />
+                </button>
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Content
+                  className="bg-white p-3 rounded-md shadow-lg border border-slate-200 max-w-m max-h-70 overflow-y-auto z-50 p-7"
+                  sideOffset={5}
+                  align="start"
+                >
+                  {(config.options?.length ?? 0) > 0 ? (
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 gap-x-4">
+                      {config.options?.map(option => (
+                        <div key={option.value} className="flex items-center gap-2">
+                          <Checkbox.Root
+                            id={`${config.id}-${option.value}`}
+                            checked={selectedOptions.includes(option.value)}
+                            onCheckedChange={() => handleMultiselectToggle(option.value)}
+                            className="h-4 w-4 rounded border border-slate-300 bg-white
                               data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600 
                               focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-1"
-                      >
-                        <Checkbox.Indicator className="flex items-center justify-center text-white">
-                          <Check className="h-3 w-3" />
-                        </Checkbox.Indicator>
-                      </Checkbox.Root>
-                      <label htmlFor={`${config.id}-${option.value}`} className="text-sm text-slate-700 cursor-pointer">
-                        {option.label}
-                      </label>
+                          >
+                            <Checkbox.Indicator className="flex items-center justify-center text-white">
+                              <Check className="h-3 w-3" />
+                            </Checkbox.Indicator>
+                          </Checkbox.Root>
+                          <label
+                            htmlFor={`${config.id}-${option.value}`}
+                            className="text-sm text-slate-700 cursor-pointer"
+                          >
+                            {option.label}
+                          </label>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-                <Popover.Close
-                  className="absolute top-2 right-2 rounded-full p-1 inline-flex items-center justify-center text-slate-400 hover:text-slate-500"
-                  aria-label="Close"
-                >
-                  <X className="h-4 w-4" />
-                </Popover.Close>
-              </Popover.Content>
-            </Popover.Portal>
-          </Popover.Root>
+                  ) : (
+                    <div className="py-2 text-center text-slate-500 text-sm">
+                      {t("requests-form.noOptionsAvailable", "No options available")}
+                    </div>
+                  )}
+                  <Popover.Close
+                    className="absolute top-2 right-2 rounded-full p-1 inline-flex items-center justify-center text-slate-400 hover:text-slate-500"
+                    aria-label="Close"
+                  >
+                    <X className="h-4 w-4" />
+                  </Popover.Close>
+                </Popover.Content>
+              </Popover.Portal>
+            </Popover.Root>
+          </div>
         );
 
       case InputType.SWITCH:
@@ -329,7 +388,8 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
                     <Check className="h-3 w-3" />
                   </Checkbox.Indicator>
                 </Checkbox.Root>
-                <span>{option.label}</span>
+                <span>{config.name === "mapTypes" ? t(`mapTypes-list.${option.label}` as any) : option.label}
+                </span>
               </label>
             ))}
           </div>
@@ -350,7 +410,11 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
         const getDisplayText = (type: "years" | "months" | "days" | "hours") => {
           if (selectedValues.length === 0) return t(`requests-form.select${type}`, `Select ${type}`);
           if (selectedValues.length <= 2) return selectedValues.join(", ");
-          return t("requests-form.itemsSelected", { count: selectedValues.length, defaultValue: "{{count}} selected" });
+          return (
+            selectedValues.length +
+            " " +
+            t("requests-form.itemsSelected", { count: selectedValues.length, defaultValue: "{{count}} selected" })
+          );
         };
 
         const getIcon = (type: "years" | "months" | "days" | "hours") => {
@@ -400,12 +464,12 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
               </Popover.Trigger>
               <Popover.Portal>
                 <Popover.Content
-                  className="bg-white p-3 rounded-md shadow-lg border border-slate-200 max-w-xs max-h-60 overflow-y-auto z-50"
+                  className="bg-white p-3 rounded-md shadow-lg border border-slate-200 max-w-m max-h-70 overflow-y-auto z-50 p-7"
                   sideOffset={5}
                   align="start"
                 >
                   {options.length > 0 ? (
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 gap-x-4">
                       {options.map(option => (
                         <div key={option.value} className="flex items-center gap-2">
                           <Checkbox.Root
@@ -424,7 +488,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
                             htmlFor={`${config.id}-${option.value}`}
                             className="text-sm text-slate-700 cursor-pointer"
                           >
-                            {option.label}
+                            {config.name === "months" ? t(`months-list.${option.label}` as any) : option.label}
                           </label>
                         </div>
                       ))}
@@ -452,8 +516,8 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
             <div className="flex items-center gap-2">
               <Checkbox.Root
                 id={`${config.id}-default`}
-                checked={useDefaultArea}
-                onCheckedChange={checked => toggleDefaultArea(!!checked)}
+                defaultChecked
+                onCheckedChange={checked => toggleDefaultArea(checked as boolean)}
                 className="h-4 w-4 rounded border border-slate-300 bg-white
                         data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600 
                         focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-1"
@@ -466,70 +530,80 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
                 {t("requests-form.useDefaultArea", "Use default area")}
               </label>
             </div>
-
-            <div className={`grid grid-cols-3 gap-2 ${useDefaultArea ? "opacity-50 pointer-events-none" : ""}`}>
+            <div className={`grid grid-cols-3 gap-3 ${useDefaultArea ? "opacity-50 pointer-events-none" : ""}`}>
               {/* Top input */}
-              <div className="col-start-2">
+              <div className="col-start-2 flex items-end justify-center">
                 <input
                   type="number"
                   value={areaCoords.up}
                   onChange={e => handleAreaCoordsChange("up", e.target.value)}
-                  min="0"
+                  min="-90"
                   max="90"
                   disabled={useDefaultArea}
                   className="w-full text-center rounded-md border border-slate-300 px-2 py-1 text-sm 
                            focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
-                  placeholder="North (0-90)"
+                  placeholder="North (-90-90)"
                 />
               </div>
 
               {/* Left input */}
-              <div className="col-start-1 row-start-2">
+              <div className="col-start-1 row-start-2 flex items-center justify-end">
                 <input
                   type="number"
                   value={areaCoords.left}
                   onChange={e => handleAreaCoordsChange("left", e.target.value)}
                   min="-180"
-                  max="0"
-                  disabled={useDefaultArea}
-                  className="w-full text-center rounded-md border border-slate-300 px-2 py-1 text-sm 
-                           focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
-                  placeholder="West (-180-0)"
-                />
-              </div>
-
-              {/* Center - empty cell */}
-              <div className="col-start-2 row-start-2 flex items-center justify-center">
-                <div className="w-4 h-4 rounded-full bg-violet-500"></div>
-              </div>
-
-              {/* Right input */}
-              <div className="col-start-3 row-start-2">
-                <input
-                  type="number"
-                  value={areaCoords.right}
-                  onChange={e => handleAreaCoordsChange("right", e.target.value)}
-                  min="0"
                   max="180"
                   disabled={useDefaultArea}
                   className="w-full text-center rounded-md border border-slate-300 px-2 py-1 text-sm 
                            focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
-                  placeholder="East (0-180)"
+                  placeholder="West (-180-180)"
+                />
+              </div>
+
+              {/* Center - compass arrows */}
+              <div className="col-start-2 row-start-2 flex items-center justify-center">
+                <div className="relative w-14 h-14 flex items-center justify-center">
+                  {/* Arrows, positioned with more space between them */}
+                  <ArrowUp className="absolute top-0 left-1/2 -translate-x-1/2 w-5 h-5 text-violet-600" />
+                  <ArrowDown className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-5 text-violet-600" />
+                  <ArrowLeft className="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-5 text-violet-600" />
+                  <ArrowRight className="absolute right-0 top-1/2 -translate-y-1/2 w-5 h-5 text-violet-600" />
+
+                  {/* Central circle - moved to the end to ensure it's on top (higher z-index) */}
+                  <div className="absolute inset-0 flex items-center justify-center z-10">
+                    <div className="w-4 h-4 rounded-full bg-violet-700 border-2 border-violet-300 shadow-sm"></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right input */}
+              <div className="col-start-3 row-start-2 flex items-center justify-start">
+                <input
+                  type="number"
+                  value={areaCoords.right}
+                  onChange={e => handleAreaCoordsChange("right", e.target.value)}
+                  min="-180"
+                  max="180"
+                  disabled={useDefaultArea}
+                  className="w-full text-center rounded-md border border-slate-300 px-2 py-1 text-sm 
+                           focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+                  placeholder="East (-180-180)"
                 />
               </div>
 
               {/* Bottom input */}
-              <div className="col-start-2 row-start-3">
+              <div className="col-start-2 row-start-3 flex items-start justify-center">
                 <input
                   type="number"
                   value={areaCoords.down}
                   onChange={e => handleAreaCoordsChange("down", e.target.value)}
                   min="-90"
-                  max="0"
+                  max="90"
                   disabled={useDefaultArea}
                   className="w-full text-center rounded-md border border-slate-300 px-2 py-1 text-sm 
                            focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
-                  placeholder="South (-90-0)"
+                  placeholder="South (-90-90)"
                 />
               </div>
             </div>
@@ -537,7 +611,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
             <p className="text-xs text-slate-500">
               {t(
                 "requests-form.areaInputHelp",
-                "Coordinates in degrees: North (0-90), West (-180-0), South (-90-0), East (0-180)"
+                "Coordinates in degrees: North (-90-90), West (-180-180), South (-90-90), East (-180-180)"
               )}
             </p>
           </div>
@@ -570,7 +644,11 @@ function getCheckboxGridClass(optionsCount: number, fieldName: string): string {
   }
 
   if (fieldName === "hours") {
-    return "grid-cols-4 sm:grid-cols-6 md:grid-cols-8";
+    return "grid-cols-6";
+  }
+
+  if (fieldName === "years") {
+    return "grid-cols-10";
   }
 
   if (optionsCount <= 4) {
