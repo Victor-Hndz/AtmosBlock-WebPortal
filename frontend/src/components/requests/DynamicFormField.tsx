@@ -197,7 +197,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
         let selectValue = value;
 
         // If value is an array, extract the first value for the select component
-        if (Array.isArray(value) && config.name === "pressureLevels" || config.name === "mapLevels") {
+        if ((Array.isArray(value) && config.name === "pressureLevels") || config.name === "mapLevels") {
           selectValue = value.length > 0 ? value[0] : "";
         }
 
@@ -388,8 +388,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
                     <Check className="h-3 w-3" />
                   </Checkbox.Indicator>
                 </Checkbox.Root>
-                <span>{config.name === "mapTypes" ? t(`mapTypes-list.${option.label}` as any) : option.label}
-                </span>
+                <span>{config.name === "mapTypes" ? t(`mapTypes-list.${option.label}` as any) : option.label}</span>
               </label>
             ))}
           </div>
