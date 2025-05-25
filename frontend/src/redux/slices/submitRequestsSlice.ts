@@ -7,13 +7,26 @@ interface SubmitRequestsState {
   isSubmitting: boolean;
   isLoading: boolean;
   error: string | null;
+  requestHash: string | null;
 }
 
 const initialState: SubmitRequestsState = {
   isLoading: false,
   error: null,
-  form: {} as RequestForm,
+  form: {
+    // Initialize array fields with empty arrays to prevent null/undefined issues
+    pressureLevels: [],
+    years: [],
+    months: [],
+    days: [],
+    hours: [],
+    areaCovered: [],
+    mapTypes: [],
+    mapRanges: [],
+    mapLevels: [],
+  } as RequestForm,
   isSubmitting: false,
+  requestHash: null,
 };
 
 /**
@@ -63,6 +76,9 @@ const submitRequestsSlice = createSlice({
         state.form[field] = value;
       }
     },
+    clearRequestHash: state => {
+      state.requestHash = null;
+    },
   },
   extraReducers: builder => {
     // Submit request
@@ -72,9 +88,11 @@ const submitRequestsSlice = createSlice({
         state.isSubmitting = true;
         state.error = null;
       })
-      .addCase(submitRequest.fulfilled, state => {
+      .addCase(submitRequest.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSubmitting = false;
+        // Store the request hash for redirection
+        state.requestHash = action.payload.hash || action.payload.requestHash || null;
         // Clear form data after successful submission
         state.form = {} as RequestForm;
       })
@@ -86,5 +104,5 @@ const submitRequestsSlice = createSlice({
   },
 });
 
-export const { clearRequestsError, updateFormField } = submitRequestsSlice.actions;
+export const { clearRequestsError, updateFormField, clearRequestHash } = submitRequestsSlice.actions;
 export default submitRequestsSlice.reducer;
