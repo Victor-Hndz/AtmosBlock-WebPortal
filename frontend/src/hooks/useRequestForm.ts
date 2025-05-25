@@ -102,12 +102,18 @@ export const useRequestForm = (t: TFunction): UseRequestFormReturn => {
     <K extends keyof RequestForm>(field: K, value: string, checked: boolean | "indeterminate") => {
       if (typeof checked !== "boolean") return;
 
-      const currentValues = (formData[field] as string[]) || [];
+      const currentValues = Array.isArray(formData[field]) ? (formData[field] as string[]) : [];
 
       if (checked) {
-        updateField(field, [...currentValues, value] as RequestForm[K]);
+        // Add value if it doesn't exist
+        if (!currentValues.includes(value)) {
+          updateField(field, [...currentValues, value] as RequestForm[K]);
+        }
       } else {
-        updateField(field, currentValues.filter(v => v !== value) as RequestForm[K]);
+        // Remove value if it exists
+        if (currentValues.includes(value)) {
+          updateField(field, currentValues.filter(v => v !== value) as RequestForm[K]);
+        }
       }
     },
     [formData, updateField]
