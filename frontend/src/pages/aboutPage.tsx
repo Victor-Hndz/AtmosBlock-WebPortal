@@ -70,43 +70,45 @@ const AboutPage: React.FC = (): JSX.Element => {
         </div>
 
         {/* External Links */}
-        <div className="external-links-container">
-          <a
-            href="https://github.com/Victor-Hndz"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-md hover:bg-slate-700 transition-colors"
-          >
-            <FaGithub size={18} />
-            <span>{t("about.links.github")}</span>
-          </a>
-          <a
-            href="https://linkedin.com/in/víctor-hernández-sánchez-a19361239"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-          >
-            <FaLinkedin size={18} />
-            <span>{t("about.links.linkedin")}</span>
-          </a>
-          <a
-            href="https://www.um.es"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 um-link rounded-md"
-          >
-            <ExternalLink size={18} />
-            <span>{t("about.links.universityUM")}</span>
-          </a>
-          <a
-            href="https://www.umh.es"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 umh-link rounded-md"
-          >
-            <ExternalLink size={18} />
-            <span>{t("about.links.universityUMH")}</span>
-          </a>
+        <div className="flex justify-center">
+          <div className="flex flex-wrap gap-4 items-center external-links-container">
+            <a
+              href="https://github.com/Victor-Hndz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-md hover:bg-slate-700 transition-colors"
+            >
+              <FaGithub size={18} />
+              <span>{t("about.links.github")}</span>
+            </a>
+            <a
+              href="https://linkedin.com/in/víctor-hernández-sánchez-a19361239"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <FaLinkedin size={18} />
+              <span>{t("about.links.linkedin")}</span>
+            </a>
+            <a
+              href="https://www.um.es"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 um-link rounded-md"
+            >
+              <ExternalLink size={18} />
+              <span>{t("about.links.universityUM")}</span>
+            </a>
+            <a
+              href="https://www.umh.es"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 umh-link rounded-md"
+            >
+              <ExternalLink size={18} />
+              <span>{t("about.links.universityUMH")}</span>
+            </a>
+          </div>
         </div>
       </section>
 
