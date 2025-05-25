@@ -15,7 +15,6 @@ const ProfilePage = lazy(() => import("@/pages/ProfilePage"));
 const SettingsPage = lazy(() => import("@/pages/SettingsPage"));
 const ResultsPage = lazy(() => import("@/pages/ResultsPage"));
 
-
 // Simple loading spinner component
 const LoadingFallback = () => (
   <div className="flex flex-col items-center justify-center h-screen text-violet-500">
@@ -23,8 +22,6 @@ const LoadingFallback = () => (
     <p className="text-sm">Cargando aplicación...</p>
   </div>
 );
-
-
 
 /**
  * Component to handle redirect to results page after submission

@@ -7,7 +7,6 @@ import "@/i18n/i18n";
 import "./index.css";
 import App from "./App";
 
-
 // Render with a loading spinner while the app loads
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
