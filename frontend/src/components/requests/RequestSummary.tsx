@@ -1,12 +1,59 @@
 import React, { useMemo } from "react";
 import { RequestForm } from "@/types/Request";
 import { TFunction } from "i18next";
+import { capitalize, extractMonthNames } from "@/utils/utilities";
 
 interface RequestSummaryProps {
   formData: RequestForm;
   onPrevious: () => void;
   t: TFunction;
 }
+
+const formatMonths = (months: string[] | undefined, t: TFunction): string => {
+  return extractMonthNames(months ?? [])
+    .map(month => t(`months-list.${month.toLowerCase()}` as any))
+    .join(", ");
+};
+
+const formatDays = (days: string[] | undefined, t: TFunction): string => {
+  if (!days || days.length === 0) return t("common.none");
+  return days
+    .map(day => {
+      const num = Number(day);
+      return num < 10 ? `0${num}` : `${num}`;
+    })
+    .join(", ");
+};
+
+const formatHours = (hours: string[] | undefined, t: TFunction): string => {
+  if (!hours || hours.length === 0) return t("common.none");
+  return hours
+    .map(hour => {
+      const num = Number(hour);
+      return num < 10 ? `0${num}:00` : `${num}:00`;
+    })
+    .join(", ");
+};
+
+const formatPressureLevels = (levels: string[] | undefined, t: TFunction): string => {
+  if (!levels || levels.length === 0) return t("common.none");
+  return levels
+    .map(level => {
+      const num = Number(level);
+      return `${num}hPa`;
+    })
+    .join(", ");
+};
+
+const formatAreaCovered = (area: string[] | undefined, t: TFunction): string => {
+  if (!area || area.length === 0) return t("common.none");
+  return area.join(", ");
+};
+
+const formatMapTypes = (mapTypes: string[] | undefined, t: TFunction): string => {
+  if (!mapTypes || mapTypes.length === 0) return t("common.none");
+  return mapTypes.map(type => t(`mapTypes-list.${type.toLowerCase()}` as any)).join(", ");
+};
 
 /**
  * Request summary component for the final step of the request form
@@ -16,59 +63,49 @@ const RequestSummary: React.FC<RequestSummaryProps> = ({ formData, onPrevious, t
   const summaryContent = useMemo(() => {
     // Process the form data for display
     const years = formData.years?.join(", ") ?? "";
-    const months = formData.months?.join(", ") ?? "";
-    const days = formData.days?.join(", ") ?? "";
-    const hours = formData.hours?.join(", ") ?? "";
-    const mapTypes = formData.mapTypes?.join(", ") ?? t("common.none");
-    const mapRanges = formData.mapRanges?.join(", ") ?? t("common.none");
-    const mapLevels = formData.mapLevels?.join(", ") ?? t("common.none");
+    const months = formData.months;
+    const days = formData.days;
+    const hours = formData.hours;
+    const mapTypes = formData.mapTypes;
     const fileFormat = formData.fileFormat ?? t("common.none");
 
     // Create array of summary items
     const summaryItems = [
       {
         label: t("requests-form.variableName"),
-        value: formData.variableName ?? t("common.none"),
+        value: capitalize(formData.variableName ?? "") || t("common.none"),
       },
       {
         label: t("requests-form.years"),
-        value: years,
+        value: years || t("common.none"),
       },
       {
         label: t("requests-form.months"),
-        value: months,
+        value: formatMonths(months, t) || t("common.none"),
       },
       {
         label: t("requests-form.days"),
-        value: days,
+        value: formatDays(days, t),
       },
       {
         label: t("requests-form.hours"),
-        value: hours,
+        value: formatHours(hours, t),
       },
       {
         label: t("requests-form.pressureLevels"),
-        value: formData.pressureLevels ?? t("common.none"),
+        value: formatPressureLevels(formData.pressureLevels, t) || t("common.none"),
       },
       {
         label: t("requests-form.areaCovered"),
-        value: formData.areaCovered ?? t("common.none"),
+        value: formatAreaCovered(formData.areaCovered, t) || t("common.none"),
       },
       {
         label: t("requests-form.mapTypes"),
-        value: mapTypes,
-      },
-      {
-        label: t("requests-form.mapRanges"),
-        value: mapRanges,
-      },
-      {
-        label: t("requests-form.mapLevels"),
-        value: mapLevels,
+        value: formatMapTypes(mapTypes, t) || t("common.none"),
       },
       {
         label: t("requests-form.fileFormat"),
-        value: fileFormat,
+        value: fileFormat.toUpperCase() || t("common.none"),
       },
     ];
 
@@ -87,10 +124,9 @@ const RequestSummary: React.FC<RequestSummaryProps> = ({ formData, onPrevious, t
         </div>
 
         {/* Advanced options summary (only shown if enabled) */}
-        {(formData.tracking ||
+        {((formData.mapLevels && formData.mapLevels.length > 0) ||
           formData.noData ||
           formData.noMaps ||
-          formData.animation ||
           formData.omp ||
           formData.nThreads ||
           formData.mpi ||
@@ -99,27 +135,21 @@ const RequestSummary: React.FC<RequestSummaryProps> = ({ formData, onPrevious, t
             <h3 className="text-md font-medium text-slate-700 mb-3">{t("requests-form.options")}</h3>
 
             <div className="space-y-3">
-              {formData.tracking && (
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="text-sm font-medium text-slate-700">{t("requests-form.tracking")}:</div>
-                  <div className="text-sm text-slate-600">{t("requests-form.enabled", "Enabled")}</div>
-                </div>
-              )}
               {formData.noData && (
                 <div className="grid grid-cols-2 gap-2">
                   <div className="text-sm font-medium text-slate-700">{t("requests-form.skipData")}:</div>
                   <div className="text-sm text-slate-600">{t("requests-form.yes", "Yes")}</div>
                 </div>
               )}
+              {formData.mapLevels && (
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="text-sm font-medium text-slate-700">{t("requests-form.mapLevels")}:</div>
+                  <div className="text-sm text-slate-600">{formData.mapLevels.join(", ")}</div>
+                </div>
+              )}
               {formData.noMaps && (
                 <div className="grid grid-cols-2 gap-2">
                   <div className="text-sm font-medium text-slate-700">{t("requests-form.skipMapGeneration")}:</div>
-                  <div className="text-sm text-slate-600">{t("requests-form.yes", "Yes")}</div>
-                </div>
-              )}
-              {formData.animation && (
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="text-sm font-medium text-slate-700">{t("requests-form.generateAnimation")}:</div>
                   <div className="text-sm text-slate-600">{t("requests-form.yes", "Yes")}</div>
                 </div>
               )}
