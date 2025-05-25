@@ -1,15 +1,21 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { updateFormField, submitRequest } from "@/redux/slices/submitRequestsSlice";
 import { RequestForm } from "@/types/Request";
 import { TFunction } from "i18next";
 
+interface SubmitResult {
+  success: boolean;
+  message: string;
+  requestHash?: string;  // Add requestHash to the return type
+}
+
 interface UseRequestFormReturn {
   formData: RequestForm;
   isSubmitting: boolean;
   updateField: <K extends keyof RequestForm>(field: K, value: RequestForm[K]) => void;
-  handleSubmit: () => Promise<{ success: boolean; data?: any; error?: any; message: string }>;
-  clearForm: () => { success: boolean; message: string };
+  handleSubmit: () => Promise<SubmitResult>;
+  clearForm: () => SubmitResult;
   handleCheckboxChange: <K extends keyof RequestForm>(
     field: K,
     value: string,
@@ -24,10 +30,10 @@ interface UseRequestFormReturn {
  */
 export const useRequestForm = (t: TFunction): UseRequestFormReturn => {
   const dispatch = useAppDispatch();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Select only necessary parts of the state to prevent unnecessary re-renders
   const formData = useAppSelector(state => state.submitRequests.form);
-  const isSubmitting = useAppSelector(state => state.submitRequests.isSubmitting);
 
   /**
    * Updates a specific form field value
@@ -46,14 +52,20 @@ export const useRequestForm = (t: TFunction): UseRequestFormReturn => {
    * @returns Promise with the result of the submission
    */
   const handleSubmit = useCallback(async () => {
+    setIsSubmitting(true);
+
     try {
       const result = await dispatch(submitRequest(formData)).unwrap();
+      setIsSubmitting(false);
+
       return {
         success: true,
-        data: result,
         message: t("requests-titles.success"),
+        requestHash: result.requestHash,  // Include the requestHash from API response
       };
     } catch (error) {
+      setIsSubmitting(false);
+
       return {
         success: false,
         error,

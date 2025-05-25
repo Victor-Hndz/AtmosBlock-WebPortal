@@ -5,6 +5,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import * as Separator from "@radix-ui/react-separator";
 import { useRequestForm } from "@/hooks/useRequestForm";
 import { useRequestNavigation } from "@/hooks/useRequestNavigation";
+import { useNavigate } from "react-router-dom";
 import RequestSummary from "@/components/requests/RequestSummary";
 import { REQUEST_FORM_STEPS } from "@/consts/requestsConsts";
 import PopulateFormTab from "./PopulateFormTab";
@@ -17,6 +18,9 @@ interface FormTabsWrapperProps {
 }
 
 const FormTabsWrapper: React.FC<FormTabsWrapperProps> = ({ advancedMode, showToast, t }) => {
+  // Add navigate hook
+  const navigate = useNavigate();
+
   // Custom hooks for form functionality
   const { formData, isSubmitting, updateField, handleSubmit, clearForm, handleCheckboxChange } = useRequestForm(t);
   const { activeTab, setActiveTab, goToNextTab, goToPreviousTab } = useRequestNavigation();
@@ -25,6 +29,11 @@ const FormTabsWrapper: React.FC<FormTabsWrapperProps> = ({ advancedMode, showToa
   const onSubmit = async () => {
     const result = await handleSubmit();
     showToast(result.message, result.success ? "success" : "error");
+
+    // If submission was successful and we have a request hash, navigate to results page
+    if (result.success && result.requestHash) {
+      navigate(`/results?requestHash=${result.requestHash}`);
+    }
   };
 
   // Handle form clearing
