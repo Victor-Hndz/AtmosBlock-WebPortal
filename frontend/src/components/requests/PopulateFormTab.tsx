@@ -140,14 +140,23 @@ const PopulateFormTab: React.FC<PopulateFormTabProps> = ({
 
   // Group fields by category (for ADDITIONAL_SETTINGS tab, we might want sections)
   const groupedFields = useMemo(() => {
+    // First filter out fields that should not be shown in advanced mode
+    const visibleFields = formFields.filter(field => {
+      // Hide fields that have showInAdvancedMode set to false when in advanced mode
+      if (advancedMode && field.showInAdvancedMode === false) {
+        return false;
+      }
+      return true;
+    });
+
     if (tabName !== TabPlace.ADDITIONAL_SETTINGS || !advancedMode) {
-      return { regular: formFields, parallel: [] };
+      return { regular: visibleFields, parallel: [] };
     }
 
     // For ADDITIONAL_SETTINGS with advanced mode, separate parallel processing options
     return {
-      regular: formFields.filter(field => !["omp", "nThreads", "mpi", "nProces"].includes(field.id)),
-      parallel: formFields.filter(field => ["omp", "nThreads", "mpi", "nProces"].includes(field.id)),
+      regular: visibleFields.filter(field => !["omp", "nThreads", "mpi", "nProces"].includes(field.id)),
+      parallel: visibleFields.filter(field => ["omp", "nThreads", "mpi", "nProces"].includes(field.id)),
     };
   }, [formFields, tabName, advancedMode]);
 
