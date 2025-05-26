@@ -7,7 +7,7 @@ import { TFunction } from "i18next";
 interface SubmitResult {
   success: boolean;
   message: string;
-  requestHash?: string;  // Add requestHash to the return type
+  requestHash?: string;
 }
 
 interface UseRequestFormReturn {
@@ -61,7 +61,7 @@ export const useRequestForm = (t: TFunction): UseRequestFormReturn => {
       return {
         success: true,
         message: t("requests-titles.success"),
-        requestHash: result.requestHash,  // Include the requestHash from API response
+        requestHash: result.requestHash,
       };
     } catch (error) {
       setIsSubmitting(false);
