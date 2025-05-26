@@ -124,6 +124,7 @@ export default function ResultsPage(): React.ReactElement {
 
       // Connect to the progress stream
       cleanup = ProgressService.connectToProgressStream({
+        requestHash,
         onConnect: () => {
           setIsConnected(true);
           setHasError(false);
@@ -156,10 +157,9 @@ export default function ResultsPage(): React.ReactElement {
     return () => {
       if (cleanup) {
         cleanup();
-        setIsConnected(false);
       }
     };
-  }, [requestHash, fetchResults]);
+  }, [requestHash]);
 
   // Handle downloading all files
   const handleDownloadAll = async () => {

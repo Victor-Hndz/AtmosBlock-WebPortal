@@ -8,6 +8,7 @@ export interface ProgressUpdateData {
 }
 
 export interface ProgressConnectionCallbacks {
+  requestHash: string;
   onUpdate: (data: ProgressUpdateData) => void;
   onConnect?: () => void;
   onError?: (error: Event) => void;
@@ -21,8 +22,9 @@ export const ProgressService = {
    * @returns Cleanup function to close the connection
    */
   connectToProgressStream: (callbacks: ProgressConnectionCallbacks): (() => void) => {
-    const progressStreamUrl = `${API_URL}/progress/stream`;
+    const progressStreamUrl = `${API_URL}/progress/stream?requestHash=${callbacks.requestHash}`;
     const eventSource = new EventSource(progressStreamUrl);
+    let completed = false;
 
     // Initialize connection
     eventSource.onopen = () => {
@@ -39,10 +41,11 @@ export const ProgressService = {
         callbacks.onUpdate(data);
 
         // Check if the progress is complete
-        if (data.increment >= MAX_PROGRESS && callbacks.onComplete) {
+        if (data.increment >= MAX_PROGRESS && callbacks.onComplete && !completed) {
+          completed = true;
           callbacks.onComplete();
           // Auto-close the connection when complete
-          setTimeout(() => eventSource.close(), 500);
+          eventSource.close();
         }
       } catch (error) {
         console.error("Error parsing progress update:", error);
@@ -55,7 +58,10 @@ export const ProgressService = {
       if (callbacks.onError) {
         callbacks.onError(error);
       }
-      eventSource.close();
+      // Only close if we're still having issues (avoid closing during temporary disconnects)
+      if (eventSource.readyState === EventSource.CLOSED) {
+        console.log("Connection was closed permanently");
+      }
     };
 
     // Return cleanup function to close the connection
