@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS requests (
   hours_selected TEXT[] NOT NULL,
   area_covered TEXT[] NOT NULL,
   map_types TEXT[] NOT NULL,
-  map_levels TEXT[] NOT NULL,
+  map_levels TEXT[],
   file_format_selected VARCHAR(50) DEFAULT 'SVG',
   no_maps BOOLEAN DEFAULT FALSE,
   no_data BOOLEAN DEFAULT FALSE,
