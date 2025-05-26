@@ -82,7 +82,7 @@ QUEUES = {
     EXECUTION_VISUALIZATION_QUEUE: {
         "exchange": EXECUTION_EXCHANGE,
         "routing_key": EXECUTION_VISUALIZATION_KEY
-    }
+    },
     
     # Notifications
     NOTIFICATIONS_QUEUE: {
