@@ -46,6 +46,7 @@ def get_dataset(file_name: str):
     """
     return xr.open_dataset(file_name)
 
+
 def date_from_nc(nc_file: str) -> np.ndarray:
     """Extract dates from a NetCDF file.
 
@@ -60,6 +61,7 @@ def date_from_nc(nc_file: str) -> np.ndarray:
     
     # Extract and return the dates
     return ds.time.values
+
 
 def from_nc_to_date(date: str) -> str:
     """Extrae la fecha exacta de una cadena con la fecha de un archivo netCDF.
@@ -86,6 +88,7 @@ def from_nc_to_date(date: str) -> str:
     #     return fecha_datetime.strftime(f"%Y-%m-({day_start}-{day_end})_%HUTC")
     return fecha_datetime.strftime("%Y-%m-%d_%HUTC")
 
+
 def from_elements_to_date(year: str, month: str, day: str, hour: str) -> str:
     """Convierte los elementos de fecha y hora en una cadena de fecha.
 
@@ -101,8 +104,9 @@ def from_elements_to_date(year: str, month: str, day: str, hour: str) -> str:
     #format: YYYY-MM-DD_HHUTC 
     return f"{int(year):04d}-{int(month):02d}-{int(day):02d}_{int(hour):02d}UTC"
 
+
 class MapGenerator:
-    def __init__(self, file_name, request_hash, variable_name, pressure_level, year, month, day, hour, map_type, map_range, map_level, file_format, area_covered):
+    def __init__(self, file_name, request_hash, variable_name, pressure_level, year, month, day, hour, map_type, map_level, file_format, area_covered):
         self.file_name = file_name
         self.request_hash = request_hash
         self.variable_name = variable_name
@@ -112,7 +116,6 @@ class MapGenerator:
         self.day = day
         self.hour = hour
         self.map_type = map_type
-        self.map_range = map_range
         self.map_level = map_level
         self.file_format = file_format
         self.area_covered = area_covered # N W S E
@@ -123,7 +126,7 @@ class MapGenerator:
         self.init_generation()
         
     def init_generation(self):
-        # print(f"Generando mapa para el año {self.year}, mes {self.month}, día {self.day}, hora {self.hour}, tipo de mapa {self.map_type}, rango {self.map_range}, nivel {self.map_level}...")
+        # print(f"Generando mapa para el año {self.year}, mes {self.month}, día {self.day}, hora {self.hour}, tipo de mapa {self.map_type}, nivel {self.map_level}...")
         if self.map_type == DataType.TYPE_CONT.value:
             self.generate_contour_map()
         elif self.map_type == DataType.TYPE_DISP.value:
@@ -357,7 +360,7 @@ def generate_map_parallel(args):
     """Process map generation in parallel."""
     try:
         (file_name, request_hash, variable_name, pressure_level, 
-         year, month, day, hour, map_type, map_range, map_level, 
+         year, month, day, hour, map_type, map_level, 
          file_format, area_covered) = args
         
         # Create directory if it doesn't exist
@@ -365,7 +368,7 @@ def generate_map_parallel(args):
         
         MapGenerator(
             file_name, request_hash, variable_name, float(pressure_level),
-            year, month, day, hour, map_type, map_range, int(map_level),
+            year, month, day, hour, map_type, int(map_level),
             file_format, [float(area) for area in area_covered]
         )
         return True

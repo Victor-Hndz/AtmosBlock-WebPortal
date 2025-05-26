@@ -22,14 +22,11 @@ export class RequestMapper {
       days: requestEntity.days,
       hours: requestEntity.hours,
       areaCovered: requestEntity.areaCovered,
-      mapRanges: requestEntity.mapRanges,
       mapTypes: requestEntity.mapTypes,
       mapLevels: requestEntity.mapLevels,
       fileFormat: requestEntity.fileFormat,
-      tracking: requestEntity.tracking,
       noData: requestEntity.noData,
       noMaps: requestEntity.noMaps,
-      animation: requestEntity.animation,
       omp: requestEntity.omp,
       mpi: requestEntity.mpi,
       nThreads: requestEntity.nThreads,
@@ -60,14 +57,11 @@ export class RequestMapper {
     persistenceRequest.days = request.days;
     persistenceRequest.hours = request.hours;
     persistenceRequest.areaCovered = request.areaCovered;
-    persistenceRequest.mapRanges = request.mapRanges;
     persistenceRequest.mapTypes = request.mapTypes;
     persistenceRequest.mapLevels = request.mapLevels;
     persistenceRequest.fileFormat = request.fileFormat;
-    persistenceRequest.tracking = request.tracking;
     persistenceRequest.noData = request.noData;
     persistenceRequest.noMaps = request.noMaps;
-    persistenceRequest.animation = request.animation;
     persistenceRequest.omp = request.omp;
     persistenceRequest.mpi = request.mpi;
     persistenceRequest.nThreads = request.nThreads;

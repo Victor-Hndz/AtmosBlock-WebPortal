@@ -46,13 +46,10 @@ class ConfigHandler:
         self.hours = None
         self.area_covered = None
         self.map_types = None
-        self.map_ranges = None
         self.map_levels = None
         self.file_format = None
-        self.tracking = None
         self.no_data = None
         self.no_maps = None
-        self.animation = None
         self.omp = None
         self.mpi = None
         self.n_threads = None
@@ -82,13 +79,10 @@ class ConfigHandler:
         self.hours = data["hours"]
         self.area_covered = data["areaCovered"]
         self.map_types = data["mapTypes"]
-        self.map_ranges = data["mapRanges"]
         self.map_levels = data["mapLevels"]
         self.file_format = data["fileFormat"]
-        self.tracking = data["tracking"]
         self.no_data = data["noData"]
         self.no_maps = data["noMaps"]
-        self.animation = data["animation"]
         self.omp = data["omp"]
         self.mpi = data["mpi"]
         self.n_threads = data["nThreads"]
@@ -151,10 +145,6 @@ class ConfigHandler:
         # Continue with the next steps in the pipeline
         if not self.no_maps:
             await self.process_map_generation()
-        elif self.animation:
-            await self.process_map_animation()
-        elif self.tracking:
-            await self.process_formation_tracking()
         else:
             print("\n✅ Procesamiento completado.")
             notify_result(self.rabbitmq, "Processing completed successfully.")
@@ -177,55 +167,6 @@ class ConfigHandler:
         print("\n✅ Generación de mapas completada exitosamente.")
         self.maps_generated = True
         
-        # Continue with the next steps in the pipeline
-        if self.animation:
-            await self.process_map_animation()
-        elif self.tracking:
-            await self.process_formation_tracking()
-        else:
-            print("\n✅ Procesamiento completado.")
-            notify_result(self.rabbitmq, "Processing completed successfully.")
-
-    async def handle_animation_message(self, body: bytes) -> None:
-        """
-        Handle animation completion messages and proceed to the next step.
-        
-        Args:
-            body: Raw message body from RabbitMQ
-        """
-        data = process_body(body)
-        message = json.loads(data)
-        
-        if message["exec_status"] == STATUS_ERROR:
-            print("\n❌ Error al generar la animación.")
-            print(f"\t❌ Error: {message['exec_message']}")
-            return
-        
-        print("\n✅ Generación de animación completada exitosamente.")
-        
-        # Continue with the next step if needed
-        if self.tracking:
-            await self.process_formation_tracking()
-        else:
-            print("\n✅ Procesamiento completado.")
-            notify_result(self.rabbitmq, "Processing completed successfully.")
-    
-    async def handle_tracking_message(self, body: bytes) -> None:
-        """
-        Handle tracking completion messages.
-        
-        Args:
-            body: Raw message body from RabbitMQ
-        """
-        data = process_body(body)
-        message = json.loads(data)
-        
-        if message["exec_status"] == STATUS_ERROR:
-            print("\n❌ Error al procesar el seguimiento de formaciones.")
-            print(f"\t❌ Error: {message['exec_message']}")
-            return
-        
-        print("\n✅ Seguimiento de formaciones completado exitosamente.")
         print("\n✅ Procesamiento completado.")
         notify_result(self.rabbitmq, "Processing completed successfully.")
 
@@ -288,7 +229,6 @@ class ConfigHandler:
             "days": self.days,
             "hours": self.hours,
             "map_types": self.map_types,
-            "map_ranges": self.map_ranges,
             "map_levels": self.map_levels,
             "file_format": self.file_format,
             "area_covered": self.area_covered,
@@ -300,58 +240,6 @@ class ConfigHandler:
         await self.rabbitmq.publish(EXECUTION_EXCHANGE, EXECUTION_VISUALIZATION_KEY, message)
         await self.rabbitmq.consume(NOTIFICATIONS_QUEUE, callback=self.handle_general_notification_message)
     
-    async def process_map_animation(self) -> None:
-        """
-        Generate animation based on maps.
-        """
-        if not self.animation:
-            return
-            
-        print("\n[ ] Iniciando generación de animación...")
-        
-        # This would be implemented to send a message to the animation service
-        # await send_message(create_message(STATUS_OK, "", data), "animation", "animation.generate")
-        # await receive_messages("animation_notifications", callback=self.handle_animation_message)
-        
-        # Temporary placeholder for the implementation
-        print("\n[ ] Simulando finalización de generación de animación...")
-        
-        # Continue with next steps
-        if self.tracking:
-            await self.process_formation_tracking()
-        else:
-            print("\n✅ Procesamiento completado.")
-            notify_result(self.rabbitmq, "Processing completed successfully.")
-    
-    async def process_formation_tracking(self) -> None:
-        """
-        Track formations based on the configuration.
-        """
-        if not self.tracking:
-            return
-            
-        print("\n[ ] Iniciando seguimiento de formaciones...")
-        
-        # This would be implemented to send a message to the tracking service
-        # await send_message(create_message(STATUS_OK, "", data), "tracking", "tracking.process")
-        # await receive_messages("tracking_notifications", callback=self.handle_tracking_message)
-        
-        # Temporary placeholder for the implementation
-        print("\n[ ] Simulando finalización de seguimiento de formaciones...")
-        print("\n✅ Procesamiento completado.")
-        notify_result(self.rabbitmq, "Processing completed successfully.")
-
-    async def send_finish_message(self) -> None:
-        """
-        Send a message indicating that the processing has finished.
-        """
-        # Save the files to MinIO and clean the directory
-        upload_files_to_request_hash(self.request_hash, OUT_DIR)
-        clean_directory(OUT_DIR)
-        
-        # message = {"exec_status": STATUS_OK, "exec_message": "Processing completed."}
-        # await send_message(create_message(STATUS_OK, "", message), "notifications", "notify.handler")
-
 # Update the main entry point to use asyncio
 if __name__ == "__main__":
     async def main():

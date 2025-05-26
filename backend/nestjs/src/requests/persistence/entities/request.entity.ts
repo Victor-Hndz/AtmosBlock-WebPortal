@@ -47,9 +47,6 @@ export class RequestEntity {
   @Column("text", { array: true, name: "area_covered" })
   areaCovered: string[];
 
-  @Column("text", { array: true, name: "map_ranges" })
-  mapRanges: string[];
-
   @Column("text", { array: true, name: "map_types" })
   mapTypes: string[];
 
@@ -59,17 +56,11 @@ export class RequestEntity {
   @Column({ nullable: true, name: "file_format_selected" })
   fileFormat?: string;
 
-  @Column({ default: false })
-  tracking: boolean;
-
   @Column({ default: false, name: "no_data" })
   noData: boolean;
 
   @Column({ default: false, name: "no_maps" })
   noMaps: boolean;
-
-  @Column({ default: false })
-  animation: boolean;
 
   @Column({ default: false })
   omp: boolean;

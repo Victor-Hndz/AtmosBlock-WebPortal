@@ -56,12 +56,6 @@ export class CreateRequestDto {
   @IsString({ each: true })
   mapTypes: string[];
 
-  @ApiProperty({ description: "Map ranges to use", type: [String] })
-  @IsArray()
-  @IsNotEmpty()
-  @IsString({ each: true })
-  mapRanges: string[];
-
   @ApiProperty({ description: "Map levels to use", type: [String] })
   @IsArray()
   @IsString({ each: true })
@@ -73,11 +67,6 @@ export class CreateRequestDto {
   @IsOptional()
   fileFormat?: string;
 
-  @ApiPropertyOptional({ description: "Enable tracking", default: false })
-  @IsBoolean()
-  @IsOptional()
-  tracking?: boolean;
-
   @ApiPropertyOptional({ description: "Skip data generation", default: false })
   @IsBoolean()
   @IsOptional()
@@ -87,11 +76,6 @@ export class CreateRequestDto {
   @IsBoolean()
   @IsOptional()
   noMaps?: boolean;
-
-  @ApiPropertyOptional({ description: "Enable animation", default: false })
-  @IsBoolean()
-  @IsOptional()
-  animation?: boolean;
 
   @ApiPropertyOptional({ description: "Enable OpenMP parallelization", default: false })
   @IsBoolean()

@@ -41,11 +41,6 @@ export class InputRequestDto {
   mapTypes: string[];
 
   @IsArray()
-  @IsNotEmpty()
-  @IsString({ each: true })
-  mapRanges: string[];
-
-  @IsArray()
   @IsString({ each: true })
   @IsOptional()
   mapLevels?: string[];
@@ -56,19 +51,11 @@ export class InputRequestDto {
 
   @IsBoolean()
   @IsOptional()
-  tracking?: boolean;
-
-  @IsBoolean()
-  @IsOptional()
   noData?: boolean;
 
   @IsBoolean()
   @IsOptional()
   noMaps?: boolean;
-
-  @IsBoolean()
-  @IsOptional()
-  animation?: boolean;
 
   @IsBoolean()
   @IsOptional()

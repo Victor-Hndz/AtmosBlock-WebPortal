@@ -16,14 +16,11 @@ export class Request {
   days: string[];
   hours: string[];
   areaCovered: string[];
-  mapRanges: string[];
   mapTypes: string[];
   mapLevels?: string[];
   fileFormat?: string;
-  tracking: boolean;
   noData: boolean;
   noMaps: boolean;
-  animation: boolean;
   omp: boolean;
   mpi: boolean;
   nThreads?: number;

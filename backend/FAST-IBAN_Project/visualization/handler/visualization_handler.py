@@ -39,23 +39,22 @@ async def handle_message(body, rabbitmq_client):
                 for day in data["days"]:
                     for hour in data["hours"]:
                         for map_type in data["map_types"]:
-                            for map_range in data["map_ranges"]:
-                                for map_level in data["map_levels"]:
-                                    map_tasks.append((
-                                        data["file_name"],
-                                        data["request_hash"],
-                                        data["variable_name"],
-                                        pressure_level,
-                                        year,
-                                        month,
-                                        day,
-                                        hour,
-                                        map_type,
-                                        map_range,
-                                        map_level,
-                                        data["file_format"],
-                                        data["area_covered"]
-                                    ))
+                            for map_level in data["map_levels"]:
+                                map_tasks.append((
+                                    data["file_name"],
+                                    data["request_hash"],
+                                    data["variable_name"],
+                                    pressure_level,
+                                    year,
+                                    month,
+                                    day,
+                                    hour,
+                                    map_type,
+                                    map_range,
+                                    map_level,
+                                    data["file_format"],
+                                    data["area_covered"]
+                                ))
     
     # Use ProcessPoolExecutor for true parallel processing
     start_time = time.time()
