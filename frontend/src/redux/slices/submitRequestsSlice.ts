@@ -22,7 +22,6 @@ const initialState: SubmitRequestsState = {
     hours: [],
     areaCovered: [],
     mapTypes: [],
-    mapRanges: [],
     mapLevels: [],
   } as RequestForm,
   isSubmitting: false,

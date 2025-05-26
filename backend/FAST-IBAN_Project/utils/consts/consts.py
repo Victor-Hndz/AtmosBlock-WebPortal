@@ -13,7 +13,6 @@ ARGUMENTS = [
     "hours",
     "areaCovered",
     "mapTypes",
-    "mapRanges",
     "mapLevels",
     "fileFormat",
     "tracking",

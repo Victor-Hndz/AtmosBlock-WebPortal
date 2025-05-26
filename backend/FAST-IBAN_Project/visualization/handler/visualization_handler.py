@@ -50,7 +50,6 @@ async def handle_message(body, rabbitmq_client):
                                     day,
                                     hour,
                                     map_type,
-                                    map_range,
                                     map_level,
                                     data["file_format"],
                                     data["area_covered"]

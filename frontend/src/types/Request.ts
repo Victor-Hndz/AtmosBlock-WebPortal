@@ -20,7 +20,6 @@ export interface RequestForm {
   hours?: string[];
   areaCovered?: string[];
   mapTypes?: string[];
-  mapRanges?: string[];
   mapLevels?: string[];
   fileFormat?: string;
   noMaps?: boolean;
