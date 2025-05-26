@@ -7,7 +7,9 @@ import { IRequestRepository } from "@/requests/domain/repositories/request.repos
 import { GeneratedFilesService } from "@/generatedFiles/services/generatedFiles.service";
 import { STATUS_PROCESSING } from "@/shared/consts/consts";
 import { requestStatus } from "@/shared/enums/requestStatus.enum";
-import { MessageContent } from "@/shared/interfaces/messageContentInterface.interface";
+import { MessageContent, ResultMessageContent } from "@/shared/interfaces/messageContentInterface.interface";
+import { MinioService } from "@/minio/services/minio.service";
+import { GeneratedFiles } from "@/generatedFiles/domain/entities/generatedFiles.entity";
 
 @Injectable()
 export class RequestsService {
@@ -17,7 +19,8 @@ export class RequestsService {
     @Inject("IRequestRepository")
     private readonly requestRepository: IRequestRepository,
     private readonly requestsPublisher: RequestsPublisher,
-    private readonly generatedFilesService: GeneratedFilesService
+    private readonly generatedFilesService: GeneratedFilesService,
+    private readonly minioService: MinioService
   ) {}
 
   async findAll(): Promise<Request[]> {
@@ -40,6 +43,10 @@ export class RequestsService {
 
   async create(createRequestDto: CreateRequestDto): Promise<Request | string> {
     //Generate the requestHash
+    if (!createRequestDto.mapLevels || createRequestDto.mapLevels.length <= 0) {
+      createRequestDto.mapLevels = createRequestDto.mapLevels ?? [];
+      createRequestDto.mapLevels.push("20");
+    }
     const requestHash = this.generateRequestHash(createRequestDto);
     createRequestDto.requestHash = requestHash;
     this.logger.log(`Creating request with hash: ${requestHash}`);
@@ -63,7 +70,7 @@ export class RequestsService {
 
     //If not exists and cached, emit a message to RabbitMQ for processing
     this.requestsPublisher.sendRequestCreatedEvent(createRequestDto);
-    const message = { status: STATUS_PROCESSING, message: `Request sent to process with ID ${requestHash}` };
+    const message = { status: STATUS_PROCESSING, message: `Request sent to process with ID ${requestHash}`, requestHash: requestHash };
     this.logger.log(`Request sent to process: ${JSON.stringify(message)}`);
     return JSON.stringify(message);
   }
@@ -74,51 +81,130 @@ export class RequestsService {
 
   async processResultMessage(message: MessageContent): Promise<void> {
     this.logger.log(`Processing result message: ${JSON.stringify(message)}`);
-    //WIP
-    // try {
-    //   // Extract data from the message
-    //   const { requestHash, resultData, errorMessage } = message;
+    try {
+      // Check if message has the expected structure
+      if (!message || typeof message !== 'object') {
+        this.logger.error('Invalid message: message is not an object');
+        return;
+      }
 
-    //   if (!requestHash) {
-    //     this.logger.error("Invalid message: missing requestHash");
-    //     return;
-    //   }
+      // Check status first
+      const messageStatus = message.status;
 
-    //   // Find the request by hash
-    //   const request = await this.requestRepository.findByRequestHash(requestHash);
+      if (
+        typeof message.content !== 'object' ||
+        message.content === null ||
+        typeof (message.content as ResultMessageContent).requestHash !== 'string'
+      ) {
+        this.logger.error('Invalid message content: not a ResultMessageContent object');
+        return;
+      }
+      const messageContent = message.content as ResultMessageContent;
+      const requestHash = messageContent.requestHash;
+      const messageText = messageContent.content;
+      
+      if (messageStatus !== 'OK') {
+        this.logger.error(`Error in result message. Status: ${messageStatus}, Message: ${messageText}, Request Hash: ${requestHash}`);
+        return;
+      }
 
-    //   if (!request) {
-    //     this.logger.warn(`Request with hash ${requestHash} not found`);
-    //     return;
-    //   }
+      // Find the request by hash
+      const request = await this.requestRepository.findByRequestHash(requestHash);
 
-    //   // If there's an error message, log it
-    //   if (errorMessage) {
-    //     this.logger.error(`Error processing request ${requestHash}: ${errorMessage}`);
-    //   }
+      if (!request) {
+        this.logger.warn(`Request with hash ${requestHash} not found`);
+        return;
+      }
 
-    //   // If there's result data, update the request's generated files
-    //   if (resultData) {
-    //     // Assuming resultData contains paths or information about generated files
-    //     const generatedFiles = request.generatedFiles || {};
-
-    //     // Update the generated files with information from resultData
-    //     // This will depend on your data structure
-    //     generatedFiles.files = resultData.files ?? [];
-    //     generatedFiles.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days TTL
-
-    //     // Update generated files in the database
-    //     await this.generatedFilesService.update(generatedFiles);
-    //   }
-
-    //   // Update the request in the database
-    //   await this.requestRepository.update(request);
-
-    //   this.logger.log(`Successfully processed result for request ${requestHash}`);
-    // } catch (error) {
-    //   this.logger.error(`Error processing result message: ${error.message}`);
-    //   throw error;
-    // }
+      try {
+        // Check if the folder with results exists in Minio
+        const folderExists = await this.minioService.folderExists(requestHash);
+        
+        if (!folderExists) {
+          this.logger.error(`No result folder found in storage for request ${requestHash}`);
+          request.requestStatus = requestStatus.EMPTY;
+          await this.requestRepository.update(request);
+          return;
+        }
+        
+        // List all files in the request's result folder
+        const minioFiles = await this.minioService.listFiles(requestHash);
+        
+        if (minioFiles.length === 0) {
+          this.logger.warn(`No files found in result folder for request ${requestHash}`);
+          request.requestStatus = requestStatus.EMPTY;
+          await this.requestRepository.update(request);
+          return;
+        }
+        
+        // Prepare the file list for the database
+        const filesList = minioFiles.map(file => file.url)
+        
+        // Create or update generated files entry
+        let generatedFiles = request.generatedFiles;
+        
+        if (!generatedFiles) {
+          // Create new generatedFiles object
+          generatedFiles = new GeneratedFiles({
+            requestHash: request.requestHash,
+            files: filesList,
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days TTL
+          });
+          
+          // Save to database
+          const savedGeneratedFiles = await this.generatedFilesService.create(generatedFiles);
+          request.generatedFiles = savedGeneratedFiles;
+        } else {
+          // Update existing generatedFiles object
+          generatedFiles.files = filesList;
+          generatedFiles.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days TTL
+          
+          // Update in database
+          await this.generatedFilesService.update(generatedFiles);
+        }
+        
+        // Update request status
+        request.requestStatus = requestStatus.CACHED;
+        
+        // Update the request in the database
+        await this.requestRepository.update(request);
+        
+        this.logger.log(`Successfully processed result for request ${requestHash} with ${filesList.length} files`);
+        
+      } catch (error) {
+        this.logger.error(`Error retrieving files from storage for request ${requestHash}: ${error.message}`);
+        request.requestStatus = requestStatus.EMPTY;
+        await this.requestRepository.update(request);
+      }
+    } catch (error) {
+      this.logger.error(`Error processing result message: ${error.message}`);
+      throw error;
+    }
+  }
+  
+  /**
+   * Helper method to determine the file type from filename
+   */
+  private determineFileType(filename: string): string {
+    const ext = filename.split('.').pop()?.toLowerCase();
+    
+    if (!ext) return 'application/octet-stream';
+    
+    const mimeTypes = {
+      'pdf': 'application/pdf',
+      'png': 'image/png',
+      'jpg': 'image/jpeg',
+      'jpeg': 'image/jpeg',
+      'gif': 'image/gif',
+      'svg': 'image/svg+xml',
+      'txt': 'text/plain',
+      'csv': 'text/csv',
+      'nc': 'application/x-netcdf',
+      'zip': 'application/zip',
+      'json': 'application/json',
+    };
+    
+    return mimeTypes[ext] || 'application/octet-stream';
   }
 
   generateRequestHash(createRequestDto: CreateRequestDto): string {

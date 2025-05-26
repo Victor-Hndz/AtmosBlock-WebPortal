@@ -8,9 +8,15 @@ import { RequestEntity } from "./persistence/entities/request.entity";
 import { GeneratedFilesModule } from "@/generatedFiles/generatedFiles.module";
 import { TypeOrmRequestRepository } from "./persistence/repositories/typeorm-request.repository";
 import { RabbitMQModule } from "@/shared/messaging/rabbitmq.module";
+import { MinioModule } from "@/minio/minio.module";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RequestEntity]), GeneratedFilesModule, RabbitMQModule],
+  imports: [
+    TypeOrmModule.forFeature([RequestEntity]),
+    GeneratedFilesModule,
+    RabbitMQModule,
+    MinioModule,
+  ],
   providers: [
     RequestsService,
     {
