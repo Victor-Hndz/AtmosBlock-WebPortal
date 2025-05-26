@@ -24,8 +24,6 @@ export interface RequestForm {
   fileFormat?: string;
   noMaps?: boolean;
   noData?: boolean;
-  tracking?: boolean;
-  animation?: boolean;
   omp?: boolean;
   nThreads?: number;
   mpi?: boolean;

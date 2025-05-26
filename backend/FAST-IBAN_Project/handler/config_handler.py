@@ -8,7 +8,7 @@ sys.path.append('/app/')
 from utils.rabbitMQ.rabbitmq import RabbitMQ
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
-from utils.rabbitMQ.rabbit_consts import HANDLER_QUEUE, NOTIFICATIONS_QUEUE, EXECUTION_EXCHANGE, EXECUTION_ALGORITHM_KEY, EXECUTION_VISUALIZATION_KEY, EXECUTION_ANIMATION_KEY, EXECUTION_TRACKING_KEY, NOTIFY_EXECUTION, NOTIFY_VISUALIZATION, NOTIFY_ANIMATION, NOTIFY_TRACKING
+from utils.rabbitMQ.rabbit_consts import HANDLER_QUEUE, NOTIFICATIONS_QUEUE, EXECUTION_EXCHANGE, EXECUTION_ALGORITHM_KEY, EXECUTION_VISUALIZATION_KEY, NOTIFY_EXECUTION, NOTIFY_VISUALIZATION
 from utils.minio.upload_files import upload_files_to_request_hash
 from utils.clean_folder_files import clean_directory
 from utils.rabbitMQ.notify_results import notify_result
@@ -119,10 +119,6 @@ class ConfigHandler:
             await self.handle_execution_message(body)
         elif data["request_type"] == NOTIFY_VISUALIZATION:
             await self.handle_map_generation_message(body)
-        elif data["request_type"] == NOTIFY_ANIMATION:
-            await self.handle_animation_message(body)
-        elif data["request_type"] == NOTIFY_TRACKING:
-            await self.handle_tracking_message(body)
     
     async def handle_execution_message(self, body: bytes) -> None:
         """

@@ -49,8 +49,6 @@ CONFIG_QUEUE = "config_queue"
 HANDLER_QUEUE = "handler_queue"
 EXECUTION_ALGORITHM_QUEUE = "execution_algorithm_queue"
 EXECUTION_VISUALIZATION_QUEUE = "execution_visualization_queue"
-EXECUTION_ANIMATION_QUEUE = "execution_animation_queue"
-EXECUTION_TRACKING_QUEUE = "execution_tracking_queue"
 NOTIFICATIONS_QUEUE = "notifications_queue"
 RESULTS_QUEUE = "results_queue"
 PROGRESS_QUEUE = "progress_queue"
@@ -60,8 +58,6 @@ CONFIG_CREATE_KEY = "config.create"
 HANDLER_START_KEY = "handler.start"
 EXECUTION_ALGORITHM_KEY = "execution.algorithm"
 EXECUTION_VISUALIZATION_KEY = "execution.visualization"
-EXECUTION_ANIMATION_KEY = "execution.animation"
-EXECUTION_TRACKING_KEY = "execution.tracking"
 NOTIFY_HANDLER_KEY = "notify.handler"
 RESULTS_DONE_KEY = "results.done"
 PROGRESS_UPDATE_KEY = "progress.update"
@@ -86,15 +82,7 @@ QUEUES = {
     EXECUTION_VISUALIZATION_QUEUE: {
         "exchange": EXECUTION_EXCHANGE,
         "routing_key": EXECUTION_VISUALIZATION_KEY
-    },
-    EXECUTION_ANIMATION_QUEUE: {
-        "exchange": EXECUTION_EXCHANGE,
-        "routing_key": EXECUTION_ANIMATION_KEY
-    },
-    EXECUTION_TRACKING_QUEUE: {
-        "exchange": EXECUTION_EXCHANGE,
-        "routing_key": EXECUTION_TRACKING_KEY
-    },
+    }
     
     # Notifications
     NOTIFICATIONS_QUEUE: {
@@ -125,5 +113,3 @@ RETRY_DELAY = 5  # in seconds
 #REQUEST TYPES
 NOTIFY_EXECUTION = "notify_execution"
 NOTIFY_VISUALIZATION = "notify_visualization"
-NOTIFY_ANIMATION = "notify_animation"
-NOTIFY_TRACKING = "notify_tracking"
