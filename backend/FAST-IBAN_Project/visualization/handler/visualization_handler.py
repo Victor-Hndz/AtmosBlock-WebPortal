@@ -6,6 +6,8 @@ import asyncio
 import multiprocessing as mp
 from concurrent.futures import ProcessPoolExecutor
 import time
+import os
+os.environ.setdefault('CARTOPY_USER_BACKGROUNDS', '/root/.local/share/cartopy')
 
 sys.path.append('/app/')
 

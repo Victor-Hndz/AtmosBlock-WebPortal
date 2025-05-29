@@ -23,5 +23,12 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 COPY ./utils /app/utils
 
+# Copy the cartopy download script
+COPY ./scripts/download_cartopy_shapes.sh /app/download_cartopy_shapes.sh
+
+# Make the script executable and run it to download cartopy shapes
+RUN chmod +x /app/download_cartopy_shapes.sh && \
+    /bin/bash /app/download_cartopy_shapes.sh
+
 # Run the executable
 CMD [ "python", "visualization/handler/visualization_handler.py" ]

@@ -1,10 +1,13 @@
 import os
 import netCDF4 as nc
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as path_effects
 import cartopy.crs as ccrs 
 import cartopy as cartopy
 import numpy as np
+import numpy.ma as ma
 import xarray as xr
 import pandas as pd
 import sys
@@ -30,6 +33,7 @@ g_0 = 9.80665 # m/s^2
 dist = 1000 # km
 lat_km = 111.32 # km/deg
 R = 6371 # km
+k_factor = 273.15 # K
 
 OUT_DIR = "./out" # Directory to save the generated maps
 
@@ -149,7 +153,7 @@ class MapGenerator:
             if self.variable_name.lower() == key.lower():
                 variable_type = value
                 
-        # print(f"Variable: {self.variable_name} -> {variable_type}")
+        print(f"Variable: {self.variable_name} -> {variable_type}")
         
         if variable_type is None:
             print("Error: variable no válida")
@@ -179,6 +183,16 @@ class MapGenerator:
             # Ensure dataset is closed properly
             ds.close()
             
+            #Adjust variable
+            if variable_type == 'z':
+                # Convert geopotential height to meters
+                print("Converting geopotential height to meters...")
+                variable = variable / g_0
+            elif variable_type == 't':
+                # Convert temperature from Kelvin to Celsius
+                print("Converting temperature from Kelvin to Celsius...")
+                variable = variable - k_factor
+            
             # Ajustar valores mayores a 180 restando 360
             if np.max(lon) > 180:
                 lon, variable = self.adjust_lon(lon, variable)
@@ -196,6 +210,9 @@ class MapGenerator:
             lat = lat[lat_idx]
             lon = lon[lon_idx]
             variable = variable[..., lat_idx[:, None], lon_idx]  # broadcasting over lat/lon
+            
+            # Mask invalid values
+            variable = ma.masked_invalid(variable)
 
             # Generate the figure
             fig, ax = self.config_map()
@@ -208,15 +225,27 @@ class MapGenerator:
             if not np.isfinite(vmin) or not np.isfinite(vmax):
                 print("Error: Invalid data range (NaN or Inf values)")
                 return
+            
+            print(f"Var max: {variable.max()}, Var min: {variable.min()}")
+            
+            print(f"Variable range: {vmin} to {vmax}, step: {step}")
+            
+            print(f"Latitudes: {lat_min} to {lat_max}, Longitudes: {lon_min} to {lon_max}")
+            
+            print(f"Variable shape: {variable.shape}, Lat shape: {lat.shape}, Lon shape: {lon.shape}")
                 
             # Ensure we have a valid range for contours
             cont_levels = np.arange(np.ceil(vmin/10)*10, vmax, step)
             if len(cont_levels) < 2:
                 # Fallback if range is too small
                 cont_levels = np.linspace(vmin, vmax, 5)
+                
+            print(f"Contour levels: {cont_levels}")
             
             co = ax.contour(lon, lat, variable, levels=cont_levels, cmap='jet', 
-                        transform=ccrs.PlateCarree(), linewidths=2.5)
+                        transform=ccrs.PlateCarree(), linewidths=1)
+            
+            print("Contours co.levels:", co.levels)
             
             plt.clabel(co, inline=True, fontsize=8)
             
@@ -288,11 +317,11 @@ class MapGenerator:
         # Añade títulos y etiquetas
         if(map_type != None):
             if var_type == 'z':
-                plt.title(f'{map_type} - Geopotential height at {self.pressure_level} - {date}', loc='center')
+                plt.title(f'{map_type} - Geopotential height at {self.pressure_level}hPa - {date}', loc='center')
             elif var_type == 't':
-                plt.title(f'{map_type} - Temperature at {self.pressure_level} - {date}', loc='center')
+                plt.title(f'{map_type} - Temperature at {self.pressure_level}hPa - {date}', loc='center')
         else:
-            plt.title(f'Variable at {self.pressure_level} - {date}', loc='center')
+            plt.title(f'Variable at {self.pressure_level}hPa - {date}', loc='center')
         
         # plt.xlabel('Longitude (deg)')
         # plt.ylabel('Latitude (deg)')
@@ -345,7 +374,7 @@ class MapGenerator:
         
         try:
             # Save the figure and close it to prevent resource leaks
-            plt.savefig(file_saved)
+            plt.savefig(file_saved, bbox_inches='tight', dpi=250, format=self.file_format)
             upload_files_to_request_hash(self.request_hash, OUT_DIR+"/"+self.request_hash)
             clean_directory(OUT_DIR+"/"+self.request_hash)
         except Exception as e:
