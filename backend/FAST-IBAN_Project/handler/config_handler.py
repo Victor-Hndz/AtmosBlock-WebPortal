@@ -143,7 +143,7 @@ class ConfigHandler:
             await self.process_map_generation()
         else:
             print("\n✅ Procesamiento completado.")
-            notify_result(self.rabbitmq, "Processing completed successfully.", self.request_hash)
+            await notify_result(self.rabbitmq, "Processing completed successfully.", self.request_hash)
 
     async def handle_map_generation_message(self, body: bytes) -> None:
         """
@@ -164,7 +164,7 @@ class ConfigHandler:
         self.maps_generated = True
         
         print("\n✅ Procesamiento completado.")
-        notify_result(self.rabbitmq, "Processing completed successfully.", self.request_hash)
+        await notify_result(self.rabbitmq, "Processing completed successfully.", self.request_hash)
 
     async def process_file(self) -> None:
         """

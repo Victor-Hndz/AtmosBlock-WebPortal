@@ -12,7 +12,7 @@ async def notify_result(rabbitmq: RabbitMQ, content_str: str, request_hash: str)
         content (str): The message to be sent.
     """
     content = {
-        "request_hash": request_hash,
+        "requestHash": request_hash,
         "content": content_str
     }
     message = create_message(STATUS_OK, "", content)
