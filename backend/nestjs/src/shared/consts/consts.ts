@@ -3,4 +3,4 @@ export const STATUS_ERROR = "ERROR";
 export const STATUS_PENDING = "PENDING";
 export const STATUS_PROCESSING = "PROCESSING";
 
-export const MAX_PROGRESS = 10;
+export const MAX_PROGRESS = 100;
