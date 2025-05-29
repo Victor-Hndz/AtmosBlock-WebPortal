@@ -9,6 +9,7 @@ import { GeneratedFilesModule } from "@/generatedFiles/generatedFiles.module";
 import { TypeOrmRequestRepository } from "./persistence/repositories/typeorm-request.repository";
 import { RabbitMQModule } from "@/shared/messaging/rabbitmq.module";
 import { MinioModule } from "@/minio/minio.module";
+import { ProgressModule } from "@/progress/progress.module";
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { MinioModule } from "@/minio/minio.module";
     GeneratedFilesModule,
     RabbitMQModule,
     MinioModule,
+    ProgressModule,
   ],
   providers: [
     RequestsService,

@@ -3,6 +3,8 @@ import { RequestsService } from "../services/requests.service";
 import { MessageContent } from "@/shared/interfaces/messageContentInterface.interface";
 import { RabbitMQExchanges, RabbitMQQueues, RabbitMQRoutingKeys } from "@/shared/enums/rabbitmqQueues.enum";
 import { AmqpConsumerService } from "@/shared/messaging/amqp-consumer.service";
+import { ProgressService } from "@/progress/services/progress.service";
+import { MAX_PROGRESS } from "@/shared/consts/consts";
 
 @Injectable()
 export class RequestsConsumer implements OnModuleInit {
@@ -10,7 +12,8 @@ export class RequestsConsumer implements OnModuleInit {
 
   constructor(
     private readonly requestsService: RequestsService,
-    private readonly amqpConsumerService: AmqpConsumerService
+    private readonly amqpConsumerService: AmqpConsumerService,
+    private readonly progressService: ProgressService
   ) {}
 
   /**
@@ -31,7 +34,15 @@ export class RequestsConsumer implements OnModuleInit {
       async (data: MessageContent) => {
         try {
           this.logger.log(`Received results.done message: ${JSON.stringify(data)}`);
+
+          // Process the message first to ensure data is available
           await this.requestsService.processResultMessage(data);
+
+          // After processing is complete, update progress to 100%
+          this.progressService.updateProgress({
+            increment: MAX_PROGRESS,
+            message: "Process completed. Results are ready for viewing and download.",
+          });
         } catch (error) {
           this.logger.error(`Error processing results.done message: ${error.message}`);
           this.logger.error(error.stack);

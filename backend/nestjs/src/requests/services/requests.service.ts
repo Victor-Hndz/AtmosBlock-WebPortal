@@ -70,7 +70,11 @@ export class RequestsService {
 
     //If not exists and cached, emit a message to RabbitMQ for processing
     this.requestsPublisher.sendRequestCreatedEvent(createRequestDto);
-    const message = { status: STATUS_PROCESSING, message: `Request sent to process with ID ${requestHash}`, requestHash: requestHash };
+    const message = {
+      status: STATUS_PROCESSING,
+      message: `Request sent to process with ID ${requestHash}`,
+      requestHash: requestHash,
+    };
     this.logger.log(`Request sent to process: ${JSON.stringify(message)}`);
     return JSON.stringify(message);
   }
@@ -83,28 +87,30 @@ export class RequestsService {
     this.logger.log(`Processing result message: ${JSON.stringify(message)}`);
     try {
       // Check if message has the expected structure
-      if (!message || typeof message !== 'object') {
-        this.logger.error('Invalid message: message is not an object');
+      if (!message || typeof message !== "object") {
+        this.logger.error("Invalid message: message is not an object");
         return;
       }
 
       // Check status first
       const messageStatus = message.status;
 
-      if (
-        typeof message.content !== 'object' ||
-        message.content === null ||
-        typeof (message.content as ResultMessageContent).requestHash !== 'string'
-      ) {
-        this.logger.error('Invalid message content: not a ResultMessageContent object');
+      console.log(`Message: ${JSON.stringify(message)}`);
+      console.log(`Message content: ${JSON.stringify(message)}`);
+      console.log(`Message content type: ${typeof message.content}`);
+
+      if (typeof message.content !== "object" || message.content === null) {
+        this.logger.error("Invalid message content: not a ResultMessageContent object");
         return;
       }
       const messageContent = message.content as ResultMessageContent;
       const requestHash = messageContent.requestHash;
       const messageText = messageContent.content;
-      
-      if (messageStatus !== 'OK') {
-        this.logger.error(`Error in result message. Status: ${messageStatus}, Message: ${messageText}, Request Hash: ${requestHash}`);
+
+      if (messageStatus !== "OK") {
+        this.logger.error(
+          `Error in result message. Status: ${messageStatus}, Message: ${messageText}, Request Hash: ${requestHash}`
+        );
         return;
       }
 
@@ -119,30 +125,30 @@ export class RequestsService {
       try {
         // Check if the folder with results exists in Minio
         const folderExists = await this.minioService.folderExists(requestHash);
-        
+
         if (!folderExists) {
           this.logger.error(`No result folder found in storage for request ${requestHash}`);
           request.requestStatus = requestStatus.EMPTY;
           await this.requestRepository.update(request);
           return;
         }
-        
+
         // List all files in the request's result folder
         const minioFiles = await this.minioService.listFiles(requestHash);
-        
+
         if (minioFiles.length === 0) {
           this.logger.warn(`No files found in result folder for request ${requestHash}`);
           request.requestStatus = requestStatus.EMPTY;
           await this.requestRepository.update(request);
           return;
         }
-        
+
         // Prepare the file list for the database
-        const filesList = minioFiles.map(file => file.url)
-        
+        const filesList = minioFiles.map(file => file.url);
+
         // Create or update generated files entry
         let generatedFiles = request.generatedFiles;
-        
+
         if (!generatedFiles) {
           // Create new generatedFiles object
           generatedFiles = new GeneratedFiles({
@@ -150,7 +156,7 @@ export class RequestsService {
             files: filesList,
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days TTL
           });
-          
+
           // Save to database
           const savedGeneratedFiles = await this.generatedFilesService.create(generatedFiles);
           request.generatedFiles = savedGeneratedFiles;
@@ -158,19 +164,18 @@ export class RequestsService {
           // Update existing generatedFiles object
           generatedFiles.files = filesList;
           generatedFiles.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days TTL
-          
+
           // Update in database
           await this.generatedFilesService.update(generatedFiles);
         }
-        
+
         // Update request status
         request.requestStatus = requestStatus.CACHED;
-        
+
         // Update the request in the database
         await this.requestRepository.update(request);
-        
+
         this.logger.log(`Successfully processed result for request ${requestHash} with ${filesList.length} files`);
-        
       } catch (error) {
         this.logger.error(`Error retrieving files from storage for request ${requestHash}: ${error.message}`);
         request.requestStatus = requestStatus.EMPTY;
@@ -181,30 +186,30 @@ export class RequestsService {
       throw error;
     }
   }
-  
+
   /**
    * Helper method to determine the file type from filename
    */
   private determineFileType(filename: string): string {
-    const ext = filename.split('.').pop()?.toLowerCase();
-    
-    if (!ext) return 'application/octet-stream';
-    
+    const ext = filename.split(".").pop()?.toLowerCase();
+
+    if (!ext) return "application/octet-stream";
+
     const mimeTypes = {
-      'pdf': 'application/pdf',
-      'png': 'image/png',
-      'jpg': 'image/jpeg',
-      'jpeg': 'image/jpeg',
-      'gif': 'image/gif',
-      'svg': 'image/svg+xml',
-      'txt': 'text/plain',
-      'csv': 'text/csv',
-      'nc': 'application/x-netcdf',
-      'zip': 'application/zip',
-      'json': 'application/json',
+      pdf: "application/pdf",
+      png: "image/png",
+      jpg: "image/jpeg",
+      jpeg: "image/jpeg",
+      gif: "image/gif",
+      svg: "image/svg+xml",
+      txt: "text/plain",
+      csv: "text/csv",
+      nc: "application/x-netcdf",
+      zip: "application/zip",
+      json: "application/json",
     };
-    
-    return mimeTypes[ext] || 'application/octet-stream';
+
+    return mimeTypes[ext] || "application/octet-stream";
   }
 
   generateRequestHash(createRequestDto: CreateRequestDto): string {
