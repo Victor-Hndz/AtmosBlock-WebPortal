@@ -15,11 +15,11 @@ import { RabbitMQModule } from "./shared/messaging/rabbitmq.module";
     DatabaseModule,
     UsersModule,
     RequestsModule,
-    MinioModule,
     AuthModule,
     GeneratedFilesModule,
     ProgressModule,
     RabbitMQModule,
+    MinioModule,
   ],
 })
 export class AppModule {}
