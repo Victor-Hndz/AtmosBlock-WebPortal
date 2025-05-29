@@ -5,7 +5,6 @@ import { GeneratedFilesEntity } from "./persistence/entities/generatedFiles.enti
 import { TypeOrmGeneratedFilesRepository } from "./persistence/repositories/typeorm-generatedFiles.repository";
 import { MinioService } from "@/minio/services/minio.service";
 import { GeneratedFilesController } from "./controllers/generatedFiles.controller";
-import { ResultsConsumer } from "./messaging/results.consumer";
 import { RabbitMQModule } from "@/shared/messaging/rabbitmq.module";
 import { ProgressModule } from "@/progress/progress.module";
 
@@ -15,7 +14,6 @@ import { ProgressModule } from "@/progress/progress.module";
   providers: [
     MinioService,
     GeneratedFilesService,
-    ResultsConsumer,
     {
       provide: "IGeneratedFilesRepository",
       useClass: TypeOrmGeneratedFilesRepository,
