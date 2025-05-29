@@ -92,7 +92,7 @@ export class GeneratedFilesService {
           const fileName = pathParts[pathParts.length - 1];
 
           // Create proxy URL
-          const proxyUrl = `${this.apiBaseUrl}/files/proxy/${requestHash}/${encodeURIComponent(fileName)}`;
+          const proxyUrl = `${this.apiBaseUrl}/api/files/proxy/${requestHash}/${encodeURIComponent(fileName)}`;
 
           const fileType = this.isPreviewableImage(fileName) ? "image" : "data";
 
