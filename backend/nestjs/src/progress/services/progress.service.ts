@@ -8,7 +8,7 @@ export class ProgressService {
   private readonly logger = new Logger(ProgressService.name);
   private actualProgress = 0;
   private progressSubject = new Subject<ProgressEvent>();
-  public readonly progress$ = this.progressSubject.asObservable();
+  public progress$ = this.progressSubject.asObservable();
 
   /**
    * Updates the progress based on the increment received
@@ -22,7 +22,37 @@ export class ProgressService {
       this.logger.warn(`Invalid progress increment: ${progressEvent.increment}`);
       return;
     }
-    this.actualProgress += progressEvent.increment;
+
+    if (progressEvent.increment === MAX_PROGRESS) {
+      this.logger.log("Progress reached 100%");
+
+      // Ensure we emit the final 100% progress event before completing
+      const finalEvent: ProgressEvent = {
+        increment: MAX_PROGRESS,
+        message: progressEvent.message || "Process completed successfully.",
+      };
+
+      // Set actual progress to 100% (MAX_PROGRESS)
+      this.actualProgress = MAX_PROGRESS;
+
+      // Emit the final event
+      this.progressSubject.next(finalEvent);
+
+      // Complete the subject after emitting the final event
+      setTimeout(() => {
+        this.progressSubject.complete();
+        this.actualProgress = 0; // Reset progress after completion
+      }, 500);
+
+      return;
+    }
+
+    this.actualProgress += progressEvent.increment * 6;
+    // Cap at MAX_PROGRESS
+    if (this.actualProgress > MAX_PROGRESS) {
+      this.actualProgress = MAX_PROGRESS;
+    }
+
     progressEvent.increment = this.actualProgress;
 
     // Emit the progress event to all subscribers
@@ -36,5 +66,7 @@ export class ProgressService {
     this.logger.log("Resetting progress");
     this.progressSubject.complete();
     this.progressSubject = new Subject<ProgressEvent>();
+    this.progress$ = this.progressSubject.asObservable();
+    this.actualProgress = 0;
   }
 }
