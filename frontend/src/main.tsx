@@ -1,4 +1,5 @@
 import React from "react";
+import { HashRouter } from "react-router-dom";
 import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
 import { AuthProvider } from "@/contexts/authProvider";
@@ -10,10 +11,12 @@ import App from "./App";
 // Render with a loading spinner while the app loads
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
+    <HashRouter>
     <Provider store={store}>
       <AuthProvider>
         <App />
       </AuthProvider>
     </Provider>
+    </HashRouter>
   </React.StrictMode>
 );
