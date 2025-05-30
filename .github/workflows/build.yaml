@@ -12,39 +12,22 @@ on:
 
 jobs:
   sonarqube:
-    name: SonarQube
+    name: SonarQube C/Python Analysis
     runs-on: ubuntu-latest
+    container:
+      image: victorhndz/netcdf-base:latest  # <-- Aquí usamos tu imagen
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Clonación completa para mejor análisis
+          fetch-depth: 0
 
-      # Instalar Python y herramientas para análisis Python
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      - name: Install Python dependencies
+      - name: Install additional tools for C & Python
         run: |
-          python -m pip install --upgrade pip
-          pip install flake8  # o cualquier linter que uses
+          apt-get update
+          apt-get install -y build-essential clang python3 python3-pip
+          pip3 install --upgrade pip
+          pip3 install flake8  # opcional para análisis Python
 
-      # Instalar herramientas para C
-      - name: Install build tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential clang
-
-      # Install C dependencies
-      - name: Install C dependencies
-        run: |
-          sudo apt-get install -y cmake ansible git libcurl4-openssl-dev libnetcdf-dev m4 mpich wget
-          cd custom_images/netcdf-base/execution
-          ansible-playbook install_netcdf.yaml
-          export HDF5_DIR=/usr/local/hdf5-1.14.3
-          export NETCDF4_DIR=/usr/local
-          
       - name: Compile C code
         run: |
           cd backend/FAST-IBAN_Project/execution/code/
@@ -60,7 +43,6 @@ jobs:
             --out-dir bw-output \
             make clean all -C backend/FAST-IBAN_Project/execution/code/build
 
-      # Ejecutar análisis SonarQube con el token
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
