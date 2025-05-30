@@ -58,7 +58,7 @@ jobs:
         run: |
           ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 \
             --out-dir bw-output \
-            make -C backend/FAST-IBAN_Project/execution/code/build
+            make clean all -C backend/FAST-IBAN_Project/execution/code/build
 
       # Ejecutar análisis SonarQube con el token
       - name: SonarQube Scan
