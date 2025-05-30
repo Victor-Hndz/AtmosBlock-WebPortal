@@ -36,6 +36,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential clang
 
+      # Install C dependencies
+      - name: Install C dependencies
+        run: |
+          sudo apt-get install -y cmake ansible git libcurl4-openssl-dev libnetcdf-dev m4 mpich wget
+          cd custom_images/netcdf-base/execution
+          ansible-playbook install_netcdf.yaml
+          export HDF5_DIR=/usr/local/hdf5-1.14.3
+          export NETCDF4_DIR=/usr/local
+          
       - name: Compile C code
         run: |
           cd backend/FAST-IBAN_Project/execution/code/
