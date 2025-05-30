@@ -1,0 +1,356 @@
+{
+  "app": {
+    "title": "Request Form Application",
+    "description": "Application for submitting and managing requests"
+  },
+  "navigation-header": {
+    "home": "Home",
+    "requests": "Requests",
+    "login": "Login",
+    "progress": "Progress"
+  },
+  "navigation-tooltips": {
+    "home": "Go to Homepage",
+    "requests": "Create and manage your requests",
+    "login": "Sign in to your account",
+    "about": "Learn more about this application",
+    "help": "Help",
+    "progress": "View real-time progress updates"
+  },
+  "navigation-footer": {
+    "about": "About"
+  },
+  "language": {
+    "switchLanguage": "Switch language",
+    "selectLanguage": "Select language"
+  },
+  "login-form": {
+    "title": "Login",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "emailRequired": "Please enter your email",
+    "emailInvalid": "Please enter a valid email",
+    "password": "Password",
+    "passwordRequirements": "Password requirements",
+    "passwordMustContain": "Password must contain",
+    "passwordCriteria": {
+      "minLength": "At least 8 characters",
+      "upperCase": "At least one uppercase letter",
+      "lowerCase": "At least one lowercase letter",
+      "number": "At least one number",
+      "specialChar": "At least one special character"
+    },
+    "passwordStrength": {
+      "weak": "Weak password",
+      "medium": "Medium password",
+      "strong": "Strong password"
+    },
+    "passwordTooShort": "Password must be at least {{count}} characters",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "forgotPassword": "Forgot password?",
+    "login-button": "Login",
+    "loggingIn": "Logging in...",
+    "loginSuccess": "Login successful!",
+    "authenticationTabsLabel": "Authenticate with your account"
+  },
+  "register-form": {
+    "title": "Register",
+    "name": "Full Name",
+    "namePlaceholder": "John Doe",
+    "nameRequired": "Please enter your name",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "emailRequired": "Please enter your email",
+    "emailInvalid": "Please enter a valid email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordRequired": "Please confirm your password",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "register-button": "Create Account",
+    "creatingAccount": "Creating account...",
+    "registerSuccess": "Registration successful!"
+  },
+  "requests-titles": {
+    "title": "Request Form",
+    "submit": "Submit Request",
+    "clear": "Clear Form",
+    "clearSuccess": "Form cleared successfully",
+    "success": "Request submitted successfully!",
+    "basicInfo": "Basic Information",
+    "mapConfig": "Map Configuration",
+    "additionalSettings": "Additional Settings",
+    "advancedSettings": "Advanced Settings",
+    "summary": "Request Summary",
+    "reviewBeforeSubmit": "Please review your request details before submitting:"
+  },
+  "requests": {
+    "details": "Request Details",
+    "variableName": "Variable Name",
+    "date": "Date",
+    "pressureLevels": "Pressure Levels",
+    "areaCovered": "Area Covered",
+    "format": "Format",
+    "status": "Status",
+    "created": "Created",
+    "requestAgain": "Request Again",
+    "statuses": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "completed": "Completed",
+      "failed": "Failed"
+    }
+  },
+  "profile": {
+    "userMenu": "User menu",
+    "viewProfile": "View Profile",
+    "settings": "Settings",
+    "logout": "Log out",
+    "profile": "My Profile",
+    "userInformation": "User Information",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "accountOptions": "Account Options",
+    "editProfile": "Edit Profile",
+    "changePassword": "Change Password",
+    "deleteAccount": "Delete Account",
+    "edit": "Edit",
+    "nameRequired": "Name is required",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Please enter a valid email address",
+    "viewRequests": "View my requests",
+    "deleteConfirmTitle": "Delete Account?",
+    "deleteConfirmMessage": "This action cannot be undone. This will permanently delete your account and remove all your data from our servers."
+  },
+  "settings": {
+    "title": "Settings",
+    "requestsHistory": "Request History",
+    "noRequests": "You haven't made any requests yet",
+    "makeRequest": "Make a request"
+  },
+  "requests-form": {
+    "variableName": "Variable Name",
+    "variableNameTooltip": "Enter the name of the variable you want to process",
+    "years": "Years",
+    "yearsAdvanced": "Years",
+    "yearsTooltip": "Select one or more years for the data",
+    "yearsAdvancedTooltip": "Select one or more years for the data",
+    "selectYears": "Select Years",
+    "selectYearsAndMonthsFirst": "Select years and months first",
+    "months": "Months",
+    "monthsTooltip": "Select one or more months for the data",
+    "selectMonths": "Select Months",
+    "days": "Days",
+    "daysTooltip": "Select one or more days for the data",
+    "hours": "Hours",
+    "hoursTooltip": "Select one or more hours for the data",
+    "pressureLevels": "Pressure Levels",
+    "selectpressureLevels": "Select Pressure Levels",
+    "pressureLevelsAdvanced": "Pressure Levels",
+    "pressureLevelsTooltip": "Select one pressure level for your data visualization",
+    "pressureLevelsAdvancedTooltip": "Select one or more pressure levels for the data",
+    "areaCovered": "Area Covered",
+    "areaCoveredTooltip": "Select the geographical areas to be covered",
+    "mapTypes": "Map Types",
+    "mapTypesTooltip": "Select the types of maps to generate",
+    "mapLevels": "Map Levels",
+    "mapLevelsTooltip": "Select the vertical levels for your maps",
+    "useDefaultArea": "Use Default Area",
+    "areaInputHelp": "Coordinates in degrees: North (0-90), West (-180-0), South (-90-0), East (0-180)",
+    "fileFormat": "File Format",
+    "fileFormatTooltip": "Select the output file format for your data",
+    "required": "This field is required",
+    "invalid": "Invalid value",
+    "advancedMode": "Advanced Mode",
+    "toggleAdvancedMode": "Toggle advanced mode",
+    "advancedModeTooltip": "Enable advanced mode to access additional configuration options",
+    "anonymousWarning": "You are not logged in. Your request will be processed anonymously.",
+    "formSteps": "Request form steps",
+    "submitting": "Submitting...",
+    "success": "Success",
+    "options": "Options",
+    "noMaps": "Skip Map Generation",
+    "noMapsTooltip": "Skip map generation step",
+    "noData": "Skip Data Generation",
+    "noDataTooltip": "Receive a response without data files (CSV, TXT...)",
+    "parallelProcessingOptions": "Parallel Processing Options",
+    "omp": "OpenMP",
+    "ompTooltip": "Use OpenMP for parallel processing",
+    "nThreads": "Use Multiple Threads",
+    "nThreadsTooltip": "Enable multithreading",
+    "mpi": "MPI",
+    "mpiTooltip": "Use MPI for distributed processing",
+    "nProces": "Use Multiple Processes",
+    "nProcesTooltip": "Enable multi-process execution",
+    "enabled": "Enabled",
+    "yes": "Yes",
+    "skipData": "Skip Data files",
+    "skipMapGeneration": "Skip Map Generation",
+    "openMP": "OpenMP",
+    "useMultipleThreads": "Use Multiple Threads",
+    "useMultipleProcesses": "Use Multiple Processes",
+    "invalidFormat": "Invalid format",
+    "valueTooShort": "Input is too short",
+    "valueTooLong": "Input is too long",
+    "invalidCoordinates": "Invalid coordinates",
+    "invalidNorthCoordinate": "Invalid North coordinate",
+    "invalidSouthCoordinate": "Invalid South coordinate",
+    "invalidEastCoordinate": "Invalid East coordinate",
+    "invalidWestCoordinate": "Invalid West coordinate",
+    "noOptionsAvailable": "No options available",
+    "selectPlaceholder": "Select an option",
+    "itemsSelected": "items selected"
+  },
+  "buttons": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "Canceling": "Canceling...",
+    "save": "Save",
+    "saving": "Saving...",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "edit": "Edit",
+    "back": "Back",
+    "close": "Close",
+    "next": "Next"
+  },
+  "toast": {
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Info"
+  },
+  "errors": {
+    "title": "Error",
+    "generic": "An error occurred",
+    "login": "Login failed. Please check your credentials.",
+    "register": "Registration failed. Please try again.",
+    "submission": "Failed to submit request. Please try again."
+  },
+  "common": {
+    "loading": "Loading...",
+    "none": "None"
+  },
+  "home": {
+    "hero": {
+      "title": "Fast & Efficient Data Processing",
+      "subtitle": "Submit requests, visualize results, and gain valuable insights from your meteorological data with our advanced processing platform.",
+      "primaryCta": "Start a Request",
+      "secondaryCta": "Sign In"
+    },
+    "features": {
+      "title": "Key Features",
+      "feature1": {
+        "title": "Data Processing",
+        "description": "Process meteorological data efficiently with our high-performance computing resources."
+      },
+      "feature2": {
+        "title": "Interactive Visualization",
+        "description": "Visualize your results with interactive charts and maps for better understanding."
+      }
+    },
+    "dataExamples": {
+      "title": "Explore Data Examples",
+      "tab1": "Temperature",
+      "tab2": "Geopotential",
+      "content1": "Temperature data processing allows for analysis of thermal patterns across different geographic regions and time periods. Our system handles temperature measurements from various sources and grid resolutions.",
+      "content2": "Pressure level data provides crucial information about atmospheric conditions. Process multi-level pressure data and generate comprehensive visualization maps for meteorological analysis."
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "description": "Create your first data processing request and unlock the power of advanced meteorological analysis.",
+      "buttonText": "Create Request Now"
+    }
+  },
+  "about": {
+    "title": "About FAST-IBAN Project",
+    "description": "A modern platform for meteorological data processing and analysis.",
+    "projectOverview": "Project Overview",
+    "projectDescription": "The FAST-IBAN project is a comprehensive solution designed to process, analyze, and visualize meteorological data efficiently. It leverages high-performance computing techniques to provide researchers and meteorologists with valuable insights from complex datasets.",
+    "technologies": "Technologies Used",
+    "techStack": {
+      "frontend": "React with TypeScript, Redux, and Tailwind CSS for the user interface.",
+      "backend": "NestJS with TypeScript for the API and authentication services.",
+      "processing": "C and python for high-performance numerical calculations and map generation."
+    },
+    "links": {
+      "github": "View on GitHub",
+      "linkedin": "Connect on LinkedIn",
+      "universityUM": "Murcia University",
+      "universityUMH": "UMH University"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "description": "Have questions or suggestions? Send us a message and we'll get back to you as soon as possible.",
+      "form": {
+        "name": "Name",
+        "namePlaceholder": "Your name",
+        "nameRequired": "Please enter your name",
+        "email": "Email",
+        "emailPlaceholder": "your@email.com",
+        "emailRequired": "Please enter your email",
+        "emailInvalid": "Please enter a valid email address",
+        "message": "Message",
+        "messagePlaceholder": "Your message",
+        "messageRequired": "Please enter your message",
+        "send": "Send Message",
+        "sending": "Sending...",
+        "success": {
+          "title": "Message sent!",
+          "message": "Your email client should open with a pre-filled message. Please send it to complete."
+        }
+      }
+    }
+  },
+  "progress": {
+    "title": "Progress Monitor",
+    "subtitle": "Real-time visualization of server-side process updates",
+    "demoTitle": "Progress Demonstration",
+    "liveTab": "Live Progress",
+    "demoTab": "How It Works",
+    "liveTitle": "Real-Time Process Updates",
+    "howItWorks": "How the Progress Bar Works",
+    "connecting": "Connecting to server...",
+    "waiting": "Waiting for updates...",
+    "simulating": "Simulation in progress...",
+    "useSimulator": "Use simulator (for testing)",
+    "connectPrompt": "Connect to the server to see real-time progress updates.",
+    "connect": "Connect to Server",
+    "restart": "Restart",
+    "explanation1": "This progress bar connects to a server-sent events (SSE) endpoint that streams real-time updates from background processes.",
+    "explanation2": "The server processes complex tasks such as data generation or long computations, sending progress updates through a RabbitMQ message queue.",
+    "explanation3": "As progress updates arrive, the bar fills up and displays status messages, providing real-time feedback on server-side operations.",
+    "technicalDetails": "Technical Implementation",
+    "techDetail1": "Server-Sent Events (SSE) for real-time communication",
+    "techDetail2": "RabbitMQ for message queuing",
+    "techDetail3": "Radix UI components for accessible UI",
+    "techDetail4": "React for state management and UI updates"
+  },
+  "notFound": {
+    "title": "404 - Page Not Found",
+    "message": "The page you're looking for doesn't exist or has been moved.",
+    "goHome": "Home",
+    "goBack": "Go Back"
+  },
+  "months-list": {
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December"
+  },
+  "mapTypes-list": {
+    "cont": "Contour",
+    "disp": "Dispersion",
+    "comb": "Combined Cont. + Disp.",
+    "forms": "Formations"
+  }
+}

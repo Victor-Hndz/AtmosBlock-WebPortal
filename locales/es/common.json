@@ -1,0 +1,356 @@
+{
+  "app": {
+    "title": "Aplicación de Formulario de Solicitud",
+    "description": "Aplicación para enviar y gestionar solicitudes"
+  },
+  "navigation-header": {
+    "home": "Inicio",
+    "requests": "Solicitudes",
+    "login": "Iniciar sesión",
+    "progress": "Progreso"
+  },
+  "navigation-tooltips": {
+    "home": "Ir a la Página Principal",
+    "requests": "Crear y gestionar tus solicitudes",
+    "login": "Iniciar sesión en tu cuenta",
+    "about": "Conocer más sobre esta aplicación",
+    "help": "Ayuda",
+    "progress": "Ver actualizaciones de progreso en tiempo real"
+  },
+  "navigation-footer": {
+    "about": "Acerca de"
+  },
+  "language": {
+    "switchLanguage": "Cambiar idioma",
+    "selectLanguage": "Seleccionar idioma"
+  },
+  "login-form": {
+    "title": "Iniciar sesión",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "emailRequired": "Por favor, introduce tu correo electrónico",
+    "emailInvalid": "Por favor, introduce un correo electrónico válido",
+    "password": "Contraseña",
+    "passwordRequirements": "Requisitos de contraseña",
+    "passwordMustContain": "La contraseña debe contener",
+    "passwordCriteria": {
+      "minLength": "Al menos 8 caracteres",
+      "upperCase": "Al menos una letra mayúscula",
+      "lowerCase": "Al menos una letra minúscula",
+      "number": "Al menos un número",
+      "specialChar": "Al menos un carácter especial"
+    },
+    "passwordStrength": {
+      "weak": "Contraseña débil",
+      "medium": "Contraseña media",
+      "strong": "Contraseña fuerte"
+    },
+    "passwordTooShort": "La contraseña debe tener al menos {{count}} caracteres",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "login-button": "Iniciar sesión",
+    "loggingIn": "Iniciando sesión...",
+    "loginSuccess": "¡Sesión iniciada correctamente!",
+    "authenticationTabsLabel": "Autentícate con tu cuenta"
+  },
+  "register-form": {
+    "title": "Crear cuenta",
+    "name": "Nombre completo",
+    "namePlaceholder": "Juan Pérez",
+    "nameRequired": "Por favor, introduce tu nombre",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "emailRequired": "Por favor, introduce tu correo electrónico",
+    "emailInvalid": "Por favor, introduce un correo electrónico válido",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "confirmPasswordRequired": "Por favor, confirma tu contraseña",
+    "passwordsDoNotMatch": "Las contraseñas no coinciden",
+    "register-button": "Registrarse",
+    "creatingAccount": "Creando cuenta...",
+    "registerSuccess": "¡Registro exitoso!"
+  },
+  "requests-titles": {
+    "title": "Formulario de Solicitud",
+    "submit": "Enviar Solicitud",
+    "clear": "Limpiar Formulario",
+    "clearSuccess": "Formulario limpiado correctamente",
+    "success": "¡Solicitud enviada correctamente!",
+    "basicInfo": "Información Básica",
+    "mapConfig": "Configuración del Mapa",
+    "additionalSettings": "Configuraciones Adicionales",
+    "advancedSettings": "Ajustes Avanzados",
+    "summary": "Resumen de la Solicitud",
+    "reviewBeforeSubmit": "Por favor, revisa los detalles de tu solicitud antes de enviar:"
+  },
+  "requests": {
+    "details": "Detalles de la Solicitud",
+    "variableName": "Nombre de la Variable",
+    "date": "Fecha",
+    "pressureLevels": "Niveles de Presión",
+    "areaCovered": "Área Cubierta",
+    "format": "Formato",
+    "status": "Estado",
+    "created": "Creado",
+    "requestAgain": "Solicitar de nuevo",
+    "statuses": {
+      "pending": "Pendiente",
+      "processing": "Procesando",
+      "completed": "Completado",
+      "failed": "Fallido"
+    }
+  },
+  "profile": {
+    "userMenu": "Menú de usuario",
+    "viewProfile": "Ver Perfil",
+    "settings": "Configuración",
+    "logout": "Cerrar sesión",
+    "profile": "Mi Perfil",
+    "userInformation": "Información del Usuario",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "role": "Rol",
+    "accountOptions": "Opciones de la Cuenta",
+    "editProfile": "Editar Perfil",
+    "changePassword": "Cambiar Contraseña",
+    "deleteAccount": "Eliminar Cuenta",
+    "edit": "Editar",
+    "nameRequired": "El nombre es obligatorio",
+    "emailRequired": "El correo electrónico es obligatorio",
+    "emailInvalid": "Por favor, introduce un correo electrónico válido",
+    "viewRequests": "Ver mis solicitudes",
+    "deleteConfirmTitle": "¿Eliminar cuenta?",
+    "deleteConfirmMessage": "Esta acción no se puede deshacer. Eliminará permanentemente tu cuenta y todos tus datos de nuestros servidores."
+  },
+  "settings": {
+    "title": "Configuración",
+    "requestsHistory": "Historial de Solicitudes",
+    "noRequests": "Aún no has realizado ninguna solicitud",
+    "makeRequest": "Realizar una solicitud"
+  },
+  "requests-form": {
+    "variableName": "Nombre de Variable",
+    "variableNameTooltip": "Introduce el nombre de la variable que deseas procesar",
+    "years": "Años",
+    "yearsAdvanced": "Años",
+    "yearsTooltip": "Selecciona uno o más años para los datos",
+    "yearsAdvancedTooltip": "Selecciona uno o más años para los datos",
+    "selectYears": "Selecciona los años",
+    "selectYearsAndMonthsFirst": "Selecciona primero los años y meses",
+    "months": "Meses",
+    "monthsTooltip": "Selecciona uno o más meses para los datos",
+    "selectMonths": "Selecciona los meses",
+    "days": "Días",
+    "daysTooltip": "Selecciona uno o más días para los datos",
+    "hours": "Horas",
+    "hoursTooltip": "Selecciona una o más horas para los datos",
+    "pressureLevels": "Niveles de Presión",
+    "selectpressureLevels": "Selecciona los niveles de presión",
+    "pressureLevelsAdvanced": "Niveles de Presión",
+    "pressureLevelsTooltip": "Selecciona un nivel de presión para tu visualización de datos",
+    "pressureLevelsAdvancedTooltip": "Selecciona uno o más niveles de presión para tu visualización de datos",
+    "areaCovered": "Área Cubierta",
+    "areaCoveredTooltip": "Selecciona las áreas geográficas a cubrir",
+    "mapTypes": "Tipos de Mapa",
+    "mapTypesTooltip": "Selecciona los tipos de mapas a generar",
+    "mapLevels": "Niveles de Mapa",
+    "mapLevelsTooltip": "Selecciona los niveles verticales para tus mapas",
+    "useDefaultArea": "Usar Área por Defecto",
+    "areaInputHelp": "Coordenadas en grados: Norte (0-90), Oeste (-180-0), Sur (-90-0), Este (0-180)",
+    "fileFormat": "Formato de Archivo",
+    "fileFormatTooltip": "Selecciona el formato de archivo de salida para tus datos",
+    "required": "Este campo es obligatorio",
+    "invalid": "Valor no válido",
+    "advancedMode": "Modo Avanzado",
+    "toggleAdvancedMode": "Activar modo avanzado",
+    "advancedModeTooltip": "Habilita el modo avanzado para acceder a opciones de configuración adicionales",
+    "anonymousWarning": "No has iniciado sesión. Tu solicitud será procesada de forma anónima.",
+    "formSteps": "Pasos del formulario de solicitud",
+    "submitting": "Enviando...",
+    "success": "Éxito",
+    "options": "Opciones",
+    "noMaps": "Omitir Generación de Mapas",
+    "noMapsTooltip": "Omitir paso de generación de mapas",
+    "noData": "Omitir Datos",
+    "noDataTooltip": "Recibir una respuesta sin archivos de datos (CSV, TXT...)",
+    "parallelProcessingOptions": "Opciones de Procesamiento Paralelo",
+    "omp": "OpenMP",
+    "ompTooltip": "Usar OpenMP para procesamiento paralelo",
+    "nThreads": "Usar Múltiples Hilos",
+    "nThreadsTooltip": "Habilitar multihilo",
+    "mpi": "MPI",
+    "mpiTooltip": "Usar MPI para procesamiento distribuido",
+    "nProces": "Usar Múltiples Procesos",
+    "nProcesTooltip": "Habilitar ejecución multiproceso",
+    "enabled": "Habilitado",
+    "yes": "Sí",
+    "skipData": "Omitir ficheros de datos",
+    "skipMapGeneration": "Omitir Generación de Mapas",
+    "openMP": "OpenMP",
+    "useMultipleThreads": "Usar Múltiples Hilos",
+    "useMultipleProcesses": "Usar Múltiples Procesos",
+    "invalidFormat": "Formato no válido",
+    "valueTooShort": "El input es demasiado corto",
+    "valueTooLong": "El input es demasiado largo",
+    "invalidCoordinates": "Coordenadas no válidas",
+    "invalidNorthCoordinate": "La coordenada norte no es válida",
+    "invalidSouthCoordinate": "La coordenada sur no es válida",
+    "invalidEastCoordinate": "La coordenada este no es válida",
+    "invalidWestCoordinate": "La coordenada oeste no es válida",
+    "noOptionsAvailable": "No hay opciones disponibles",
+    "selectPlaceholder": "Selecciona una opción",
+    "itemsSelected": "elementos seleccionados"
+  },
+  "buttons": {
+    "submit": "Enviar",
+    "cancel": "Cancelar",
+    "canceling": "Cancelando...",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "delete": "Eliminar",
+    "deleteing": "Eliminando...",
+    "edit": "Editar",
+    "back": "Atrás",
+    "close": "Cerrar",
+    "next": "Siguiente"
+  },
+  "toast": {
+    "success": "Éxito",
+    "error": "Error",
+    "warning": "Advertencia",
+    "info": "Información"
+  },
+  "errors": {
+    "title": "Error",
+    "generic": "Ha ocurrido un error",
+    "login": "Error al iniciar sesión. Por favor, compruebe sus credenciales.",
+    "register": "Error al registrarse. Por favor, inténtelo de nuevo.",
+    "submission": "Error al enviar la solicitud. Por favor, inténtelo de nuevo."
+  },
+  "common": {
+    "loading": "Cargando...",
+    "none": "Ninguno"
+  },
+  "home": {
+    "hero": {
+      "title": "Procesamiento de Datos Rápido y Eficiente",
+      "subtitle": "Envía solicitudes, visualiza resultados y obtén información valiosa de tus datos meteorológicos con nuestra plataforma de procesamiento avanzado.",
+      "primaryCta": "Iniciar una Solicitud",
+      "secondaryCta": "Iniciar Sesión"
+    },
+    "features": {
+      "title": "Características Principales",
+      "feature1": {
+        "title": "Procesamiento de Datos",
+        "description": "Procesa datos meteorológicos de manera eficiente con nuestros recursos de cómputo de alto rendimiento."
+      },
+      "feature2": {
+        "title": "Visualización Interactiva",
+        "description": "Visualiza tus resultados con gráficos y mapas interactivos para una mejor comprensión."
+      }
+    },
+    "dataExamples": {
+      "title": "Explora Ejemplos de Datos",
+      "tab1": "Temperatura",
+      "tab2": "Geopotencial",
+      "content1": "El procesamiento de datos de temperatura permite el análisis de patrones térmicos en diferentes regiones geográficas y periodos de tiempo. Nuestro sistema maneja mediciones de temperatura de varias fuentes y resoluciones de cuadrícula.",
+      "content2": "Los datos de niveles de presión proporcionan información crucial sobre las condiciones atmosféricas. Procesa datos de presión multinivel y genera mapas de visualización completos para análisis meteorológico."
+    },
+    "cta": {
+      "title": "¿Listo para Empezar?",
+      "description": "Crea tu primera solicitud de procesamiento de datos y desbloquea el poder del análisis meteorológico avanzado.",
+      "buttonText": "Crear Solicitud Ahora"
+    }
+  },
+  "about": {
+    "title": "Acerca del Proyecto FAST-IBAN",
+    "description": "Una plataforma moderna para el procesamiento y análisis de datos meteorológicos.",
+    "projectOverview": "Descripción del Proyecto",
+    "projectDescription": "El proyecto FAST-IBAN es una solución integral diseñada para procesar, analizar y visualizar datos meteorológicos de manera eficiente. Utiliza técnicas de computación de alto rendimiento para proporcionar a investigadores y meteorólogos información valiosa de conjuntos de datos complejos.",
+    "technologies": "Tecnologías Utilizadas",
+    "techStack": {
+      "frontend": "React con TypeScript, Redux y Tailwind CSS para la interfaz de usuario.",
+      "backend": "NestJS con TypeScript para la API y servicios de autenticación.",
+      "processing": "C y python para cálculos numéricos de alto rendimiento y generación de mapas."
+    },
+    "links": {
+      "github": "Ver en GitHub",
+      "linkedin": "Conectar en LinkedIn",
+      "universityUM": "Universidad de Murcia",
+      "universityUMH": "Universidad UMH"
+    },
+    "contact": {
+      "title": "Contáctanos",
+      "description": "¿Tienes preguntas o sugerencias? Envíanos un mensaje y te responderemos lo antes posible.",
+      "form": {
+        "name": "Nombre",
+        "namePlaceholder": "Tu nombre",
+        "nameRequired": "Por favor, introduce tu nombre",
+        "email": "Correo electrónico",
+        "emailPlaceholder": "tu@correo.com",
+        "emailRequired": "Por favor, introduce tu correo electrónico",
+        "emailInvalid": "Por favor, introduce un correo electrónico válido",
+        "message": "Mensaje",
+        "messagePlaceholder": "Tu mensaje",
+        "messageRequired": "Por favor, introduce tu mensaje",
+        "send": "Enviar Mensaje",
+        "sending": "Enviando...",
+        "success": {
+          "title": "¡Mensaje enviado!",
+          "message": "Tu cliente de correo electrónico debería abrirse con un mensaje pre-completado. Por favor, envíalo para completar."
+        }
+      }
+    }
+  },
+  "progress": {
+    "title": "Monitor de Progreso",
+    "subtitle": "Visualización en tiempo real de actualizaciones de procesos del servidor",
+    "demoTitle": "Demostración de Progreso",
+    "liveTab": "Progreso en Vivo",
+    "demoTab": "Cómo Funciona",
+    "liveTitle": "Actualizaciones de Proceso en Tiempo Real",
+    "howItWorks": "Cómo Funciona la Barra de Progreso",
+    "connecting": "Conectando al servidor...",
+    "waiting": "Esperando actualizaciones...",
+    "simulating": "Simulación en progreso...",
+    "useSimulator": "Usar simulador (para pruebas)",
+    "connectPrompt": "Conéctate al servidor para ver actualizaciones de progreso en tiempo real.",
+    "connect": "Conectar al Servidor",
+    "restart": "Reiniciar",
+    "explanation1": "Esta barra de progreso se conecta a un endpoint de eventos del servidor (SSE) que transmite actualizaciones en tiempo real de procesos en segundo plano.",
+    "explanation2": "El servidor procesa tareas complejas como generación de datos o cálculos largos, enviando actualizaciones de progreso a través de una cola de mensajes RabbitMQ.",
+    "explanation3": "Conforme llegan las actualizaciones de progreso, la barra se va llenando y muestra mensajes de estado, proporcionando feedback en tiempo real de las operaciones del servidor.",
+    "technicalDetails": "Implementación Técnica",
+    "techDetail1": "Server-Sent Events (SSE) para comunicación en tiempo real",
+    "techDetail2": "RabbitMQ para la cola de mensajes",
+    "techDetail3": "Componentes Radix UI para una interfaz accesible",
+    "techDetail4": "React para gestión de estado y actualizaciones de UI"
+  },
+  "notFound": {
+    "title": "404 - Página No Encontrada",
+    "message": "Lo sentimos, la página que buscas no existe o ha sido eliminada.",
+    "goHome": "Volver a Inicio",
+    "goBack": "Volver Atrás"
+  },
+  "months-list": {
+    "january": "Enero",
+    "february": "Febrero",
+    "march": "Marzo",
+    "april": "Abril",
+    "may": "Mayo",
+    "june": "Junio",
+    "july": "Julio",
+    "august": "Agosto",
+    "september": "Septiembre",
+    "october": "Octubre",
+    "november": "Noviembre",
+    "december": "Diciembre"
+  },
+  "mapTypes-list": {
+    "cont": "Contornos",
+    "disp": "Dispersión",
+    "comb": "Combinación Cont. + Disp.",
+    "forms": "Formaciones"
+  }
+}

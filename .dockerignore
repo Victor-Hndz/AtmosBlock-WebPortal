@@ -1,0 +1,50 @@
+# Version control
+.git
+.gitignore
+.unlighthouse
+
+**/scripts/
+
+# Docker files
+.dockerignore
+**/Dockerfile
+**/docker-compose*
+
+# Node.js
+**/node_modules
+**/npm-debug.log
+**/yarn-debug.log
+**/yarn-error.log
+
+# Python
+**/__pycache__
+**/*.py[cod]
+**/*$py.class
+**/.env
+**/.venv
+**/env/
+**/venv/
+**/ENV/
+**/.Python
+**/.pytest_cache
+**/.coverage
+
+# Build directories
+**/dist
+**/build
+**/.next
+**/.nuxt
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# IDE
+**/.idea
+**/.vscode
+**/*.swp
+**/*.swo
+
+# Logs
+**/logs
+**/*.log

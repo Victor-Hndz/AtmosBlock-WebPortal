@@ -1,0 +1,49 @@
+name: Build
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonarqube:
+    name: SonarQube C/Python Analysis
+    runs-on: ubuntu-latest
+    container:
+      image: victorhndz/netcdf-base:latest  # <-- Aquí usamos tu imagen
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install additional tools for C & Python
+        run: |
+          apt-get update
+          apt-get install -y build-essential clang python3 python3-pip unzip
+          pip3 install --upgrade pip
+          pip3 install flake8  # opcional para análisis Python
+
+      - name: Compile C code
+        run: |
+          cd backend/FAST-IBAN_Project/execution/code/
+          mkdir -p build
+          cd build
+          cmake ..
+          cmake --build .
+          make clean all
+
+      - name: Run build-wrapper on C code
+        run: |
+          ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 \
+            --out-dir bw-output \
+            make clean all -C backend/FAST-IBAN_Project/execution/code/build
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
