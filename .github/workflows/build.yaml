@@ -36,6 +36,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential clang
 
+      - name: Run build-wrapper on C code
+        run: |
+          ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 \
+            --out-dir bw-output \
+            make -C backend/FAST-IBAN_Project/execution/code/build
+
       # Ejecutar análisis SonarQube con el token
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
