@@ -54,6 +54,11 @@ Para poder descargar datos desde el Climate Data Store (CDS) de Copernicus, es n
   ./frontend_build
   ```
 
+- **Generar archivos .env (Sólo la primera vez)**
+  ```bash
+  ./generate_env.sh
+  ```
+
 ---
 
 ## 📦 Requisitos previos
