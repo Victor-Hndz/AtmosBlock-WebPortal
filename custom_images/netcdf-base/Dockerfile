@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y \
     python3-apt \
     python3-pip \
     wget \
+    unzip \
     && pip install --upgrade pip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
