@@ -41,6 +41,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Run build-wrapper
+        run: |
+          wget https://binaries.sonarsource.com/Distribution/sonar-build-wrapper/build-wrapper-linux-x86.zip
+          unzip build-wrapper-linux-x86.zip
+          build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir bw-output make clean all
+
       - name: Analyze with SonarQube
 
         # You can pin the exact commit or the version.
