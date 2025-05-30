@@ -1,7 +1,7 @@
 # TFM – Web Application for Atmospheric Blocking Analysis
 
-Este proyecto corresponde al Trabajo Fin de Máster (TFM) titulado: Desarrollo Full-stack de un
-Portal Web para el Análisis de Bloqueos Atmosféricos y proporciona una solución completa para la visualización, análisis y generación de datos relacionados con bloqueos atmosféricos utilizando microservicios, Docker y fuentes de datos climáticos como Copernicus.
+Este proyecto corresponde al Trabajo Fin de Máster (TFM) titulado: **Desarrollo Full-stack de un
+Portal Web para el Análisis de Bloqueos Atmosféricos** y proporciona una solución completa para la visualización, análisis y generación de datos relacionados con bloqueos atmosféricos utilizando microservicios, Docker y fuentes de datos climáticos como Copernicus.
 
 ---
 
