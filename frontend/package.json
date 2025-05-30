@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "homepage": "https://victor-hndz.github.io/AtmosBlock-WebPortal/",
+  "homepage": "https://victor-hndz.github.io/",
   "version": "1.0.0",
   "description": "",
   "author": "victor.hernandezs@um.es",
@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "format": "prettier --write .",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
