@@ -264,10 +264,10 @@
     }
   },
   "about": {
-    "title": "Acerca del Proyecto FAST-IBAN",
+    "title": "Acerca del Proyecto AtmosBlock Web Portal",
     "description": "Una plataforma moderna para el procesamiento y análisis de datos meteorológicos.",
     "projectOverview": "Descripción del Proyecto",
-    "projectDescription": "El proyecto FAST-IBAN es una solución integral diseñada para procesar, analizar y visualizar datos meteorológicos de manera eficiente. Utiliza técnicas de computación de alto rendimiento para proporcionar a investigadores y meteorólogos información valiosa de conjuntos de datos complejos.",
+    "projectDescription": "El proyecto AtmosBlock Web Portal es una solución integral diseñada para procesar, analizar y visualizar datos meteorológicos de manera eficiente. Utiliza técnicas de computación de alto rendimiento para proporcionar a investigadores y meteorólogos información valiosa de conjuntos de datos complejos.",
     "technologies": "Tecnologías Utilizadas",
     "techStack": {
       "frontend": "React con TypeScript, Redux y Tailwind CSS para la interfaz de usuario.",

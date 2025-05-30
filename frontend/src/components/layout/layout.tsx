@@ -254,7 +254,7 @@ const Layout: React.FC = (): JSX.Element => {
       {/* Footer */}
       <footer className="fixed bottom-0 left-0 right-0 bg-gray-800 text-white p-4 shadow-md" role="contentinfo">
         <div className="flex justify-center items-center gap-2 flex-wrap">
-          <p className="transition-opacity duration-300 hover:opacity-80">&copy; 2025 FAST-IBAN Project</p>
+          <p className="transition-opacity duration-300 hover:opacity-80">&copy; 2025 AtmosBlock Web Portal</p>
           <Separator.Root className="h-4 w-px bg-gray-500 mx-2" decorative orientation="vertical" />
           <Tooltip.Provider delayDuration={300}>
             <Tooltip.Root>

@@ -33,7 +33,7 @@ const AboutPage: React.FC = (): JSX.Element => {
     setIsSubmitting(true);
 
     // Create mailto link with form data
-    const subject = `Contact from ${name} via FAST-IBAN Project`;
+    const subject = `Contact from ${name} via AtmosBlock Web Portal`;
     const body = `Message from ${name} (${email}):\n\n${message}`;
     const mailtoLink = `mailto:vic.hernandezs08@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
