@@ -91,8 +91,8 @@ export class GeneratedFilesService {
           const pathParts = file.name.split("/");
           const fileName = pathParts[pathParts.length - 1];
 
-          // Create proxy URL
-          const proxyUrl = `${this.apiBaseUrl}/api/files/proxy/${requestHash}/${encodeURIComponent(fileName)}`;
+          // Create proxy URL - use the MinioService's method to ensure proper URL encoding
+          const proxyUrl = this.minioService.getProxyUrl(requestHash, fileName);
 
           const fileType = this.isPreviewableImage(fileName) ? "image" : "data";
 

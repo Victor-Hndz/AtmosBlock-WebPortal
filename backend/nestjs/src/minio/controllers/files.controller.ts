@@ -7,6 +7,7 @@ import {
   StreamableFile,
   InternalServerErrorException,
   All,
+  Header,
 } from "@nestjs/common";
 import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { MinioService } from "../services/minio.service";
@@ -24,6 +25,9 @@ export class FilesController {
   @ApiOperation({ summary: "Proxy file requests to MinIO" })
   @ApiParam({ name: "requestHash", description: "Request hash for the folder" })
   @ApiParam({ name: "filename", description: "Filename to retrieve" })
+  @Header("Access-Control-Allow-Origin", "*")
+  @Header("Access-Control-Allow-Methods", "GET, OPTIONS")
+  @Header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept")
   async proxyFile(
     @Param("requestHash") requestHash: string,
     @Param("filename") filename: string,
@@ -42,14 +46,22 @@ export class FilesController {
         throw new InternalServerErrorException("Invalid stream returned from storage");
       }
 
+      // Determine content type - use a more robust approach
+      const contentType = this.getContentType(filename);
+
+      // Log the content type for debugging
+      this.logger.log(`Serving file ${filename} with content type: ${contentType}`);
+
       // Set appropriate headers
       res.set({
-        "Content-Type":
-          metadata.metaData && metadata.metaData["content-type"]
-            ? metadata.metaData["content-type"]
-            : this.getContentType(filename),
-        "Content-Disposition": `inline; filename="${filename}"`,
+        "Content-Type": contentType,
+        "Content-Disposition": this.shouldInlineContent(contentType)
+          ? `inline; filename="${filename}"`
+          : `attachment; filename="${filename}"`,
         "Access-Control-Allow-Origin": "*", // Enable CORS
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept",
+        "Access-Control-Max-Age": "86400", // 24 hours
         "Cache-Control": "public, max-age=86400", // Cache for 1 day
       });
 
@@ -59,6 +71,16 @@ export class FilesController {
       this.logger.error(`Error proxying file ${requestHash}/${filename}: ${error.message}`);
       throw error;
     }
+  }
+
+  // OPTIONS handler for CORS preflight requests
+  @All("proxy/:requestHash/:filename")
+  @Header("Access-Control-Allow-Origin", "*")
+  @Header("Access-Control-Allow-Methods", "GET, OPTIONS")
+  @Header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept")
+  @Header("Access-Control-Max-Age", "86400")
+  handleOptions(@Res() res: Response): void {
+    res.status(204).end();
   }
 
   // Catch-all route to handle any file under the proxy path
@@ -89,5 +111,13 @@ export class FilesController {
     };
 
     return mimeTypes[ext] || "application/octet-stream";
+  }
+
+  /**
+   * Determine if content should be displayed inline or as attachment
+   */
+  private shouldInlineContent(contentType: string): boolean {
+    // Types that browsers can typically display
+    return contentType.startsWith("image/") || contentType === "application/pdf" || contentType === "text/plain";
   }
 }

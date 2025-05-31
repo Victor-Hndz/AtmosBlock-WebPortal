@@ -53,7 +53,11 @@ export class MinioService {
 
   // Create public file URL using API proxy
   getProxyUrl(requestHash: string, fileName: string): string {
-    return `${this.apiBaseUrl}/files/proxy/${requestHash}/${fileName}`;
+    // Ensure both requestHash and fileName are properly encoded for URL
+    const encodedRequestHash = encodeURIComponent(requestHash);
+    const encodedFileName = encodeURIComponent(fileName);
+
+    return `${this.apiBaseUrl}/api/files/proxy/${encodedRequestHash}/${encodedFileName}`;
   }
 
   // This is kept for compatibility but should not be used
