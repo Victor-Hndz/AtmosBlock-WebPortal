@@ -51,8 +51,8 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ user }) => {
   /**
    * Navigates to settings page
    */
-  const goToSettings = () => {
-    navigate("/settings");
+  const goToPreviousRequests = () => {
+    navigate("/previous-requests");
   };
 
   /**
@@ -106,7 +106,7 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ user }) => {
 
           <DropdownMenu.Item
             className="flex items-center rounded-md px-3 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
-            onSelect={goToSettings}
+            onSelect={goToPreviousRequests}
           >
             <Settings className="mr-2 h-4 w-4" />
             {t("profile.settings")}

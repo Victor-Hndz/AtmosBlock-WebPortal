@@ -124,7 +124,7 @@ const ProfilePage: React.FC = () => {
   return (
     <Toast.Provider swipeDirection="right">
       <div className="max-w-3xl mx-auto p-4">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col justify-between items-center mb-6 gap-6">
           <h1 className="text-2xl font-bold">{t("profile.profile")}</h1>
           {!isEditing && (
             <button
@@ -234,7 +234,7 @@ const ProfilePage: React.FC = () => {
           <h2 className="text-xl font-semibold mb-4">{t("profile.accountOptions")}</h2>
 
           <button
-            onClick={() => navigate("/settings")}
+            onClick={() => navigate("/previous-requests")}
             className="w-full mb-3 px-4 py-2 border border-gray-300 rounded-md text-left hover:bg-gray-50 transition-colors flex items-center"
           >
             <span className="flex-1">{t("profile.viewRequests")}</span>
