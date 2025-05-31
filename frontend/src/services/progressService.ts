@@ -26,6 +26,9 @@ export const ProgressService = {
     const eventSource = new EventSource(progressStreamUrl);
     let completed = false;
 
+    // Store initial connection timestamp to prevent reconnection loops
+    const connectionTimestamp = Date.now();
+
     // Initialize connection
     eventSource.onopen = () => {
       console.log("Connected to progress stream");
@@ -41,11 +44,18 @@ export const ProgressService = {
         callbacks.onUpdate(data);
 
         // Check if the progress is complete
-        if (data.increment >= MAX_PROGRESS && callbacks.onComplete && !completed) {
+        if (data.increment >= MAX_PROGRESS && !completed) {
           completed = true;
-          callbacks.onComplete();
-          // Auto-close the connection when complete
-          eventSource.close();
+          console.log("Progress completed, calling onComplete callback");
+
+          // Ensure we call onComplete with a slight delay to allow UI to update
+          setTimeout(() => {
+            if (callbacks.onComplete) {
+              callbacks.onComplete();
+            }
+            // Auto-close the connection when complete
+            eventSource.close();
+          }, 500);
         }
       } catch (error) {
         console.error("Error parsing progress update:", error);
@@ -55,13 +65,34 @@ export const ProgressService = {
     // Handle errors
     eventSource.onerror = error => {
       console.error("Progress stream error:", error);
+
+      // If we've been connected for a while and have already completed, don't call error handler
+      if (completed || (Date.now() - connectionTimestamp > 5000 && eventSource.readyState === EventSource.CLOSED)) {
+        console.log("Error occurred but progress was already marked complete, ignoring");
+        eventSource.close();
+        return;
+      }
+
       if (callbacks.onError) {
         callbacks.onError(error);
       }
+
       // Only close if we're still having issues (avoid closing during temporary disconnects)
       if (eventSource.readyState === EventSource.CLOSED) {
         console.log("Connection was closed permanently");
       }
+    };
+
+    // Add handler for when SSE connection naturally closes
+    const originalClose = eventSource.close;
+    eventSource.close = function () {
+      console.log("Progress stream connection closing");
+      if (!completed && callbacks.onComplete) {
+        // If we're closing but haven't completed, call onComplete
+        completed = true;
+        callbacks.onComplete();
+      }
+      return originalClose.call(eventSource);
     };
 
     // Return cleanup function to close the connection
