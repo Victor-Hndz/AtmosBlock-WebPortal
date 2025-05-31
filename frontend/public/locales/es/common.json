@@ -104,7 +104,7 @@
   "profile": {
     "userMenu": "Menú de usuario",
     "viewProfile": "Ver Perfil",
-    "settings": "Configuración",
+    "settings": "Peticiones",
     "logout": "Cerrar sesión",
     "profile": "Mi Perfil",
     "userInformation": "Información del Usuario",
@@ -124,7 +124,7 @@
     "deleteConfirmMessage": "Esta acción no se puede deshacer. Eliminará permanentemente tu cuenta y todos tus datos de nuestros servidores."
   },
   "settings": {
-    "title": "Configuración",
+    "title": "Solicitudes anteriores",
     "requestsHistory": "Historial de Solicitudes",
     "noRequests": "Aún no has realizado ninguna solicitud",
     "makeRequest": "Realizar una solicitud"

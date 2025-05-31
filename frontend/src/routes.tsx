@@ -111,7 +111,7 @@ function AppRoutes(): JSX.Element {
           ),
         },
         {
-          path: "settings",
+          path: "/previous-requests",
           element: (
             <ProtectedRoute>
               <Suspense fallback={<LoadingFallback />}>

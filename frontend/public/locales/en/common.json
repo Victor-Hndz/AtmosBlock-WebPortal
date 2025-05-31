@@ -104,7 +104,7 @@
   "profile": {
     "userMenu": "User menu",
     "viewProfile": "View Profile",
-    "settings": "Settings",
+    "settings": "Requests",
     "logout": "Log out",
     "profile": "My Profile",
     "userInformation": "User Information",
@@ -124,7 +124,7 @@
     "deleteConfirmMessage": "This action cannot be undone. This will permanently delete your account and remove all your data from our servers."
   },
   "settings": {
-    "title": "Settings",
+    "title": "Previous Requests",
     "requestsHistory": "Request History",
     "noRequests": "You haven't made any requests yet",
     "makeRequest": "Make a request"
