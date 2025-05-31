@@ -92,29 +92,29 @@ export class ReturnRequestDto {
   @IsBoolean()
   @IsOptional()
   mpi?: boolean;
+}
 
-  fromRequest(request: Request): ReturnRequestDto {
-    const dto = new ReturnRequestDto();
+export function fromRequestToReturnRequest(request: Request): ReturnRequestDto {
+  const dto = new ReturnRequestDto();
 
-    dto.variableName = request.variableName;
-    dto.pressureLevels = request.pressureLevels;
-    dto.years = request.years;
-    dto.months = request.months;
-    dto.days = request.days;
-    dto.hours = request.hours;
-    dto.areaCovered = request.areaCovered;
-    dto.mapTypes = request.mapTypes;
-    dto.mapLevels = request.mapLevels || [];
-    dto.fileFormat = request.fileFormat;
-    dto.noData = request.noData || false;
-    dto.noMaps = request.noMaps || false;
-    dto.omp = request.omp || false;
-    dto.mpi = request.mpi || false;
-    dto.requestHash = request.requestHash;
-    dto.requestStatus = request.requestStatus;
-    dto.timesRequested = request.timesRequested || 0;
-    dto.updatedAt = request.updatedAt || new Date();
+  dto.variableName = request.variableName;
+  dto.pressureLevels = request.pressureLevels;
+  dto.years = request.years;
+  dto.months = request.months;
+  dto.days = request.days;
+  dto.hours = request.hours;
+  dto.areaCovered = request.areaCovered;
+  dto.mapTypes = request.mapTypes;
+  dto.mapLevels = request.mapLevels || [];
+  dto.fileFormat = request.fileFormat;
+  dto.noData = request.noData || false;
+  dto.noMaps = request.noMaps || false;
+  dto.omp = request.omp || false;
+  dto.mpi = request.mpi || false;
+  dto.requestHash = request.requestHash;
+  dto.requestStatus = request.requestStatus;
+  dto.timesRequested = request.timesRequested || 0;
+  dto.updatedAt = request.updatedAt || new Date();
 
-    return dto;
-  }
+  return dto;
 }
