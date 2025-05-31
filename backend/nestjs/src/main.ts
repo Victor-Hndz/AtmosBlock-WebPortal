@@ -11,6 +11,19 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
+  // Global prefix
+  app.setGlobalPrefix("api");
+
+  // CORS configuration
+  app.enableCors({
+    origin: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    allowedHeaders: "Content-Type, Accept, Authorization",
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  });
+
   // Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
@@ -30,12 +43,6 @@ async function bootstrap() {
 
   // Global filters
   app.useGlobalFilters(new HttpExceptionFilter());
-
-  // Enable CORS
-  app.enableCors();
-
-  // Global prefix
-  app.setGlobalPrefix("api");
 
   // Swagger documentation
   const config = new DocumentBuilder()
@@ -62,10 +69,12 @@ async function bootstrap() {
     });
   });
 
+  // Start the server
   const port = configService.get<number>("PORT") ?? 3000;
   await app.listen(port);
 
   logger.log(`🚀 Application is running on: ${await app.getUrl()}`);
   logger.log(`📝 Swagger documentation available at: ${await app.getUrl()}/api/docs`);
 }
+
 bootstrap();
