@@ -59,7 +59,8 @@ const formatCreatedDate = (dateStr: string): string => {
  */
 const formatPressureLevels = (levels: number[]): string => {
   if (levels.length === 0) return "None";
-  if (levels.length <= 3) return levels.join(", ");
+  if (levels.length === 1) return `${levels[0]}hPa`;
+  if (levels.length <= 3) return levels.join("hPa, ");
   return `${levels.length} levels`;
 };
 
@@ -112,7 +113,7 @@ const formatRequestGroups = (groups: RequestGroup[], t: TFunction): React.ReactN
   return (
     <div>
       {groups.map(group => (
-        <RequestItem key={group.request.id} group={group} />
+        <RequestItem key={group.request.requestHash} group={group} />
       ))}
     </div>
   );
@@ -182,7 +183,11 @@ const RequestItem: React.FC<RequestItemProps> = ({ group }) => {
 
               <div>
                 <p className="text-sm text-gray-500">{t("requests.pressureLevels")}</p>
-                <p>{request.pressureLevels.join(", ") || t("common.none")}</p>
+                {request.pressureLevels.length === 1 ? (
+                  <p>{request.pressureLevels} hPa</p>
+                ) : (
+                  <p>{request.pressureLevels.join("500hPa, ")}</p>
+                )}
               </div>
 
               <div>
@@ -193,7 +198,7 @@ const RequestItem: React.FC<RequestItemProps> = ({ group }) => {
               {request.format && (
                 <div>
                   <p className="text-sm text-gray-500">{t("requests.format")}</p>
-                  <p>{request.format}</p>
+                  <p>{request.format.toUpperCase()}</p>
                 </div>
               )}
 

@@ -95,10 +95,10 @@
     "created": "Created",
     "requestAgain": "Request Again",
     "statuses": {
-      "pending": "Pending",
-      "processing": "Processing",
-      "completed": "Completed",
-      "failed": "Failed"
+      "GENERATING": "Generating",
+      "CACHED": "Cached",
+      "EXPIRED": "Expired",
+      "EMPTY": "Empty"
     }
   },
   "profile": {

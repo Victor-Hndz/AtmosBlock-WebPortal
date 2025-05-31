@@ -2,10 +2,10 @@
  * Request status types
  */
 export enum RequestStatus {
-  PENDING = "pending",
-  PROCESSING = "processing",
-  COMPLETED = "completed",
-  FAILED = "failed",
+  GENERATING = "GENERATING",
+  CACHED = "CACHED",
+  EXPIRED = "EXPIRED",
+  EMPTY = "EMPTY",
 }
 
 /**
@@ -30,12 +30,32 @@ export interface RequestForm {
   nProces?: number;
 }
 
+export interface UserRequestsReturned {
+  requestHash: string;
+  requestStatus: RequestStatus;
+  timesRequested: number;
+  updatedAt: Date;
+  variableName: string;
+  pressureLevels: string[];
+  years: string[];
+  months: string[];
+  days: string[];
+  hours: string[];
+  areaCovered: string[];
+  mapTypes: string[];
+  mapLevels?: string[];
+  fileFormat?: string;
+  noData?: boolean;
+  noMaps?: boolean;
+  omp?: boolean;
+  mpi?: boolean;
+}
+
 /**
  * Data structure for user requests
  */
 export interface UserRequest {
-  id: string;
-  userId: string;
+  requestHash: string;
   variableName: string;
   pressureLevels: number[];
   date: {
@@ -51,8 +71,8 @@ export interface UserRequest {
   };
   format?: string;
   status: RequestStatus;
+  timesRequested?: number;
   createdAt: string; // ISO date string
-  updatedAt: string; // ISO date string
 }
 
 /**
@@ -133,4 +153,27 @@ export function groupRequestsByContent(requests: UserRequest[]): RequestGroup[] 
   }
 
   return groups;
+}
+
+export function fromUserRequestsReturnedToUserRequest(returned: UserRequestsReturned): UserRequest {
+  return {
+    requestHash: returned.requestHash,
+    variableName: returned.variableName,
+    pressureLevels: returned.pressureLevels.map(level => parseInt(level)),
+    date: {
+      year: returned.years.length > 0 ? parseInt(returned.years[0]) : new Date().getFullYear(),
+      month: returned.months.length > 0 ? parseInt(returned.months[0]) : new Date().getMonth() + 1,
+      day: returned.days.length > 0 ? parseInt(returned.days[0]) : new Date().getDate(),
+    },
+    areaCovered: {
+      north: parseInt(returned.areaCovered[0]),
+      south: parseInt(returned.areaCovered[1]),
+      east: parseInt(returned.areaCovered[2]),
+      west: parseInt(returned.areaCovered[3]),
+    },
+    format: returned.fileFormat || undefined,
+    status: returned.requestStatus,
+    timesRequested: returned.timesRequested,
+    createdAt: returned.updatedAt instanceof Date ? returned.updatedAt.toISOString() : returned.updatedAt,
+  };
 }
