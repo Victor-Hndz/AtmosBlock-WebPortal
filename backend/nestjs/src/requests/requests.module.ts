@@ -10,6 +10,7 @@ import { TypeOrmRequestRepository } from "./persistence/repositories/typeorm-req
 import { RabbitMQModule } from "@/shared/messaging/rabbitmq.module";
 import { MinioModule } from "@/minio/minio.module";
 import { ProgressModule } from "@/progress/progress.module";
+import { UsersModule } from "@/users/users.module";
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ProgressModule } from "@/progress/progress.module";
     RabbitMQModule,
     MinioModule,
     ProgressModule,
+    UsersModule,
   ],
   providers: [
     RequestsService,

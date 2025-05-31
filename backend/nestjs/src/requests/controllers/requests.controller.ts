@@ -7,6 +7,7 @@ import { RolesGuard } from "@/auth/guards/roles.guard";
 import { RequestsService } from "@/requests/services/requests.service";
 import { CreateRequestDto } from "@/requests/dtos/create-request.dto";
 import { CurrentUser } from "@/shared/decorators/currentUserDecorator.decorator";
+import { ReturnRequestDto } from "../dtos/returnRequestDto.dto";
 
 @ApiTags("requests")
 @Controller("requests")
@@ -28,8 +29,14 @@ export class RequestsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get user's own requests" })
   @ApiResponse({ status: 200, description: "Return user's requests." })
-  findMyRequests(@CurrentUser("id") userId: string) {
-    return this.requestsService.findAllByUser(userId);
+  async findMyRequests(@CurrentUser("id") userId: string): Promise<ReturnRequestDto[]> {
+    const requests = await this.requestsService.findAllByUser(userId);
+    const returnResponse = requests.map(request => {
+      const returnRequest = new ReturnRequestDto();
+      returnRequest.fromRequest(request);
+      return returnRequest;
+    });
+    return returnResponse;
   }
 
   @Get(":id")

@@ -10,6 +10,7 @@ import { requestStatus } from "@/shared/enums/requestStatus.enum";
 import { MessageContent, ResultMessageContent } from "@/shared/interfaces/messageContentInterface.interface";
 import { MinioService } from "@/minio/services/minio.service";
 import { GeneratedFiles } from "@/generatedFiles/domain/entities/generatedFiles.entity";
+import { UsersService } from "@/users/services/users.service";
 
 @Injectable()
 export class RequestsService {
@@ -20,6 +21,7 @@ export class RequestsService {
     private readonly requestRepository: IRequestRepository,
     private readonly requestsPublisher: RequestsPublisher,
     private readonly generatedFilesService: GeneratedFilesService,
+    private readonly usersService: UsersService,
     private readonly minioService: MinioService
   ) {}
 
@@ -65,7 +67,11 @@ export class RequestsService {
       await this.requestRepository.update(existingRequest);
       return existingRequest;
     } else if (existingRequest === null) {
-      await this.requestRepository.create(createRequestDto.toRequest());
+      const createRequest = createRequestDto.toRequest();
+      if (createRequestDto.userId) {
+        createRequest.user = await this.usersService.findOne(createRequestDto.userId);
+      }
+      await this.requestRepository.create(createRequest);
     }
 
     //If not exists and cached, emit a message to RabbitMQ for processing

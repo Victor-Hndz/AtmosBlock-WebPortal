@@ -47,7 +47,7 @@ export class InputRequestDto {
 
   @IsString()
   @IsOptional()
-  fileFormat?: boolean;
+  fileFormat?: string;
 
   @IsBoolean()
   @IsOptional()
@@ -64,14 +64,4 @@ export class InputRequestDto {
   @IsBoolean()
   @IsOptional()
   mpi?: boolean;
-
-  @ValidateIf(o => o.omp === true)
-  @IsBoolean()
-  @IsOptional()
-  nThreads?: boolean;
-
-  @ValidateIf(o => o.mpi === true)
-  @IsBoolean()
-  @IsOptional()
-  nProces?: boolean;
 }
