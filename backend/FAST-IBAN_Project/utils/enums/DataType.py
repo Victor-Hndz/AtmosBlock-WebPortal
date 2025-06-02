@@ -6,3 +6,4 @@ class DataType(Enum):
     TYPE_DISP = "disp"
     TYPE_CONT = "cont"
     TYPE_FORMS = "forms"
+    TYPE_3D = "3d"
