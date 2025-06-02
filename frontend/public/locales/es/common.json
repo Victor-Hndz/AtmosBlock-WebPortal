@@ -142,6 +142,7 @@
     "monthsTooltip": "Selecciona uno o más meses para los datos",
     "selectMonths": "Selecciona los meses",
     "days": "Días",
+    "selectDays": "Selecciona los días",
     "daysTooltip": "Selecciona uno o más días para los datos",
     "hours": "Horas",
     "hoursTooltip": "Selecciona una o más horas para los datos",
@@ -352,5 +353,22 @@
     "disp": "Dispersión",
     "comb": "Combinación Cont. + Disp.",
     "forms": "Formaciones"
+  },
+  "results": {
+    "title": "Resultados de la Solicitud",
+    "noResults": "No se encontraron resultados para esta solicitud.",
+    "connecting": "Conectando al servidor...",
+    "processStatus": "Estado",
+    "downloadFile": "Descargar archivo",
+    "downloadAll": "Descargar todo",
+    "preview": "Vista previa",
+    "viewFile": "Ver archivo",
+    "loading": "Cargando previsualización...",
+    "loadingResults": "Cargando resultados...",
+    "files": "Archivos generados",
+    "fileList": "Lista de todos los archivos generados",
+    "complete": "Procesamiento completado",
+    "viewDetails": "Ver Detalles",
+    "error": "Error durante el procesamiento"
   }
 }

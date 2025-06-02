@@ -136,12 +136,13 @@
     "yearsAdvanced": "Years",
     "yearsTooltip": "Select one or more years for the data",
     "yearsAdvancedTooltip": "Select one or more years for the data",
-    "selectYears": "Select Years",
+    "selectYears": "Select years",
     "selectYearsAndMonthsFirst": "Select years and months first",
     "months": "Months",
     "monthsTooltip": "Select one or more months for the data",
-    "selectMonths": "Select Months",
+    "selectMonths": "Select months",
     "days": "Days",
+    "selectDays": "Select days",
     "daysTooltip": "Select one or more days for the data",
     "hours": "Hours",
     "hoursTooltip": "Select one or more hours for the data",
@@ -352,5 +353,22 @@
     "disp": "Dispersion",
     "comb": "Combined Cont. + Disp.",
     "forms": "Formations"
+  },
+  "results": {
+    "title": "Results",
+    "noResults": "No results available",
+    "connecting": "Connecting to server...",
+    "processStatus": "Process Status",
+    "downloadFile": "Download File",
+    "downloadAll": "Download All",
+    "preview": "Preview",
+    "viewFile": "View File",
+    "loading": "Loding preview...",
+    "loadingResults": "Loading results...",
+    "files": "Files generated",
+    "fileList": "All generated files list",
+    "complete": "Process completed",
+    "viewDetails": "View Details",
+    "error": "Error while processing"
   }
 }
