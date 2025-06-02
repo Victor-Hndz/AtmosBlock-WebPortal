@@ -5,7 +5,7 @@ import { CreateRequestDto } from "@/requests/dtos/create-request.dto";
 import { RequestsPublisher } from "@/requests/messaging/requests.publisher";
 import { IRequestRepository } from "@/requests/domain/repositories/request.repository.interface";
 import { GeneratedFilesService } from "@/generatedFiles/services/generatedFiles.service";
-import { STATUS_PROCESSING } from "@/shared/consts/consts";
+import { STATUS_CACHED, STATUS_PROCESSING } from "@/shared/consts/consts";
 import { requestStatus } from "@/shared/enums/requestStatus.enum";
 import { MessageContent, ResultMessageContent } from "@/shared/interfaces/messageContentInterface.interface";
 import { MinioService } from "@/minio/services/minio.service";
@@ -60,12 +60,17 @@ export class RequestsService {
       // If it exists, increment the timesRequested
       existingRequest.timesRequested += 1;
 
-      //update TTL by 7 days
-      existingRequest.generatedFiles.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-      await this.generatedFilesService.update(existingRequest.generatedFiles);
-
       await this.requestRepository.update(existingRequest);
-      return existingRequest;
+
+      await this.processResult(requestHash);
+
+      const message = {
+        status: STATUS_CACHED,
+        message: `Request cached`,
+        requestHash: requestHash,
+      };
+
+      return JSON.stringify(message);
     } else if (existingRequest === null) {
       const createRequest = createRequestDto.toRequest();
       if (createRequestDto.userId) {
@@ -120,108 +125,129 @@ export class RequestsService {
         return;
       }
 
-      // Find the request by hash
-      const request = await this.requestRepository.findByRequestHash(requestHash);
-
-      if (!request) {
-        this.logger.warn(`Request with hash ${requestHash} not found`);
-        return;
-      }
-
-      try {
-        // Check if the folder with results exists in Minio
-        const folderExists = await this.minioService.folderExists(requestHash);
-
-        if (!folderExists) {
-          this.logger.error(`No result folder found in storage for request ${requestHash}`);
-          request.requestStatus = requestStatus.EMPTY;
-          await this.requestRepository.update(request);
-          return;
-        }
-
-        // List all files in the request's result folder
-        const minioFiles = await this.minioService.listFiles(requestHash);
-
-        if (minioFiles.length === 0) {
-          this.logger.warn(`No files found in result folder for request ${requestHash}`);
-          request.requestStatus = requestStatus.EMPTY;
-          await this.requestRepository.update(request);
-          return;
-        }
-
-        // Prepare the file list for the database
-        const filesList = minioFiles.map(file => file.url);
-
-        // Create or update generated files entry
-        let generatedFiles = request.generatedFiles;
-
-        if (!generatedFiles) {
-          // Create new generatedFiles object
-          generatedFiles = new GeneratedFiles({
-            requestHash: request.requestHash,
-            files: filesList,
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days TTL
-          });
-
-          // Save to database
-          const savedGeneratedFiles = await this.generatedFilesService.create(generatedFiles);
-          request.generatedFiles = savedGeneratedFiles;
-        } else {
-          // Update existing generatedFiles object
-          generatedFiles.files = filesList;
-          generatedFiles.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days TTL
-          request.generatedFiles = generatedFiles;
-
-          // Update in database
-          await this.generatedFilesService.update(generatedFiles);
-        }
-
-        // Update request status
-        request.requestStatus = requestStatus.CACHED;
-
-        // Update the request in the database
-        await this.requestRepository.update(request);
-
-        this.logger.log(`Successfully processed result for request ${requestHash} with ${filesList.length} files`);
-      } catch (error) {
-        this.logger.error(`Error retrieving files from storage for request ${requestHash}: ${error.message}`);
-        request.requestStatus = requestStatus.EMPTY;
-        await this.requestRepository.update(request);
-      }
+      await this.processResult(requestHash);
     } catch (error) {
       this.logger.error(`Error processing result message: ${error.message}`);
       throw error;
     }
   }
 
-  /**
-   * Helper method to determine the file type from filename
-   */
-  private determineFileType(filename: string): string {
-    const ext = filename.split(".").pop()?.toLowerCase();
+  private async processResult(requestHash: string) {
+    // Find the request by hash
+    const request = await this.requestRepository.findByRequestHash(requestHash);
 
-    if (!ext) return "application/octet-stream";
+    if (!request) {
+      this.logger.warn(`Request with hash ${requestHash} not found`);
+      return;
+    }
 
-    const mimeTypes = {
-      pdf: "application/pdf",
-      png: "image/png",
-      jpg: "image/jpeg",
-      jpeg: "image/jpeg",
-      gif: "image/gif",
-      svg: "image/svg+xml",
-      txt: "text/plain",
-      csv: "text/csv",
-      nc: "application/x-netcdf",
-      zip: "application/zip",
-      json: "application/json",
-    };
+    try {
+      // Check if the folder with results exists in Minio
+      const folderExists = await this.minioService.folderExists(requestHash);
 
-    return mimeTypes[ext] || "application/octet-stream";
+      if (!folderExists) {
+        this.logger.error(`No result folder found in storage for request ${requestHash}`);
+        request.requestStatus = requestStatus.EMPTY;
+        await this.requestRepository.update(request);
+        return;
+      }
+
+      // List all files in the request's result folder
+      const minioFiles = await this.minioService.listFiles(requestHash);
+
+      if (minioFiles.length === 0) {
+        this.logger.warn(`No files found in result folder for request ${requestHash}`);
+        request.requestStatus = requestStatus.EMPTY;
+        await this.requestRepository.update(request);
+        return;
+      }
+
+      // Prepare the file list for the database
+      const filesList = minioFiles.map(file => file.url);
+
+      // Create or update generated files entry
+      let generatedFiles = request.generatedFiles;
+
+      if (!generatedFiles) {
+        // Create new generatedFiles object
+        generatedFiles = new GeneratedFiles({
+          requestHash: request.requestHash,
+          files: filesList,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days TTL
+        });
+
+        // Save to database
+        const savedGeneratedFiles = await this.generatedFilesService.create(generatedFiles);
+        request.generatedFiles = savedGeneratedFiles;
+      } else {
+        // Update existing generatedFiles object
+        generatedFiles.files = filesList;
+        generatedFiles.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days TTL
+        request.generatedFiles = generatedFiles;
+
+        // Update in database
+        await this.generatedFilesService.update(generatedFiles);
+      }
+
+      // Update request status
+      request.requestStatus = requestStatus.CACHED;
+
+      // Update the request in the database
+      await this.requestRepository.update(request);
+
+      this.logger.log(`Successfully processed result for request ${requestHash} with ${filesList.length} files`);
+    } catch (error) {
+      this.logger.error(`Error retrieving files from storage for request ${requestHash}: ${error.message}`);
+      request.requestStatus = requestStatus.EMPTY;
+      await this.requestRepository.update(request);
+    }
   }
 
-  generateRequestHash(createRequestDto: CreateRequestDto): string {
-    const { requestHash, userId, ...rest } = createRequestDto;
-    const str = JSON.stringify(rest);
+  private generateRequestHash(createRequestDto: CreateRequestDto): string {
+    const str = this.normalizeDtoForHash(createRequestDto);
     return createHash("sha256").update(str).digest("hex");
+  }
+
+  private normalizeDtoForHash(dto: CreateRequestDto): string {
+    // Campos que deben aparecer y su orden deseado
+    const orderedKeys: (keyof CreateRequestDto)[] = [
+      "variableName",
+      "pressureLevels",
+      "years",
+      "months",
+      "days",
+      "hours",
+      "areaCovered",
+      "mapTypes",
+      "mapLevels",
+      "fileFormat",
+      "noData",
+      "noMaps",
+      "omp",
+      "mpi",
+      "nThreads",
+      "nProces",
+    ];
+
+    const normalized: Record<string, any> = {};
+
+    for (const key of orderedKeys) {
+      const value = dto[key];
+
+      // Saltar campos undefined o null
+      if (value === undefined || value === null) continue;
+
+      if (Array.isArray(value)) {
+        // Ordenar arrays: numéricamente si todos los valores son números
+        const allNumeric = value.every(v => !isNaN(Number(v)));
+        normalized[key] = [...value].sort((a, b) =>
+          allNumeric ? Number(a) - Number(b) : String(a).localeCompare(String(b))
+        );
+      } else {
+        normalized[key] = value;
+      }
+    }
+
+    return JSON.stringify(normalized);
   }
 }

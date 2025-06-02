@@ -146,6 +146,8 @@ export function groupRequestsByContent(requests: UserRequest[]): RequestGroup[] 
       }
     }
 
+    count += (currentRequest.timesRequested ?? 0) - 1;
+
     groups.push({
       request: currentRequest,
       count,
