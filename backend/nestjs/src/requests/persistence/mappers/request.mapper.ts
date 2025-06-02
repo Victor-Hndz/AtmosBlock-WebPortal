@@ -68,6 +68,9 @@ export class RequestMapper {
     persistenceRequest.nProces = request.nProces;
     persistenceRequest.timesRequested = request.timesRequested;
     persistenceRequest.user = request.user ? UserMapper.toPersistence(request.user) : undefined;
+    persistenceRequest.generatedFiles = request.generatedFiles
+      ? GeneratedFilesMapper.toPersistence(request.generatedFiles)
+      : undefined;
 
     return persistenceRequest;
   }

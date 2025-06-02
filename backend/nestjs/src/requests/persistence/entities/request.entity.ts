@@ -92,5 +92,5 @@ export class RequestEntity {
     nullable: true,
   })
   @JoinColumn({ name: "generated_files_id" })
-  generatedFiles: GeneratedFilesEntity;
+  generatedFiles?: GeneratedFilesEntity;
 }
