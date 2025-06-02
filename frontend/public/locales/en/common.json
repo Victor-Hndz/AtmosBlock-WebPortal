@@ -358,6 +358,7 @@
     "title": "Results",
     "noResults": "No results available",
     "connecting": "Connecting to server...",
+    "processing": "Processing your request...",
     "processStatus": "Process Status",
     "downloadFile": "Download File",
     "downloadAll": "Download All",

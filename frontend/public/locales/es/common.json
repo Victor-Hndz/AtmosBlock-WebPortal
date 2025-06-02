@@ -358,6 +358,7 @@
     "title": "Resultados de la Solicitud",
     "noResults": "No se encontraron resultados para esta solicitud.",
     "connecting": "Conectando al servidor...",
+    "processing": "Procesando la solicitud...",
     "processStatus": "Estado",
     "downloadFile": "Descargar archivo",
     "downloadAll": "Descargar todo",
