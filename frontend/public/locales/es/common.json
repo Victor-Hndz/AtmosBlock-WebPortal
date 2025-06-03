@@ -99,7 +99,9 @@
       "CACHED": "Cacheda",
       "EXPIRED": "Expirada",
       "EMPTY": "Vacía"
-    }
+    },
+    "requestAgainTooltip": "Solicitar esta información de nuevo",
+    "requestAgainAriaLabel": "Solicitar de nuevo esta solicitud"
   },
   "profile": {
     "userMenu": "Menú de usuario",

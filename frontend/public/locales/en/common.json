@@ -99,7 +99,9 @@
       "CACHED": "Cached",
       "EXPIRED": "Expired",
       "EMPTY": "Empty"
-    }
+    },
+    "requestAgainTooltip": "Fill the form with this request data",
+    "requestAgainAriaLabel": "Request this data again"
   },
   "profile": {
     "userMenu": "User menu",
