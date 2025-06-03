@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Loader2, AlertTriangle, Check, Download, Eye, FileIcon } from "lucide-react";
@@ -8,10 +8,53 @@ import ProgressService, { ProgressUpdateData } from "@/services/progressService"
 // Component for displaying file preview
 const FilePreview: React.FC<{ file: ResultFile }> = ({ file }) => {
   const [enlarged, setEnlarged] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const { t } = useTranslation();
+  const imageTimeoutRef = useRef<number | null>(null);
 
   const isImage = file.name.match(/\.(jpeg|jpg|png|gif|svg)$/i);
   const isPdf = file.name.match(/\.pdf$/i);
+
+  console.log(`Rendering preview for file: ${file.name}, URL: ${file.url}, isImage: ${isImage}, isPdf: ${isPdf}`);
+
+  useEffect(() => {
+    // Reset states when file changes
+    setImageLoaded(false);
+    setHasError(false);
+
+    // Set a timeout to avoid infinite loading state
+    if (isImage) {
+      // Clear any existing timeout
+      if (imageTimeoutRef.current) {
+        window.clearTimeout(imageTimeoutRef.current);
+      }
+
+      // Set a new timeout (10 seconds) after which we'll consider the image loading failed
+      imageTimeoutRef.current = window.setTimeout(() => {
+        if (!imageLoaded && !hasError) {
+          console.error(`Image load timeout for: ${file.url}`);
+          setHasError(true);
+        }
+      }, 10000); // 10 seconds timeout
+    }
+
+    return () => {
+      // Clean up timeout on unmount or when file changes
+      if (imageTimeoutRef.current) {
+        window.clearTimeout(imageTimeoutRef.current);
+      }
+    };
+  }, [file, isImage, imageLoaded, hasError]);
+
+  // Handle image loading errors
+  const handleImageError = () => {
+    console.error(`Failed to load image: ${file.url}`);
+    setHasError(true);
+    if (imageTimeoutRef.current) {
+      window.clearTimeout(imageTimeoutRef.current);
+    }
+  };
 
   if (!isImage && !isPdf) {
     return (
@@ -31,22 +74,39 @@ const FilePreview: React.FC<{ file: ResultFile }> = ({ file }) => {
         }`}
       >
         {isImage && (
-          <img
-            src={file.url}
-            alt={file.name}
-            className={`
-              border border-slate-200 rounded 
-              ${enlarged ? "max-h-[90vh] max-w-[90vw] object-contain cursor-zoom-out" : "h-60 cursor-zoom-in"}
-            `}
+          <div
             onClick={() => setEnlarged(!enlarged)}
-          />
+            className={`
+              border border-slate-200 rounded overflow-auto relative 
+              ${enlarged ? "cursor-zoom-out" : "cursor-zoom-in"}
+              bg-white
+            `}
+            style={{
+              maxWidth: enlarged ? "90vw" : "100%",
+              maxHeight: enlarged ? "90vh" : "60vh",
+              transition: "all 0.3s ease",
+              transform: enlarged ? "scale(2)" : "scale(1)",
+              transformOrigin: "center",
+            }}
+          >
+            <img
+              src={file.url}
+              alt={file.name}
+              className={`object-contain ${enlarged ? "w-full h-full" : "max-h-60 w-auto mx-auto"}`}
+              onLoad={() => setImageLoaded(true)}
+              onError={handleImageError}
+            />
+          </div>
         )}
+
         {isPdf && (
           <div className={`${enlarged ? "w-[90vw] h-[90vh]" : "h-60 w-full"}`}>
             <iframe
               src={`${file.url}#toolbar=0&view=FitH`}
               className="w-full h-full border border-slate-200 rounded"
               title={file.name}
+              onLoad={() => setImageLoaded(true)}
+              onError={handleImageError}
             />
             <button
               onClick={() => setEnlarged(!enlarged)}
@@ -78,12 +138,15 @@ export default function ResultsPage(): React.ReactElement {
   const [resultsData, setResultsData] = useState<ResultsData | null>(null);
   const [previewFile, setPreviewFile] = useState<ResultFile | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isLoadingResults, setIsLoadingResults] = useState(false);
+  const [progressComplete, setProgressComplete] = useState(false);
 
   // Fetch result files when processing is complete
-  const fetchResults = async () => {
+  const fetchResults = useCallback(async () => {
     if (!requestHash) return;
 
     try {
+      setIsLoadingResults(true);
       const data = await ResultsService.getResultFiles(requestHash);
       setResultsData(data);
 
@@ -92,11 +155,14 @@ export default function ResultsPage(): React.ReactElement {
       if (imageFile) {
         setPreviewFile(imageFile);
       }
+      setIsComplete(true);
+      setIsLoadingResults(false);
     } catch (error) {
       console.error("Error fetching results:", error);
       setHasError(true);
+      setIsLoadingResults(false);
     }
-  };
+  }, [requestHash]);
 
   // Get request hash from URL parameters
   useEffect(() => {
@@ -121,34 +187,48 @@ export default function ResultsPage(): React.ReactElement {
       setIsConnected(false);
       setHasError(false);
       setIsComplete(false);
+      setProgress(0);
+      setProgressComplete(false);
 
       // Connect to the progress stream
       cleanup = ProgressService.connectToProgressStream({
         requestHash,
         onConnect: () => {
+          console.log("Connected to progress stream successfully");
           setIsConnected(true);
           setHasError(false);
         },
         onUpdate: (data: ProgressUpdateData) => {
+          console.log(`Received progress update: ${JSON.stringify(data)}`);
           setProgress(data.increment);
           setProgressMessage(data.message);
 
-          if (data.increment >= 100) {
-            setIsComplete(true);
+          // Check for completed flag to avoid unnecessary reloads
+          if (data.completed === true) {
+            console.log("Server signaled completion, skipping reload");
+            setProgressComplete(true);
             setIsConnected(false);
-            // Fetch results after process is complete
-            fetchResults();
           }
         },
         onError: () => {
+          console.error("Error with progress stream connection");
           setHasError(true);
           setIsConnected(false);
+
+          // Only try to fetch if we haven't already been marked as complete
+          if (!progressComplete) {
+            // Try to fetch results anyway, maybe they're already available
+            fetchResults();
+          }
         },
         onComplete: () => {
-          setIsComplete(true);
+          console.log("Progress stream completed, fetching results");
           setIsConnected(false);
-          // Fetch results after process is complete
-          fetchResults();
+
+          // Only fetch results if we haven't already been marked as complete
+          if (!progressComplete) {
+            fetchResults();
+          }
         },
       });
     }
@@ -159,7 +239,7 @@ export default function ResultsPage(): React.ReactElement {
         cleanup();
       }
     };
-  }, [requestHash]);
+  }, [requestHash, fetchResults, progressComplete]);
 
   // Handle downloading all files
   const handleDownloadAll = async () => {
@@ -196,6 +276,11 @@ export default function ResultsPage(): React.ReactElement {
                   <span className="flex items-center text-green-600">
                     <Check className="mr-2 h-4 w-4" />
                     {t("results.complete", "Processing complete")}
+                  </span>
+                ) : isLoadingResults ? (
+                  <span className="flex items-center text-blue-600">
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {t("results.loadingResults", "Loading results...")}
                   </span>
                 ) : hasError ? (
                   <span className="flex items-center text-red-600">

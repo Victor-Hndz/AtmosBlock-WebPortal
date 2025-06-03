@@ -29,6 +29,7 @@ export const ResultsService = {
         throw new Error("No authentication token found");
       }
 
+      // Use the correct API endpoint to get results
       const response = await fetch(`${API_URL}/results/${requestHash}`, {
         method: "GET",
         headers: {
@@ -43,8 +44,10 @@ export const ResultsService = {
       }
 
       const data = await response.json();
+      console.log("Received result data:", data);
       return data;
     } catch (error) {
+      console.error("Error fetching results:", error);
       throw error instanceof Error ? error : new Error("Unknown error occurred");
     }
   },
@@ -60,9 +63,18 @@ export const ResultsService = {
 
       // Add all files to the zip
       const fetchPromises = files.map(async file => {
-        const response = await fetch(file.url);
-        const blob = await response.blob();
-        zip.file(file.name, blob);
+        try {
+          console.log(`Downloading file: ${file.name} from URL: ${file.url}`);
+          const response = await fetch(file.url);
+          if (!response.ok) {
+            console.error(`Error downloading file ${file.name}: ${response.statusText}`);
+            return;
+          }
+          const blob = await response.blob();
+          zip.file(file.name, blob);
+        } catch (error) {
+          console.error(`Error processing file ${file.name}:`, error);
+        }
       });
 
       // Wait for all files to be fetched and added to the zip

@@ -5,6 +5,7 @@ export interface ProgressUpdateData {
   increment: number;
   message: string;
   timestamp?: string;
+  completed?: boolean; // Add completed flag to interface
 }
 
 export interface ProgressConnectionCallbacks {
@@ -43,8 +44,8 @@ export const ProgressService = {
         const data = JSON.parse(event.data) as ProgressUpdateData;
         callbacks.onUpdate(data);
 
-        // Check if the progress is complete
-        if (data.increment >= MAX_PROGRESS && !completed) {
+        // Check if the progress is complete (either by explicit flag or by progress value)
+        if ((data.completed === true || data.increment >= MAX_PROGRESS) && !completed) {
           completed = true;
           console.log("Progress completed, calling onComplete callback");
 
@@ -65,9 +66,10 @@ export const ProgressService = {
     // Handle errors
     eventSource.onerror = error => {
       console.error("Progress stream error:", error);
+      console.log("Completed status:", completed);
 
       // If we've been connected for a while and have already completed, don't call error handler
-      if (completed || (Date.now() - connectionTimestamp > 5000 && eventSource.readyState === EventSource.CLOSED)) {
+      if (completed || Date.now() - connectionTimestamp > 5000) {
         console.log("Error occurred but progress was already marked complete, ignoring");
         eventSource.close();
         return;

@@ -5,12 +5,13 @@ import { CreateRequestDto } from "@/requests/dtos/create-request.dto";
 import { RequestsPublisher } from "@/requests/messaging/requests.publisher";
 import { IRequestRepository } from "@/requests/domain/repositories/request.repository.interface";
 import { GeneratedFilesService } from "@/generatedFiles/services/generatedFiles.service";
-import { STATUS_CACHED, STATUS_PROCESSING } from "@/shared/consts/consts";
+import { MAX_PROGRESS, STATUS_CACHED, STATUS_PROCESSING } from "@/shared/consts/consts";
 import { requestStatus } from "@/shared/enums/requestStatus.enum";
 import { MessageContent, ResultMessageContent } from "@/shared/interfaces/messageContentInterface.interface";
 import { MinioService } from "@/minio/services/minio.service";
 import { GeneratedFiles } from "@/generatedFiles/domain/entities/generatedFiles.entity";
 import { UsersService } from "@/users/services/users.service";
+import { ProgressService } from "@/progress/services/progress.service";
 
 @Injectable()
 export class RequestsService {
@@ -21,6 +22,7 @@ export class RequestsService {
     private readonly requestRepository: IRequestRepository,
     private readonly requestsPublisher: RequestsPublisher,
     private readonly generatedFilesService: GeneratedFilesService,
+    private readonly progressService: ProgressService,
     private readonly usersService: UsersService,
     private readonly minioService: MinioService
   ) {}
@@ -61,6 +63,11 @@ export class RequestsService {
       existingRequest.timesRequested += 1;
 
       await this.requestRepository.update(existingRequest);
+
+      this.progressService.updateProgress({
+        increment: MAX_PROGRESS,
+        message: "Process completed. Results are ready for viewing and download.",
+      });
 
       await this.processResult(requestHash);
 

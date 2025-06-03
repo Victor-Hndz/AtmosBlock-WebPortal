@@ -3,6 +3,7 @@ import { Response } from "express";
 import { Observable, map } from "rxjs";
 import { ProgressService } from "../services/progress.service";
 import { ProgressEvent } from "../domain/progress.interface";
+import { MAX_PROGRESS } from "@/shared/consts/consts";
 
 interface MessageEvent {
   data: string | object;
@@ -29,6 +30,7 @@ export class ProgressController {
             increment: progressEvent.increment,
             message: progressEvent.message,
             timestamp: new Date().toISOString(),
+            completed: progressEvent.increment >= MAX_PROGRESS, // Add completed flag when progress reaches max
           },
         };
       })
