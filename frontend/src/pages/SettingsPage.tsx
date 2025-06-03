@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import {
   Calendar,
   Layers,
@@ -13,11 +13,59 @@ import {
   AlertCircle,
   ExternalLink,
 } from "lucide-react";
+import { Tooltip } from "@/components/ui/Tooltip";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import * as Toast from "@radix-ui/react-toast";
 import { fetchUserRequests } from "@/redux/slices/viewRequestsSlice";
-import { RequestGroup, groupRequestsByContent } from "@/types/Request";
+import { prefillForm } from "@/redux/slices/submitRequestsSlice";
+import { RequestGroup, groupRequestsByContent, UserRequest, RequestForm } from "@/types/Request";
 import { TFunction } from "i18next";
+
+/**
+ * Converts a UserRequest object to a RequestForm format for form prefilling
+ * @param request The user request to convert
+ * @returns RequestForm object with data from the user request
+ */
+const convertToRequestForm = (request: UserRequest): RequestForm => {
+  if (!request) {
+    throw new Error("Cannot convert undefined request to form data");
+  }
+  
+  return {
+    // Basic info
+    variableName: request.variableName || "",
+    
+    // Pressure levels - ensure they're converted to strings
+    pressureLevels: Array.isArray(request.pressureLevels) 
+      ? request.pressureLevels.map(level => level.toString())
+      : [],
+      
+    // Date fields - convert numbers to strings
+    years: [request.date?.year?.toString() || new Date().getFullYear().toString()],
+    months: [request.date?.month?.toString() || (new Date().getMonth() + 1).toString()],
+    days: [request.date?.day?.toString() || new Date().getDate().toString()],
+    hours: [],
+    
+    // Area coordinates - ensure they're converted to strings
+    areaCovered: [
+      request.areaCovered?.north?.toString() || "90",  // Default to global if missing
+      request.areaCovered?.west?.toString() || "-180",
+      request.areaCovered?.south?.toString() || "-90",
+      request.areaCovered?.east?.toString() || "180",
+    ],
+    
+    // Optional fields - initialize with empty arrays or sensible defaults
+    mapTypes: [],
+    mapLevels: [],
+    fileFormat: request.format || "netcdf",
+    
+    // Additional flags with sensible defaults
+    noMaps: false,
+    noData: false,
+    omp: false,
+    mpi: false,
+  };
+};
 
 /**
  * Custom Badge component to replace the Radix Badge
@@ -129,7 +177,54 @@ interface RequestItemProps {
 const RequestItem: React.FC<RequestItemProps> = ({ group }) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isRequesting, setIsRequesting] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<"error" | "success" | "info" | "warning">("info");
   const { request, count } = group;
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  
+  /**
+   * Handle click on "Request Again" button
+   * This converts the request to form data format and navigates to requests form
+   */
+  const handleRequestAgain = () => {
+    try {
+      setIsRequesting(true);
+      
+      // Convert the UserRequest to RequestForm format
+      const formData = convertToRequestForm(request);
+      
+      // Dispatch action to prefill form
+      dispatch(prefillForm(formData));
+      
+      // Show success toast
+      setToastMessage(t("requests.formPrefilled", "Request data loaded in form"));
+      setToastType("success");
+      setToastOpen(true);
+      
+      // Add a small delay for better UX
+      setTimeout(() => {
+        // Navigate to requests page
+        navigate("/requests");
+        setIsRequesting(false);
+      }, 500);
+    } catch (error) {
+      console.error("Error prefilling form:", error);
+      setIsRequesting(false);
+      
+      // Show error toast
+      setToastMessage(t("errors.prefillError", "Could not load request data"));
+      setToastType("error");
+      setToastOpen(true);
+      
+      // Fall back to just navigating without prefill if there's an error
+      setTimeout(() => {
+        navigate("/requests");
+      }, 1000);
+    }
+  };
 
   return (
     <div className="border rounded-md overflow-hidden mb-4">
@@ -214,14 +309,61 @@ const RequestItem: React.FC<RequestItemProps> = ({ group }) => {
             </div>
 
             <div className="pt-3 border-t mt-3">
-              <button className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
-                <RefreshCw size={14} />
-                <span>{t("requests.requestAgain")}</span>
-              </button>
+              <Tooltip 
+                content={t("requests.requestAgainTooltip", "Fill the form with this request data")} 
+                delay={300}
+              >
+                <button 
+                  className={`flex items-center gap-2 px-3 py-1.5 text-sm ${isRequesting ? 'bg-blue-400 cursor-wait' : 'bg-blue-500 hover:bg-blue-600'} text-white rounded-md transition-colors`}
+                  onClick={handleRequestAgain}
+                  disabled={isRequesting}
+                  aria-label={t("requests.requestAgainAriaLabel", "Request this data again")}
+                  aria-busy={isRequesting}
+                >
+                  {isRequesting ? (
+                    <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  ) : (
+                    <RefreshCw size={14} className={isRequesting ? 'animate-spin' : ''} />
+                  )}
+                  <span>{isRequesting ? t("common.loading") : t("requests.requestAgain")}</span>
+                </button>
+              </Tooltip>
             </div>
           </div>
         </Collapsible.Content>
       </Collapsible.Root>
+      
+      {/* Toast notification for this RequestItem */}
+      <Toast.Provider swipeDirection="right">
+        <Toast.Root
+          className={`fixed bottom-4 right-4 p-4 rounded-md shadow-md max-w-sm 
+          ${toastType === 'error' ? 'bg-red-50 border border-red-200' : 
+            toastType === 'success' ? 'bg-green-50 border border-green-200' : 
+            'bg-blue-50 border border-blue-200'} 
+          data-[state=open]:animate-slideIn data-[state=closed]:animate-slideOut`}
+          open={toastOpen}
+          onOpenChange={setToastOpen}
+          duration={3000}
+        >
+          <Toast.Title className={`font-medium flex items-center gap-2 
+            ${toastType === 'error' ? 'text-red-800' : 
+              toastType === 'success' ? 'text-green-800' : 
+              'text-blue-800'}`}
+          >
+            <AlertCircle size={16} />
+            {t(`toast.${toastType}`)}
+          </Toast.Title>
+          <Toast.Description className={
+            `${toastType === 'error' ? 'text-red-700' : 
+              toastType === 'success' ? 'text-green-700' : 
+              'text-blue-700'}`
+          }>
+            {toastMessage}
+          </Toast.Description>
+          <Toast.Close className="absolute top-2 right-2 text-gray-400 hover:text-gray-600">×</Toast.Close>
+        </Toast.Root>
+        <Toast.Viewport />
+      </Toast.Provider>
     </div>
   );
 };

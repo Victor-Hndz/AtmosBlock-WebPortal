@@ -78,6 +78,14 @@ const submitRequestsSlice = createSlice({
     clearRequestHash: state => {
       state.requestHash = null;
     },
+    /**
+     * Prefills the form with data from a previous request
+     * @param state Current state
+     * @param action Action with previous request data
+     */
+    prefillForm: (state, action: PayloadAction<RequestForm>) => {
+      state.form = action.payload;
+    },
   },
   extraReducers: builder => {
     // Submit request
@@ -103,5 +111,5 @@ const submitRequestsSlice = createSlice({
   },
 });
 
-export const { clearRequestsError, updateFormField, clearRequestHash } = submitRequestsSlice.actions;
+export const { clearRequestsError, updateFormField, clearRequestHash, prefillForm } = submitRequestsSlice.actions;
 export default submitRequestsSlice.reducer;
