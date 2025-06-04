@@ -30,35 +30,33 @@ const convertToRequestForm = (request: UserRequest): RequestForm => {
   if (!request) {
     throw new Error("Cannot convert undefined request to form data");
   }
-  
+
   return {
     // Basic info
     variableName: request.variableName || "",
-    
+
     // Pressure levels - ensure they're converted to strings
-    pressureLevels: Array.isArray(request.pressureLevels) 
-      ? request.pressureLevels.map(level => level.toString())
-      : [],
-      
+    pressureLevels: Array.isArray(request.pressureLevels) ? request.pressureLevels.map(level => level.toString()) : [],
+
     // Date fields - convert numbers to strings
     years: [request.date?.year?.toString() || new Date().getFullYear().toString()],
     months: [request.date?.month?.toString() || (new Date().getMonth() + 1).toString()],
     days: [request.date?.day?.toString() || new Date().getDate().toString()],
     hours: [],
-    
+
     // Area coordinates - ensure they're converted to strings
     areaCovered: [
-      request.areaCovered?.north?.toString() || "90",  // Default to global if missing
+      request.areaCovered?.north?.toString() || "90", // Default to global if missing
       request.areaCovered?.west?.toString() || "-180",
       request.areaCovered?.south?.toString() || "-90",
       request.areaCovered?.east?.toString() || "180",
     ],
-    
+
     // Optional fields - initialize with empty arrays or sensible defaults
     mapTypes: [],
     mapLevels: [],
     fileFormat: request.format || "netcdf",
-    
+
     // Additional flags with sensible defaults
     noMaps: false,
     noData: false,
@@ -184,7 +182,7 @@ const RequestItem: React.FC<RequestItemProps> = ({ group }) => {
   const { request, count } = group;
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  
+
   /**
    * Handle click on "Request Again" button
    * This converts the request to form data format and navigates to requests form
@@ -192,18 +190,18 @@ const RequestItem: React.FC<RequestItemProps> = ({ group }) => {
   const handleRequestAgain = () => {
     try {
       setIsRequesting(true);
-      
+
       // Convert the UserRequest to RequestForm format
       const formData = convertToRequestForm(request);
-      
+
       // Dispatch action to prefill form
       dispatch(prefillForm(formData));
-      
+
       // Show success toast
       setToastMessage(t("requests.formPrefilled", "Request data loaded in form"));
       setToastType("success");
       setToastOpen(true);
-      
+
       // Add a small delay for better UX
       setTimeout(() => {
         // Navigate to requests page
@@ -213,12 +211,12 @@ const RequestItem: React.FC<RequestItemProps> = ({ group }) => {
     } catch (error) {
       console.error("Error prefilling form:", error);
       setIsRequesting(false);
-      
+
       // Show error toast
       setToastMessage(t("errors.prefillError", "Could not load request data"));
       setToastType("error");
       setToastOpen(true);
-      
+
       // Fall back to just navigating without prefill if there's an error
       setTimeout(() => {
         navigate("/requests");
@@ -309,12 +307,9 @@ const RequestItem: React.FC<RequestItemProps> = ({ group }) => {
             </div>
 
             <div className="pt-3 border-t mt-3">
-              <Tooltip 
-                content={t("requests.requestAgainTooltip", "Fill the form with this request data")} 
-                delay={300}
-              >
-                <button 
-                  className={`flex items-center gap-2 px-3 py-1.5 text-sm ${isRequesting ? 'bg-blue-400 cursor-wait' : 'bg-blue-500 hover:bg-blue-600'} text-white rounded-md transition-colors`}
+              <Tooltip content={t("requests.requestAgainTooltip", "Fill the form with this request data")} delay={300}>
+                <button
+                  className={`flex items-center gap-2 px-3 py-1.5 text-sm ${isRequesting ? "bg-blue-400 cursor-wait" : "bg-blue-500 hover:bg-blue-600"} text-white rounded-md transition-colors`}
                   onClick={handleRequestAgain}
                   disabled={isRequesting}
                   aria-label={t("requests.requestAgainAriaLabel", "Request this data again")}
@@ -323,7 +318,7 @@ const RequestItem: React.FC<RequestItemProps> = ({ group }) => {
                   {isRequesting ? (
                     <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                   ) : (
-                    <RefreshCw size={14} className={isRequesting ? 'animate-spin' : ''} />
+                    <RefreshCw size={14} className={isRequesting ? "animate-spin" : ""} />
                   )}
                   <span>{isRequesting ? t("common.loading") : t("requests.requestAgain")}</span>
                 </button>
@@ -332,32 +327,35 @@ const RequestItem: React.FC<RequestItemProps> = ({ group }) => {
           </div>
         </Collapsible.Content>
       </Collapsible.Root>
-      
+
       {/* Toast notification for this RequestItem */}
       <Toast.Provider swipeDirection="right">
         <Toast.Root
           className={`fixed bottom-4 right-4 p-4 rounded-md shadow-md max-w-sm 
-          ${toastType === 'error' ? 'bg-red-50 border border-red-200' : 
-            toastType === 'success' ? 'bg-green-50 border border-green-200' : 
-            'bg-blue-50 border border-blue-200'} 
+          ${
+            toastType === "error"
+              ? "bg-red-50 border border-red-200"
+              : toastType === "success"
+                ? "bg-green-50 border border-green-200"
+                : "bg-blue-50 border border-blue-200"
+          } 
           data-[state=open]:animate-slideIn data-[state=closed]:animate-slideOut`}
           open={toastOpen}
           onOpenChange={setToastOpen}
           duration={3000}
         >
-          <Toast.Title className={`font-medium flex items-center gap-2 
-            ${toastType === 'error' ? 'text-red-800' : 
-              toastType === 'success' ? 'text-green-800' : 
-              'text-blue-800'}`}
+          <Toast.Title
+            className={`font-medium flex items-center gap-2 
+            ${toastType === "error" ? "text-red-800" : toastType === "success" ? "text-green-800" : "text-blue-800"}`}
           >
             <AlertCircle size={16} />
             {t(`toast.${toastType}`)}
           </Toast.Title>
-          <Toast.Description className={
-            `${toastType === 'error' ? 'text-red-700' : 
-              toastType === 'success' ? 'text-green-700' : 
-              'text-blue-700'}`
-          }>
+          <Toast.Description
+            className={`${
+              toastType === "error" ? "text-red-700" : toastType === "success" ? "text-green-700" : "text-blue-700"
+            }`}
+          >
             {toastMessage}
           </Toast.Description>
           <Toast.Close className="absolute top-2 right-2 text-gray-400 hover:text-gray-600">×</Toast.Close>
