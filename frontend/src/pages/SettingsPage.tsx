@@ -12,58 +12,22 @@ import {
   ChevronUp,
   AlertCircle,
   ExternalLink,
+  Download,
 } from "lucide-react";
 import { Tooltip } from "@/components/ui/Tooltip";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import * as Toast from "@radix-ui/react-toast";
 import { fetchUserRequests } from "@/redux/slices/viewRequestsSlice";
 import { prefillForm } from "@/redux/slices/submitRequestsSlice";
-import { RequestGroup, groupRequestsByContent, UserRequest, RequestForm } from "@/types/Request";
+import {
+  RequestGroup,
+  groupRequestsByContent,
+  RequestForm,
+  fromUserRequestsReturnedToUserRequest,
+  UserRequestsReturned,
+} from "@/types/Request";
 import { TFunction } from "i18next";
-
-/**
- * Converts a UserRequest object to a RequestForm format for form prefilling
- * @param request The user request to convert
- * @returns RequestForm object with data from the user request
- */
-const convertToRequestForm = (request: UserRequest): RequestForm => {
-  if (!request) {
-    throw new Error("Cannot convert undefined request to form data");
-  }
-
-  return {
-    // Basic info
-    variableName: request.variableName || "",
-
-    // Pressure levels - ensure they're converted to strings
-    pressureLevels: Array.isArray(request.pressureLevels) ? request.pressureLevels.map(level => level.toString()) : [],
-
-    // Date fields - convert numbers to strings
-    years: [request.date?.year?.toString() || new Date().getFullYear().toString()],
-    months: [request.date?.month?.toString() || (new Date().getMonth() + 1).toString()],
-    days: [request.date?.day?.toString() || new Date().getDate().toString()],
-    hours: [],
-
-    // Area coordinates - ensure they're converted to strings
-    areaCovered: [
-      request.areaCovered?.north?.toString() || "90", // Default to global if missing
-      request.areaCovered?.west?.toString() || "-180",
-      request.areaCovered?.south?.toString() || "-90",
-      request.areaCovered?.east?.toString() || "180",
-    ],
-
-    // Optional fields - initialize with empty arrays or sensible defaults
-    mapTypes: [],
-    mapLevels: [],
-    fileFormat: request.format || "netcdf",
-
-    // Additional flags with sensible defaults
-    noMaps: false,
-    noData: false,
-    omp: false,
-    mpi: false,
-  };
-};
+import ResultsService from "@/services/resultsService";
 
 /**
  * Custom Badge component to replace the Radix Badge
@@ -78,6 +42,25 @@ const Badge: React.FC<BadgeProps> = ({ children, className = "" }) => (
     {children}
   </span>
 );
+
+const toRequestForm = (request: UserRequestsReturned): RequestForm => {
+  return {
+    variableName: request.variableName,
+    pressureLevels: request.pressureLevels,
+    years: request.years,
+    months: request.months,
+    days: request.days,
+    hours: request.hours,
+    areaCovered: request.areaCovered,
+    mapTypes: request.mapTypes,
+    mapLevels: request.mapLevels,
+    fileFormat: request.fileFormat,
+    noMaps: request.noMaps,
+    noData: request.noData,
+    omp: request.omp,
+    mpi: request.mpi,
+  };
+};
 
 /**
  * Format date for display
@@ -138,7 +121,7 @@ const formatRequestStatus = (status: string): string => {
   }
 };
 
-const formatRequestGroups = (groups: RequestGroup[], t: TFunction): React.ReactNode => {
+const formatRequestGroups = (groups: RequestGroup[], forms: UserRequestsReturned[], t: TFunction): React.ReactNode => {
   if (groups.length === 0) {
     return (
       <div className="text-center py-8">
@@ -158,8 +141,8 @@ const formatRequestGroups = (groups: RequestGroup[], t: TFunction): React.ReactN
 
   return (
     <div>
-      {groups.map(group => (
-        <RequestItem key={group.request.requestHash} group={group} />
+      {groups.map((group, idx) => (
+        <RequestItem key={group.request.requestHash} group={group} formRequest={toRequestForm(forms[idx])} />
       ))}
     </div>
   );
@@ -170,12 +153,14 @@ const formatRequestGroups = (groups: RequestGroup[], t: TFunction): React.ReactN
  */
 interface RequestItemProps {
   group: RequestGroup;
+  formRequest: RequestForm;
 }
 
-const RequestItem: React.FC<RequestItemProps> = ({ group }) => {
+const RequestItem: React.FC<RequestItemProps> = ({ group, formRequest }) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState<"error" | "success" | "info" | "warning">("info");
@@ -192,7 +177,7 @@ const RequestItem: React.FC<RequestItemProps> = ({ group }) => {
       setIsRequesting(true);
 
       // Convert the UserRequest to RequestForm format
-      const formData = convertToRequestForm(request);
+      const formData = formRequest;
 
       // Dispatch action to prefill form
       dispatch(prefillForm(formData));
@@ -221,6 +206,23 @@ const RequestItem: React.FC<RequestItemProps> = ({ group }) => {
       setTimeout(() => {
         navigate("/requests");
       }, 1000);
+    }
+  };
+
+  const handleDownloadFiles = async (requestHash: string) => {
+    try {
+      setIsDownloading(true);
+      // Fetch the result files for this request
+      const results = await ResultsService.getResultFiles(requestHash);
+
+      ResultsService.downloadAllFiles(results.files, requestHash);
+    } catch (error) {
+      console.error("Error downloading files:", error);
+      setToastMessage(t("errors.downloadError", "Could not download files"));
+      setToastType("error");
+      setToastOpen(true);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -306,7 +308,7 @@ const RequestItem: React.FC<RequestItemProps> = ({ group }) => {
               </div>
             </div>
 
-            <div className="pt-3 border-t mt-3">
+            <div className="pt-3 border-t mt-3 flex flex-col md:flex-row gap-3 justify-between">
               <Tooltip content={t("requests.requestAgainTooltip", "Fill the form with this request data")} delay={300}>
                 <button
                   className={`flex items-center gap-2 px-3 py-1.5 text-sm ${isRequesting ? "bg-blue-400 cursor-wait" : "bg-blue-500 hover:bg-blue-600"} text-white rounded-md transition-colors`}
@@ -321,6 +323,23 @@ const RequestItem: React.FC<RequestItemProps> = ({ group }) => {
                     <RefreshCw size={14} className={isRequesting ? "animate-spin" : ""} />
                   )}
                   <span>{isRequesting ? t("common.loading") : t("requests.requestAgain")}</span>
+                </button>
+              </Tooltip>
+
+              <Tooltip content={t("requests.downloadFilesTooltip", "Download all the files")} delay={300}>
+                <button
+                  className={`flex items-center gap-2 px-3 py-1.5 text-sm ${isDownloading ? "bg-green-500 cursor-wait" : "bg-green-600 hover:bg-green-500"} text-white rounded-md transition-colors`}
+                  onClick={() => handleDownloadFiles(request.requestHash)}
+                  disabled={isDownloading}
+                  aria-label={t("requests.downloadFilesAriaLabel", "Download all files for this request")}
+                  aria-busy={isDownloading}
+                >
+                  {isDownloading ? (
+                    <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  ) : (
+                    <Download size={14} className={isDownloading ? "animate-spin" : ""} />
+                  )}
+                  <span>{isDownloading ? t("common.loading") : t("requests.downloadFiles")}</span>
                 </button>
               </Tooltip>
             </div>
@@ -384,7 +403,7 @@ const SettingsPage: React.FC = () => {
   const [toastOpen, setToastOpen] = useState(false);
 
   // Group requests
-  const requestGroups = groupRequestsByContent(requests);
+  const requestGroups = groupRequestsByContent(requests.map(fromUserRequestsReturnedToUserRequest));
 
   // Fetch requests on component mount
   useEffect(() => {
@@ -417,7 +436,7 @@ const SettingsPage: React.FC = () => {
               <p className="mt-2 text-gray-600">{t("common.loading")}</p>
             </div>
           ) : (
-            formatRequestGroups(requestGroups, t)
+            formatRequestGroups(requestGroups, requests, t)
           )}
         </div>
       </div>

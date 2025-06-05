@@ -94,6 +94,7 @@
     "status": "Estado",
     "created": "Creado",
     "requestAgain": "Solicitar de nuevo",
+    "downloadFiles": "Descargar Archivos",
     "statuses": {
       "GENERATING": "En proceso de generación",
       "CACHED": "Cacheda",
@@ -101,7 +102,9 @@
       "EMPTY": "Vacía"
     },
     "requestAgainTooltip": "Solicitar esta información de nuevo",
-    "requestAgainAriaLabel": "Solicitar de nuevo esta solicitud"
+    "requestAgainAriaLabel": "Solicitar de nuevo esta solicitud",
+    "downloadFilesTooltip": "Descargar los archivos generados para esta solicitud",
+    "downloadFilesAriaLabel": "Descargar los archivos generados para esta solicitud"
   },
   "profile": {
     "userMenu": "Menú de usuario",

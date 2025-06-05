@@ -94,6 +94,7 @@
     "status": "Status",
     "created": "Created",
     "requestAgain": "Request Again",
+    "downloadFiles": "Download Files",
     "statuses": {
       "GENERATING": "Generating",
       "CACHED": "Cached",
@@ -101,7 +102,9 @@
       "EMPTY": "Empty"
     },
     "requestAgainTooltip": "Fill the form with this request data",
-    "requestAgainAriaLabel": "Request this data again"
+    "requestAgainAriaLabel": "Request this data again",
+    "downloadFilesTooltip": "Download files generated for this request",
+    "downloadFilesAriaLabel": "Download files for this request"
   },
   "profile": {
     "userMenu": "User menu",

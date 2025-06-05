@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { fromUserRequestsReturnedToUserRequest, UserRequest, UserRequestsReturned } from "@/types/Request";
+import { UserRequestsReturned } from "@/types/Request";
 import { API_URL_REQUESTS_MY_REQUESTS } from "@/consts/apiConsts";
 
 interface ViewRequestsState {
-  items: UserRequest[];
+  items: UserRequestsReturned[];
   isLoading: boolean;
   error: string | null;
 }
@@ -61,7 +61,7 @@ const viewRequestsSlice = createSlice({
       })
       .addCase(fetchUserRequests.fulfilled, (state, action: PayloadAction<UserRequestsReturned[]>) => {
         state.isLoading = false;
-        state.items = action.payload.map(fromUserRequestsReturnedToUserRequest);
+        state.items = action.payload;
       })
       .addCase(fetchUserRequests.rejected, (state, action) => {
         state.isLoading = false;
