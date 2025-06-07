@@ -4,7 +4,7 @@ import * as Avatar from "@radix-ui/react-avatar";
 import * as Separator from "@radix-ui/react-separator";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { User, LogOut, Settings } from "lucide-react";
+import { User, LogOut, LayoutList } from "lucide-react";
 import { useAppDispatch } from "@/redux/hooks";
 import { logoutUser } from "@/redux/slices/authSlice";
 import { User as UserType } from "@/types/User";
@@ -108,7 +108,7 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ user }) => {
             className="flex items-center rounded-md px-3 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
             onSelect={goToPreviousRequests}
           >
-            <Settings className="mr-2 h-4 w-4" />
+            <LayoutList className="mr-2 h-4 w-4" />
             {t("profile.settings")}
           </DropdownMenu.Item>
 
