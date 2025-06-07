@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Loader2, AlertTriangle, Check, Download, Eye, FileIcon } from "lucide-react";
 import ResultsService, { ResultFile, ResultsData } from "@/services/resultsService";
 import ProgressService, { ProgressUpdateData } from "@/services/progressService";
+import { MAX_PROGRESS } from "@/consts/progressConsts";
 
 // Component for displaying file preview
 const FilePreview: React.FC<{ file: ResultFile }> = ({ file }) => {
@@ -130,7 +131,7 @@ export default function ResultsPage(): React.ReactElement {
   const location = useLocation();
   const navigate = useNavigate();
   const [requestHash, setRequestHash] = useState<string | null>(null);
-  const [progress, setProgress] = useState(0);
+  const [totalProgress, setTotalProgress] = useState(0);
   const [progressMessage, setProgressMessage] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -140,6 +141,7 @@ export default function ResultsPage(): React.ReactElement {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isLoadingResults, setIsLoadingResults] = useState(false);
   const [progressComplete, setProgressComplete] = useState(false);
+  const previousRequestHashRef = useRef<string | null>(null);
 
   // Fetch result files when processing is complete
   const fetchResults = useCallback(async () => {
@@ -159,8 +161,8 @@ export default function ResultsPage(): React.ReactElement {
       setIsLoadingResults(false);
     } catch (error) {
       console.error("Error fetching results:", error);
-      setHasError(true);
-      setIsLoadingResults(false);
+      // setHasError(true);
+      // setIsLoadingResults(false);
     }
   }, [requestHash]);
 
@@ -183,12 +185,24 @@ export default function ResultsPage(): React.ReactElement {
     let cleanup: (() => void) | null = null;
 
     if (requestHash) {
-      // Reset states when starting a new connection
-      setIsConnected(false);
-      setHasError(false);
-      setIsComplete(false);
-      setProgress(0);
-      setProgressComplete(false);
+      // Check if this is a new request or just a page reload
+      const isNewRequest = previousRequestHashRef.current !== requestHash;
+
+      // Only reset states when starting a new connection for a new request
+      if (isNewRequest) {
+        console.log("New request detected, resetting states");
+        setIsConnected(false);
+        setHasError(false);
+        setIsComplete(false);
+        setTotalProgress(0);
+        setProgressComplete(false);
+        setProgressMessage("");
+        setResultsData(null);
+        setPreviewFile(null);
+      }
+
+      // Update the reference for future comparisons
+      previousRequestHashRef.current = requestHash;
 
       // Connect to the progress stream
       cleanup = ProgressService.connectToProgressStream({
@@ -200,14 +214,25 @@ export default function ResultsPage(): React.ReactElement {
         },
         onUpdate: (data: ProgressUpdateData) => {
           console.log(`Received progress update: ${JSON.stringify(data)}`);
-          setProgress(data.increment);
-          setProgressMessage(data.message);
 
-          // Check for completed flag to avoid unnecessary reloads
+          // Update progress message
+          if (data.message) {
+            setProgressMessage(data.message);
+          }
+
+          // Handle progress updates
+          if (data.increment > 0) {
+            // Update total progress, ensuring it doesn't exceed MAX_PROGRESS
+            setTotalProgress(prev => Math.min(prev + data.increment, MAX_PROGRESS));
+          }
+
+          // If completed flag is sent, set progress to 100%
           if (data.completed === true) {
-            console.log("Server signaled completion, skipping reload");
+            console.log("Server signaled completion");
+            setTotalProgress(MAX_PROGRESS);
             setProgressComplete(true);
             setIsConnected(false);
+            fetchResults();
           }
         },
         onError: () => {
@@ -222,11 +247,16 @@ export default function ResultsPage(): React.ReactElement {
           }
         },
         onComplete: () => {
-          console.log("Progress stream completed, fetching results");
+          console.log("Progress stream completed");
           setIsConnected(false);
 
+          // Set progress to 100% if we're completing
+          if (!isComplete && !hasError) {
+            setTotalProgress(MAX_PROGRESS);
+          }
+
           // Only fetch results if we haven't already been marked as complete
-          if (!progressComplete) {
+          if (!progressComplete && !isComplete) {
             fetchResults();
           }
         },
@@ -294,15 +324,15 @@ export default function ResultsPage(): React.ReactElement {
                   </span>
                 )}
               </div>
-              <div className="text-sm font-medium text-slate-900">{Math.round(progress)}%</div>
+              <div className="text-sm font-medium text-slate-900">{Math.round(totalProgress)}%</div>
             </div>
 
             <div className="relative overflow-hidden bg-slate-200 rounded-full h-2">
               <div
-                className={`h-full transition-all duration-500 ease-in-out ${
-                  hasError ? "bg-red-500" : isComplete ? "bg-green-500" : "bg-blue-600"
+                className={`h-full transition-all duration-200 ease-in-out ${
+                  hasError ? "bg-red-500" : isComplete || progressComplete ? "bg-green-500" : "bg-blue-600"
                 }`}
-                style={{ width: `${progress}%` }}
+                style={{ width: `${totalProgress}%` }}
               />
             </div>
 

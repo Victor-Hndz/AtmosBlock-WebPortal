@@ -80,6 +80,7 @@ export interface UserRequest {
  */
 export interface RequestGroup {
   request: UserRequest;
+  formRequest: RequestForm;
   count: number;
 }
 
@@ -123,10 +124,12 @@ export function hasSameContent(req1: UserRequest, req2: UserRequest): boolean {
  * @param requests Array of user requests
  * @returns Array of request groups
  */
-export function groupRequestsByContent(requests: UserRequest[]): RequestGroup[] {
+export function groupRequestsByContent(requests: UserRequestsReturned[]): RequestGroup[] {
   // Sort requests by creation date (newest first)
   const sortedRequests = [...requests].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    (a, b) =>
+      new Date(fromUserRequestsReturnedToUserRequest(b).createdAt).getTime() -
+      new Date(fromUserRequestsReturnedToUserRequest(a).createdAt).getTime()
   );
 
   const groups: RequestGroup[] = [];
@@ -135,12 +138,12 @@ export function groupRequestsByContent(requests: UserRequest[]): RequestGroup[] 
   for (let i = 0; i < sortedRequests.length; i++) {
     if (processedIndices.has(i)) continue;
 
-    const currentRequest = sortedRequests[i];
+    const currentRequest = fromUserRequestsReturnedToUserRequest(sortedRequests[i]);
     let count = currentRequest.timesRequested ?? 1; // Default to 1 if not specified
 
     // Check remaining requests for matches
     for (let j = i + 1; j < sortedRequests.length; j++) {
-      if (hasSameContent(currentRequest, sortedRequests[j])) {
+      if (hasSameContent(currentRequest, fromUserRequestsReturnedToUserRequest(sortedRequests[j]))) {
         count += sortedRequests[j].timesRequested ?? 1; // Add count from matching request
         processedIndices.add(j);
       }
@@ -148,6 +151,7 @@ export function groupRequestsByContent(requests: UserRequest[]): RequestGroup[] 
 
     groups.push({
       request: currentRequest,
+      formRequest: toRequestForm(sortedRequests[i]),
       count,
     });
   }
@@ -155,7 +159,7 @@ export function groupRequestsByContent(requests: UserRequest[]): RequestGroup[] 
   return groups;
 }
 
-export function fromUserRequestsReturnedToUserRequest(returned: UserRequestsReturned): UserRequest {
+function fromUserRequestsReturnedToUserRequest(returned: UserRequestsReturned): UserRequest {
   return {
     requestHash: returned.requestHash,
     variableName: returned.variableName,
@@ -175,5 +179,24 @@ export function fromUserRequestsReturnedToUserRequest(returned: UserRequestsRetu
     status: returned.requestStatus,
     timesRequested: returned.timesRequested,
     createdAt: returned.updatedAt instanceof Date ? returned.updatedAt.toISOString() : returned.updatedAt,
+  };
+}
+
+function toRequestForm(request: UserRequestsReturned): RequestForm {
+  return {
+    variableName: request.variableName,
+    pressureLevels: request.pressureLevels,
+    years: request.years,
+    months: request.months,
+    days: request.days,
+    hours: request.hours,
+    areaCovered: request.areaCovered,
+    mapTypes: request.mapTypes,
+    mapLevels: request.mapLevels,
+    fileFormat: request.fileFormat,
+    noMaps: request.noMaps,
+    noData: request.noData,
+    omp: request.omp,
+    mpi: request.mpi,
   };
 }

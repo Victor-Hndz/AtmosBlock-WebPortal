@@ -19,13 +19,7 @@ import * as Collapsible from "@radix-ui/react-collapsible";
 import * as Toast from "@radix-ui/react-toast";
 import { fetchUserRequests } from "@/redux/slices/viewRequestsSlice";
 import { prefillForm } from "@/redux/slices/submitRequestsSlice";
-import {
-  RequestGroup,
-  groupRequestsByContent,
-  RequestForm,
-  fromUserRequestsReturnedToUserRequest,
-  UserRequestsReturned,
-} from "@/types/Request";
+import { RequestGroup, groupRequestsByContent, RequestForm } from "@/types/Request";
 import { TFunction } from "i18next";
 import ResultsService from "@/services/resultsService";
 
@@ -42,25 +36,6 @@ const Badge: React.FC<BadgeProps> = ({ children, className = "" }) => (
     {children}
   </span>
 );
-
-const toRequestForm = (request: UserRequestsReturned): RequestForm => {
-  return {
-    variableName: request.variableName,
-    pressureLevels: request.pressureLevels,
-    years: request.years,
-    months: request.months,
-    days: request.days,
-    hours: request.hours,
-    areaCovered: request.areaCovered,
-    mapTypes: request.mapTypes,
-    mapLevels: request.mapLevels,
-    fileFormat: request.fileFormat,
-    noMaps: request.noMaps,
-    noData: request.noData,
-    omp: request.omp,
-    mpi: request.mpi,
-  };
-};
 
 /**
  * Format date for display
@@ -121,7 +96,7 @@ const formatRequestStatus = (status: string): string => {
   }
 };
 
-const formatRequestGroups = (groups: RequestGroup[], forms: UserRequestsReturned[], t: TFunction): React.ReactNode => {
+const formatRequestGroups = (groups: RequestGroup[], t: TFunction): React.ReactNode => {
   if (groups.length === 0) {
     return (
       <div className="text-center py-8">
@@ -141,8 +116,8 @@ const formatRequestGroups = (groups: RequestGroup[], forms: UserRequestsReturned
 
   return (
     <div>
-      {groups.map((group, idx) => (
-        <RequestItem key={group.request.requestHash} group={group} formRequest={toRequestForm(forms[idx])} />
+      {groups.map(group => (
+        <RequestItem key={group.request.requestHash} group={group} formRequest={group.formRequest} />
       ))}
     </div>
   );
@@ -403,7 +378,7 @@ const SettingsPage: React.FC = () => {
   const [toastOpen, setToastOpen] = useState(false);
 
   // Group requests
-  const requestGroups = groupRequestsByContent(requests.map(fromUserRequestsReturnedToUserRequest));
+  const requestGroups = groupRequestsByContent(requests);
 
   // Fetch requests on component mount
   useEffect(() => {
@@ -436,7 +411,7 @@ const SettingsPage: React.FC = () => {
               <p className="mt-2 text-gray-600">{t("common.loading")}</p>
             </div>
           ) : (
-            formatRequestGroups(requestGroups, requests, t)
+            formatRequestGroups(requestGroups, t)
           )}
         </div>
       </div>
