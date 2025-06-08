@@ -43,6 +43,15 @@ export const useRequestForm = (t: TFunction): UseRequestFormReturn => {
   const updateField = useCallback(
     <K extends keyof RequestForm>(field: K, value: RequestForm[K]) => {
       dispatch(updateFormField({ field, value: value ?? "" }));
+
+      // Special handling for variableName and mapTypes dependency
+      if (field === "variableName") {
+        if (value === "temperature") {
+          dispatch(updateFormField({ field: "mapTypes", value: ["cont"] }));
+        } else {
+          dispatch(updateFormField({ field: "mapTypes", value: [] }));
+        }
+      }
     },
     [dispatch]
   );
@@ -116,6 +125,12 @@ export const useRequestForm = (t: TFunction): UseRequestFormReturn => {
 
       const currentValues = Array.isArray(formData[field]) ? (formData[field] as string[]) : [];
 
+      // Prevent changes to "cont" in mapTypes when variableName is "temperature"
+      if (field === "mapTypes" && formData.variableName === "temperature" && value === "cont") {
+        if (!checked) return;
+      }
+
+      // Normal handling for other fields
       if (checked) {
         // Add value if it doesn't exist
         if (!currentValues.includes(value)) {

@@ -369,28 +369,49 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
         );
 
       case InputType.CHECKBOX_GROUP:
+        const isTemperatureSelected = formData.variableName === "temperature";
+        const isMapTypesField = config.name === "mapTypes";
+
         return (
           <div
             className={`grid ${getCheckboxGridClass(config.options?.length ?? 0, config.name)} gap-2 mt-1.5 
                          ${config.name === "days" ? "max-h-48 overflow-y-auto border border-slate-200 rounded-md p-2" : ""}`}
           >
-            {config.options?.map(option => (
-              <label key={option.value} className="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer">
-                <Checkbox.Root
-                  id={`${config.id}-${option.value}`}
-                  checked={Array.isArray(value) && value.includes(option.value)}
-                  onCheckedChange={checked => handleCheckboxChange?.(config.name, option.value, checked)}
-                  className="h-4 w-4 rounded border border-slate-300 bg-white
-                          data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600 
-                          focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-1"
+            {config.options?.map(option => {
+              const isDisabled = isMapTypesField && isTemperatureSelected && option.value !== "cont";
+
+              const isChecked =
+                isMapTypesField && isTemperatureSelected && option.value === "cont"
+                  ? true
+                  : Array.isArray(value) && value.includes(option.value);
+
+              return (
+                <label
+                  key={option.value}
+                  className={`flex items-center space-x-2 text-sm ${
+                    isDisabled ? "text-slate-400 cursor-not-allowed" : "text-slate-700 cursor-pointer"
+                  }`}
                 >
-                  <Checkbox.Indicator className="flex items-center justify-center text-white">
-                    <Check className="h-3 w-3" />
-                  </Checkbox.Indicator>
-                </Checkbox.Root>
-                <span>{config.name === "mapTypes" ? t(`mapTypes-list.${option.label}` as any) : option.label}</span>
-              </label>
-            ))}
+                  <Checkbox.Root
+                    id={`${config.id}-${option.value}`}
+                    checked={isChecked}
+                    disabled={isDisabled}
+                    onCheckedChange={checked => handleCheckboxChange?.(config.name, option.value, checked)}
+                    className={`h-4 w-4 rounded border ${
+                      isDisabled
+                        ? "bg-slate-100 border-slate-300 cursor-not-allowed"
+                        : "bg-white border-slate-300 data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600"
+                    } 
+                    focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-1`}
+                  >
+                    <Checkbox.Indicator className="flex items-center justify-center text-white">
+                      <Check className="h-3 w-3" />
+                    </Checkbox.Indicator>
+                  </Checkbox.Root>
+                  <span>{config.name === "mapTypes" ? t(`mapTypes-list.${option.label}` as any) : option.label}</span>
+                </label>
+              );
+            })}
           </div>
         );
 
