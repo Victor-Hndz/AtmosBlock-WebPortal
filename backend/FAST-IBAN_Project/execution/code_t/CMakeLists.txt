@@ -5,7 +5,7 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 endif()
 
 project(FAST-IBAN
-    VERSION 1.0
+    VERSION 2.0
     DESCRIPTION "Temperature" 
     LANGUAGES C)
 
@@ -28,5 +28,5 @@ target_link_libraries(FAST-IBAN PRIVATE netcdf)
 target_link_libraries(FAST-IBAN PRIVATE LIB)
 
 
-target_include_directories(FAST-IBAN PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-set_target_properties(FAST-IBAN PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../)
+# target_include_directories(FAST-IBAN PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+# set_target_properties(FAST-IBAN PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../)

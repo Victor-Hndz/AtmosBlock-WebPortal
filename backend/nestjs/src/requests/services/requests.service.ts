@@ -49,7 +49,14 @@ export class RequestsService {
     //Generate the requestHash
     if (!createRequestDto.mapLevels || createRequestDto.mapLevels.length <= 0) {
       createRequestDto.mapLevels = createRequestDto.mapLevels ?? [];
-      createRequestDto.mapLevels.push("20");
+
+      if (createRequestDto.variableName.toLowerCase() === "temperature") {
+        createRequestDto.mapLevels.push("10");
+      } else if (createRequestDto.variableName.toLowerCase() === "geopotential") {
+        createRequestDto.mapLevels.push("20");
+      } else {
+        createRequestDto.mapLevels.push("20");
+      }
     }
     const requestHash = this.generateRequestHash(createRequestDto);
     createRequestDto.requestHash = requestHash;

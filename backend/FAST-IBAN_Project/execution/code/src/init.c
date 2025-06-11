@@ -21,7 +21,7 @@ void process_entry(int argc, char **argv) {
     char *p = strrchr(cwd, '/');
     p == NULL ? p = cwd : p++;
     if(strcmp(p, ACTUAL_DIR) == 0) {
-        error_catcher_int = chdir("..");
+        error_catcher_int = chdir("../../");
         error_catcher_char = getcwd(cwd, sizeof(cwd));
     }
 

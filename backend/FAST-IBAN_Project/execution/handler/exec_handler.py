@@ -11,7 +11,6 @@ from utils.rabbitMQ.create_message import create_message
 from utils.rabbitMQ.notify_updates import notify_update
 from utils.rabbitMQ.rabbit_consts import NOTIFICATIONS_EXCHANGE, NOTIFY_HANDLER_KEY, EXECUTION_ALGORITHM_QUEUE, NOTIFY_EXECUTION
 from utils.minio.upload_files import upload_files_to_request_hash
-from utils.clean_folder_files import clean_directory
 from utils.consts.consts import STATUS_OK, STATUS_ERROR
 
 
@@ -21,10 +20,18 @@ async def handle_message(body, rabbitmq_client):
     await notify_update(rabbitmq_client, 1, "EXEC: Compilando algoritmo.")
 
     data = process_body(body)
+    
+    if data["variable_name"] == "geopotential":
+        build_folder = "./code/build"
+    elif data["variable_name"] == "temperature":
+        build_folder = "./code_t/build"
+        
+    # print("\n[ ] Contenido de code_t: ", os.listdir("./"))
+        
+    os.makedirs(build_folder, exist_ok=True)
+    print("\n[ ] Compilando el algoritmo en la carpeta: ", build_folder)
 
-    os.makedirs("build", exist_ok=True)
-
-    subprocess.run(["cmake", ".."], cwd="build")
+    subprocess.run(["cmake", ".."], cwd=build_folder)
 
     build_cmd = ["cmake", "--build", "."]
     process = subprocess.Popen(
@@ -32,7 +39,7 @@ async def handle_message(body, rabbitmq_client):
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
-        cwd="build",
+        cwd=build_folder,
     )
     stdout, stderr = process.communicate()
 
@@ -40,7 +47,6 @@ async def handle_message(body, rabbitmq_client):
         print(stdout)
         print("\n✅ Build completado exitosamente.")
     else:
-        print(stderr)
         print("\n❌ Error al ejecutar el build:")
         message = {"request_type": NOTIFY_EXECUTION, "exec_status": STATUS_ERROR, "exec_message": "Error al compilar"}
         await rabbitmq_client.publish(
@@ -55,7 +61,11 @@ async def handle_message(body, rabbitmq_client):
     await notify_update(rabbitmq_client, 1, "EXEC: Ejecutando algoritmo.")
         
     print("\n[ ] Ejecutando comando: ", run_cmd)
-    result = subprocess.run(run_cmd, capture_output=True, text=True, cwd="build")
+    result = subprocess.run(run_cmd, capture_output=True, text=True, cwd=build_folder)
+    
+    # print("\n[ ] Resultado de la ejecución:")
+    # print(f"Código de retorno: {result.returncode}")
+    
     # print("Salida estándar (stdout):")
     # print(result.stdout)
 
@@ -69,7 +79,6 @@ async def handle_message(body, rabbitmq_client):
         #save the files in minio
         upload_files_to_request_hash(data["request_hash"], local_folder="./out/"+data["request_hash"])
         print("\n[ ] Archivos subidos a minio.")
-        clean_directory("./out/"+data["request_hash"])
         
         await rabbitmq_client.publish(
             NOTIFICATIONS_EXCHANGE, 

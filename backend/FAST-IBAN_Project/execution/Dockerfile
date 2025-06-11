@@ -25,7 +25,8 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy project files to the container
-COPY ./execution/code /app
+COPY ./execution/code /app/code
+COPY ./execution/code_t /app/code_t
 COPY ./execution/handler /app/handler
 
 # Copy and install utils dependencies

@@ -1,7 +1,7 @@
 #include "lib.h"
 
-int LAT_LIM_MIN, LAT_LIM_MAX, LON_LIM_MIN, LON_LIM_MAX, NLAT, NLON, NTIME, N_THREADS;
-char* FILE_NAME;
+int NTIME, NLAT, NLON, LAT_LIM_MIN, LAT_LIM_MAX, LON_LIM_MIN, LON_LIM_MAX, N_THREADS;
+char* FILE_NAME, *OUT_DIR_NAME;
 
 void process_entry(int argc, char **argv) {
     char cwd[NC_MAX_CHAR];
@@ -14,20 +14,21 @@ void process_entry(int argc, char **argv) {
     char *p = strrchr(cwd, '/');
     p == NULL ? p = cwd : p++;
     if(strcmp(p, ACTUAL_DIR) == 0) {
-        error_catcher_int = chdir("..");
+        error_catcher_int = chdir("../../");
         error_catcher_char = getcwd(cwd, sizeof(cwd));
     }
 
-    if (argc != 7) {
+    if (argc != 8) {
         //FILE_NAME = "config/data/geopot_500hPa_2019-06-26_00-06-12-18UTC.nc";
         //FILE_NAME = "config/data/geopot_500hPa_2003-08-(01-15)_00-06-12-18UTC.nc";
         // FILE_NAME = "config/data/geopot_500hPa_2022-03-14_00-06-12-18UTC.nc";
         // FILE_NAME = "config/data/temp_850hPa_2019-06-(23-30)_00-06-12-18UTC.nc";
         FILE_NAME = "config/data/temp_850hPa_2024-10-29_18UTC.nc";
         LAT_LIM_MIN = 25;
-        LAT_LIM_MAX = 80;
-        LON_LIM_MIN = -40;
-        LON_LIM_MAX = 40;
+        LAT_LIM_MAX = 85;
+        LON_LIM_MIN = -180;
+        LON_LIM_MAX = 180;
+        OUT_DIR_NAME = "out/";
         N_THREADS = 1;
     } else {
         FILE_NAME = argv[1];
@@ -35,7 +36,11 @@ void process_entry(int argc, char **argv) {
         LAT_LIM_MAX = atoi(argv[3]);
         LON_LIM_MIN = atoi(argv[4]);
         LON_LIM_MAX = atoi(argv[5]);
-        N_THREADS = atoi(argv[6]);
+        OUT_DIR_NAME = argv[6];
+        N_THREADS = atoi(argv[7]);
+
+        printf("FILE_NAME: %s\n", FILE_NAME);
+        printf("OUT_DIR_NAME: %s\n", OUT_DIR_NAME);
 
         if(strlen(FILE_NAME) > 255) {
             printf("Error: El nombre del archivo es demasiado largo.\n");
@@ -74,11 +79,11 @@ void extract_nc_data(int ncid) {
         return;
     }
 
-    printf("Número de variables en el archivo: %d\n", num_vars);
+    // printf("Número de variables en el archivo: %d\n", num_vars);
 
     // Iterar sobre todas las variables y obtener información sobre cada una
     for (varid = 0; varid < num_vars; varid++) {
-        printf("Procesando variable con ID %d...\n", varid);
+        // printf("Procesando variable con ID %d...\n", varid);
         // Obtener información sobre la variable
         retval = nc_inq_var(ncid, varid, varname, &vartype, &ndims, dimids, &natts);
         if (retval != NC_NOERR) {
@@ -109,9 +114,9 @@ void extract_nc_data(int ncid) {
         else if(strcmp(varname, T_NAME) == 0) continue;        
         else {
             printf("Error: Variable %d: Nombre=%s, Tipo=%d, Número de dimensiones=%d, Tamaño=%zu\n", varid, varname, vartype, ndims, var_size);
-            return;
         }
     }
+    printf("NLON: %d, NLAT: %d, NTIME: %d\n", NLON, NLAT, NTIME);
 }
 
 void init_nc_variables(int ncid, short*** t_in, float lats[NLAT], float lons[NLON], double *scale_factor, double *offset, char *long_name) {
@@ -193,9 +198,9 @@ void check_coords(short*** z_in, float lats[NLAT], float lons[NLON]) {
 
 void init_file(char* filename, char* long_name) {
     char cwd[NC_MAX_CHAR];
-    char file_path[NC_MAX_CHAR];
     char* error_catcher_char;
     int error_catcher_int;
+    size_t buffer_size;
     error_catcher_char = getcwd(cwd, sizeof(cwd));
 
     //extract the last part of the path
@@ -206,10 +211,19 @@ void init_file(char* filename, char* long_name) {
         error_catcher_char = getcwd(cwd, sizeof(cwd));
     }
 
-    snprintf(file_path, sizeof(file_path), "%s/%s", cwd, OUT_DIR_NAME);
+    buffer_size = strlen(cwd) + strlen(OUT_DIR_NAME) + 2;
+    char file_path[buffer_size];
 
-    if (!mkdir(file_path, DIR_PERMS)) 
-        printf("Carpeta creada con éxito.\n");
+    snprintf(file_path, buffer_size, "%s/%s", cwd, OUT_DIR_NAME);
+    printf("File path: %s\n", file_path);
+
+    // Check if the directory exists, if not create it.
+    if (access(file_path, F_OK) == -1) {
+        if (mkdir(file_path, 0777) == -1) {
+            perror("Error creating directory");
+            exit(EXIT_FAILURE);
+        }
+    }
 
     // FILE_NAME extract the last part of the path
     p = strrchr(FILE_NAME, '/');
@@ -217,7 +231,7 @@ void init_file(char* filename, char* long_name) {
 
     // printf("File name: %s\n", p);
     char temp[NC_MAX_CHAR];
-    strcpy(temp, p);
+    strncpy(temp, p, strlen(p));
 
     //delete the extension from p
     char *dot = strrchr(temp, '.');
@@ -233,6 +247,12 @@ void init_file(char* filename, char* long_name) {
 
     sprintf(filename, "%s%s_selected_%s_%sUTC.csv", file_path, long_name, temp, fecha);
     FILE *fp = fopen(filename, "w");
+    
+    if (fp == NULL) {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
+    
     fprintf(fp, "time,latitude,longitude,t,cluster,centroid_lat,centroid_lon\n");
     fclose(fp);
 }

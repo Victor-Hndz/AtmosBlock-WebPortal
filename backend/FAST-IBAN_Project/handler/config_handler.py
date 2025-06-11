@@ -1,5 +1,4 @@
 import sys
-import json
 from typing import List
 import asyncio
 
@@ -144,6 +143,7 @@ class ConfigHandler:
         else:
             print("\n✅ Procesamiento completado.")
             await notify_result(self.rabbitmq, "Processing completed successfully.", self.request_hash)
+            clean_directory(OUT_DIR+"/"+self.request_hash)
 
     async def handle_map_generation_message(self, body: bytes) -> None:
         """
@@ -165,6 +165,7 @@ class ConfigHandler:
         
         print("\n✅ Procesamiento completado.")
         await notify_result(self.rabbitmq, "Processing completed successfully.", self.request_hash)
+        clean_directory(OUT_DIR+"/"+self.request_hash)
 
     async def process_file(self) -> None:
         """
@@ -179,7 +180,7 @@ class ConfigHandler:
         
         print("\n[ ] Enviando mensaje a la cola de ejecución...")
         
-        data = {"cmd": cmd, "request_hash": self.request_hash}
+        data = {"cmd": cmd, "request_hash": self.request_hash, "variable_name": self.variable_name.lower()}
         
         # Send execution request and wait for response
         message = create_message(STATUS_OK, "", data)

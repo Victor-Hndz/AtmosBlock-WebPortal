@@ -21,13 +21,11 @@
 
 #define ERR(e) {if (e != NC_NOERR) {fprintf(stderr, "Error: %s\n", nc_strerror(e)); exit(EXIT_FAILURE);}}
 
-#define ACTUAL_DIR "execution"
+#define ACTUAL_DIR "build"
 #define DIR_PERMS 0777
 #define RES 0.25 // Resolution of the map in degrees
 
 #define FILT_LAT(g) (360-(g) / RES)
-
-#define OUT_DIR_NAME "out/"
 
 #define LONG_NAME "long_name"
 #define REC_NAME "time"
@@ -41,7 +39,7 @@
 
 
 extern int NTIME, NLAT, NLON, LAT_LIM_MIN, LAT_LIM_MAX, LON_LIM_MIN, LON_LIM_MAX, N_THREADS;
-extern char* FILE_NAME;
+extern char* FILE_NAME, *OUT_DIR_NAME;
 
 
 typedef struct point{
