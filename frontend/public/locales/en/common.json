@@ -375,6 +375,7 @@
     "fileList": "All generated files list",
     "complete": "Process completed",
     "viewDetails": "View Details",
-    "error": "Error while processing"
+    "error": "Error while processing",
+    "initializing": "Downloading netcdf file..."
   }
 }

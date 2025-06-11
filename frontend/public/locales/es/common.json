@@ -375,6 +375,7 @@
     "fileList": "Lista de todos los archivos generados",
     "complete": "Procesamiento completado",
     "viewDetails": "Ver Detalles",
-    "error": "Error durante el procesamiento"
+    "error": "Error durante el procesamiento",
+    "initializing": "Descargando archivo NetCDF..."
   }
 }

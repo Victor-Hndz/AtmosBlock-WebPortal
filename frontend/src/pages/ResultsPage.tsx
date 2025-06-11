@@ -211,6 +211,9 @@ export default function ResultsPage(): React.ReactElement {
           console.log("Connected to progress stream successfully");
           setIsConnected(true);
           setHasError(false);
+          // Set default progress to 5% and default message
+          setTotalProgress(5);
+          setProgressMessage("CONFIG: " + t("results.initializing", "Initializing processing..."));
         },
         onUpdate: (data: ProgressUpdateData) => {
           console.log(`Received progress update: ${JSON.stringify(data)}`);
