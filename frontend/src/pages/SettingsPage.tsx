@@ -190,7 +190,7 @@ const RequestItem: React.FC<RequestItemProps> = ({ group, formRequest }) => {
       // Fetch the result files for this request
       const results = await ResultsService.getResultFiles(requestHash);
 
-      ResultsService.downloadAllFiles(results.files, requestHash);
+      ResultsService.downloadAllFiles(results.files);
     } catch (error) {
       console.error("Error downloading files:", error);
       setToastMessage(t("errors.downloadError", "Could not download files"));

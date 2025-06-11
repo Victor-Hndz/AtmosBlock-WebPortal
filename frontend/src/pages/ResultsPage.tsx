@@ -280,7 +280,7 @@ export default function ResultsPage(): React.ReactElement {
 
     try {
       setIsDownloading(true);
-      await ResultsService.downloadAllFiles(resultsData.files, requestHash);
+      await ResultsService.downloadAllFiles(resultsData.files);
       setIsDownloading(false);
     } catch (error) {
       console.error("Error downloading files:", error);

@@ -57,7 +57,7 @@ export const ResultsService = {
    * @param files Array of result files to download
    * @param requestHash Hash of the request for naming the ZIP file
    */
-  downloadAllFiles: async (files: ResultFile[], requestHash: string): Promise<void> => {
+  downloadAllFiles: async (files: ResultFile[]): Promise<void> => {
     try {
       const zip = new JSZip();
 
@@ -82,7 +82,7 @@ export const ResultsService = {
 
       // Generate the zip file and save it
       const content = await zip.generateAsync({ type: "blob" });
-      saveAs(content, `results-${requestHash}.zip`);
+      saveAs(content, `generated-results.zip`);
     } catch (error) {
       console.error("Error downloading files:", error);
       throw error instanceof Error ? error : new Error("Failed to download files");
