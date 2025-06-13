@@ -16,13 +16,13 @@ export const VARIABLE_NAME_OPTIONS = ["geopotential", "temperature"];
 /**
  * Available pressure levels for selection
  */
-export const PRESSURE_LEVELS = ["1000", "550", "500", "300", "100", "10"];
+export const PRESSURE_LEVELS = ["1000", "850", "500", "300", "100", "10"];
 
 /**
  * Available pressure levels for advanced selection
  * Ordered in descending numerical value
  */
-export const PRESSURE_LEVELS_ADVANCED = [...PRESSURE_LEVELS, "850", "700", "200", "50"].sort((a, b) => {
+export const PRESSURE_LEVELS_ADVANCED = [...PRESSURE_LEVELS, "900", "700", "550", "200", "50"].sort((a, b) => {
   const numA = parseInt(a);
   const numB = parseInt(b);
   return numB - numA;
