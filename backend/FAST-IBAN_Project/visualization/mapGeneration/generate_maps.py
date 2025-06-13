@@ -4,6 +4,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as path_effects
+from mpl_toolkits.mplot3d import Axes3D
 import cartopy.crs as ccrs 
 import cartopy as cartopy
 import numpy as np
@@ -25,7 +26,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 
 from utils.enums.DataType import DataType
 from utils.minio.upload_files import upload_files_to_request_hash
-from utils.clean_folder_files import clean_directory
 from utils.consts.consts import VARIABLE_NAMES, STATUS_OK
 
 
@@ -109,6 +109,34 @@ def from_elements_to_date(year: str, month: str, day: str, hour: str) -> str:
     return f"{int(year):04d}-{int(month):02d}-{int(day):02d}_{int(hour):02d}UTC"
 
 
+def obtain_csv_files(file_path: str, file_type: str) -> str:
+    """Obtiene el nombre del archivo CSV correspondiente al tipo de archivo solicitado.
+
+    Args:
+        file_path (str): Carpeta donde buscar los archivos.
+        file_type (str): Tipo de archivo solicitado (e.g., "selected", "all").
+
+    Returns:
+        str: Ruta completa del archivo CSV correspondiente.
+
+    Raises:
+        FileNotFoundError: Si no se encuentra un archivo que coincida con el tipo.
+    """
+    # Ruta completa a la carpeta donde buscar
+    search_path = os.path.join(OUT_DIR, file_path)
+
+    if not os.path.isdir(search_path):
+        raise FileNotFoundError(f"El directorio no existe: {search_path}")
+
+    # Buscar archivos .csv
+    for filename in os.listdir(search_path):
+        if filename.endswith(".csv") and file_type in filename:
+            base_name = os.path.splitext(filename)[0]
+            return os.path.join(search_path, f"{base_name}.csv")
+
+    raise FileNotFoundError(f"No se encontró un archivo CSV con tipo '{file_type}' en {search_path}")
+
+
 class MapGenerator:
     def __init__(self, file_name, request_hash, variable_name, pressure_level, year, month, day, hour, map_type, map_level, file_format, area_covered):
         self.file_name = file_name
@@ -134,13 +162,16 @@ class MapGenerator:
         if self.map_type == DataType.TYPE_CONT.value:
             self.generate_contour_map()
         elif self.map_type == DataType.TYPE_DISP.value:
-            # self.generate_scatter_map()
+            self.generate_scatter_map()
             pass
         elif self.map_type == DataType.TYPE_COMB.value:
             # self.generate_combined_map()
             pass
         elif self.map_type == DataType.TYPE_FORMS.value:
             # self.generate_formations_map()
+            pass
+        elif self.map_type == DataType.TYPE_3D.value:
+            self.generate_3d_surface_map()
             pass
         else:
             print("Error en el tipo de archivo")
@@ -226,13 +257,13 @@ class MapGenerator:
                 print("Error: Invalid data range (NaN or Inf values)")
                 return
             
-            print(f"Var max: {variable.max()}, Var min: {variable.min()}")
+            # print(f"Var max: {variable.max()}, Var min: {variable.min()}")
             
-            print(f"Variable range: {vmin} to {vmax}, step: {step}")
+            # print(f"Variable range: {vmin} to {vmax}, step: {step}")
             
-            print(f"Latitudes: {lat_min} to {lat_max}, Longitudes: {lon_min} to {lon_max}")
+            # print(f"Latitudes: {lat_min} to {lat_max}, Longitudes: {lon_min} to {lon_max}")
             
-            print(f"Variable shape: {variable.shape}, Lat shape: {lat.shape}, Lon shape: {lon.shape}")
+            # print(f"Variable shape: {variable.shape}, Lat shape: {lat.shape}, Lon shape: {lon.shape}")
                 
             # Ensure we have a valid range for contours
             cont_levels = np.arange(np.ceil(vmin/10)*10, vmax, step)
@@ -240,12 +271,12 @@ class MapGenerator:
                 # Fallback if range is too small
                 cont_levels = np.linspace(vmin, vmax, 5)
                 
-            print(f"Contour levels: {cont_levels}")
+            # print(f"Contour levels: {cont_levels}")
             
             co = ax.contour(lon, lat, variable, levels=cont_levels, cmap='jet', 
                         transform=ccrs.PlateCarree(), linewidths=1)
             
-            print("Contours co.levels:", co.levels)
+            # print("Contours co.levels:", co.levels)
             
             plt.clabel(co, inline=True, fontsize=8)
             
@@ -262,6 +293,172 @@ class MapGenerator:
             plt.close('all')
             raise
 
+        return True
+     
+    def generate_scatter_map(self):
+        print("Generando mapa de dispersión...")
+        variable_type = None
+        
+        for key, value in VARIABLE_NAMES.items():
+            if self.variable_name.lower() == key.lower():
+                variable_type = value
+                
+        print(f"Variable: {self.variable_name} -> {variable_type}")
+        
+        if variable_type is None:
+            print("Error: variable no válida")
+            return
+
+        # print(f"File name: {self.file_name}")
+        
+        try:
+            data = pd.read_csv(obtain_csv_files(self.request_hash, "selected"))
+            dates_nc = date_from_nc(self.file_name)
+            corrected_dates = [from_nc_to_date(str(date)) for date in dates_nc]
+            actual_date = from_elements_to_date(self.year, self.month, self.day, self.hour)
+            
+            #from corrected_dates, obtain the index of the date that is equal to actual_date
+            if actual_date not in corrected_dates:
+                print(f"Error: la fecha {actual_date} no se encuentra en el archivo netCDF")
+                return
+            
+            time_index = corrected_dates.index(actual_date)
+            
+            #Filtrar los datos para el índice de tiempo actual
+            data = data[data['time'] == time_index]
+             
+            lat = data['latitude'].copy()
+            lon = data['longitude'].copy()
+            cluster = data['cluster'].copy()
+            variable = data[variable_type].copy()
+            
+            # Ensure we have valid data in numpy arrays
+            lat = lat.to_numpy()
+            lon = lon.to_numpy()
+            cluster = cluster.to_numpy()
+            variable = variable.to_numpy()
+
+            # Generate the figure
+            fig, ax = self.config_map()
+            
+            sc = ax.scatter(
+                lon,
+                lat,
+                c=variable,
+                cmap='jet',
+                s=8,
+                transform=ccrs.PlateCarree(),
+                linewidths=0.3,
+                edgecolors='black'
+            )
+
+            for i, txt in enumerate(cluster):
+                # Add text labels to the scatter points
+                ax.annotate(txt, (lon[i], lat[i]), fontsize=1, color='white')
+                
+            #visual_adds
+            self.visual_adds(fig, ax, sc, self.map_type, variable_type, "v", actual_date)
+            
+            print("Map generated. Saving map...")
+            # Save the figure and close it to prevent resource leaks
+            self.save_map(actual_date)
+            
+        except Exception as e:
+            print(f"Error in generate_contour_map: {str(e)}")
+            # Clean up any open figures
+            plt.close('all')
+            raise
+
+        return True
+     
+    def generate_3d_surface_map(self):
+        print("Generando mapa de superficie 3D...")
+        variable_type = None
+        
+        for key, value in VARIABLE_NAMES.items():
+            if self.variable_name.lower() == key.lower():
+                variable_type = value
+                
+        print(f"Variable: {self.variable_name} -> {variable_type}")
+        
+        if variable_type is None:
+            print("Error: variable no válida")
+            return
+
+        print(f"File name: {self.file_name}")
+        
+        try:
+            ds = get_dataset(self.file_name)
+            dates_nc = date_from_nc(self.file_name)
+            corrected_dates = [from_nc_to_date(str(date)) for date in dates_nc]
+            actual_date = from_elements_to_date(self.year, self.month, self.day, self.hour)
+            
+            if actual_date not in corrected_dates:
+                print(f"Fecha {actual_date} no encontrada en el archivo NetCDF")
+                return
+
+            time_index = corrected_dates.index(actual_date)
+            print(f"Time index for {actual_date}: {time_index}")
+
+            lat = ds.latitude.values
+            lon = ds.longitude.values
+            variable = ds[variable_type].values[time_index]
+            
+            print(f"Variable shape before adjustment: {variable.shape}, Lat shape: {lat.shape}, Lon shape: {lon.shape}")
+
+            ds.close()
+            
+            #Adjust variable
+            if variable_type == 'z':
+                # Convert geopotential height to meters
+                print("Converting geopotential height to meters...")
+                variable = variable / g_0
+            elif variable_type == 't':
+                # Convert temperature from Kelvin to Celsius
+                print("Converting temperature from Kelvin to Celsius...")
+                variable = variable - k_factor
+                
+            print(f"Variable shape: {variable.shape}, Lat shape: {lat.shape}, Lon shape: {lon.shape}")
+            
+            if np.max(lon) > 180:
+                lon, variable = self.adjust_lon(lon, variable)
+
+            lat_max, lon_min, lat_min, lon_max = self.area_covered
+            lat_idx = np.nonzero((lat >= lat_min) & (lat <= lat_max))[0]
+            lon_idx = np.nonzero((lon >= lon_min) & (lon <= lon_max))[0]
+
+            lat = lat[lat_idx]
+            lon = lon[lon_idx]
+            variable = variable[..., lat_idx[:, None], lon_idx]
+
+            lon_grid, lat_grid = np.meshgrid(lon, lat)
+            
+            print(f"Lon grid shape: {lon_grid.shape}, Lat grid shape: {lat_grid.shape}, Variable shape: {variable.shape}")
+
+            fig = plt.figure(figsize=(10, 6), dpi=200)
+            ax = fig.add_subplot(111, projection='3d')
+
+            # Plot 3D surface
+            surf = ax.plot_surface(lon_grid, lat_grid, variable[0], cmap='viridis', linewidth=0, antialiased=False)
+
+            ax.set_xlabel('Longitude')
+            ax.set_ylabel('Latitude')
+            ax.set_zlabel(self.variable_name)
+            ax.set_title(f"{self.variable_name} on {actual_date}")
+
+            fig.colorbar(surf, ax=ax, shrink=0.5, aspect=5)
+
+            output_path = f"{OUT_DIR}/{self.request_hash}/{self.variable_name}_3D_{actual_date}.{self.file_format}"
+            plt.savefig(output_path)
+            plt.close()
+
+            print(f"Mapa 3D guardado en {output_path}")
+        except Exception as e:
+            print(f"Error in generate_3d_map: {str(e)}")
+            # Clean up any open figures
+            plt.close('all')
+            raise
+        
         return True
         
     def adjust_lon(self, lon, z):
@@ -376,7 +573,6 @@ class MapGenerator:
             # Save the figure and close it to prevent resource leaks
             plt.savefig(file_saved, bbox_inches='tight', dpi=250, format=self.file_format)
             upload_files_to_request_hash(self.request_hash, OUT_DIR+"/"+self.request_hash)
-            clean_directory(OUT_DIR+"/"+self.request_hash)
         except Exception as e:
             print(f"Error saving figure: {str(e)}")
         finally:
