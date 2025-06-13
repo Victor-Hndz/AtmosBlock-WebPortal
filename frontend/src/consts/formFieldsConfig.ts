@@ -244,25 +244,6 @@ export const FORM_FIELDS_CONFIG: FormFieldConfig[] = [
     defaultValue: false,
   },
   {
-    id: "nThreads",
-    name: "nThreads",
-    inputType: InputType.SWITCH,
-    tabPlace: TabPlace.ADDITIONAL_SETTINGS,
-    advancedField: true,
-    optionalField: true,
-    showInAdvancedMode: true,
-    label: "requests-form.nThreads",
-    tooltip: "requests-form.nThreadsTooltip",
-    defaultValue: false,
-    dependencies: [
-      {
-        field: "omp",
-        value: true,
-        condition: "equals",
-      },
-    ],
-  },
-  {
     id: "mpi",
     name: "mpi",
     inputType: InputType.SWITCH,
@@ -273,25 +254,6 @@ export const FORM_FIELDS_CONFIG: FormFieldConfig[] = [
     label: "requests-form.mpi",
     tooltip: "requests-form.mpiTooltip",
     defaultValue: false,
-  },
-  {
-    id: "nProces",
-    name: "nProces",
-    inputType: InputType.SWITCH,
-    tabPlace: TabPlace.ADDITIONAL_SETTINGS,
-    advancedField: true,
-    optionalField: true,
-    showInAdvancedMode: true,
-    label: "requests-form.nProces",
-    tooltip: "requests-form.nProcesTooltip",
-    defaultValue: false,
-    dependencies: [
-      {
-        field: "mpi",
-        value: true,
-        condition: "equals",
-      },
-    ],
   },
 ];
 

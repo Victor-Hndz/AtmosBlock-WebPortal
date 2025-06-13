@@ -327,7 +327,7 @@ export default function ResultsPage(): React.ReactElement {
                   </span>
                 )}
               </div>
-              <div className="text-sm font-medium text-slate-900">{Math.round(totalProgress)}%</div>
+              <div className="text-sm font-medium text-slate-900">{isComplete ? 100 : Math.round(totalProgress)}%</div>
             </div>
 
             <div className="relative overflow-hidden bg-slate-200 rounded-full h-2">
@@ -335,11 +335,11 @@ export default function ResultsPage(): React.ReactElement {
                 className={`h-full transition-all duration-200 ease-in-out ${
                   hasError ? "bg-red-500" : isComplete || progressComplete ? "bg-green-500" : "bg-blue-600"
                 }`}
-                style={{ width: `${totalProgress}%` }}
+                style={{ width: `${isComplete ? 100 : totalProgress}%` }}
               />
             </div>
 
-            {progressMessage && <p className="text-sm text-slate-600">{progressMessage}</p>}
+            {progressMessage && !isComplete && <p className="text-sm text-slate-600">{progressMessage}</p>}
           </div>
         </div>
       </section>

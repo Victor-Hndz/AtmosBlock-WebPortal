@@ -75,9 +75,9 @@ export const ProgressService = {
         return;
       }
 
-      if (callbacks.onError) {
-        callbacks.onError(error);
-      }
+      // if (callbacks.onError) {
+      //   callbacks.onError(error);
+      // }
 
       // Only close if we're still having issues (avoid closing during temporary disconnects)
       if (eventSource.readyState === EventSource.CLOSED) {

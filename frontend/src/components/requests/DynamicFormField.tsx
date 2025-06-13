@@ -88,6 +88,25 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
           right: value[3],
         });
       }
+      // If no value is set yet, initialize it with the default values
+      else if (!value || value.length === 0) {
+        // Parse default value from config or use standard values
+        let defaultCoords = ["90", "-180", "-90", "180"];
+        if (config.defaultValue && typeof config.defaultValue === "string") {
+          defaultCoords = config.defaultValue.split(',').map(v => v.trim());
+        }
+        
+        // Update form with default values
+        updateField(config.name, defaultCoords as any);
+        
+        // Update local state
+        setAreaCoords({
+          up: defaultCoords[0],
+          left: defaultCoords[1],
+          down: defaultCoords[2],
+          right: defaultCoords[3],
+        });
+      }
     }
     // Handle pressure levels as array
     if (config.name === "pressureLevels" && value) {
