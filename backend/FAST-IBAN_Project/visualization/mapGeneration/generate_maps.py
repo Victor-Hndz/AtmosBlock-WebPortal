@@ -165,7 +165,7 @@ class MapGenerator:
             self.generate_scatter_map()
             pass
         elif self.map_type == DataType.TYPE_COMB.value:
-            # self.generate_combined_map()
+            self.generate_combined_map()
             pass
         elif self.map_type == DataType.TYPE_FORMS.value:
             # self.generate_formations_map()
@@ -364,7 +364,146 @@ class MapGenerator:
             self.save_map(actual_date)
             
         except Exception as e:
-            print(f"Error in generate_contour_map: {str(e)}")
+            print(f"Error in generate_scatter_map: {str(e)}")
+            # Clean up any open figures
+            plt.close('all')
+            raise
+
+        return True
+     
+    def generate_combined_map(self):
+        print("Generando mapa combinado (disp + cont)...")
+        variable_type = None
+        
+        for key, value in VARIABLE_NAMES.items():
+            if self.variable_name.lower() == key.lower():
+                variable_type = value
+                
+        print(f"Variable: {self.variable_name} -> {variable_type}")
+        
+        if variable_type is None:
+            print("Error: variable no válida")
+            return
+
+        print(f"File name: {self.file_name}")
+        
+        try:
+            cont_ds = get_dataset(self.file_name)
+            disp_data = pd.read_csv(obtain_csv_files(self.request_hash, "selected"))
+            
+            dates_nc = date_from_nc(self.file_name)
+            corrected_dates = [from_nc_to_date(str(date)) for date in dates_nc]
+            actual_date = from_elements_to_date(self.year, self.month, self.day, self.hour)
+            
+            #from corrected_dates, obtain the index of the date that is equal to actual_date
+            if actual_date not in corrected_dates:
+                print(f"Error: la fecha {actual_date} no se encuentra en el archivo netCDF")
+                return
+            
+            time_index = corrected_dates.index(actual_date)
+            
+            # Extract coordinates and data using xarray for better performance
+            cont_lat = cont_ds.latitude.values
+            cont_lon = cont_ds.longitude.values
+            cont_variable = cont_ds[variable_type].values[time_index]
+            
+            # Ensure dataset is closed properly
+            cont_ds.close()
+            
+            #Filtrar los datos para el índice de tiempo actual
+            disp_data = disp_data[disp_data['time'] == time_index]
+             
+            disp_lat = disp_data['latitude'].copy()
+            disp_lon = disp_data['longitude'].copy()
+            disp_cluster = disp_data['cluster'].copy()
+            disp_variable = disp_data[variable_type].copy()
+            
+            # Ensure we have valid data in numpy arrays
+            disp_lat = disp_lat.to_numpy()
+            disp_lon = disp_lon.to_numpy()
+            disp_cluster = disp_cluster.to_numpy()
+            disp_variable = disp_variable.to_numpy()
+            
+            #Adjust variable
+            if variable_type == 'z':
+                # Convert geopotential height to meters
+                print("Converting geopotential height to meters...")
+                cont_variable = cont_variable / g_0
+            
+            # Ajustar valores mayores a 180 restando 360
+            if np.max(cont_lon) > 180:
+                cont_lon, cont_variable = self.adjust_lon(cont_lon, cont_variable)
+            
+            # Adapt lat,lon and variable to the selected area
+            lat_max, lon_min, lat_min, lon_max = self.area_covered
+            
+            lat_idx = np.nonzero((cont_lat >= lat_min) & (cont_lat <= lat_max))[0]
+            lon_idx = np.nonzero((cont_lon >= lon_min) & (cont_lon <= lon_max))[0]
+            
+            if len(lat_idx) == 0 or len(lon_idx) == 0:
+                print("Error: No data points within the specified area")
+                return
+            
+            cont_lat = cont_lat[lat_idx]
+            cont_lon = cont_lon[lon_idx]
+            cont_variable = cont_variable[..., lat_idx[:, None], lon_idx]  # broadcasting over lat/lon
+            
+            # Mask invalid values
+            cont_variable = ma.masked_invalid(cont_variable)
+            
+            # Calculate contour levels
+            vmin = np.nanmin(cont_variable) 
+            vmax = np.nanmax(cont_variable)
+            step = self.map_level
+            
+            if not np.isfinite(vmin) or not np.isfinite(vmax):
+                print("Error: Invalid data range (NaN or Inf values)")
+                return
+            
+            # Ensure we have a valid range for contours
+            cont_levels = np.arange(np.ceil(vmin/10)*10, vmax, step)
+            if len(cont_levels) < 2:
+                # Fallback if range is too small
+                cont_levels = np.linspace(vmin, vmax, 5)
+                
+            # print(f"Contour levels: {cont_levels}")
+            
+            # Generate the figure
+            fig, ax = self.config_map()
+            
+            co = ax.contour(cont_lon, cont_lat, cont_variable, levels=cont_levels, cmap='jet', 
+                        transform=ccrs.PlateCarree(), linewidths=1)
+            
+            plt.clabel(co, inline=True, fontsize=8)
+            
+            # Then draw scatter plot so it appears on top
+            sc = ax.scatter(
+                disp_lon,
+                disp_lat,
+                c=disp_variable,
+                cmap='jet',
+                s=8,
+                transform=ccrs.PlateCarree(),
+                linewidths=0.3,
+                edgecolors='black',
+                zorder=10  # Higher zorder ensures points are drawn on top
+            )
+            
+            # Enumerate cluster labels
+            for i, txt in enumerate(disp_cluster):
+                # Add text labels to the scatter points
+                ax.annotate(txt, (disp_lon[i], disp_lat[i]), fontsize=1, color='white', zorder=11)
+            
+            
+            #visual_adds
+            self.visual_adds(fig, ax, sc, self.map_type, variable_type, "v", actual_date)
+            
+            print("Map generated. Saving map...")
+            # Save the figure and close it to prevent resource leaks
+            self.save_map(actual_date)
+            
+        except Exception as e:
+            print(f"Error in generate_combined_map: {str(e)}")
             # Clean up any open figures
             plt.close('all')
             raise
