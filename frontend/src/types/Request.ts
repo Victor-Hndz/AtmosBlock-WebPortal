@@ -69,6 +69,8 @@ export interface UserRequest {
     east: number;
     west: number;
   };
+  mapTypes: string[];
+  mapLevels?: string[];
   format?: string;
   status: RequestStatus;
   timesRequested?: number;
@@ -115,6 +117,22 @@ export function hasSameContent(req1: UserRequest, req2: UserRequest): boolean {
 
   // Compare optional fields if present
   if (req1.format !== req2.format) return false;
+
+  // Compare map types
+  if (req1.mapTypes.length !== req2.mapTypes.length) return false;
+  for (let i = 0; i < req1.mapTypes.length; i++) {
+    if (req1.mapTypes[i] !== req2.mapTypes[i]) return false;
+  }
+
+  // Compare map levels if present
+  if (req1.mapLevels && req2.mapLevels) {
+    if (req1.mapLevels.length !== req2.mapLevels.length) return false;
+    for (let i = 0; i < req1.mapLevels.length; i++) {
+      if (req1.mapLevels[i] !== req2.mapLevels[i]) return false;
+    }
+  } else if (req1.mapLevels || req2.mapLevels) {
+    return false;
+  }
 
   return true;
 }
@@ -175,6 +193,8 @@ function fromUserRequestsReturnedToUserRequest(returned: UserRequestsReturned): 
       east: parseInt(returned.areaCovered[2]),
       west: parseInt(returned.areaCovered[3]),
     },
+    mapTypes: returned.mapTypes,
+    mapLevels: returned.mapLevels,
     format: returned.fileFormat || undefined,
     status: returned.requestStatus,
     timesRequested: returned.timesRequested,

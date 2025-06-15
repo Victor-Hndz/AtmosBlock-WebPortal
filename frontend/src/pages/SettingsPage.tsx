@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import * as Dialog from "@radix-ui/react-dialog";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { Navigate, useNavigate } from "react-router-dom";
 import {
@@ -13,6 +14,7 @@ import {
   AlertCircle,
   ExternalLink,
   Download,
+  X,
 } from "lucide-react";
 import { Tooltip } from "@/components/ui/Tooltip";
 import * as Collapsible from "@radix-ui/react-collapsible";
@@ -139,6 +141,7 @@ const RequestItem: React.FC<RequestItemProps> = ({ group, formRequest }) => {
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState<"error" | "success" | "info" | "warning">("info");
+  const [showMapTypesPopup, setShowMapTypesPopup] = useState(false);
   const { request, count } = group;
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -203,6 +206,45 @@ const RequestItem: React.FC<RequestItemProps> = ({ group, formRequest }) => {
 
   return (
     <div className="border rounded-md overflow-hidden mb-4">
+      {/* Map types dialog using Radix UI */}
+      <Dialog.Root open={showMapTypesPopup} onOpenChange={setShowMapTypesPopup}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black/30 backdrop-blur-[2px]" />
+          <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg p-6 w-[90vw] max-w-md max-h-[80vh] overflow-auto focus:outline-none z-50 shadow-xl">
+            <Dialog.Title className="font-medium mb-3">{t("requests.allMapTypes")}</Dialog.Title>
+            <Dialog.Description className="sr-only">
+              {t("requests.allMapTypesDescription", "List of all map types for this request")}
+            </Dialog.Description>
+
+            <ul className="space-y-2">
+              {request.mapTypes.map((type, index) => (
+                <li key={index} className="border-b pb-1 last:border-0">
+                  {t(`mapTypes-list.${type.toLowerCase()}`, "Type not found")}
+                </li>
+              ))}
+            </ul>
+
+            <Dialog.Close asChild>
+              <button
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full"
+                aria-label={t("common.close")}
+              >
+                {t("common.close")}
+              </button>
+            </Dialog.Close>
+
+            <Dialog.Close asChild>
+              <button
+                className="absolute top-3 right-3 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label={t("common.close")}
+              >
+                <X size={18} />
+              </button>
+            </Dialog.Close>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
       <Collapsible.Root open={isOpen} onOpenChange={setIsOpen}>
         <Collapsible.Trigger asChild>
           <div className="flex flex-col md:flex-row md:justify-between md:items-center p-4 bg-white cursor-pointer hover:bg-gray-50">
@@ -256,7 +298,7 @@ const RequestItem: React.FC<RequestItemProps> = ({ group, formRequest }) => {
                 {request.pressureLevels.length === 1 ? (
                   <p>{request.pressureLevels} hPa</p>
                 ) : (
-                  <p>{request.pressureLevels.join("500hPa, ")}</p>
+                  <p>{request.pressureLevels.join("hPa, ")}</p>
                 )}
               </div>
 
@@ -264,6 +306,32 @@ const RequestItem: React.FC<RequestItemProps> = ({ group, formRequest }) => {
                 <p className="text-sm text-gray-500">{t("requests.areaCovered")}</p>
                 <p>{formatArea(request.areaCovered)}</p>
               </div>
+
+              <div>
+                <p className="text-sm text-gray-500">{t("requests.mapTypes")}</p>
+                {request.mapTypes.length === 1 ? (
+                  <p>{t(`mapTypes-list.${request.mapTypes[0].toLowerCase()}`, "Type not found")}</p>
+                ) : (
+                  <p className="flex items-center">
+                    <button
+                      className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded hover:bg-blue-200"
+                      onClick={e => {
+                        e.stopPropagation();
+                        setShowMapTypesPopup(true);
+                      }}
+                    >
+                      {t("common.viewAll")} ({request.mapTypes.length})
+                    </button>
+                  </p>
+                )}
+              </div>
+
+              {request.mapLevels && (
+                <div>
+                  <p className="text-sm text-gray-500">{t("requests.mapLevels")}</p>
+                  <p>{request.mapLevels}</p>
+                </div>
+              )}
 
               {request.format && (
                 <div>

@@ -85,11 +85,14 @@
     "reviewBeforeSubmit": "Please review your request details before submitting:"
   },
   "requests": {
+    "allMapTypes": "All Map Types",
     "details": "Request Details",
     "variableName": "Variable Name",
     "date": "Date",
     "pressureLevels": "Pressure Levels",
     "areaCovered": "Area Covered",
+    "mapTypes": "Map Types",
+    "mapLevels": "Map Levels",
     "format": "Format",
     "status": "Status",
     "created": "Created",
@@ -236,7 +239,9 @@
   },
   "common": {
     "loading": "Loading...",
-    "none": "None"
+    "none": "None",
+    "viewAll": "View All",
+    "close": "Close"
   },
   "home": {
     "hero": {

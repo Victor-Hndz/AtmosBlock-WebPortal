@@ -85,11 +85,14 @@
     "reviewBeforeSubmit": "Por favor, revisa los detalles de tu solicitud antes de enviar:"
   },
   "requests": {
+    "allMapTypes": "Todos los Tipos de Mapa",
     "details": "Detalles de la Solicitud",
     "variableName": "Nombre de la Variable",
     "date": "Fecha",
     "pressureLevels": "Niveles de Presión",
     "areaCovered": "Área Cubierta",
+    "mapTypes": "Tipos de Mapa",
+    "mapLevels": "Niveles de Mapa",
     "format": "Formato",
     "status": "Estado",
     "created": "Creado",
@@ -236,7 +239,9 @@
   },
   "common": {
     "loading": "Cargando...",
-    "none": "Ninguno"
+    "none": "Ninguno",
+    "viewAll": "Ver Todo",
+    "close": "Cerrar"
   },
   "home": {
     "hero": {
