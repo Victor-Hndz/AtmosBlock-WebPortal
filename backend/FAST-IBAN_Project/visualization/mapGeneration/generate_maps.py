@@ -168,7 +168,7 @@ class MapGenerator:
             self.generate_combined_map()
             pass
         elif self.map_type == DataType.TYPE_FORMS.value:
-            # self.generate_formations_map()
+            self.generate_formations_map()
             pass
         elif self.map_type == DataType.TYPE_3D.value:
             self.generate_3d_surface_map()
@@ -504,6 +504,237 @@ class MapGenerator:
             
         except Exception as e:
             print(f"Error in generate_combined_map: {str(e)}")
+            # Clean up any open figures
+            plt.close('all')
+            raise
+
+        return True
+     
+    def generate_formations_map(self):
+        print("Generando mapa de formaciones...")
+        variable_type = None
+        
+        for key, value in VARIABLE_NAMES.items():
+            if self.variable_name.lower() == key.lower():
+                variable_type = value
+                
+        print(f"Variable: {self.variable_name} -> {variable_type}")
+        
+        if variable_type is None:
+            print("Error: variable no válida")
+            return
+
+        # print(f"File name: {self.file_name}")
+        
+        try:
+            select_data = pd.read_csv(obtain_csv_files(self.request_hash, "selected"))
+            forms_data = pd.read_csv(obtain_csv_files(self.request_hash, "formations"))
+            dates_nc = date_from_nc(self.file_name)
+            corrected_dates = [from_nc_to_date(str(date)) for date in dates_nc]
+            actual_date = from_elements_to_date(self.year, self.month, self.day, self.hour)
+            
+            #from corrected_dates, obtain the index of the date that is equal to actual_date
+            if actual_date not in corrected_dates:
+                print(f"Error: la fecha {actual_date} no se encuentra en el archivo netCDF")
+                return
+            
+            time_index = corrected_dates.index(actual_date)
+            
+            #Filtrar los datos para el índice de tiempo actual
+            select_data = select_data[select_data['time'] == time_index]
+             
+            s_lat = select_data['latitude'].copy()
+            s_lon = select_data['longitude'].copy()
+            s_cluster = select_data['cluster'].copy()
+            s_type = select_data['type'].copy()
+            s_variable = select_data[variable_type].copy()
+            
+            #Filtrar los datos de formaciones para el índice de tiempo actual
+            forms_data = forms_data[forms_data['time'] == time_index]
+            max_ids = forms_data['max_id'].copy()
+            min1_ids = forms_data['min1_id'].copy()
+            min2_ids = forms_data['min2_id'].copy()
+            f_types = forms_data['type'].copy()
+            
+            Points = namedtuple('Points', ['lat', 'lon', 'var', 'cluster', 'type'])
+            Formations = namedtuple('Formations', ['max', 'min1', 'min2', 'type'])
+            
+            formations_array = []
+            
+            for max_id, min1_id, min2_id, f_type in zip(max_ids, min1_ids, min2_ids, f_types):
+                max_points = [Points(lat, lon, var, clus, t) for lat, lon, var, clus, t in zip(s_lat, s_lon, s_variable, s_cluster, s_type) if clus == max_id]
+                min1_points = [Points(lat, lon, var, clus, t) for lat, lon, var, clus, t in zip(s_lat, s_lon, s_variable, s_cluster, s_type) if clus == min1_id]
+                min2_points = [Points(lat, lon, var, clus, t) for lat, lon, var, clus, t in zip(s_lat, s_lon, s_variable, s_cluster, s_type) if clus == min2_id] if f_type == 'OMEGA' else None
+        
+                formations_array.append(Formations(max_points, min1_points, min2_points, f_type))
+        
+            dataset_nc = get_dataset(self.file_name)
+            
+             # Extract coordinates and data using xarray for better performance
+            nc_lat = dataset_nc.latitude.values
+            nc_lon = dataset_nc.longitude.values
+            nc_variable = dataset_nc[variable_type].values[time_index]
+            
+            # Ensure dataset is closed properly
+            dataset_nc.close()
+            
+            #Adjust variable
+            if variable_type == 'z':
+                # Convert geopotential height to meters
+                print("Converting geopotential height to meters...")
+                nc_variable = nc_variable / g_0
+           
+            
+            # Ajustar valores mayores a 180 restando 360
+            if np.max(nc_lon) > 180:
+                nc_lon, nc_variable = self.adjust_lon(nc_lon, nc_variable)
+            
+            # Adapt lat,lon and variable to the selected area
+            lat_max, lon_min, lat_min, lon_max = self.area_covered
+            
+            lat_idx = np.nonzero((nc_lat >= lat_min) & (nc_lat <= lat_max))[0]
+            lon_idx = np.nonzero((nc_lon >= lon_min) & (nc_lon <= lon_max))[0]
+            
+            if len(lat_idx) == 0 or len(lon_idx) == 0:
+                print("Error: No data points within the specified area")
+                return
+            
+            nc_lat = nc_lat[lat_idx]
+            nc_lon = nc_lon[lon_idx]
+            nc_variable = nc_variable[..., lat_idx[:, None], lon_idx]  # broadcasting over lat/lon
+            
+            # Mask invalid values
+            nc_variable = ma.masked_invalid(nc_variable)
+            
+            # Generate the figure
+            fig, ax = self.config_map()
+            
+            # Calculate contour levels
+            vmin = np.nanmin(nc_variable) 
+            vmax = np.nanmax(nc_variable)
+            step = self.map_level
+            
+            if not np.isfinite(vmin) or not np.isfinite(vmax):
+                print("Error: Invalid data range (NaN or Inf values)")
+                return
+            
+            co = None
+            
+            for formation in formations_array:
+                all_points = []
+                for points in [formation.max, formation.min1, formation.min2]:
+                    if points:
+                        latitude = [p.lat for p in points]
+                        longitude = [p.lon for p in points]
+                        ids = [p.cluster for p in points]
+                        type = [p.type for p in points]
+                        
+                        # Dibujar los puntos en el scatter plot
+                        for i, t in enumerate(type):
+                            color = 'red' if t == 'MAX' else 'blue'
+                            sc = ax.scatter(longitude, latitude, c=color, s=8, 
+                                    transform=ccrs.PlateCarree(), 
+                                    linewidths=0.3, edgecolors='black', zorder=10
+                            )
+
+                        all_points.extend(zip(latitude, longitude))
+                        
+                        # Encontrar la posición más arriba a la derecha
+                        max_lat_idx = np.argmax(latitude)
+                        max_lat = latitude[max_lat_idx]
+                        corresponding_lon = longitude[max_lat_idx]
+                        
+                        margin = 0.5
+                        
+                        # Anotar el ID del grupo en la posición media
+                        num = ax.annotate(
+                            ids[0], 
+                            xy=(corresponding_lon + margin, max_lat + margin), 
+                            fontsize=6, 
+                            ha='left', color='white', transform=ccrs.PlateCarree(), zorder=11
+                        )
+                        plt.setp(
+                            num, 
+                            path_effects=[path_effects.Stroke(linewidth=1, foreground='black'), 
+                                path_effects.Normal()]
+                        )
+                        
+                if all_points:
+                    lon_points = [point[1] for point in all_points]
+                    
+                    if(abs(min(lon_points) - max(lon_points)) >= 180):
+                        norm_points = [(lat, lon + 360 if lon < 0 else lon) for lat, lon in all_points]
+                        lats, lons = zip(*norm_points) 
+                        points = np.array(norm_points)
+                    else:
+                        lats, lons = zip(*all_points)
+                        points = np.array(all_points)
+                    
+                    min_lat, max_lat = min(lats), max(lats)
+                    min_lon, max_lon = min(lons), max(lons)
+                    padding = 0.3
+                    
+                    hull = ConvexHull(points)
+                    polygon_points = points[hull.vertices]
+                    centroid = np.mean(polygon_points, axis=0)
+                    polygon_points = polygon_points + padding * (polygon_points - centroid)
+                    
+                    # Trazar el polígono
+                    ax.plot(polygon_points[:, 1], polygon_points[:, 0], 
+                            color='black', linewidth=0.75, 
+                            transform=ccrs.PlateCarree(), zorder=10
+                    )
+                    ax.plot([polygon_points[0, 1], polygon_points[-1, 1]], 
+                            [polygon_points[0, 0], polygon_points[-1, 0]], 
+                            color='black', linewidth=0.75, transform=ccrs.PlateCarree(), 
+                            zorder=10
+                    )
+                    
+                    # Anotar el tipo de la formación en el mapa
+                    mid_lat = (min_lat + max_lat) / 2
+                    mid_lon = (min_lon + max_lon) / 2
+                    
+                    if mid_lon >= 170:
+                        mid_lon = 170
+                    
+                    if formation.type == 'OMEGA':
+                        an_xy = (mid_lon, mid_lat - 8)
+                    else:
+                        an_xy = (mid_lon, mid_lat)
+                        
+                    type_an = ax.annotate(formation.type, an_xy, fontsize=4, ha='center', 
+                                          color='white', transform=ccrs.PlateCarree(), zorder=13)
+                    plt.setp(type_an, 
+                             path_effects=[path_effects.Stroke(linewidth=1, foreground='black'), 
+                                           path_effects.Normal()]
+                    )
+            
+            #Valor entre los contornos
+            cont_levels = np.arange(np.ceil(vmin/10)*10, vmax, step)
+            if len(cont_levels) < 2:
+                # Fallback if range is too small
+                cont_levels = np.linspace(vmin, vmax, 5)
+                
+            co = ax.contour(nc_lon, nc_lat, nc_variable, levels=cont_levels, cmap='jet', 
+                            transform=ccrs.PlateCarree(), vmax=s_variable.max(), 
+                            vmin=s_variable.min(), linewidths=0.5, zorder=7
+                            )
+            
+            # Valores de contorno
+            cont_txt = plt.clabel(co, inline=True, fontsize=4, zorder=8)
+            plt.setp(cont_txt, path_effects=[path_effects.Stroke(linewidth=0.5, foreground='white'), 
+                                             path_effects.Normal()]
+                    )
+
+            # Visual adds
+            self.visual_adds(fig, ax, co, self.map_type, variable_type, "v", actual_date)
+            
+            print("Map generated. Saving map...")
+            # Save the figure and close it to prevent resource leaks
+            self.save_map(actual_date)
+        
+        except Exception as e:
+            print(f"Error in generate_formations_map: {str(e)}")
             # Clean up any open figures
             plt.close('all')
             raise
