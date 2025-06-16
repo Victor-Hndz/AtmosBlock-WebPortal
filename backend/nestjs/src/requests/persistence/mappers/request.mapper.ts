@@ -9,8 +9,10 @@ import { GeneratedFilesMapper } from "@/generatedFiles/persistence/mappers/gener
 export class RequestMapper {
   /**
    * Maps a persistence entity to a domain entity
+   * @param requestEntity The entity to map
+   * @param includeUsers Whether to include full user objects (default: true)
    */
-  static toDomain(requestEntity: RequestEntity): Request {
+  static toDomain(requestEntity: RequestEntity, includeUsers: boolean = true): Request {
     return new Request({
       id: requestEntity.id,
       requestHash: requestEntity.requestHash,
@@ -34,7 +36,12 @@ export class RequestMapper {
       timesRequested: requestEntity.timesRequested,
       createdAt: requestEntity.createdAt,
       updatedAt: requestEntity.updatedAt,
-      user: requestEntity.user ? UserMapper.toDomain(requestEntity.user) : undefined,
+      // Only map users if specifically requested
+      users: includeUsers && requestEntity.users 
+        ? requestEntity.users.map(user => {
+            return UserMapper.toDomain(user, false);
+          }) 
+        : [],
       generatedFiles: requestEntity.generatedFiles
         ? GeneratedFilesMapper.toDomain(requestEntity.generatedFiles)
         : undefined,
@@ -67,7 +74,13 @@ export class RequestMapper {
     persistenceRequest.nThreads = request.nThreads;
     persistenceRequest.nProces = request.nProces;
     persistenceRequest.timesRequested = request.timesRequested;
-    persistenceRequest.user = request.user ? UserMapper.toPersistence(request.user) : undefined;
+    
+    if (request.users && request.users.length > 0) {
+      persistenceRequest.users = request.users.map(user => {
+        return UserMapper.toPersistence(user, false);
+      });
+    }
+    
     persistenceRequest.generatedFiles = request.generatedFiles
       ? GeneratedFilesMapper.toPersistence(request.generatedFiles)
       : undefined;

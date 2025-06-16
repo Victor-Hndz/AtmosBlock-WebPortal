@@ -6,6 +6,7 @@ import {
   ManyToOne,
   JoinColumn,
   UpdateDateColumn,
+  ManyToMany,
 } from "typeorm";
 import { GeneratedFilesEntity } from "@/generatedFiles/persistence/entities/generatedFiles.entity";
 import { UserEntity } from "@/users/persistence/entities/user.entity";
@@ -83,9 +84,8 @@ export class RequestEntity {
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
-  @ManyToOne(() => UserEntity, user => user.requests, { onDelete: "SET NULL", nullable: true })
-  @JoinColumn({ name: "user_id" })
-  user?: UserEntity;
+  @ManyToMany(() => UserEntity, user => user.requests)
+  users?: UserEntity[];
 
   @ManyToOne(() => GeneratedFilesEntity, generatedFiles => generatedFiles.requests, {
     onDelete: "SET NULL",

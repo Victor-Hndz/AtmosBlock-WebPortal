@@ -32,7 +32,11 @@ export class RequestsService {
   }
 
   async findAllByUser(userId: string): Promise<Request[]> {
-    return this.requestRepository.findByUserId(userId);
+    const user = await this.usersService.findOneWithRequests(userId);
+    if (!user.requests || user.requests.length === 0) {
+      return [];
+    }
+    return user.requests;
   }
 
   async findOne(id: string): Promise<Request> {
@@ -64,10 +68,38 @@ export class RequestsService {
 
     // Check if the request already exists
     const existingRequest = await this.requestRepository.findByRequestHash(requestHash);
+
+    let request = existingRequest;
+
     this.logger.log(`Existing request: ${JSON.stringify(existingRequest)}`);
     if (existingRequest !== null && existingRequest.requestStatus === requestStatus.CACHED) {
       // If it exists, increment the timesRequested
       existingRequest.timesRequested += 1;
+
+      // If a user ID is provided, associate the request with the user
+      if (createRequestDto.userId) {
+        const user = await this.usersService.findOneWithRequests(createRequestDto.userId);
+
+        if (!existingRequest.users) {
+          existingRequest.users = [];
+        }
+
+        const userAlreadyAssociated = existingRequest.users.some(u => u.id === user.id);
+
+        if (!userAlreadyAssociated) {
+          existingRequest.users.push(user);
+          this.logger.log(`User ${user.id} associated with existing request ${requestHash}`);
+        }
+
+        if (!user.requests) {
+          user.requests = [];
+        }
+
+        if (!user.requests.some(req => req.requestHash === requestHash)) {
+          user.requests.push(existingRequest);
+          await this.usersService.updateRequests(user);
+        }
+      }
 
       await this.requestRepository.update(existingRequest);
 
@@ -87,10 +119,27 @@ export class RequestsService {
       return JSON.stringify(message);
     } else if (existingRequest === null) {
       const createRequest = createRequestDto.toRequest();
+
       if (createRequestDto.userId) {
-        createRequest.user = await this.usersService.findOne(createRequestDto.userId);
+        const user = await this.usersService.findOne(createRequestDto.userId);
+        createRequest.users = [user];
       }
-      await this.requestRepository.create(createRequest);
+
+      request = await this.requestRepository.create(createRequest);
+
+      if (createRequestDto.userId) {
+        const existingUser = await this.usersService.findOneWithRequests(createRequestDto.userId);
+
+        if (!existingUser.requests) {
+          existingUser.requests = [];
+        }
+
+        if (!existingUser.requests.some(req => req.requestHash === requestHash)) {
+          existingUser.requests.push(request);
+          await this.usersService.updateRequests(existingUser);
+          this.logger.log(`User ${existingUser.id} updated with new request ${requestHash}`);
+        }
+      }
     }
 
     //If not exists and cached, emit a message to RabbitMQ for processing

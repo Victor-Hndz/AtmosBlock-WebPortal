@@ -15,7 +15,7 @@ export class TypeOrmUserRepository implements IUserRepository {
 
   async findAll(): Promise<User[]> {
     const userEntities = await this.userRepository.find();
-    return userEntities.map(UserMapper.toDomain);
+    return userEntities.map(entity => UserMapper.toDomain(entity));
   }
 
   async findOne(id: string): Promise<User> {
@@ -87,6 +87,6 @@ export class TypeOrmUserRepository implements IUserRepository {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    return UserMapper.toDomain(userEntity);
+    return UserMapper.toDomain(userEntity, true);
   }
 }

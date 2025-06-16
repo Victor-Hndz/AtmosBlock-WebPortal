@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Request } from "@/requests/domain/entities/request.entity";
@@ -27,18 +27,27 @@ export class TypeOrmRequestRepository implements IRequestRepository {
   }
 
   async findByRequestHash(requestHash: string): Promise<Request | null> {
-    const requestEntity = await this.requestRepository.findOneBy({ requestHash });
+    const requestEntity = await this.requestRepository.findOne({
+      where: { requestHash },
+      relations: ["users", "generatedFiles"],
+    });
     if (!requestEntity) {
       return null;
     }
     return RequestMapper.toDomain(requestEntity);
   }
 
+  async findAllByRequestHashes(requestHashes: string[]): Promise<Request[]> {
+    const requestEntities = await this.requestRepository.findBy({ requestHash: In(requestHashes) });
+    return requestEntities.map(requestEntity => RequestMapper.toDomain(requestEntity));
+  }
+
   async findByUserId(userId: string): Promise<Request[]> {
-    const requestEntities = await this.requestRepository.find({
-      where: { user: { id: userId } },
-      relations: ["user"],
-    });
+    const requestEntities = await this.requestRepository
+      .createQueryBuilder("request")
+      .innerJoin("request.users", "user", "user.id = :userId", { userId })
+      .getMany();
+
     return requestEntities.map(requestEntity => RequestMapper.toDomain(requestEntity));
   }
 

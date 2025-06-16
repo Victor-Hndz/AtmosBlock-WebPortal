@@ -52,12 +52,28 @@ export class UsersService {
     return updatedUser;
   }
 
+  async updateRequests(existingUser: User): Promise<User> {
+    return this.userRepository.update(existingUser);
+  }
+
   async remove(id: string): Promise<void> {
     return this.userRepository.remove(id);
   }
 
   async findOneWithRequests(id: string): Promise<User> {
     return this.userRepository.findOneWithRequests(id);
+  }
+
+  async getRequestHashesByUserId(userId: string): Promise<string[]> {
+    const user = await this.userRepository.findOneWithRequests(userId);
+
+    if (!user) {
+      throw new Error(`User with ID ${userId} not found`);
+    }
+    if (!user.requests || user.requests.length === 0) {
+      return [];
+    }
+    return user.requests.map(request => request.requestHash);
   }
 
   async updateProfile(id: string, updateProfileDto: UpdateProfileDto): Promise<User> {

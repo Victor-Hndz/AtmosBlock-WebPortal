@@ -28,7 +28,7 @@ export class Request {
   timesRequested: number;
   createdAt: Date;
   updatedAt: Date;
-  user?: User;
+  users?: User[];
   generatedFiles: GeneratedFiles;
 
   constructor(props: Partial<Request>) {
