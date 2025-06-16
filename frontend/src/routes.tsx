@@ -83,11 +83,9 @@ function AppRoutes(): JSX.Element {
         {
           path: "results",
           element: (
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback />}>
-                <ResultsPage />
-              </Suspense>
-            </ProtectedRoute>
+            <Suspense fallback={<LoadingFallback />}>
+              <ResultsPage />
+            </Suspense>
           ),
         },
         {

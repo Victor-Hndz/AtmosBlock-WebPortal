@@ -12,7 +12,6 @@ export class GeneratedFilesController {
   constructor(private readonly generatedFilesService: GeneratedFilesService) {}
 
   @Get(":requestHash")
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get all result files for a request" })
   @ApiParam({ name: "requestHash", description: "The hash of the request to get files for" })

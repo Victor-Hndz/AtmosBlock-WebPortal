@@ -2,6 +2,7 @@ export const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/ap
 
 export const API_URL_AUTH = `${API_URL}/auth`;
 export const API_URL_REQUESTS = `${API_URL}/requests`;
+export const API_URL_REQUESTS_NO_AUTH = `${API_URL}/requests/process`;
 export const API_URL_USERS = `${API_URL}/users`;
 
 export const API_URL_AUTH_LOGIN = `${API_URL_AUTH}/login`;

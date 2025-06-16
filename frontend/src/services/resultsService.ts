@@ -24,16 +24,10 @@ export const ResultsService = {
    */
   getResultFiles: async (requestHash: string): Promise<ResultsData> => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
-
       // Use the correct API endpoint to get results
       const response = await fetch(`${API_URL}/results/${requestHash}`, {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
