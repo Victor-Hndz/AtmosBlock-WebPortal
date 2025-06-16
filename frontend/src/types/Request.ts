@@ -157,12 +157,12 @@ export function groupRequestsByContent(requests: UserRequestsReturned[]): Reques
     if (processedIndices.has(i)) continue;
 
     const currentRequest = fromUserRequestsReturnedToUserRequest(sortedRequests[i]);
-    let count = currentRequest.timesRequested ?? 1; // Default to 1 if not specified
+    let count = 1; // Default to 1 if not specified
 
     // Check remaining requests for matches
     for (let j = i + 1; j < sortedRequests.length; j++) {
       if (hasSameContent(currentRequest, fromUserRequestsReturnedToUserRequest(sortedRequests[j]))) {
-        count += sortedRequests[j].timesRequested ?? 1; // Add count from matching request
+        count += 1;
         processedIndices.add(j);
       }
     }
