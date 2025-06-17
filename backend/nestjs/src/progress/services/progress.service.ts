@@ -47,7 +47,7 @@ export class ProgressService {
       return;
     }
 
-    this.actualProgress += progressEvent.increment * 6;
+    this.actualProgress += progressEvent.increment * 4;
     // Cap at MAX_PROGRESS
     if (this.actualProgress > MAX_PROGRESS) {
       this.actualProgress = MAX_PROGRESS;
