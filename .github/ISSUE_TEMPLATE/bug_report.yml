@@ -1,0 +1,29 @@
+name: Error
+description: Algo no funciona como debería en el portal o en el algoritmo.
+labels: [bug]
+body:
+  - type: textarea
+    id: que-ocurre
+    attributes:
+      label: Qué ocurre
+      description: Qué esperabas y qué ha pasado.
+    validations:
+      required: true
+  - type: textarea
+    id: reproducir
+    attributes:
+      label: Cómo reproducirlo
+      placeholder: |
+        1. …
+        2. …
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Versión o commit
+  - type: textarea
+    id: entorno
+    attributes:
+      label: Entorno
+      description: Sistema operativo, navegador, versión de Docker…
