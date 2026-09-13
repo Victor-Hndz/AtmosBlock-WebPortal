@@ -1,0 +1,2 @@
+# Finales de línea LF en el repositorio (evita errores de prettier y scripts .sh rotos al clonar en Windows)
+* text=auto eol=lf
