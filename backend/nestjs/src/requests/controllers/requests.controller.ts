@@ -66,10 +66,13 @@ export class RequestsController {
   }
 
   @Post("process")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: "Process a request" })
   @ApiResponse({ status: 201, description: "Request processed successfully." })
-  async launchRequest(@Body() request: CreateRequestDto) {
-    const response = await this.requestsService.create(request);
-    return response;
+  @ApiResponse({ status: 401, description: "Authentication required." })
+  async launchRequest(@Body() request: CreateRequestDto, @CurrentUser("id") userId: string) {
+    request.userId = userId;
+    return this.requestsService.create(request);
   }
 }

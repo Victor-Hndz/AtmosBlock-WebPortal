@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { RequestForm } from "@/types/Request";
-import { API_URL_REQUESTS, API_URL_REQUESTS_NO_AUTH } from "@/consts/apiConsts";
+import { API_URL_REQUESTS } from "@/consts/apiConsts";
 
 interface SubmitRequestsState {
   form: RequestForm;
@@ -36,26 +36,19 @@ export const submitRequest = createAsyncThunk(
   async (requestData: RequestForm, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      let response;
 
       if (!token) {
-        response = await fetch(API_URL_REQUESTS_NO_AUTH, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
-        });
-      } else {
-        response = await fetch(API_URL_REQUESTS, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
-        });
+        return rejectWithValue("You must be logged in to submit a request");
       }
+
+      const response = await fetch(API_URL_REQUESTS, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+      });
 
       if (!response.ok) {
         const error = await response.json();
