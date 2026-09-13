@@ -11,7 +11,7 @@ interface RequestSummaryProps {
 
 const formatMonths = (months: string[] | undefined, t: TFunction): string => {
   return extractMonthNames(months ?? [])
-    .map(month => t(`months-list.${month.toLowerCase()}` as any))
+    .map(month => t(`months-list.${month.toLowerCase()}`, `months-list.${month.toLowerCase()}`))
     .join(", ");
 };
 
@@ -52,7 +52,9 @@ const formatAreaCovered = (area: string[] | undefined, t: TFunction): string => 
 
 const formatMapTypes = (mapTypes: string[] | undefined, t: TFunction): string => {
   if (!mapTypes || mapTypes.length === 0) return t("common.none");
-  return mapTypes.map(type => t(`mapTypes-list.${type.toLowerCase()}` as any)).join(", ");
+  return mapTypes
+    .map(type => t(`mapTypes-list.${type.toLowerCase()}`, `mapTypes-list.${type.toLowerCase()}`))
+    .join(", ");
 };
 
 /**

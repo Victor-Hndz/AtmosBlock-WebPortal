@@ -70,10 +70,13 @@ const submitRequestsSlice = createSlice({
     clearRequestsError: state => {
       state.error = null;
     },
-    updateFormField: (state, action: PayloadAction<{ field: keyof RequestForm; value: any }>) => {
+    updateFormField: (
+      state,
+      action: PayloadAction<{ field: keyof RequestForm; value: RequestForm[keyof RequestForm] }>
+    ) => {
       const { field, value } = action.payload;
       if (state.form) {
-        state.form[field] = value;
+        (state.form as Record<keyof RequestForm, RequestForm[keyof RequestForm]>)[field] = value;
       }
     },
     clearRequestHash: state => {

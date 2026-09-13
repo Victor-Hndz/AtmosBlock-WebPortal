@@ -27,7 +27,7 @@ import { capitalize } from "@/utils/utilities";
 
 interface DynamicFormFieldProps {
   config: FormFieldConfig;
-  value: any;
+  value: RequestForm[keyof RequestForm];
   error?: string;
   formData: RequestForm;
   updateField: <K extends keyof RequestForm>(field: K, value: RequestForm[K]) => void;
@@ -37,6 +37,8 @@ interface DynamicFormFieldProps {
     checked: boolean | "indeterminate"
   ) => void;
 }
+
+type DateField = "years" | "months" | "days" | "hours";
 
 /**
  * Dynamic form field component that renders different input types based on configuration
@@ -51,7 +53,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
 }) => {
   const { t } = useTranslation();
   const [isMultiselectOpen, setIsMultiselectOpen] = useState(false);
-  const [activeDatePopover, setActiveDatePopover] = useState<"years" | "months" | "days" | "hours" | null>(null);
+  const [activeDatePopover, setActiveDatePopover] = useState<DateField | null>(null);
   const [useDefaultArea, setUseDefaultArea] = useState(true);
 
   // Area Input state
@@ -89,7 +91,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
         });
       }
       // If no value is set yet, initialize it with the default values
-      else if (!value || value.length === 0) {
+      else if (!value || (Array.isArray(value) && value.length === 0)) {
         // Parse default value from config or use standard values
         let defaultCoords = ["90", "-180", "-90", "180"];
         if (config.defaultValue && typeof config.defaultValue === "string") {
@@ -97,7 +99,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
         }
 
         // Update form with default values
-        updateField(config.name, defaultCoords as any);
+        updateField(config.name, defaultCoords);
 
         // Update local state
         setAreaCoords({
@@ -113,11 +115,11 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
       // If it's a string, convert to array format
       if (typeof value === "string") {
         const pressureArray = value.split(",").map(v => v.trim());
-        updateField("pressureLevels", pressureArray as any);
+        updateField("pressureLevels", pressureArray);
       }
       // If it's empty, initialize with empty array
       else if (!Array.isArray(value)) {
-        updateField("pressureLevels", [] as any);
+        updateField("pressureLevels", []);
       }
     }
   }, [config.inputType, config.name, value, config.defaultValue, updateField]);
@@ -158,7 +160,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
   const handleAreaCoordsChange = (key: keyof typeof areaCoords, val: string) => {
     const newCoords = { ...areaCoords, [key]: val };
     setAreaCoords(newCoords);
-    updateField(config.name, [newCoords.up, newCoords.left, newCoords.down, newCoords.right] as any);
+    updateField(config.name, [newCoords.up, newCoords.left, newCoords.down, newCoords.right]);
   };
 
   const toggleDefaultArea = (checked: boolean) => {
@@ -171,9 +173,9 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
       }
       // Default to standard coordinates if no default provided
       const fallbackDefault = ["90", "-180", "-90", "180"];
-      updateField(config.name, (defaultValue || fallbackDefault) as any);
+      updateField(config.name, defaultValue || fallbackDefault);
     } else {
-      updateField(config.name, [areaCoords.up, areaCoords.left, areaCoords.down, areaCoords.right] as any);
+      updateField(config.name, [areaCoords.up, areaCoords.left, areaCoords.down, areaCoords.right]);
     }
   };
 
@@ -185,9 +187,9 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
           <input
             id={config.id}
             type="text"
-            value={value || ""}
-            onChange={e => updateField(config.name, e.target.value as any)}
-            placeholder={config.placeholder ? t(config.placeholder as any) : undefined}
+            value={(value as string | undefined) || ""}
+            onChange={e => updateField(config.name, e.target.value)}
+            placeholder={config.placeholder ? t(config.placeholder, config.placeholder) : undefined}
             className="mt-1.5 w-full rounded-md border border-slate-300 px-3 py-2 text-sm placeholder:text-slate-400 
                       focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
           />
@@ -198,51 +200,51 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
           <input
             id={config.id}
             type="number"
-            value={value || ""}
+            value={(value as number | undefined) || ""}
             onChange={e => {
               const numberValue = e.target.value === "" ? "" : Number(e.target.value);
-              updateField(config.name, numberValue as any);
+              updateField(config.name, numberValue);
             }}
             min={config.validation?.minValue}
             max={config.validation?.maxValue}
-            placeholder={config.placeholder ? t(config.placeholder as any) : undefined}
+            placeholder={config.placeholder ? t(config.placeholder, config.placeholder) : undefined}
             className="mt-1.5 w-full rounded-md border border-slate-300 px-3 py-2 text-sm placeholder:text-slate-400 
                       focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
           />
         );
 
-      case InputType.SELECT:
+      case InputType.SELECT: {
         // Handle array values for pressure levels field
-        let selectValue = value;
+        let selectValue = value as string | string[] | undefined;
 
         // If value is an array, extract the first value for the select component
         if ((Array.isArray(value) && config.name === "pressureLevels") || config.name === "mapLevels") {
-          selectValue = value.length > 0 ? value[0] : "";
+          selectValue = selectValue && selectValue.length > 0 ? selectValue[0] : "";
         }
 
         // Handle value changes for array-type fields
         const handleSelectChange = (newValue: string) => {
           if (config.name === "pressureLevels" || config.name === "mapLevels") {
             // Maintain array format for pressure levels
-            updateField(config.name, [newValue] as any);
+            updateField(config.name, [newValue]);
           } else {
             // Normal handling for other fields
-            updateField(config.name, newValue as any);
+            updateField(config.name, newValue);
           }
         };
 
         return (
-          <Select.Root value={selectValue ?? ""} onValueChange={handleSelectChange}>
+          <Select.Root value={(selectValue as string | undefined) ?? ""} onValueChange={handleSelectChange}>
             <Select.Trigger
               className="inline-flex items-center justify-between w-full px-3 py-2 text-sm border border-slate-300 
                       rounded-md shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 
                       focus:border-violet-500"
-              aria-label={config.label ? t(config.label as any) : config.name}
+              aria-label={config.label ? t(config.label, config.label) : config.name}
             >
               <Select.Value
                 placeholder={
                   config.placeholder
-                    ? t(config.placeholder as any)
+                    ? t(config.placeholder, config.placeholder)
                     : t("requests-form.selectPlaceholder", "Select an option")
                 }
               />
@@ -277,8 +279,9 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
             </Select.Portal>
           </Select.Root>
         );
+      }
 
-      case InputType.MULTISELECT:
+      case InputType.MULTISELECT: {
         const selectedOptions = Array.isArray(value) ? value : [];
 
         const handleMultiselectToggle = (optionValue: string) => {
@@ -287,7 +290,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
             ? selectedOptions.filter(v => v !== optionValue)
             : [...selectedOptions, optionValue];
 
-          updateField(config.name, newSelection as any);
+          updateField(config.name, newSelection);
         };
 
         return (
@@ -305,7 +308,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
                       {selectedOptions.length === 0
                         ? t(
                             config.placeholder ? config.placeholder : `requests-form.select${config.name}`,
-                            config.placeholder ? t(config.placeholder as any) : `Select ${config.name}`
+                            config.placeholder ? t(config.placeholder, config.placeholder) : `Select ${config.name}`
                           )
                         : selectedOptions.length <= 2
                           ? selectedOptions
@@ -369,6 +372,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
             </Popover.Root>
           </div>
         );
+      }
 
       case InputType.SWITCH:
         return (
@@ -376,7 +380,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
             <Switch.Root
               id={config.id}
               checked={!!value}
-              onCheckedChange={checked => updateField(config.name, checked as any)}
+              onCheckedChange={checked => updateField(config.name, checked)}
               className="w-10 h-5 bg-slate-300 rounded-full relative data-[state=checked]:bg-violet-600"
             >
               <Switch.Thumb
@@ -387,7 +391,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
           </div>
         );
 
-      case InputType.CHECKBOX_GROUP:
+      case InputType.CHECKBOX_GROUP: {
         const isTemperatureSelected = formData.variableName === "temperature";
         const isMapTypesField = config.name === "mapTypes";
 
@@ -427,14 +431,19 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
                       <Check className="h-3 w-3" />
                     </Checkbox.Indicator>
                   </Checkbox.Root>
-                  <span>{config.name === "mapTypes" ? t(`mapTypes-list.${option.label}` as any) : option.label}</span>
+                  <span>
+                    {config.name === "mapTypes"
+                      ? t(`mapTypes-list.${option.label}`, `mapTypes-list.${option.label}`)
+                      : option.label}
+                  </span>
                 </label>
               );
             })}
           </div>
         );
+      }
 
-      case InputType.MULTIDATE_SELECT:
+      case InputType.MULTIDATE_SELECT: {
         const selectedValues = Array.isArray(value) ? value : [];
         // Use calculated days for days field, otherwise use config options
         const options = config.name === "days" ? availableDays : config.options || [];
@@ -443,10 +452,10 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
           const isSelected = selectedValues.includes(value);
           const newSelection = isSelected ? selectedValues.filter(v => v !== value) : [...selectedValues, value];
 
-          updateField(config.name, newSelection as any);
+          updateField(config.name, newSelection);
         };
 
-        const getDisplayText = (type: "years" | "months" | "days" | "hours") => {
+        const getDisplayText = (type: DateField) => {
           if (selectedValues.length === 0) return t(`requests-form.select${type}`, `Select ${type}`);
           if (selectedValues.length <= 2) return selectedValues.join(", ");
           return (
@@ -456,7 +465,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
           );
         };
 
-        const getIcon = (type: "years" | "months" | "days" | "hours") => {
+        const getIcon = (type: DateField) => {
           switch (type) {
             case "years":
             case "days":
@@ -482,7 +491,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
           <div className="mt-1.5 space-y-3">
             <Popover.Root
               open={activeDatePopover === config.name}
-              onOpenChange={open => setActiveDatePopover(open ? (config.name as any) : null)}
+              onOpenChange={open => setActiveDatePopover(open ? (config.name as DateField) : null)}
             >
               <Popover.Trigger asChild>
                 <button
@@ -493,9 +502,9 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
                           focus:border-violet-500 disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200"
                 >
                   <span className="inline-flex items-center">
-                    {getIcon(config.name as any)}
+                    {getIcon(config.name as DateField)}
                     <span className="truncate">
-                      {selectedValues.length > 0 ? getDisplayText(config.name as any) : placeholderMessage}
+                      {selectedValues.length > 0 ? getDisplayText(config.name as DateField) : placeholderMessage}
                     </span>
                   </span>
                   <ChevronDown className="w-4 h-4 text-slate-500" />
@@ -527,7 +536,9 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
                             htmlFor={`${config.id}-${option.value}`}
                             className="text-sm text-slate-700 cursor-pointer"
                           >
-                            {config.name === "months" ? t(`months-list.${option.label}` as any) : option.label}
+                            {config.name === "months"
+                              ? t(`months-list.${option.label}`, `months-list.${option.label}`)
+                              : option.label}
                           </label>
                         </div>
                       ))}
@@ -548,6 +559,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
             </Popover.Root>
           </div>
         );
+      }
 
       case InputType.AREA_INPUT:
         return (
@@ -664,8 +676,8 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
   return (
     <FieldWrapper
       id={config.id}
-      label={config.label ? t(config.label as any) : config.name}
-      tooltip={config.tooltip ? t(config.tooltip as any) : undefined}
+      label={config.label ? t(config.label, config.label) : config.name}
+      tooltip={config.tooltip ? t(config.tooltip, config.tooltip) : undefined}
       error={error}
       required={config.validation?.required}
     >
