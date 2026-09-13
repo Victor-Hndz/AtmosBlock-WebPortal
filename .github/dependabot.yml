@@ -1,0 +1,45 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: npm
+    directories:
+      - /backend/nestjs
+      - /frontend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      menores:
+        update-types: [minor, patch]
+
+  - package-ecosystem: pip
+    directories:
+      - /backend/FAST-IBAN_Project/configurator
+      - /backend/FAST-IBAN_Project/handler
+      - /backend/FAST-IBAN_Project/utils
+      - /backend/FAST-IBAN_Project/visualization
+      - /cron_cleanup
+    schedule:
+      interval: monthly
+    groups:
+      python:
+        patterns: ["*"]
+
+  - package-ecosystem: docker
+    directories:
+      - /backend/nestjs
+      - /backend/FAST-IBAN_Project/configurator
+      - /backend/FAST-IBAN_Project/handler
+      - /backend/FAST-IBAN_Project/execution
+      - /backend/FAST-IBAN_Project/visualization
+      - /cron_cleanup
+      - /custom_images/netcdf-base
+    schedule:
+      interval: monthly

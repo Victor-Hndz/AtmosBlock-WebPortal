@@ -1,0 +1,48 @@
+name: Discrepancia en la detección
+description: El algoritmo detecta un bloqueo que no existe, no detecta uno documentado o lo clasifica mal.
+labels: [ciencia]
+body:
+  - type: markdown
+    attributes:
+      value: Con fecha, dominio, versión y configuración el caso se puede reproducir.
+  - type: input
+    id: fecha
+    attributes:
+      label: Fecha y hora (UTC)
+      placeholder: 2022-03-18 12:00
+    validations:
+      required: true
+  - type: input
+    id: dominio
+    attributes:
+      label: Dominio (latitud y longitud)
+      placeholder: 25–90°S, 180°W–180°E
+    validations:
+      required: true
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: Qué ocurre
+      options:
+        - Detecta un bloqueo que no existe
+        - No detecta un bloqueo documentado
+        - Clasifica mal el tipo (Omega / Rex)
+        - Otro
+    validations:
+      required: true
+  - type: textarea
+    id: referencia
+    attributes:
+      label: Referencia
+      description: Artículo, figura u otro índice con el que se compara.
+  - type: input
+    id: version
+    attributes:
+      label: Versión o commit
+    validations:
+      required: true
+  - type: textarea
+    id: configuracion
+    attributes:
+      label: Configuración usada
+      render: shell
