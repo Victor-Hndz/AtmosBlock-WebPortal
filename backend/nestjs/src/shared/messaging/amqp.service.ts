@@ -60,7 +60,7 @@ export class AmqpService implements OnModuleInit, OnModuleDestroy {
           // Break the retry loop on successful connection
           break;
         } catch (connectError: any) {
-          retries++;
+          retries += 1;
           this.logger.warn(`RabbitMQ connection attempt ${retries}/${maxRetries} failed: ${connectError.message}`);
 
           if (retries >= maxRetries) {

@@ -38,7 +38,7 @@ export class FilesController {
       const filePath = `${requestHash}/${filename}`;
 
       // Get file from MinIO
-      const { stream, metadata } = await this.minioService.getFile(filePath);
+      const { stream } = await this.minioService.getFile(filePath);
 
       // Validate that we have a proper readable stream
       if (!(stream instanceof Readable)) {

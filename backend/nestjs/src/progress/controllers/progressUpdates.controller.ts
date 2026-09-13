@@ -31,7 +31,8 @@ export class ProgressUpdatesController implements OnModuleInit {
    */
   private setupProgressUpdateConsumer() {
     this.logger.log(
-      `Setting up consumer for ${RabbitMQExchanges.PROGRESS_EXCHANGE}:${RabbitMQRoutingKeys.PROGRESS_UPDATE} on queue ${RabbitMQQueues.PROGRESS_QUEUE}`
+      `Setting up consumer for ${RabbitMQExchanges.PROGRESS_EXCHANGE}:${RabbitMQRoutingKeys.PROGRESS_UPDATE} ` +
+        `on queue ${RabbitMQQueues.PROGRESS_QUEUE}`
     );
 
     this.amqpConsumerService.registerHandler(

@@ -169,9 +169,8 @@ export class RequestsService {
       // Check status first
       const messageStatus = message.status;
 
-      console.log(`Message: ${JSON.stringify(message)}`);
-      console.log(`Message content: ${JSON.stringify(message)}`);
-      console.log(`Message content type: ${typeof message.content}`);
+      this.logger.debug(`Message: ${JSON.stringify(message)}`);
+      this.logger.debug(`Message content type: ${typeof message.content}`);
 
       if (typeof message.content !== "object" || message.content === null) {
         this.logger.error("Invalid message content: not a ResultMessageContent object");

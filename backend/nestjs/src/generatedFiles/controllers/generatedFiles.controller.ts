@@ -1,5 +1,4 @@
-import { JwtAuthGuard } from "@/auth/guards/jwt-auth.guard";
-import { Controller, Get, Logger, NotFoundException, Param, UseGuards } from "@nestjs/common";
+import { Controller, Get, Logger, NotFoundException, Param } from "@nestjs/common";
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiParam } from "@nestjs/swagger";
 import { GeneratedFilesService } from "../services/generatedFiles.service";
 import type { ResultsData } from "../services/generatedFiles.service";

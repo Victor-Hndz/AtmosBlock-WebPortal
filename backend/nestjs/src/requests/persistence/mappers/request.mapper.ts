@@ -37,11 +37,12 @@ export class RequestMapper {
       createdAt: requestEntity.createdAt,
       updatedAt: requestEntity.updatedAt,
       // Only map users if specifically requested
-      users: includeUsers && requestEntity.users 
-        ? requestEntity.users.map(user => {
-            return UserMapper.toDomain(user, false);
-          }) 
-        : [],
+      users:
+        includeUsers && requestEntity.users
+          ? requestEntity.users.map(user => {
+              return UserMapper.toDomain(user, false);
+            })
+          : [],
       generatedFiles: requestEntity.generatedFiles
         ? GeneratedFilesMapper.toDomain(requestEntity.generatedFiles)
         : undefined,
@@ -74,13 +75,13 @@ export class RequestMapper {
     persistenceRequest.nThreads = request.nThreads;
     persistenceRequest.nProces = request.nProces;
     persistenceRequest.timesRequested = request.timesRequested;
-    
+
     if (request.users && request.users.length > 0) {
       persistenceRequest.users = request.users.map(user => {
         return UserMapper.toPersistence(user, false);
       });
     }
-    
+
     persistenceRequest.generatedFiles = request.generatedFiles
       ? GeneratedFilesMapper.toPersistence(request.generatedFiles)
       : undefined;

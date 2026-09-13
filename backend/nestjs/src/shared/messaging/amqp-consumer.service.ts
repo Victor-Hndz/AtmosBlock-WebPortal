@@ -95,7 +95,7 @@ export class AmqpConsumerService implements OnModuleInit {
           // Break the retry loop on successful connection
           break;
         } catch (connectError: any) {
-          retries++;
+          retries += 1;
           this.logger.warn(
             `RabbitMQ consumer connection attempt ${retries}/${maxRetries} failed: ${connectError.message}`
           );
@@ -194,7 +194,8 @@ export class AmqpConsumerService implements OnModuleInit {
       this.logger.log(`Consumer set up for ${handler.exchange}:${handler.routingKey} on queue ${handler.queue}`);
     } catch (error: any) {
       this.logger.error(
-        `Failed to set up consumer for ${handler.exchange}:${handler.routingKey} on queue ${handler.queue}: ${error.message}`
+        `Failed to set up consumer for ${handler.exchange}:${handler.routingKey} ` +
+          `on queue ${handler.queue}: ${error.message}`
       );
     }
   }
