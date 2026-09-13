@@ -1,4 +1,5 @@
 import { FormFieldConfig, InputType, TabPlace } from "@/types/FormField";
+import { RequestForm } from "@/types/Request";
 import {
   VARIABLE_NAME_OPTIONS,
   AVAILABLE_YEARS,
@@ -290,7 +291,7 @@ export function getFormFieldById(fieldId: string): FormFieldConfig | undefined {
  * @param formData - The current form data
  * @returns Whether the field should be shown
  */
-export function shouldShowField(field: FormFieldConfig, formData: Record<string, any>): boolean {
+export function shouldShowField(field: FormFieldConfig, formData: RequestForm): boolean {
   // If no dependencies, always show
   if (!field.dependencies || field.dependencies.length === 0) {
     return true;
@@ -298,7 +299,7 @@ export function shouldShowField(field: FormFieldConfig, formData: Record<string,
 
   // Check all dependencies - all must be satisfied
   return field.dependencies.every(dependency => {
-    const dependencyValue = formData[dependency.field];
+    const dependencyValue = formData[dependency.field as keyof RequestForm];
 
     switch (dependency.condition) {
       case "equals":
@@ -306,9 +307,9 @@ export function shouldShowField(field: FormFieldConfig, formData: Record<string,
       case "notEquals":
         return dependencyValue !== dependency.value;
       case "includes":
-        return Array.isArray(dependencyValue) && dependencyValue.includes(dependency.value);
+        return Array.isArray(dependencyValue) && dependencyValue.includes(dependency.value as string);
       case "notIncludes":
-        return Array.isArray(dependencyValue) && !dependencyValue.includes(dependency.value);
+        return Array.isArray(dependencyValue) && !dependencyValue.includes(dependency.value as string);
       default:
         return true;
     }

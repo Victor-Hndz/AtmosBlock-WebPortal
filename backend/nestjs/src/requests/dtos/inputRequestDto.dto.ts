@@ -1,4 +1,4 @@
-import { IsString, IsBoolean, IsArray, ValidateIf, IsNotEmpty, IsOptional } from "class-validator";
+import { IsString, IsBoolean, IsArray, IsNotEmpty, IsOptional } from "class-validator";
 
 export class InputRequestDto {
   @IsString()
