@@ -29,7 +29,7 @@ int main(void) {
     if ((retval = nc_close(ncid)))
         ERR(retval)
 
-    check_coords(z_in, lats, lons);
+    check_coords(z_in, lons);
 
     file = fopen("contours.csv", "w");
     fprintf(file, "time,contour,n_points,points\n");

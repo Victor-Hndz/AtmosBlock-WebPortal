@@ -20,6 +20,12 @@ find_package(OpenMP REQUIRED)
 #MPI
 find_package(MPI REQUIRED)
 
+# Avisos como errores (el CI lo activa). Tras los find_package: -Werror en CMAKE_C_FLAGS rompe la detección de MPI.
+option(FAST_IBAN_WERROR "Compilar con -Wall -Wextra -Werror" OFF)
+if(FAST_IBAN_WERROR)
+    add_compile_options(-Wall -Wextra -Werror)
+endif()
+
 # Agregar los flags de OpenMP al compilador
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 

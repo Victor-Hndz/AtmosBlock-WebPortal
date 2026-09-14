@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
         ERR(retval)
 
     //Check the coordinates and correct them if necessary.
-    check_coords(z_in, lats, lons);
+    check_coords(z_in, lons);
 
     //Initialize the output files.
     init_files(filename, filename2, log_file, speed_file, long_name);
