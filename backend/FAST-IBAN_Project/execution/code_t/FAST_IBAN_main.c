@@ -1,7 +1,7 @@
 #include "lib/lib.h"
 
 int main(int argc, char **argv) {
-    int ncid, retval, i, j, k, time, lat, lon, size_x, size_y, step, id;
+    int ncid, retval, i, j, time, lat, lon, size_x, size_y, step, id;
     double scale_factor, offset;
     short ***t_in = NULL;
     char long_name[NC_MAX_NAME+1] = "";
@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
         ERR(retval)
 
     //Check the coordinates and correct them if necessary.
-    check_coords(t_in, lats, lons);
+    check_coords(t_in, lons);
 
     //Initialize the output files.
     init_file(filename, long_name);
