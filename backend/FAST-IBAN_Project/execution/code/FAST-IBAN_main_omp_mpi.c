@@ -8,7 +8,7 @@
 
 int main(int argc, char **argv) {
     int ncid, retval, i, j, k, time, lat, lon, size_x, size_y, step, bearing_count, bearing_count2, id, rank, size, time_start, time_end, chunk_size, resto, base_chunk;
-    double scale_factor, offset, t_ini, t_fin, t_total;
+    double scale_factor, offset, t_ini, t_fin, t_total = 0.0;
     short z_aux_selected;
     short ***z_in;
     char long_name[NC_MAX_NAME+1] = "";
