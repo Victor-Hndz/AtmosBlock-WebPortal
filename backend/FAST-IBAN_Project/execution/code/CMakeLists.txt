@@ -60,6 +60,10 @@ target_link_libraries(FAST-IBAN PRIVATE CALC)
 target_link_libraries(FAST-IBAN PRIVATE INIT)
 target_link_libraries(FAST-IBAN PRIVATE LIB)
 
+# ALG-004: variante OpenMP, para el test de invariancia al número de hilos
+add_executable(FAST-IBAN_omp FAST-IBAN_main_omp.c)
+target_link_libraries(FAST-IBAN_omp PRIVATE netcdf OpenMP::OpenMP_C UTILS CALC INIT LIB)
+
 
 # target_include_directories(FAST-IBAN PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # set_target_properties(FAST-IBAN PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../)
