@@ -14,4 +14,4 @@ cdsapi>=0.7.7
 pika>=1.4.4
 python-dotenv>=1.0.0
 minio>=7.2.20
-aio_pika>=9.5.0
+aio_pika>=9.6.2
