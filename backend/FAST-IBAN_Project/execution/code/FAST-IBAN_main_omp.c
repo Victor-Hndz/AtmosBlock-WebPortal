@@ -168,6 +168,8 @@ int main(int argc, char **argv) {
                 clusters[j].point_sup.cluster = j;
                 clusters[j].point_inf.cluster = j;
                 j++;
+            } else {
+                free(clusters_aux[i].points);  // R5 (ALG-203): cluster descartado por el filtro
             }
         }
         free(clusters_aux);
@@ -195,6 +197,8 @@ int main(int argc, char **argv) {
         t_total += (t_fin-t_ini);
         
         printf("Tiempo %d procesado.\n", time);
+        for(i=0; i<j; i++)
+            free(clusters[i].points);  // R5 (ALG-203)
         free(clusters);
     }
 

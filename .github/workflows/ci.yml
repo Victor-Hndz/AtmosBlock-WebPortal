@@ -58,6 +58,17 @@ jobs:
           cmake --build build --parallel
       - name: CTest
         run: ctest --test-dir backend/FAST-IBAN_Project/execution/code/build --output-on-failure
+      - name: valgrind sin fugas en serie y OpenMP (ALG-203)
+        run: |
+          apt-get update -qq && apt-get install -y -qq valgrind > /dev/null
+          CODE=$GITHUB_WORKSPACE/backend/FAST-IBAN_Project/execution/code
+          CASO=$CODE/tests/fixtures/geopot_500hPa_2022-03-14_00-06-12-18UTC.nc
+          for ejecucion in "FAST-IBAN 1" "FAST-IBAN_omp 4"; do
+            set -- $ejecucion
+            cd "$(mktemp -d)"
+            valgrind --leak-check=full --errors-for-leak-kinds=definite,indirect --error-exitcode=3 \
+              "$CODE/build/$1" "$CASO" 25 85 -180 180 out/ "$2" > /dev/null
+          done
       - name: Compilar la variante de temperatura (code_t) con -Wall -Wextra -Werror
         working-directory: backend/FAST-IBAN_Project/execution/code_t
         run: |
