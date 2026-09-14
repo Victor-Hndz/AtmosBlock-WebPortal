@@ -65,3 +65,9 @@ endforeach()
 # ALG-108: las formaciones no deben depender del orden de los clusters (caso donde B5 lo hacía visible)
 add_test(NAME invariancia_orden COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_orden.sh $<TARGET_FILE:FAST-IBAN> ${CMAKE_CURRENT_SOURCE_DIR}/fixtures/geopot_500hPa_2003-08-14-15_18-00UTC.nc)
 set_tests_properties(invariancia_orden PROPERTIES TIMEOUT 900)
+
+# Test de B4 (ALG-103): hash de la salida del caso de 2003, con varias OMEGA de mínimos a ambos lados.
+# Detecta filtros asimétricos entre la rama izquierda y la derecha de search_formation.
+add_test(NAME regresion_hash_2003 COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN>)
+set_tests_properties(regresion_hash_2003 PROPERTIES TIMEOUT 900 ENVIRONMENT
+    "CASO=${CMAKE_CURRENT_SOURCE_DIR}/fixtures/geopot_500hPa_2003-08-14-15_18-00UTC.nc;BASE=${CMAKE_CURRENT_SOURCE_DIR}/regression/baseline_2003.sha256")
