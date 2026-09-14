@@ -1,5 +1,5 @@
 import { ExtractJwt, Strategy } from "passport-jwt";
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { ConfigService } from "@nestjs/config";
 import { UsersService } from "@/users/services/users.service";
@@ -22,17 +22,23 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any) {
-    const user = await this.usersService.findOne(payload.sub);
+  async validate(payload: { sub: string }) {
+    // WEB-201 (V7): identity and role come from the database, so revoking a role takes effect at once.
+    const user = await this.usersService.findOne(payload.sub).catch(error => {
+      if (error instanceof NotFoundException) {
+        return null;
+      }
+      throw error;
+    });
 
     if (!user) {
       throw new UnauthorizedException("User not found");
     }
 
     return {
-      id: payload.sub,
-      email: payload.email,
-      role: payload.role,
+      id: user.id,
+      email: user.email,
+      role: user.role,
     };
   }
 }
