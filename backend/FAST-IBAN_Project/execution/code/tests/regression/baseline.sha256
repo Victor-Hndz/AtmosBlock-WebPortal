@@ -1,4 +1,4 @@
-256b95c0c3783acd992b2c5eb10b158e17388257a30b7122d7a209d85f9676ab  selected.csv
-d870d0513117a0413e7e681d4c315e994b18c2c79a4c34d11a23133ed6b37c1e  formations.csv
-findIndex: 586504 fallos (-1) de 31268016 llamadas (1.88 %)
-bilinear_interpolation: 147960 fallos (-1) de 3907584 llamadas (3.79 %)
+fb17ea97bba80db711ff96499873eb8b7b3f6a12eea9f41701b161ef3da43251  selected.csv
+f48981b25d5710bbf9caaae862569ad1e9baee74a44a88cd1b06f699dca87353  formations.csv
+findIndex: 553680 fallos (-1) de 31268080 llamadas (1.77 %)
+bilinear_interpolation: 139752 fallos (-1) de 3907584 llamadas (3.58 %)

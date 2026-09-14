@@ -33,5 +33,11 @@ int main(void) {
             fallos += distintas != N_RAYOS;
         }
     }
+
+    // B2 (ALG-104): los N_RAYOS acimutes deben cubrir la vuelta completa.
+    double cobertura = N_RAYOS * (double)BEARING_STEP;
+    printf("cobertura angular: %.3f de 360 grados%s\n", cobertura, fabs(cobertura - 360.0) < 1e-9 ? "" : "  <-- INCOMPLETA");
+    fallos += fabs(cobertura - 360.0) >= 1e-9;
+
     return fallos != 0;
 }
