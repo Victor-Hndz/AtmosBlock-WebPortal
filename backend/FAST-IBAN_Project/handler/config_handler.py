@@ -131,6 +131,8 @@ class ConfigHandler:
         if message["exec_status"] == STATUS_ERROR:
             print("\n❌ Error al ejecutar el programa.")
             print(f"\t❌ Error: {message['exec_message']}")
+            # WEB-211: la API marca la petición como fallida en vez de dejarla en GENERATING.
+            await notify_result(self.rabbitmq, f"Error al ejecutar el algoritmo: {message['exec_message']}", self.request_hash, STATUS_ERROR)
             return
         elif message["exec_status"] == STATUS_OK:
             # print(f"\n[ ] Se recibió un mensaje de ejecución: {message['exec_message']}")
@@ -158,6 +160,7 @@ class ConfigHandler:
         if message["exec_status"] == STATUS_ERROR:
             print("\n❌ Error al generar los mapas.")
             print(f"\t❌ Error: {message['exec_message']}")
+            await notify_result(self.rabbitmq, f"Error al generar los mapas: {message['exec_message']}", self.request_hash, STATUS_ERROR)
             return
         
         print("\n✅ Generación de mapas completada exitosamente.")

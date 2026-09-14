@@ -52,6 +52,16 @@ describe("ProgressService (canal por petición)", () => {
     expect((await recibidos).map(e => e.increment)).toEqual([4, MAX_PROGRESS]);
   });
 
+  it("un error se reenvía al stream y lo cierra (WEB-211)", async () => {
+    const recibidos = firstValueFrom(service.progressOf("hash-a").pipe(toArray()));
+
+    service.updateProgress({ requestHash: "hash-a", increment: MAX_PROGRESS, message: "falló", error: "falló" });
+
+    expect(await recibidos).toEqual([
+      { requestHash: "hash-a", increment: MAX_PROGRESS, message: "falló", error: "falló" },
+    ]);
+  });
+
   it("ignora eventos sin requestHash", () => {
     const next = jest.fn();
     service.progressOf("undefined").subscribe(next);

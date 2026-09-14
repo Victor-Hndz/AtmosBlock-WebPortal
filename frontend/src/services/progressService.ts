@@ -6,6 +6,7 @@ export interface ProgressUpdateData {
   message: string;
   timestamp?: string;
   completed?: boolean; // Add completed flag to interface
+  error?: string; // Set when the request failed on the server (WEB-211)
 }
 
 export interface ProgressConnectionCallbacks {

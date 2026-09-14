@@ -221,6 +221,15 @@ export default function ResultsPage(): React.ReactElement {
         onUpdate: (data: ProgressUpdateData) => {
           console.log(`Received progress update: ${JSON.stringify(data)}`);
 
+          // WEB-211: the request failed on the server; show the error and don't fetch results
+          if (data.error) {
+            setHasError(true);
+            setProgressMessage(data.error);
+            setProgressComplete(true);
+            setIsConnected(false);
+            return;
+          }
+
           // Update progress message
           if (data.message) {
             setProgressMessage(data.message);
