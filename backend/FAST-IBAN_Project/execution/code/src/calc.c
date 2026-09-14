@@ -84,7 +84,7 @@ bool bilinear_interpolation(coord_point p, short **z_mat, float *lats, float *lo
 
 // Función para generar las direcciones
 void generateDirections(int *dx, int *dy, int n_dirs) {
-    int i, j, x, y, l, pos, cont = 0;
+    int i, j, x, l, pos, cont = 0;
 
     l = ((n_dirs) / 4) + 1;
     pos = (l - 1) / 2;
