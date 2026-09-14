@@ -24,11 +24,13 @@ export const ResultsService = {
    */
   getResultFiles: async (requestHash: string): Promise<ResultsData> => {
     try {
-      // Use the correct API endpoint to get results
+      // Results require authentication and ownership (WEB-102); file URLs come signed and expiring.
+      const token = localStorage.getItem("token");
       const response = await fetch(`${API_URL}/results/${requestHash}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       });
 
