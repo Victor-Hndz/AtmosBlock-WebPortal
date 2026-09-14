@@ -40,9 +40,9 @@ export class RequestsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get a request by id" })
   @ApiResponse({ status: 200, description: "Return the request." })
-  @ApiResponse({ status: 404, description: "Request not found." })
-  findOne(@Param("id") id: string) {
-    return this.requestsService.findOne(id);
+  @ApiResponse({ status: 404, description: "Request not found or not owned by the user." })
+  findOne(@Param("id") id: string, @CurrentUser("id") userId: string) {
+    return this.requestsService.findOneForUser(id, userId);
   }
 
   @Post()
@@ -60,9 +60,9 @@ export class RequestsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: "Delete a request" })
   @ApiResponse({ status: 200, description: "The request has been successfully deleted." })
-  @ApiResponse({ status: 404, description: "Request not found." })
-  remove(@Param("id") id: string) {
-    return this.requestsService.remove(id);
+  @ApiResponse({ status: 404, description: "Request not found or not owned by the user." })
+  remove(@Param("id") id: string, @CurrentUser("id") userId: string) {
+    return this.requestsService.removeForUser(id, userId);
   }
 
   @Post("process")
