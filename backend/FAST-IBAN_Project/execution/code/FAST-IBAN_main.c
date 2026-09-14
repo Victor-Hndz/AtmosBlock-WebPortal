@@ -227,6 +227,9 @@ int main(int argc, char **argv) {
     free(speed_file);
     free(log_file);
 
+    fprintf(stderr, "findIndex: %lld fallos (-1) de %lld llamadas (%.2f %%)\n", FINDINDEX_MISSES, FINDINDEX_CALLS, 100.0 * FINDINDEX_MISSES / FINDINDEX_CALLS);
+    fprintf(stderr, "bilinear_interpolation: %lld fallos (-1) de %lld llamadas (%.2f %%)\n", INTERP_FAILS, INTERP_CALLS, 100.0 * INTERP_FAILS / INTERP_CALLS);
+
     printf("\n\n*** SUCCESS reading the file %s and writing the data to %s! ***\n", FILE_NAME, OUT_DIR_NAME);
     printf("\n## Total execution time: %.6f s.\n\n", t_total);
     return 0;
