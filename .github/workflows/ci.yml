@@ -112,6 +112,20 @@ jobs:
       - run: npm ci
       - run: npm run lint
 
+  compose-seguridad:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Servicios internos sin puertos publicados (WEB-105)
+        env:
+          PORT: "3000"
+          RABBITMQ_PORT: "5672"
+          RABBITMQ_MANAGEMENT_PORT: "15672"
+          DB_PORT: "5432"
+        run: |
+          touch .env
+          docker compose config --format json | python3 .github/scripts/check_compose_puertos.py
+
   dependency-review:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest

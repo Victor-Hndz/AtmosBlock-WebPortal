@@ -3,14 +3,18 @@ import {
   Get,
   Logger,
   Param,
+  Query,
   Res,
   StreamableFile,
   InternalServerErrorException,
+  ForbiddenException,
   All,
   Header,
 } from "@nestjs/common";
-import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { ConfigService } from "@nestjs/config";
 import { MinioService } from "../services/minio.service";
+import { firmaValida } from "../signed-url";
 import { Response } from "express";
 import { Readable } from "stream";
 
@@ -19,20 +23,33 @@ import { Readable } from "stream";
 export class FilesController {
   private readonly logger = new Logger(FilesController.name);
 
-  constructor(private readonly minioService: MinioService) {}
+  constructor(
+    private readonly minioService: MinioService,
+    private readonly configService: ConfigService
+  ) {}
 
   @Get("proxy/:requestHash/:filename")
-  @ApiOperation({ summary: "Proxy file requests to MinIO" })
+  @ApiOperation({ summary: "Proxy file requests to MinIO (signed, expiring URLs issued by GET /results)" })
   @ApiParam({ name: "requestHash", description: "Request hash for the folder" })
   @ApiParam({ name: "filename", description: "Filename to retrieve" })
+  @ApiQuery({ name: "expires", description: "Unix expiry time of the signed URL" })
+  @ApiQuery({ name: "sig", description: "HMAC signature of the URL" })
   @Header("Access-Control-Allow-Origin", "*")
   @Header("Access-Control-Allow-Methods", "GET, OPTIONS")
   @Header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept")
   async proxyFile(
     @Param("requestHash") requestHash: string,
     @Param("filename") filename: string,
+    @Query("expires") expires: string,
+    @Query("sig") sig: string,
     @Res({ passthrough: true }) res: Response
   ): Promise<StreamableFile> {
+    // WEB-102 (V2): solo URLs firmadas y vigentes; sin secreto configurado se deniega todo.
+    const secreto = this.configService.get<string>("JWT_SECRET");
+    if (!secreto || !firmaValida(`${requestHash}/${filename}`, expires, sig, secreto)) {
+      throw new ForbiddenException("Invalid or expired file URL");
+    }
+
     try {
       this.logger.log(`Proxying file: ${requestHash}/${filename}`);
       const filePath = `${requestHash}/${filename}`;
