@@ -1,6 +1,5 @@
 #include "../libraries/calc.h"
 
-long long INTERP_CALLS = 0, INTERP_FAILS = 0;
 
 
 coord_point coord_from_great_circle(coord_point initial, double dist, double bearing) {
@@ -28,8 +27,7 @@ coord_point coord_from_great_circle(coord_point initial, double dist, double bea
 // No se usa -1 como centinela porque -1 es un valor empaquetado válido.
 bool bilinear_interpolation(coord_point p, short **z_mat, float *lats, float *lons, short *z_out) {
     double z, z1, z2, z3, z4;
-    #pragma omp atomic
-    INTERP_CALLS++;
+    CONTADOR_HILO().interp_calls++;
 
     //Calculate the 4 points of the square.
     coord_point p11 = {floor(p.lat/RES)*RES, floor(p.lon/RES)*RES}; //p1
@@ -62,8 +60,7 @@ bool bilinear_interpolation(coord_point p, short **z_mat, float *lats, float *lo
     //si alguno de ellos es -1, no se puede interpolar.
     if(i11 == -1 || j11 == -1 || i12 == -1 || j12 == -1 || i21 == -1 || j21 == -1 || i22 == -1 || j22 == -1) {
         //perror("Error: No se ha encontrado el punto en la lista.\n");
-        #pragma omp atomic
-        INTERP_FAILS++;
+        CONTADOR_HILO().interp_fails++;
         return false;
     }
 

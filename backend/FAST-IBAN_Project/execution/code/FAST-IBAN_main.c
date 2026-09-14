@@ -240,8 +240,9 @@ int main(int argc, char **argv) {
     free(speed_file);
     free(log_file);
 
-    fprintf(stderr, "findIndex: %lld fallos (-1) de %lld llamadas (%.2f %%)\n", FINDINDEX_MISSES, FINDINDEX_CALLS, 100.0 * FINDINDEX_MISSES / FINDINDEX_CALLS);
-    fprintf(stderr, "bilinear_interpolation: %lld fallos (-1) de %lld llamadas (%.2f %%)\n", INTERP_FAILS, INTERP_CALLS, 100.0 * INTERP_FAILS / INTERP_CALLS);
+    contadores_hilo total = contadores_totales();
+    fprintf(stderr, "findIndex: %lld fallos (-1) de %lld llamadas (%.2f %%)\n", total.findindex_misses, total.findindex_calls, 100.0 * total.findindex_misses / total.findindex_calls);
+    fprintf(stderr, "bilinear_interpolation: %lld fallos (-1) de %lld llamadas (%.2f %%)\n", total.interp_fails, total.interp_calls, 100.0 * total.interp_fails / total.interp_calls);
 
     printf("\n\n*** SUCCESS reading the file %s and writing the data to %s! ***\n", FILE_NAME, OUT_DIR_NAME);
     printf("\n## Total execution time: %.6f s.\n\n", t_total);

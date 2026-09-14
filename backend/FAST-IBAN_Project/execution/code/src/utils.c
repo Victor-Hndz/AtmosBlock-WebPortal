@@ -1,7 +1,18 @@
 #include "../libraries/utils.h"
 
 int NLAT, NLON, NTIME;
-long long FINDINDEX_CALLS = 0, FINDINDEX_MISSES = 0;
+contadores_hilo CONTADORES[MAX_HILOS_CONTADORES];
+
+contadores_hilo contadores_totales(void) {
+    long long calls = 0, misses = 0, interp = 0, fails = 0;
+    for (int i = 0; i < MAX_HILOS_CONTADORES; i++) {
+        calls += CONTADORES[i].findindex_calls;
+        misses += CONTADORES[i].findindex_misses;
+        interp += CONTADORES[i].interp_calls;
+        fails += CONTADORES[i].interp_fails;
+    }
+    return (contadores_hilo){.findindex_calls = calls, .findindex_misses = misses, .interp_calls = interp, .interp_fails = fails};
+}
 
 
 // Índice de target en una rejilla regular arr[i] = arr[0] + i*paso, en O(1) (B1, ALG-105).
@@ -9,8 +20,7 @@ long long FINDINDEX_CALLS = 0, FINDINDEX_MISSES = 0;
 // grados (longitud), el índice da la vuelta: 180 es -180. Si no, fuera de rango devuelve -1.
 int findIndex(float *arr, int n, float target) {
     int idx = -1;
-    #pragma omp atomic
-    FINDINDEX_CALLS++;
+    CONTADOR_HILO().findindex_calls++;
 
     if (n == 1) {
         idx = arr[0] == target ? 0 : -1;
@@ -27,8 +37,7 @@ int findIndex(float *arr, int n, float target) {
     }
 
     if (idx == -1) {
-        #pragma omp atomic
-        FINDINDEX_MISSES++;
+        CONTADOR_HILO().findindex_misses++;
     }
     return idx;
 }
