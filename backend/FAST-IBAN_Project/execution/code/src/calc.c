@@ -441,17 +441,17 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
             if(selected_rex.center.lat != INF && selected_rex.id != -1 && selected_izq.center.lat != INF && selected_der.center.lat != INF && selected_izq.id != -1 && selected_der.id != -1) {
                 mean_dist = (point_distance(selected_der.center, clusters[i].center)+point_distance(clusters[i].center, selected_izq.center))/2;
                 if(mean_dist < point_distance(selected_rex.center, clusters[i].center)) {
-                    selected_rex.center.lat == INF;
-                    selected_rex.center.lon == INF;
-                    selected_rex.id == -1;
+                    selected_rex.center.lat = INF;
+                    selected_rex.center.lon = INF;
+                    selected_rex.id = -1;
                 } else {
-                    selected_der.center.lat == INF;
-                    selected_der.center.lon == INF;
-                    selected_der.id == -1;
+                    selected_der.center.lat = INF;
+                    selected_der.center.lon = INF;
+                    selected_der.id = -1;
 
-                    selected_izq.center.lat == INF;
-                    selected_izq.center.lon == INF;
-                    selected_izq.id == -1;
+                    selected_izq.center.lat = INF;
+                    selected_izq.center.lon = INF;
+                    selected_izq.id = -1;
                 }
             }
             
