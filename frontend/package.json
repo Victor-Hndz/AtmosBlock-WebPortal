@@ -37,7 +37,7 @@
     "file-saver": "^2.0.5",
     "i18next": "^23.10.0",
     "i18next-browser-languagedetector": "^7.2.0",
-    "i18next-http-backend": "^3.0.5",
+    "i18next-http-backend": "^4.0.2",
     "jszip": "^3.10.1",
     "lucide-react": "^0.484.0",
     "react": "^19.0.0",
