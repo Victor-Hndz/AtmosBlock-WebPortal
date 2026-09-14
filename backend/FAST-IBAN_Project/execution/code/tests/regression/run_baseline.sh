@@ -12,8 +12,9 @@ case "${2:-}" in
     ''|--actualizar) ;;
     *) HILOS=$2 ;;
 esac
-CASO="$AQUI/../fixtures/geopot_500hPa_2022-03-14_00-06-12-18UTC.nc"
-BASE="$AQUI/baseline.sha256"
+# CASO y BASE se pueden sustituir por entorno (p. ej. para el caso de 2003, ver tests/CMakeLists.txt).
+CASO="${CASO:-$AQUI/../fixtures/geopot_500hPa_2022-03-14_00-06-12-18UTC.nc}"
+BASE="${BASE:-$AQUI/baseline.sha256}"
 
 # Directorio temporal: el binario hace chdir si el directorio actual se llama "build".
 TMP=$(mktemp -d)
