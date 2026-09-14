@@ -51,6 +51,10 @@ add_test(NAME test_findindex COMMAND TEST_findindex)
 add_executable(TEST_bilinear test_bilinear.c)
 target_link_libraries(TEST_bilinear CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
 add_test(NAME test_bilinear COMMAND TEST_bilinear)
+# ALG-403 (B8): expandCluster sin recursión, sin desbordar la pila con clusters grandes
+add_executable(TEST_expandcluster test_expandcluster.c)
+target_link_libraries(TEST_expandcluster CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
+add_test(NAME test_expandcluster COMMAND TEST_expandcluster)
 
 # ALG-003: regresión por hash de la salida completa sobre el caso fijo
 add_test(NAME regresion_hash COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN>)
