@@ -1,14 +1,19 @@
 #include "../libraries/utils.h"
 
 int NLAT, NLON, NTIME;
+long long FINDINDEX_CALLS = 0, FINDINDEX_MISSES = 0;
 
 
 // Function to find an index in an array.
 int findIndex(float *arr, int n, float target) {
     int i;
+    #pragma omp atomic
+    FINDINDEX_CALLS++;
     for (i = 0; i < n; i++)
         if (arr[i] == target)
             return i;
+    #pragma omp atomic
+    FINDINDEX_MISSES++;
     return -1;
 }
 
