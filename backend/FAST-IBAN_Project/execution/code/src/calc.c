@@ -24,7 +24,9 @@ coord_point coord_from_great_circle(coord_point initial, double dist, double bea
 }
 
 
-short bilinear_interpolation(coord_point p, short **z_mat, float *lats, float *lons) {
+// B7 (ALG-106): devuelve false si alguna esquina no está en la rejilla; el valor va en *z_out.
+// No se usa -1 como centinela porque -1 es un valor empaquetado válido.
+bool bilinear_interpolation(coord_point p, short **z_mat, float *lats, float *lons, short *z_out) {
     double z, z1, z2, z3, z4;
     #pragma omp atomic
     INTERP_CALLS++;
@@ -62,7 +64,7 @@ short bilinear_interpolation(coord_point p, short **z_mat, float *lats, float *l
         //perror("Error: No se ha encontrado el punto en la lista.\n");
         #pragma omp atomic
         INTERP_FAILS++;
-        return -1;
+        return false;
     }
 
     z1 = z_mat[i11][j11];
@@ -76,7 +78,8 @@ short bilinear_interpolation(coord_point p, short **z_mat, float *lats, float *l
         (((p22.lat-p.lat)*(p.lon-p11.lon))/((p22.lat-p11.lat)*(p22.lon-p11.lon)))*z3 + 
         (((p.lat-p11.lat)*(p.lon-p11.lon))/((p22.lat-p11.lat)*(p22.lon-p11.lon)))*z4;
 
-    return (short)round(z);
+    *z_out = (short)round(z);
+    return true;
 }
 
 // Función para generar las direcciones
