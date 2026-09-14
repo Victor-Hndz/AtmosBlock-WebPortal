@@ -43,6 +43,10 @@ target_link_libraries(TEST_geometria_polar CALC UTILS INIT LIB m netcdf OpenMP::
 add_test(NAME test_lines COMMAND TEST_lines)
 # ALG-006: los 64 rayos no degeneran cerca del polo (función real, ambos hemisferios)
 add_test(NAME test_geometria_polar COMMAND TEST_geometria_polar)
+# ALG-105 (B1): findIndex en O(1), con vuelta en longitud sobre la rejilla real
+add_executable(TEST_findindex test_findindex.c)
+target_link_libraries(TEST_findindex UTILS LIB m)
+add_test(NAME test_findindex COMMAND TEST_findindex)
 
 # ALG-003: regresión por hash de la salida completa sobre el caso fijo
 add_test(NAME regresion_hash COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN>)

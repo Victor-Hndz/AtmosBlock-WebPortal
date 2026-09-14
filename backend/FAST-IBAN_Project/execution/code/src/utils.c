@@ -4,17 +4,33 @@ int NLAT, NLON, NTIME;
 long long FINDINDEX_CALLS = 0, FINDINDEX_MISSES = 0;
 
 
-// Function to find an index in an array.
+// Índice de target en una rejilla regular arr[i] = arr[0] + i*paso, en O(1) (B1, ALG-105).
+// target debe ser un nodo de la rejilla (tolerancia de 0,001 pasos). Si la rejilla cubre 360
+// grados (longitud), el índice da la vuelta: 180 es -180. Si no, fuera de rango devuelve -1.
 int findIndex(float *arr, int n, float target) {
-    int i;
+    int idx = -1;
     #pragma omp atomic
     FINDINDEX_CALLS++;
-    for (i = 0; i < n; i++)
-        if (arr[i] == target)
-            return i;
-    #pragma omp atomic
-    FINDINDEX_MISSES++;
-    return -1;
+
+    if (n == 1) {
+        idx = arr[0] == target ? 0 : -1;
+    } else if (n > 1) {
+        double paso = (double)arr[1] - arr[0];
+        double pos = ((double)target - arr[0]) / paso;
+        double k = floor(pos + 0.5);
+        if (fabs(pos - k) < 1e-3) {
+            if (fabs(fabs(paso) * n - 360.0) < 1e-6)
+                k = fmod(fmod(k, n) + n, n);
+            if (k >= 0 && k < n)
+                idx = (int)k;
+        }
+    }
+
+    if (idx == -1) {
+        #pragma omp atomic
+        FINDINDEX_MISSES++;
+    }
+    return idx;
 }
 
 
