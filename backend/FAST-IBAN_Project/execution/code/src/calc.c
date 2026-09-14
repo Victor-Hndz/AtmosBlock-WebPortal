@@ -392,8 +392,6 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                             contour_bot = check_contour_dir_omega(clusters[j], contour_top, 1, 0, z_in, lats, lons, scale_factor, offset);
                             contour_izq = check_contour_dir_omega(clusters[j], contour_top, 0, -1, z_in, lats, lons, scale_factor, offset);
 
-                            if(clusters[j].center.lat < selected_der.center.lat)
-
                             if(contour_bot && contour_izq) {
                                 mean_dist = (point_distance(clusters[j].center, clusters[i].center)+point_distance(clusters[j].center, selected_izq.center)+point_distance(selected_izq.center, clusters[i].center))/3;
                                 if(clusters[j].center.lat < selected_izq.center.lat)
