@@ -142,6 +142,9 @@ export default function ResultsPage(): React.ReactElement {
   const [isLoadingResults, setIsLoadingResults] = useState(false);
   const [progressComplete, setProgressComplete] = useState(false);
   const previousRequestHashRef = useRef<string | null>(null);
+  // Latest flags for the stream callbacks, so the stream is not reconnected when they change
+  const streamFlagsRef = useRef({ hasError, isComplete, progressComplete });
+  streamFlagsRef.current = { hasError, isComplete, progressComplete };
 
   // Fetch result files when processing is complete
   const fetchResults = useCallback(async () => {
@@ -244,7 +247,7 @@ export default function ResultsPage(): React.ReactElement {
           setIsConnected(false);
 
           // Only try to fetch if we haven't already been marked as complete
-          if (!progressComplete) {
+          if (!streamFlagsRef.current.progressComplete) {
             // Try to fetch results anyway, maybe they're already available
             fetchResults();
           }
@@ -252,14 +255,15 @@ export default function ResultsPage(): React.ReactElement {
         onComplete: () => {
           console.log("Progress stream completed");
           setIsConnected(false);
+          const flags = streamFlagsRef.current;
 
           // Set progress to 100% if we're completing
-          if (!isComplete && !hasError) {
+          if (!flags.isComplete && !flags.hasError) {
             setTotalProgress(MAX_PROGRESS);
           }
 
           // Only fetch results if we haven't already been marked as complete
-          if (!progressComplete && !isComplete) {
+          if (!flags.progressComplete && !flags.isComplete) {
             fetchResults();
           }
         },
@@ -272,7 +276,7 @@ export default function ResultsPage(): React.ReactElement {
         cleanup();
       }
     };
-  }, [requestHash, fetchResults, progressComplete]);
+  }, [requestHash, fetchResults, t]);
 
   // Handle downloading all files
   const handleDownloadAll = async () => {

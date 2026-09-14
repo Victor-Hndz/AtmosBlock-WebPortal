@@ -1,7 +1,7 @@
 #include "lib/lib.h"
 
 int main(int argc, char **argv) {
-    int ncid, retval, i, j, k, time, lat, lon, size_x, size_y, step, id;
+    int ncid, retval, i, j, time, lat, lon, size_x, size_y, step, id;
     double scale_factor, offset;
     short ***t_in = NULL;
     char long_name[NC_MAX_NAME+1] = "";
@@ -30,8 +30,8 @@ int main(int argc, char **argv) {
 
     //Allocate contiguous memory for the data.
     t_in = malloc(NTIME*sizeof(short**));
-    t_in[0] = malloc(NTIME*NLAT*sizeof(short*));
-    t_in[0][0] = malloc(NTIME*NLAT*NLON*sizeof(short));
+    t_in[0] = malloc(sizeof(short*)*NTIME*NLAT);
+    t_in[0][0] = malloc(sizeof(short)*NTIME*NLAT*NLON);
     
     for(i = 0; i < NTIME; i++) 
         t_in[i] = t_in[0] + i * NLAT;
@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
     size_y = (int)((NLON)/step);
     
     filtered_points = calloc(size_x, sizeof(selected_point*));
-    filtered_points[0] = calloc(size_x*size_y, sizeof(selected_point));
+    filtered_points[0] = calloc((size_t)size_x*size_y, sizeof(selected_point));
 
     for(i = 0; i < size_x; i++) 
         filtered_points[i] = filtered_points[0] + i * size_y;
@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
         ERR(retval)
 
     //Check the coordinates and correct them if necessary.
-    check_coords(t_in, lats, lons);
+    check_coords(t_in, lons);
 
     //Initialize the output files.
     init_file(filename, long_name);
