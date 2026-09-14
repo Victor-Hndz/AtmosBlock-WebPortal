@@ -18,9 +18,17 @@ if ! "$BIN" "$CASO" 25 85 -180 180 out/ 1 > ejecucion.log 2>&1; then
     exit 1
 fi
 
+# ALG-005: contadores de findIndex == -1; forman parte de la línea base.
+contadores=$(grep -E '^(findIndex|bilinear_interpolation):' ejecucion.log || true)
+if [ -z "$contadores" ]; then
+    echo "ERROR: FAST-IBAN no informa de los contadores de findIndex (ALG-005)"
+    exit 1
+fi
+
 {
     echo "$(cat out/*_selected_*.csv | sha256sum | cut -d' ' -f1)  selected.csv"
     echo "$(cat out/*_formations_*.csv | sha256sum | cut -d' ' -f1)  formations.csv"
+    echo "$contadores"
 } > actual.sha256
 
 if [ "${2:-}" = "--actualizar" ]; then

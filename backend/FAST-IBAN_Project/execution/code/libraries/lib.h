@@ -54,6 +54,8 @@
 
 extern int NTIME, NLAT, NLON, LAT_LIM_MIN, LAT_LIM_MAX, LON_LIM_MIN, LON_LIM_MAX, N_THREADS;
 extern char* FILE_NAME, *OUT_DIR_NAME;
+// ALG-005: diagnóstico de findIndex == -1 (B1); se imprimen por stderr al terminar.
+extern long long FINDINDEX_CALLS, FINDINDEX_MISSES, INTERP_CALLS, INTERP_FAILS;
 
 /*STRUCTS*/
 enum Tipo_form{MAX, MIN, NO_TYPE};
