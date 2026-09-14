@@ -186,6 +186,15 @@ int main(int argc, char **argv) {
         }
         free(clusters_aux);
 
+        // ALG-108: invierte el orden de los clusters (conservando sus id) para comprobar
+        // que las formaciones no dependen del orden en que se recorren.
+        if(getenv("FAST_IBAN_INVERTIR_CLUSTERS") != NULL)
+            for(k=0; k<j/2; k++) {
+                points_cluster aux = clusters[k];
+                clusters[k] = clusters[j-1-k];
+                clusters[j-1-k] = aux;
+            }
+
         t_fin = omp_get_wtime();
         t_total += (t_fin-t_ini);
         t_ini = omp_get_wtime();

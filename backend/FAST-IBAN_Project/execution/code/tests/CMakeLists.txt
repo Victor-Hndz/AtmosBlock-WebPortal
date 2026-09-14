@@ -53,3 +53,7 @@ foreach(hilos 1 4 16)
     add_test(NAME invariancia_omp_${hilos} COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN_omp> ${hilos})
     set_tests_properties(invariancia_omp_${hilos} PROPERTIES TIMEOUT 900)
 endforeach()
+
+# ALG-108: las formaciones no deben depender del orden de los clusters (caso donde B5 lo hacía visible)
+add_test(NAME invariancia_orden COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_orden.sh $<TARGET_FILE:FAST-IBAN> ${CMAKE_CURRENT_SOURCE_DIR}/fixtures/geopot_500hPa_2003-08-14-15_18-00UTC.nc)
+set_tests_properties(invariancia_orden PROPERTIES TIMEOUT 900)
