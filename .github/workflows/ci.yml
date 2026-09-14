@@ -58,6 +58,8 @@ jobs:
           cmake --build build --parallel
       - name: CTest
         run: ctest --test-dir backend/FAST-IBAN_Project/execution/code/build --output-on-failure
+      - name: Avisos -Wall -Wextra frente a la línea base
+        run: sh backend/FAST-IBAN_Project/execution/code/tests/check_warnings.sh
 
   # --- Aún no obligatorios: hoy fallan con el código existente ----------------
   # Pasan a obligatorios en cuanto se arreglen (lint de ambos paquetes y @types/jest).

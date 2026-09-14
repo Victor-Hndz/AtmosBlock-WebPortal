@@ -39,3 +39,7 @@ target_link_libraries(TEST_lines LIB)
 # add_test(NAME test_contours COMMAND TEST_contours)
 # add_test(NAME test_bearing COMMAND TEST_bearing)
 add_test(NAME test_lines COMMAND TEST_lines)
+
+# ALG-003: regresión por hash de la salida completa sobre el caso fijo
+add_test(NAME regresion_hash COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN>)
+set_tests_properties(regresion_hash PROPERTIES TIMEOUT 900)
