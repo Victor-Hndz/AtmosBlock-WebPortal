@@ -9,6 +9,7 @@ project(TESTS)
 # add_executable(TEST_contours test_contours.c)
 # add_executable(TEST_bearing test_bearing_points.c)
 add_executable(TEST_lines test_line_between_points.c)
+add_executable(TEST_geometria_polar test_geometria_polar.c)
 
 
 # target_link_libraries(TEST_coordpoint LIB)
@@ -29,6 +30,7 @@ add_executable(TEST_lines test_line_between_points.c)
 # target_link_libraries(TEST_bearing LIB CALC UTILS INIT)
 # target_link_libraries(TEST_bearing m)
 target_link_libraries(TEST_lines LIB)
+target_link_libraries(TEST_geometria_polar CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
 
 
 
@@ -39,6 +41,8 @@ target_link_libraries(TEST_lines LIB)
 # add_test(NAME test_contours COMMAND TEST_contours)
 # add_test(NAME test_bearing COMMAND TEST_bearing)
 add_test(NAME test_lines COMMAND TEST_lines)
+# ALG-006: los 64 rayos no degeneran cerca del polo (función real, ambos hemisferios)
+add_test(NAME test_geometria_polar COMMAND TEST_geometria_polar)
 
 # ALG-003: regresión por hash de la salida completa sobre el caso fijo
 add_test(NAME regresion_hash COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN>)
