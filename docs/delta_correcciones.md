@@ -22,7 +22,20 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 
 | B1 `findIndex`: igualdad de floats en barrido lineal, sin vuelta en longitud | ALG-105 | puntos en clusters 1379 → 1367; sigue 1 OMEGA | **99 / 14** | Interpolaciones con −1: 3,58 % → **0 %**. OMEGA +11 %, puntos MAX −10 %, MIN +7,3 %. **6,7–7,2× más rápido.** Ver sección B1 |
 
-B6, B3, B4 y B5 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2 y B1 sí, porque cambian el muestreo.
+| B7 `bilinear_interpolation` usaba −1 como centinela, pero −1 es un valor empaquetado válido (~5271 m) | ALG-106 | sin cambios | 99 / 14 | **Mínimo:** 1 punto más clasificado como MIN en los 60 pasos (19 715 → 19 716); clusters y formaciones idénticos |
+
+B6, B3, B4 y B5 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2 y B1 sí, porque cambian el muestreo. B7 cambia un solo punto.
+
+## B7: el éxito de la interpolación va aparte del valor
+
+`bilinear_interpolation` devolvía un `short` y los llamadores trataban `-1` como "no se pudo interpolar". Pero −1 es un valor empaquetado válido: con `scale_factor` 0,2143 y `add_offset` 51 692 equivale a 51 691,8 m²/s², unos 5271 m de Z500. Un rayo que interpolaba exactamente −1 contaba como voto a MAX y nunca para MIN.
+
+Ahora la función devuelve `bool` (éxito) y deja el valor en `*z_out`. Las 4 variantes usan `if(!interp_ok)`. El test `test_bilinear` comprueba:
+- un campo constante −1 interpola −1 con éxito;
+- un campo constante 1234 da 1234;
+- un punto fuera de dominio devuelve fallo.
+
+Con la interfaz anterior el test no podía expresarse, y el rojo fue un error de compilación. Tras B1 ya no hay interpolaciones fallidas, así que el efecto se limita a los −1 legítimos: en los 15 días, **1 punto** cambia de clase.
 
 ## B1: `findIndex` en O(1) con vuelta en longitud
 
