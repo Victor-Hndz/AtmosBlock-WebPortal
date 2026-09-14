@@ -34,5 +34,11 @@ int main(void) {
     // Valor que no está en la rejilla: -1
     comprobar("lat 45.1 (no es nodo)", findIndex(lats, 361, 45.1f), -1);
 
+    // Rejillas degeneradas: un solo nodo (sin paso definido) o vacía.
+    float uno[1] = {12.5f};
+    comprobar("rejilla de 1 nodo, su valor", findIndex(uno, 1, 12.5f), 0);
+    comprobar("rejilla de 1 nodo, otro valor", findIndex(uno, 1, 13.0f), -1);
+    comprobar("rejilla vacía", findIndex(uno, 0, 12.5f), -1);
+
     return fallos != 0;
 }
