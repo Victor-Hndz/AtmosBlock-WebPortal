@@ -69,38 +69,23 @@ export class RequestsService {
     // Check if the request already exists
     const existingRequest = await this.requestRepository.findByRequestHash(requestHash);
 
-    let request = existingRequest;
-
     this.logger.log(`Existing request: ${JSON.stringify(existingRequest)}`);
-    if (existingRequest !== null && existingRequest.requestStatus === requestStatus.CACHED) {
-      // If it exists, increment the timesRequested
-      existingRequest.timesRequested += 1;
+    const processingMessage = JSON.stringify({
+      status: STATUS_PROCESSING,
+      message: `Request sent to process with ID ${requestHash}`,
+      requestHash: requestHash,
+    });
 
-      // If a user ID is provided, associate the request with the user
+    if (existingRequest === null) {
+      // New request: the user link is persisted together with the request (user_requests).
+      const createRequest = createRequestDto.toRequest();
       if (createRequestDto.userId) {
-        const user = await this.usersService.findOneWithRequests(createRequestDto.userId);
-
-        if (!existingRequest.users) {
-          existingRequest.users = [];
-        }
-
-        const userAlreadyAssociated = existingRequest.users.some(u => u.id === user.id);
-
-        if (!userAlreadyAssociated) {
-          existingRequest.users.push(user);
-          this.logger.log(`User ${user.id} associated with existing request ${requestHash}`);
-        }
-
-        if (!user.requests) {
-          user.requests = [];
-        }
-
-        if (!user.requests.some(req => req.requestHash === requestHash)) {
-          user.requests.push(existingRequest);
-          await this.usersService.updateRequests(user);
-        }
+        createRequest.users = [await this.usersService.findOne(createRequestDto.userId)];
       }
-
+      await this.requestRepository.create(createRequest);
+    } else if (existingRequest.requestStatus === requestStatus.CACHED) {
+      existingRequest.timesRequested += 1;
+      await this.linkUser(existingRequest, createRequestDto.userId);
       await this.requestRepository.update(existingRequest);
 
       this.progressService.updateProgress({
@@ -110,47 +95,39 @@ export class RequestsService {
 
       await this.processResult(requestHash);
 
-      const message = {
+      return JSON.stringify({
         status: STATUS_CACHED,
         message: `Request cached`,
         requestHash: requestHash,
-      };
+      });
+    } else {
+      // Existing request not cached: link the user so it shows in their requests (WEB-209).
+      await this.linkUser(existingRequest, createRequestDto.userId);
+      await this.requestRepository.update(existingRequest);
 
-      return JSON.stringify(message);
-    } else if (existingRequest === null) {
-      const createRequest = createRequestDto.toRequest();
-
-      if (createRequestDto.userId) {
-        const user = await this.usersService.findOne(createRequestDto.userId);
-        createRequest.users = [user];
-      }
-
-      request = await this.requestRepository.create(createRequest);
-
-      if (createRequestDto.userId) {
-        const existingUser = await this.usersService.findOneWithRequests(createRequestDto.userId);
-
-        if (!existingUser.requests) {
-          existingUser.requests = [];
-        }
-
-        if (!existingUser.requests.some(req => req.requestHash === requestHash)) {
-          existingUser.requests.push(request);
-          await this.usersService.updateRequests(existingUser);
-          this.logger.log(`User ${existingUser.id} updated with new request ${requestHash}`);
-        }
+      if (existingRequest.requestStatus === requestStatus.GENERATING) {
+        // Already being processed: do not publish it again.
+        this.logger.log(`Request ${requestHash} already in progress; user linked, not re-published`);
+        return processingMessage;
       }
     }
 
-    //If not exists and cached, emit a message to RabbitMQ for processing
+    // New, expired or empty request: emit a message to RabbitMQ for processing
     this.requestsPublisher.sendRequestCreatedEvent(createRequestDto);
-    const message = {
-      status: STATUS_PROCESSING,
-      message: `Request sent to process with ID ${requestHash}`,
-      requestHash: requestHash,
-    };
-    this.logger.log(`Request sent to process: ${JSON.stringify(message)}`);
-    return JSON.stringify(message);
+    this.logger.log(`Request sent to process: ${processingMessage}`);
+    return processingMessage;
+  }
+
+  /** Adds the user to the request's users if not already there (persisted by requestRepository.update). */
+  private async linkUser(request: Request, userId?: string): Promise<void> {
+    if (!userId) {
+      return;
+    }
+    request.users = request.users ?? [];
+    if (!request.users.some(u => u.id === userId)) {
+      request.users.push(await this.usersService.findOne(userId));
+      this.logger.log(`User ${userId} associated with existing request ${request.requestHash}`);
+    }
   }
 
   async remove(id: string): Promise<void> {
