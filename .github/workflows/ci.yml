@@ -61,6 +61,20 @@ jobs:
       - name: Avisos -Wall -Wextra frente a la línea base
         run: sh backend/FAST-IBAN_Project/execution/code/tests/check_warnings.sh
 
+  imagenes-sin-secretos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Ningún secreto horneado en las imágenes Docker (WEB-104)
+        env:
+          PORT: "3000"
+          RABBITMQ_PORT: "5672"
+          RABBITMQ_MANAGEMENT_PORT: "15672"
+          DB_PORT: "5432"
+        run: |
+          touch .env
+          docker compose config --format json | python3 .github/scripts/check_imagen_sin_secretos.py .
+
   # --- Aún no obligatorios: hoy fallan con el código existente ----------------
   # Pasan a obligatorios en cuanto se arreglen (lint de ambos paquetes y @types/jest).
 
