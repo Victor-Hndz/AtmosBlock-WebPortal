@@ -21,7 +21,7 @@ find_package(OpenMP REQUIRED)
 find_package(MPI REQUIRED)
 
 # Agregar los flags de OpenMP al compilador
-set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS})
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 
 # Agregar la ruta de las cabeceras de OpenMP (si es necesario)
 include_directories(${OpenMP_C_INCLUDE_DIRS})
