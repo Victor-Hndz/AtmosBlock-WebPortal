@@ -39,6 +39,27 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: [version-update:semver-major]
+      # Stack científico fijado a la versión de Python de las imágenes (3.10/3.11). Dependabot no la
+      # tiene en cuenta y propone versiones que exigen Python más nuevo: aquí solo parches; los saltos
+      # de versión se hacen a mano al cambiar el Python de las imágenes.
+      - dependency-name: numpy
+        update-types: [version-update:semver-minor]
+      - dependency-name: scipy
+        update-types: [version-update:semver-minor]
+      - dependency-name: matplotlib
+        update-types: [version-update:semver-minor]
+      - dependency-name: pandas
+        update-types: [version-update:semver-minor]
+      - dependency-name: cartopy
+        update-types: [version-update:semver-minor]
+      - dependency-name: basemap*
+        update-types: [version-update:semver-minor]
+      - dependency-name: xarray
+        update-types: [version-update:semver-minor]
+      - dependency-name: netcdf4
+        update-types: [version-update:semver-minor]
+      - dependency-name: h5py
+        update-types: [version-update:semver-minor]
 
   - package-ecosystem: docker
     directories:
