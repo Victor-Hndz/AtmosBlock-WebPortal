@@ -8,10 +8,12 @@ import { GeneratedFilesModule } from "./generatedFiles/generatedFiles.module";
 import { MinioModule } from "./minio/minio.module";
 import { ProgressModule } from "./progress/progress.module";
 import { RabbitMQModule } from "./shared/messaging/rabbitmq.module";
+import { ThrottlingModule } from "./shared/throttling";
 
 @Module({
   imports: [
     ConfigModule,
+    ThrottlingModule,
     DatabaseModule,
     UsersModule,
     RequestsModule,
