@@ -18,6 +18,10 @@ updates:
     groups:
       menores:
         update-types: [minor, patch]
+    # Las versiones mayores se migran a mano, con PR propia; las alertas de seguridad siguen llegando
+    ignore:
+      - dependency-name: "*"
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: pip
     directories:
@@ -30,7 +34,11 @@ updates:
       interval: monthly
     groups:
       python:
-        patterns: ["*"]
+        update-types: [minor, patch]
+    # El CI no instala estos requirements: las mayores (numpy, pandas...) se prueban a mano
+    ignore:
+      - dependency-name: "*"
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: docker
     directories:
@@ -43,3 +51,7 @@ updates:
       - /custom_images/netcdf-base
     schedule:
       interval: monthly
+    # El CI no construye las imágenes: cambiar de Python, Node o Ubuntu es una migración manual
+    ignore:
+      - dependency-name: "*"
+        update-types: [version-update:semver-major, version-update:semver-minor]
