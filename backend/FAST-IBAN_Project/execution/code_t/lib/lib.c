@@ -5,17 +5,17 @@ char* FILE_NAME, *OUT_DIR_NAME;
 
 void process_entry(int argc, char **argv) {
     char cwd[NC_MAX_CHAR];
-    char file_path[NC_MAX_CHAR];
-    char* error_catcher_char;
-    int error_catcher_int;
-    error_catcher_char = getcwd(cwd, sizeof(cwd));
+    if (getcwd(cwd, sizeof(cwd)) == NULL) {
+        perror("Error getting current directory");
+        exit(EXIT_FAILURE);
+    }
 
     //extract the last part of the path
     char *p = strrchr(cwd, '/');
     p == NULL ? p = cwd : p++;
-    if(strcmp(p, ACTUAL_DIR) == 0) {
-        error_catcher_int = chdir("../../");
-        error_catcher_char = getcwd(cwd, sizeof(cwd));
+    if(strcmp(p, ACTUAL_DIR) == 0 && chdir("../../") == -1) {
+        perror("Error changing directory");
+        exit(EXIT_FAILURE);
     }
 
     if (argc != 8) {
@@ -164,7 +164,7 @@ void init_nc_variables(int ncid, short*** t_in, float lats[NLAT], float lons[NLO
         ERR(retval)
 }
 
-void check_coords(short*** z_in, float lats[NLAT], float lons[NLON]) {
+void check_coords(short*** z_in, float lons[NLON]) {
     int i,j,k;
     
     // Check if the longitudes are in the range [-180, 180] or [0, 360] and correct them if necessary.
@@ -198,17 +198,20 @@ void check_coords(short*** z_in, float lats[NLAT], float lons[NLON]) {
 
 void init_file(char* filename, char* long_name) {
     char cwd[NC_MAX_CHAR];
-    char* error_catcher_char;
-    int error_catcher_int;
     size_t buffer_size;
-    error_catcher_char = getcwd(cwd, sizeof(cwd));
+    if (getcwd(cwd, sizeof(cwd)) == NULL) {
+        perror("Error getting current directory");
+        exit(EXIT_FAILURE);
+    }
 
     //extract the last part of the path
     char *p = strrchr(cwd, '/');
     p == NULL ? p = cwd : p++;
     if(strcmp(p, ACTUAL_DIR) == 0) {
-        error_catcher_int = chdir("..");
-        error_catcher_char = getcwd(cwd, sizeof(cwd));
+        if (chdir("..") == -1 || getcwd(cwd, sizeof(cwd)) == NULL) {
+            perror("Error changing directory");
+            exit(EXIT_FAILURE);
+        }
     }
 
     buffer_size = strlen(cwd) + strlen(OUT_DIR_NAME) + 2;
@@ -231,7 +234,7 @@ void init_file(char* filename, char* long_name) {
 
     // printf("File name: %s\n", p);
     char temp[NC_MAX_CHAR];
-    strncpy(temp, p, strlen(p));
+    snprintf(temp, sizeof(temp), "%s", p);
 
     //delete the extension from p
     char *dot = strrchr(temp, '.');
@@ -243,7 +246,7 @@ void init_file(char* filename, char* long_name) {
     struct tm tm = *localtime(&t);
 
     char fecha[20];
-    sprintf(fecha, "%02d-%02d-%04d_%02d-%02d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min);
+    strftime(fecha, sizeof(fecha), "%d-%m-%Y_%H-%M", &tm);
 
     sprintf(filename, "%s%s_selected_%s_%sUTC.csv", file_path, long_name, temp, fecha);
     FILE *fp = fopen(filename, "w");

@@ -40,8 +40,8 @@ int main(int argc, char **argv) {
 
     //Allocate contiguous memory for the data.
     z_in = malloc(NTIME*sizeof(short**));
-    z_in[0] = malloc(NTIME*NLAT*sizeof(short*));
-    z_in[0][0] = malloc(NTIME*NLAT*NLON*sizeof(short));
+    z_in[0] = malloc(sizeof(short*)*NTIME*NLAT);
+    z_in[0][0] = malloc(sizeof(short)*NTIME*NLAT*NLON);
     
     for(i = 0; i < NTIME; i++) 
         z_in[i] = z_in[0] + i * NLAT;
@@ -54,10 +54,10 @@ int main(int argc, char **argv) {
     size_y = (int)((NLON)/step);
 
     selected_points = malloc((size_x)*sizeof(selected_point*));
-    selected_points[0] = malloc((size_x*size_y)*sizeof(selected_point));
+    selected_points[0] = malloc(sizeof(selected_point)*size_x*size_y);
     
     filtered_points = calloc(size_x, sizeof(selected_point*));
-    filtered_points[0] = calloc(size_x*size_y, sizeof(selected_point));
+    filtered_points[0] = calloc((size_t)size_x*size_y, sizeof(selected_point));
 
     for(i = 0; i < size_x; i++) {
         selected_points[i] = selected_points[0] + i * size_y;

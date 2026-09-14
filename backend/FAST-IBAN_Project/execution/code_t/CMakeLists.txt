@@ -17,6 +17,12 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
 
+# Avisos como errores (el CI lo activa), igual que en code/.
+option(FAST_IBAN_WERROR "Compilar con -Wall -Wextra -Werror" OFF)
+if(FAST_IBAN_WERROR)
+    add_compile_options(-Wall -Wextra -Werror)
+endif()
+
 
 add_library(LIB lib/lib.c lib/lib.h)
 add_executable(FAST-IBAN FAST_IBAN_main.c)
