@@ -7,9 +7,10 @@ import { MinioService } from "@/minio/services/minio.service";
 import { GeneratedFilesController } from "./controllers/generatedFiles.controller";
 import { RabbitMQModule } from "@/shared/messaging/rabbitmq.module";
 import { ProgressModule } from "@/progress/progress.module";
+import { UsersModule } from "@/users/users.module";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([GeneratedFilesEntity]), RabbitMQModule, ProgressModule],
+  imports: [TypeOrmModule.forFeature([GeneratedFilesEntity]), RabbitMQModule, ProgressModule, UsersModule],
   controllers: [GeneratedFilesController],
   providers: [
     MinioService,
