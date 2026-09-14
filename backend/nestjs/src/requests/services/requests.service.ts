@@ -89,6 +89,7 @@ export class RequestsService {
       await this.requestRepository.update(existingRequest);
 
       this.progressService.updateProgress({
+        requestHash,
         increment: MAX_PROGRESS,
         message: "Process completed. Results are ready for viewing and download.",
       });
@@ -112,7 +113,8 @@ export class RequestsService {
       }
     }
 
-    // New, expired or empty request: emit a message to RabbitMQ for processing
+    // New, expired or empty request: forget any previous progress, then emit a message to RabbitMQ for processing
+    this.progressService.reset(requestHash);
     this.requestsPublisher.sendRequestCreatedEvent(createRequestDto);
     this.logger.log(`Request sent to process: ${processingMessage}`);
     return processingMessage;

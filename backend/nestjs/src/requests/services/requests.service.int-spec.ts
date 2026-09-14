@@ -57,7 +57,7 @@ describe("RequestsService.create contra PostgreSQL (vínculo usuario-petición)"
       new TypeOrmRequestRepository(dataSource.getRepository(RequestEntity)),
       { sendRequestCreatedEvent: publicar } as unknown as RequestsPublisher,
       {} as GeneratedFilesService,
-      { updateProgress: jest.fn() } as unknown as ProgressService,
+      { updateProgress: jest.fn(), reset: jest.fn() } as unknown as ProgressService,
       usersService,
       {} as MinioService
     );

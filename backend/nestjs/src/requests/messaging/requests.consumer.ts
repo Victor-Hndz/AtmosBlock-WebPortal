@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { RequestsService } from "../services/requests.service";
-import { MessageContent } from "@/shared/interfaces/messageContentInterface.interface";
+import { MessageContent, ResultMessageContent } from "@/shared/interfaces/messageContentInterface.interface";
 import { RabbitMQExchanges, RabbitMQQueues, RabbitMQRoutingKeys } from "@/shared/enums/rabbitmqQueues.enum";
 import { AmqpConsumerService } from "@/shared/messaging/amqp-consumer.service";
 import { ProgressService } from "@/progress/services/progress.service";
@@ -38,8 +38,10 @@ export class RequestsConsumer implements OnModuleInit {
           // Process the message first to ensure data is available
           await this.requestsService.processResultMessage(data);
 
-          // After processing is complete, update progress to 100%
+          // After processing is complete, update the request's progress to 100%
+          const { requestHash } = (data.content ?? {}) as ResultMessageContent;
           this.progressService.updateProgress({
+            requestHash,
             increment: MAX_PROGRESS,
             message: "Process completed. Results are ready for viewing and download.",
           });
