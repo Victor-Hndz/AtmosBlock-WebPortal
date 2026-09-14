@@ -18,6 +18,12 @@ services:
         condition: service_started
     networks:
       - app-network
+    healthcheck:  # WEB-206
+      test: ["CMD-SHELL", "wget -qO- http://localhost:$${PORT}/api/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     restart: unless-stopped
 
   configurator_module:

@@ -185,6 +185,12 @@ export class RequestsService {
         this.logger.error(
           `Error in result message. Status: ${messageStatus}, Message: ${messageText}, Request Hash: ${requestHash}`
         );
+        // WEB-211: the pipeline failed; EMPTY lets a new request with the same hash be processed again.
+        const failedRequest = await this.requestRepository.findByRequestHash(requestHash);
+        if (failedRequest) {
+          failedRequest.requestStatus = requestStatus.EMPTY;
+          await this.requestRepository.update(failedRequest);
+        }
         return;
       }
 

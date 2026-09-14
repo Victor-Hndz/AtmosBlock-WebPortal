@@ -6,6 +6,8 @@ import { AmqpConsumerService } from "@/shared/messaging/amqp-consumer.service";
 import { ProgressService } from "@/progress/services/progress.service";
 import { MAX_PROGRESS } from "@/shared/consts/consts";
 
+const REQUEST_FAILED_MESSAGE = "The request could not be processed. Please try again later.";
+
 @Injectable()
 export class RequestsConsumer implements OnModuleInit {
   private readonly logger = new Logger(RequestsConsumer.name);
@@ -38,12 +40,15 @@ export class RequestsConsumer implements OnModuleInit {
           // Process the message first to ensure data is available
           await this.requestsService.processResultMessage(data);
 
-          // After processing is complete, update the request's progress to 100%
+          // After processing is complete, update the request's progress to 100%.
+          // WEB-211: a failed request closes the progress with a generic error; the details stay in the logs.
           const { requestHash } = (data.content ?? {}) as ResultMessageContent;
+          const failed = data.status !== "OK";
           this.progressService.updateProgress({
             requestHash,
             increment: MAX_PROGRESS,
-            message: "Process completed. Results are ready for viewing and download.",
+            message: failed ? REQUEST_FAILED_MESSAGE : "Process completed. Results are ready for viewing and download.",
+            ...(failed && { error: REQUEST_FAILED_MESSAGE }),
           });
         } catch (error) {
           this.logger.error(`Error processing results.done message: ${error.message}`);

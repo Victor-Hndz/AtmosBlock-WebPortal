@@ -15,7 +15,7 @@ export class ProgressService {
    * @param progressEvent The progress event containing the request hash, increment and message
    */
   updateProgress(progressEvent: ProgressEvent): void {
-    const { requestHash, increment, message } = progressEvent;
+    const { requestHash, increment, message, error } = progressEvent;
     this.logger.log(`Progress update: ${JSON.stringify(progressEvent)}`);
 
     if (!requestHash) {
@@ -32,6 +32,9 @@ export class ProgressService {
       increment === MAX_PROGRESS
         ? { requestHash, increment: MAX_PROGRESS, message: message || "Process completed successfully." }
         : { requestHash, increment: Math.min(previous + increment * 4, MAX_PROGRESS), message };
+    if (error) {
+      event.error = error;
+    }
 
     this.lastByRequest.set(requestHash, event);
     this.events.next(event);

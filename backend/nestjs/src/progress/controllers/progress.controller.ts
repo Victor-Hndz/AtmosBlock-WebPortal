@@ -6,13 +6,11 @@ import {
   NotFoundException,
   Param,
   Query,
-  Res,
   Sse,
   UseGuards,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { ApiBearerAuth } from "@nestjs/swagger";
-import { Response } from "express";
 import { Observable, map } from "rxjs";
 import { ProgressService } from "../services/progress.service";
 import { ProgressEvent } from "../domain/progress.interface";
@@ -83,17 +81,9 @@ export class ProgressController {
           message: progressEvent.message,
           timestamp: new Date().toISOString(),
           completed: progressEvent.increment >= MAX_PROGRESS,
+          error: progressEvent.error,
         },
       }))
     );
-  }
-
-  /**
-   * Health check endpoint
-   * @param res Express Response object
-   */
-  @Get("health")
-  healthCheck(@Res() res: Response): void {
-    res.status(200).json({ status: "ok", service: "progress" });
   }
 }
