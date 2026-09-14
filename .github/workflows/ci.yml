@@ -126,6 +126,13 @@ jobs:
           touch .env
           docker compose config --format json | python3 .github/scripts/check_compose_puertos.py
 
+  python-handlers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Tests de los handlers de Python (sin dependencias externas)
+        run: python3 backend/FAST-IBAN_Project/execution/handler/test_exec_handler.py
+
   dependency-review:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest

@@ -29,4 +29,5 @@ def process_body(body):
         else:
             return json.loads(content)
     except json.JSONDecodeError as e:
-        raise SystemExit(f"Error decoding JSON: {e}")
+        # ValueError, not SystemExit: consumers catch Exception and must survive a malformed message.
+        raise ValueError(f"Error decoding JSON: {e}") from e
