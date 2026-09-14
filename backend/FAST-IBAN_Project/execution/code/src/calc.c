@@ -116,18 +116,29 @@ void generateDirections(int *dx, int *dy, int n_dirs) {
     }
 }
 
+// R3 (ALG-201): las direcciones de búsqueda de contornos son constantes; se calculan una vez
+// en vez de malloc + generateDirections + free en cada llamada.
+// ponytail: inicialización perezosa sin cerrojo, válida porque la fase 2 es secuencial; si se
+// paraleliza, llamar a cargar_direcciones() antes de la región paralela.
+static int DIR_X[2 * N_BEARINGS], DIR_Y[2 * N_BEARINGS];
+static bool DIR_CARGADAS = false;
+
+static void cargar_direcciones(void) {
+    if (!DIR_CARGADAS) {
+        generateDirections(DIR_X, DIR_Y, 2 * N_BEARINGS);
+        DIR_CARGADAS = true;
+    }
+}
+
 bool check_closed_contour(points_cluster cluster, int contour, short **z_in, float *lats, float *lons, double scale_factor, double offset) {
     int i, lat, lon, newX, newY, cont=0;
-    int *dx, *dy;
+    const int *dx = DIR_X, *dy = DIR_Y;
     bool exit;
 
     lat = findIndex(lats, NLAT, cluster.center.lat);
     lon = findIndex(lons, NLON, cluster.center.lon);
 
-    dx = (int *)malloc(2*N_BEARINGS * sizeof(int));
-    dy = (int *)malloc(2*N_BEARINGS * sizeof(int));
-
-    generateDirections(dx, dy, 2*N_BEARINGS);
+    cargar_direcciones();
 
     for (i = 0; i < 2*N_BEARINGS; i++) {
         newX = lat, newY = lon;
@@ -150,8 +161,6 @@ bool check_closed_contour(points_cluster cluster, int contour, short **z_in, flo
             }
         }
     }
-    free(dx);
-    free(dy);
     
     if(cont == 2*N_BEARINGS)
         return true;
@@ -160,16 +169,13 @@ bool check_closed_contour(points_cluster cluster, int contour, short **z_in, flo
 
 bool check_contour_dir_rex(points_cluster cluster, int contour, int dir_lat, int dir_lon, short **z_in, float *lats, float *lons, double scale_factor, double offset) {
     int i, lat, lon, newX, newY;
-    int *dx, *dy;
+    const int *dx = DIR_X, *dy = DIR_Y;
     bool exit, found, all_found = true;
 
     lat = findIndex(lats, NLAT, cluster.center.lat);
     lon = findIndex(lons, NLON, cluster.center.lon);
 
-    dx = (int *)malloc(2 * N_BEARINGS * sizeof(int));
-    dy = (int *)malloc(2 * N_BEARINGS * sizeof(int));
-
-    generateDirections(dx, dy, 2 * N_BEARINGS);
+    cargar_direcciones();
 
     for(i = 0; i < 2 * N_BEARINGS; i++) {
         newX = lat;
@@ -214,24 +220,19 @@ bool check_contour_dir_rex(points_cluster cluster, int contour, int dir_lat, int
         }
     }
 
-    free(dx);
-    free(dy);
 
     return all_found;
 }
 
 bool check_contour_dir_omega(points_cluster cluster, int contour, int dir_lat, int dir_lon, short **z_in, float *lats, float *lons, double scale_factor, double offset) {
     int i, lat, lon, newX, newY, cont=0, cont2=0;
-    int *dx, *dy;
+    const int *dx = DIR_X, *dy = DIR_Y;
     bool exit, found;
 
     lat = findIndex(lats, NLAT, cluster.center.lat);
     lon = findIndex(lons, NLON, cluster.center.lon);
 
-    dx = (int *)malloc(2 * N_BEARINGS * sizeof(int));
-    dy = (int *)malloc(2 * N_BEARINGS * sizeof(int));
-
-    generateDirections(dx, dy, 2 * N_BEARINGS);
+    cargar_direcciones();
 
     for(i = 0; i < 2 * N_BEARINGS; i++) {
         newX = lat;
@@ -275,8 +276,6 @@ bool check_contour_dir_omega(points_cluster cluster, int contour, int dir_lat, i
             cont2++;
     }
 
-    free(dx);
-    free(dy);
 
     if (cont > cont2)
         return true;
