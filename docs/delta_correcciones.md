@@ -20,7 +20,32 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 | B5 emparejamiento MAX↔MIN dependiente del orden | ALG-107 | sin cambios | 124 / 14 | **10 de 138 formaciones (7,2 %)** cambian algún mínimo, en 9 de 60 pasos. La salida ya no depende del orden de los clusters (`invariancia_orden`) |
 | B2 `BEARING_STEP` entero: 64 rayos cada 5° cubrían 320° | ALG-104 | puntos en clusters 1527 → 1379 (−9,7 %); sigue 1 OMEGA con otros clusters | **89 / 14** | **Grande:** OMEGA −28 %, puntos MAX −15,5 %, clusters −3,5 %. Ver sección B2 |
 
-B6, B3, B4 y B5 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2 sí, porque cambia el muestreo. Los contadores de `findIndex` no cambian: 1,88 % de las llamadas y 3,79 % de las interpolaciones.
+| B1 `findIndex`: igualdad de floats en barrido lineal, sin vuelta en longitud | ALG-105 | puntos en clusters 1379 → 1367; sigue 1 OMEGA | **99 / 14** | Interpolaciones con −1: 3,58 % → **0 %**. OMEGA +11 %, puntos MAX −10 %, MIN +7,3 %. **6,7–7,2× más rápido.** Ver sección B1 |
+
+B6, B3, B4 y B5 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2 y B1 sí, porque cambian el muestreo.
+
+## B1: `findIndex` en O(1) con vuelta en longitud
+
+`findIndex` buscaba cada nodo con un barrido lineal y comparaba floats con `==`, sin dar la vuelta en longitud. Un rayo cuyo punto caía en lon ≥ 180° no encontraba su celda, `bilinear_interpolation` devolvía −1 y ese rayo **contaba como voto a MAX sin contar nunca para MIN**.
+
+Ahora el índice se calcula directamente, `(target − arr[0]) / paso`:
+- se exige que sea un nodo de la rejilla (tolerancia de 0,001 pasos);
+- si la rejilla cubre 360°, da la vuelta.
+
+`test_findindex` cubre nodos, vuelta (180 → −180; −180,25 → 179,75), fuera de dominio en latitud y valores que no son nodo. Con el código anterior fallaban los 3 casos de vuelta.
+
+| Métrica | Caso fijo antes → después | Caso largo antes → después |
+|---|---|---|
+| Interpolaciones con −1 | 3,58 % → **0 %** | 3,58 % → **0 %** |
+| Puntos en clusters | 1379 → 1367 | 33 091 → 32 973 |
+| Puntos MAX / MIN | — | 14 723 / 18 368 → 13 258 / 19 715 (−10 % / +7,3 %) |
+| Clusters (suma de pasos) | 74 → 77 | 1913 → 1906 |
+| Formaciones OMEGA / REX | 1 / 0 → 1 / 0 | **89 / 14 → 99 / 14** (OMEGA +11 %) |
+| **Tiempo, 1 hilo** | 7,05 s → **0,98 s** (7,2×) | 107,3 s → **15,9 s** (6,7×) |
+
+- **Por pasos:** los OMEGA cambian en 9 de los 60 pasos, todos al alza.
+- **Invariancia:** se mantiene al orden de los clusters (0 diferencias en 15 días) y al número de hilos.
+- **Aceleración:** menor que los 2–3 órdenes estimados, porque ahora domina el resto del cálculo (contornos y clusters). Los contadores de `findIndex` no cambian: 1,88 % de las llamadas y 3,79 % de las interpolaciones.
 
 ## B2: cobertura angular completa
 
