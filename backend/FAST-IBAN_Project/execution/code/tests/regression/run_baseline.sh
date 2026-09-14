@@ -1,25 +1,32 @@
 #!/bin/sh
 # ALG-003: ejecuta FAST-IBAN sobre el caso fijo y compara el SHA-256 de sus CSV con baseline.sha256.
 # Los nombres de los CSV llevan la hora de ejecución, así que se compara solo su contenido.
-# Uso: run_baseline.sh <binario FAST-IBAN> [--actualizar]
+# Uso: run_baseline.sh <binario FAST-IBAN> [--actualizar | <hilos>]
+# Con <hilos> (ALG-004) ejecuta con ese número de hilos y exige la misma línea base.
 set -eu
 
 AQUI=$(cd "$(dirname "$0")" && pwd)
 BIN=$(realpath "$1")
+HILOS=1
+case "${2:-}" in
+    ''|--actualizar) ;;
+    *) HILOS=$2 ;;
+esac
 CASO="$AQUI/../fixtures/geopot_500hPa_2022-03-14_00-06-12-18UTC.nc"
 BASE="$AQUI/baseline.sha256"
 
 # Directorio temporal: el binario hace chdir si el directorio actual se llama "build".
 TMP=$(mktemp -d)
 cd "$TMP"
-if ! "$BIN" "$CASO" 25 85 -180 180 out/ 1 > ejecucion.log 2>&1; then
-    cat ejecucion.log
+# stderr aparte: el stdout con búfer puede partir las líneas de los contadores si comparten fichero.
+if ! "$BIN" "$CASO" 25 85 -180 180 out/ "$HILOS" > ejecucion.log 2> errores.log; then
+    cat ejecucion.log errores.log
     echo "ERROR: FAST-IBAN terminó con error"
     exit 1
 fi
 
 # ALG-005: contadores de findIndex == -1; forman parte de la línea base.
-contadores=$(grep -E '^(findIndex|bilinear_interpolation):' ejecucion.log || true)
+contadores=$(grep -E '^(findIndex|bilinear_interpolation):' errores.log || true)
 if [ -z "$contadores" ]; then
     echo "ERROR: FAST-IBAN no informa de los contadores de findIndex (ALG-005)"
     exit 1

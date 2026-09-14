@@ -47,3 +47,9 @@ add_test(NAME test_geometria_polar COMMAND TEST_geometria_polar)
 # ALG-003: regresión por hash de la salida completa sobre el caso fijo
 add_test(NAME regresion_hash COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN>)
 set_tests_properties(regresion_hash PROPERTIES TIMEOUT 900)
+
+# ALG-004: la variante OpenMP debe dar la misma línea base con cualquier número de hilos
+foreach(hilos 1 4 16)
+    add_test(NAME invariancia_omp_${hilos} COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN_omp> ${hilos})
+    set_tests_properties(invariancia_omp_${hilos} PROPERTIES TIMEOUT 900)
+endforeach()
