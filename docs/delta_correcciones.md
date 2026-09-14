@@ -24,7 +24,21 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 
 | B7 `bilinear_interpolation` usaba −1 como centinela, pero −1 es un valor empaquetado válido (~5271 m) | ALG-106 | sin cambios | 99 / 14 | **Mínimo:** 1 punto más clasificado como MIN en los 60 pasos (19 715 → 19 716); clusters y formaciones idénticos |
 
-B6, B3, B4 y B5 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2 y B1 sí, porque cambian el muestreo. B7 cambia un solo punto.
+| B8 `expandCluster` recursivo: desbordaba la pila con clusters grandes | ALG-403 | sin cambios | 99 / 14 | **0**: CSV de clusters, formaciones y contadores idénticos byte a byte en los 60 pasos |
+
+B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2 y B1 sí, porque cambian el muestreo. B7 cambia un solo punto.
+
+## B8: `expandCluster` iterativo
+
+El agrupado recorría cada cluster con un DFS recursivo: una llamada por punto conectado. Con la pila por defecto (8 MB en la imagen del CI), un cluster de ~1 millón de puntos provocaba un *segmentation fault*.
+
+Ahora usa una pila explícita que crece con `realloc`, con el mismo criterio: vecindad 8, mismo tipo que el punto actual y dentro de `eps`. Esa relación es simétrica, así que el orden de recorrido no cambia qué puntos quedan en cada cluster.
+
+`test_expandcluster` usa una rejilla de 1000 × 1000 con un bloque MAX de 999 000 puntos y una fila separadora con un MIN:
+- con la versión recursiva, *segmentation fault* (exit 139);
+- con la iterativa, los 999 000 puntos quedan marcados con el id y no se toca ningún punto de otro tipo.
+
+En los datos reales los clusters no llegan a ese tamaño (≤ 15 552 puntos submuestreados por paso), así que la salida no cambia.
 
 ## B7: el éxito de la interpolación va aparte del valor
 
