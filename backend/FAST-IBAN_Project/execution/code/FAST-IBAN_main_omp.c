@@ -6,7 +6,7 @@
 
 
 int main(int argc, char **argv) {
-    int ncid, retval, i, j, k, time, size_x, size_y, step, id, chunk_size;
+    int ncid, retval, i, j, k, time, size_x, size_y, step, id;
     double scale_factor, offset, t_ini, t_fin, t_total = 0.0;
     short ***z_in;
     char long_name[NC_MAX_NAME+1] = "";
@@ -53,9 +53,6 @@ int main(int argc, char **argv) {
     size_x = (int)((FILT_LAT(LAT_LIM_MIN))/step)+1;
     size_y = (int)((NLON)/step);
 
-    //Chumk paralelo
-    chunk_size = (size_x + N_THREADS - 1) / N_THREADS; // Redondea hacia arriba
-
     selected_points = malloc((size_x)*sizeof(selected_point*));
     selected_points[0] = malloc((size_x*size_y)*sizeof(selected_point));
     
@@ -82,7 +79,7 @@ int main(int argc, char **argv) {
         ERR(retval)
 
     //Check the coordinates and correct them if necessary.
-    check_coords(z_in, lats, lons);
+    check_coords(z_in, lons);
 
     //Initialize the output files.
     init_files(filename, filename2, log_file, speed_file, long_name);
@@ -99,7 +96,7 @@ int main(int argc, char **argv) {
     //Loop for every z value.
     for (time=0; time<NTIME; time++) { 
         t_ini = omp_get_wtime();
-        #pragma omp parallel num_threads(N_THREADS) shared(z_in, lats, lons, size_x, size_y, time, selected_points, filtered_points, step, scale_factor, offset, chunk_size) default(none)
+        #pragma omp parallel num_threads(N_THREADS) shared(z_in, lats, lons, size_x, size_y, time, selected_points, filtered_points, step, scale_factor, offset) default(none)
         {
             int lat, lon, it, bearing_count, bearing_count2;
             short z_aux_selected; bool interp_ok;

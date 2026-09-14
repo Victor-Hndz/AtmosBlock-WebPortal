@@ -51,15 +51,13 @@ jobs:
       image: victorhndz/netcdf-base@sha256:6f448a9eda3a12073be2c427d524d984387a85fc408a2f5755b648f59361a429 # latest a 2025-02-03
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Compilar
+      - name: Compilar con -Wall -Wextra -Werror
         working-directory: backend/FAST-IBAN_Project/execution/code
         run: |
-          cmake -S . -B build
+          cmake -S . -B build -DFAST_IBAN_WERROR=ON
           cmake --build build --parallel
       - name: CTest
         run: ctest --test-dir backend/FAST-IBAN_Project/execution/code/build --output-on-failure
-      - name: Avisos -Wall -Wextra frente a la línea base
-        run: sh backend/FAST-IBAN_Project/execution/code/tests/check_warnings.sh
 
   imagenes-sin-secretos:
     runs-on: ubuntu-latest
