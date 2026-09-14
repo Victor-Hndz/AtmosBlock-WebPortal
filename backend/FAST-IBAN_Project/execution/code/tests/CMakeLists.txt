@@ -43,6 +43,14 @@ target_link_libraries(TEST_geometria_polar CALC UTILS INIT LIB m netcdf OpenMP::
 add_test(NAME test_lines COMMAND TEST_lines)
 # ALG-006: los 64 rayos no degeneran cerca del polo (función real, ambos hemisferios)
 add_test(NAME test_geometria_polar COMMAND TEST_geometria_polar)
+# ALG-105 (B1): findIndex en O(1), con vuelta en longitud sobre la rejilla real
+add_executable(TEST_findindex test_findindex.c)
+target_link_libraries(TEST_findindex UTILS LIB m)
+add_test(NAME test_findindex COMMAND TEST_findindex)
+# ALG-106 (B7): la interpolación no usa -1 como centinela (es un valor válido)
+add_executable(TEST_bilinear test_bilinear.c)
+target_link_libraries(TEST_bilinear CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
+add_test(NAME test_bilinear COMMAND TEST_bilinear)
 
 # ALG-003: regresión por hash de la salida completa sobre el caso fijo
 add_test(NAME regresion_hash COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN>)
@@ -53,3 +61,7 @@ foreach(hilos 1 4 16)
     add_test(NAME invariancia_omp_${hilos} COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN_omp> ${hilos})
     set_tests_properties(invariancia_omp_${hilos} PROPERTIES TIMEOUT 900)
 endforeach()
+
+# ALG-108: las formaciones no deben depender del orden de los clusters (caso donde B5 lo hacía visible)
+add_test(NAME invariancia_orden COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_orden.sh $<TARGET_FILE:FAST-IBAN> ${CMAKE_CURRENT_SOURCE_DIR}/fixtures/geopot_500hPa_2003-08-14-15_18-00UTC.nc)
+set_tests_properties(invariancia_orden PROPERTIES TIMEOUT 900)

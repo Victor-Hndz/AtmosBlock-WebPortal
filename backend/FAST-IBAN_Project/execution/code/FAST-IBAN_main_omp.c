@@ -7,7 +7,7 @@
 
 int main(int argc, char **argv) {
     int ncid, retval, i, j, k, time, size_x, size_y, step, id, chunk_size;
-    double scale_factor, offset, t_ini, t_fin, t_total;
+    double scale_factor, offset, t_ini, t_fin, t_total = 0.0;
     short ***z_in;
     char long_name[NC_MAX_NAME+1] = "";
     FILE *fp;
@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
         #pragma omp parallel num_threads(N_THREADS) shared(z_in, lats, lons, size_x, size_y, time, selected_points, filtered_points, step, scale_factor, offset, chunk_size) default(none)
         {
             int lat, lon, it, bearing_count, bearing_count2;
-            short z_aux_selected;
+            short z_aux_selected; bool interp_ok;
 
             #pragma omp for schedule(dynamic, 2)
             for(lat=0;lat<size_x;lat++) {
@@ -112,10 +112,10 @@ int main(int argc, char **argv) {
                     selected_points[lat][lon] = create_selected_point(create_point(lats[lat*step], lons[lon*step]), z_in[time][lat*step][lon*step], NO_TYPE, -1);
 
                     for(it=0; it<N_BEARINGS*2;it++) {
-                        z_aux_selected = bilinear_interpolation(coord_from_great_circle(create_point(lats[lat*step], lons[lon*step]), DIST, BEARING_START + it*BEARING_STEP), z_in[time], lats, lons);
+                        interp_ok = bilinear_interpolation(coord_from_great_circle(create_point(lats[lat*step], lons[lon*step]), DIST, BEARING_START + it*BEARING_STEP), z_in[time], lats, lons, &z_aux_selected);
                         
                         //Si se sale de la zona delimitada por los límites de latitud y longitud , no se tiene en cuenta.
-                        if(z_aux_selected == -1) {
+                        if(!interp_ok) {
                             bearing_count++;
                             continue;
                         }
