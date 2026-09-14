@@ -28,7 +28,7 @@ async def handle_message(body, rabbitmq_client):
     data = process_body(body)
     
     print("\n[ ] Iniciando generación de mapas...")
-    await notify_update(rabbitmq_client, 1, "MAPS: Iniciando generación de mapas.")
+    await notify_update(rabbitmq_client, data["request_hash"], 1, "MAPS: Iniciando generación de mapas.")
     
     # Create output directory if it doesn't exist
     os.makedirs(f"{OUT_DIR}/{data['request_hash']}", exist_ok=True)
@@ -83,7 +83,7 @@ async def handle_message(body, rabbitmq_client):
                     print(f"Error in map generation task: {e}")
                     results.append(False)
             
-            await notify_update(rabbitmq_client, 2, "MAPS: Mapa generado con éxito.")
+            await notify_update(rabbitmq_client, data["request_hash"], 2, "MAPS: Mapa generado con éxito.")
                     
         end_time = time.time()
         duration = end_time - start_time

@@ -10,8 +10,14 @@ export class ProgressConsumer {
 
   async handleProgressUpdate(data: ProgressEvent): Promise<boolean> {
     // Validate and process the progress event
-    if (data && typeof data.increment === "number" && typeof data.message === "string") {
+    if (
+      data &&
+      typeof data.requestHash === "string" &&
+      typeof data.increment === "number" &&
+      typeof data.message === "string"
+    ) {
       this.progressService.updateProgress({
+        requestHash: data.requestHash,
         increment: data.increment,
         message: data.message,
       });
