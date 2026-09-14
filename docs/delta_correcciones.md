@@ -18,8 +18,26 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 | B3 nueve `==` en la desambiguación Rex/Omega | ALG-102 | sin cambios | 124 / 14, CSV idénticos | **0**: en ningún paso un máximo tuvo a la vez candidato REX y par OMEGA |
 | B4 `if` sin cuerpo en la rama derecha de `search_formation` | ALG-103 | sin cambios | 124 / 14 | **8 de 138 formaciones (5,8 %)** cambian el mínimo derecho, en 7 de 60 pasos |
 | B5 emparejamiento MAX↔MIN dependiente del orden | ALG-107 | sin cambios | 124 / 14 | **10 de 138 formaciones (7,2 %)** cambian algún mínimo, en 9 de 60 pasos. La salida ya no depende del orden de los clusters (`invariancia_orden`) |
+| B2 `BEARING_STEP` entero: 64 rayos cada 5° cubrían 320° | ALG-104 | puntos en clusters 1527 → 1379 (−9,7 %); sigue 1 OMEGA con otros clusters | **89 / 14** | **Grande:** OMEGA −28 %, puntos MAX −15,5 %, clusters −3,5 %. Ver sección B2 |
 
-En las cuatro correcciones los puntos seleccionados y los clusters (`*_selected_*.csv`) son idénticos. Los contadores de `findIndex` no cambian: 1,88 % de las llamadas y 3,79 % de las interpolaciones.
+B6, B3, B4 y B5 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2 sí, porque cambia el muestreo. Los contadores de `findIndex` no cambian: 1,88 % de las llamadas y 3,79 % de las interpolaciones.
+
+## B2: cobertura angular completa
+
+`BEARING_STEP` era `360/(N_BEARINGS*2)` en división entera: 5° en vez de 5,625°. Los 64 rayos iban de −180° a 135° y dejaban **sin muestrear un sector de 40° (11,1 %)**, siempre el mismo. Ahora es `360.0/(N_BEARINGS*2)`, y `test_geometria_polar` exige que 64 × paso = 360°. Con el paso entero el test daba 320° y fallaba.
+
+| Métrica | Caso fijo antes → después | Caso largo antes → después |
+|---|---|---|
+| Puntos en clusters | 1527 → 1379 (−9,7 %) | 36 427 → 33 091 (−9,2 %) |
+| Puntos MAX / MIN | — | 17 430 / 18 997 → 14 723 / 18 368 (−15,5 % / −3,3 %) |
+| Clusters (suma de pasos) | 79 → 74 | 1982 → 1913 (−3,5 %) |
+| Formaciones OMEGA / REX | 1 / 0 → 1 / 0 | **124 / 14 → 89 / 14** (OMEGA −28 %) |
+| Interpolaciones con −1 | 3,79 % → 3,58 % | 3,79 % → 3,58 % |
+
+- **Por pasos:** el número de OMEGA cambia en 26 de los 60 pasos, casi siempre a la baja.
+- **Identificadores:** los `id` de cluster se renumeran, así que las formaciones no se comparan una a una entre versiones.
+- **Invariancia al orden:** se mantiene (0 diferencias en los 15 días).
+- **Lectura:** el sector sin muestrear no aportaba votos y dejaba pasar como extremo puntos que no lo son en esa dirección. Afectaba más a los MAX y, en cadena, a las parejas OMEGA. Queda por comprobar en la validación contra referencias (H5) si el nuevo recuento se acerca más a ellas. Aquí solo se mide el cambio.
 
 ## B4: formaciones que cambian (caso largo)
 
