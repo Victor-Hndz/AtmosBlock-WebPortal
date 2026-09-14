@@ -52,10 +52,6 @@ export class UsersService {
     return updatedUser;
   }
 
-  async updateRequests(existingUser: User): Promise<User> {
-    return this.userRepository.update(existingUser);
-  }
-
   async remove(id: string): Promise<void> {
     return this.userRepository.remove(id);
   }

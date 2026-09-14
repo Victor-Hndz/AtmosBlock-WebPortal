@@ -2,6 +2,7 @@ import { Client } from "minio";
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Readable } from "stream";
+import { DURACION_URL_FIRMADA_S, firmaRuta } from "../signed-url";
 
 export interface MinioFileInfo {
   name: string;
@@ -51,13 +52,16 @@ export class MinioService {
     }
   }
 
-  // Create public file URL using API proxy
+  // File URL through the API proxy, signed and expiring (WEB-102): usable in <img> without Authorization
   getProxyUrl(requestHash: string, fileName: string): string {
     // Ensure both requestHash and fileName are properly encoded for URL
     const encodedRequestHash = encodeURIComponent(requestHash);
     const encodedFileName = encodeURIComponent(fileName);
 
-    return `${this.apiBaseUrl}/api/files/proxy/${encodedRequestHash}/${encodedFileName}`;
+    const expires = Math.floor(Date.now() / 1000) + DURACION_URL_FIRMADA_S;
+    const sig = firmaRuta(`${requestHash}/${fileName}`, expires, this.configService.get<string>("JWT_SECRET") ?? "");
+
+    return `${this.apiBaseUrl}/api/files/proxy/${encodedRequestHash}/${encodedFileName}?expires=${expires}&sig=${sig}`;
   }
 
   // This is kept for compatibility but should not be used

@@ -31,16 +31,8 @@ COPY ./utils /app/utils
 # Create necessary directory
 RUN mkdir -p /app/config/data
 
-# Build arguments (used only at build time)
-ARG CDSAPI_URL
-ARG CDSAPI_KEY
-
-# Set environment variables for runtime
-ENV CDSAPI_URL=${CDSAPI_URL}
-ENV CDSAPI_KEY=${CDSAPI_KEY}
-
-# Configure CDS API access
-RUN echo -e "url: ${CDSAPI_URL}\nkey: ${CDSAPI_KEY}" > /root/.cdsapirc
+# CDS API credentials are NOT baked into the image (V4): cdsapi reads CDSAPI_URL and CDSAPI_KEY
+# from the environment at runtime (env_file: .env in docker-compose).
 
 # Default command
 CMD ["python", "configurator/configurator_CLI.py"]
