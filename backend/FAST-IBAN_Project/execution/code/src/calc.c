@@ -429,15 +429,12 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
             free(visited_conts);
 
             // B5: pareja (izquierdo, derecho) con menor distancia media del triángulo máximo-izq-der, sin
-            // depender del orden de los clusters. Bonus x0,95 si el mínimo más al norte de la pareja queda por
-            // debajo de la latitud del máximo. Empates: menor id izquierdo y, después, menor id derecho.
+            // depender del orden de los clusters. Empates: menor id izquierdo y, después, menor id derecho.
             best_score = INF;
             for(int a=0; a<n_izq; a++) {
                 for(int b=0; b<n_der; b++) {
                     points_cluster izq = clusters[cand_izq[a]], der = clusters[cand_der[b]];
                     pair_score = (point_distance(izq.center, clusters[i].center)+point_distance(izq.center, der.center)+point_distance(der.center, clusters[i].center))/3;
-                    if(fmax(izq.center.lat, der.center.lat) < clusters[i].center.lat)
-                        pair_score *= (1-0.05);
                     if(pair_score < best_score || (pair_score == best_score && (izq.id < selected_izq.id || (izq.id == selected_izq.id && der.id < selected_der.id)))) {
                         best_score = pair_score;
                         selected_izq = izq;

@@ -45,10 +45,9 @@ Los identificadores son los índices de cluster de cada paso temporal.
 **Ahora** (dos pasadas):
 1. En el recorrido de contornos solo se reúnen los candidatos válidos de cada lado, sin duplicados. Las condiciones de validez no cambian.
 2. Se elige la pareja (izquierdo, derecho) con menor distancia media del triángulo máximo–izquierdo–derecho.
-   - **Bonus:** ×0,95 si el mínimo más al norte de la pareja queda por debajo de la latitud del máximo.
    - **Empates:** menor `id` izquierdo y, después, menor `id` derecho.
 
-Como los candidatos ya exigen latitud ≤ la del máximo, el bonus solo distingue parejas en las que algún mínimo está exactamente a la latitud del máximo.
+**Bonus ×0,95 retirado.** Se probó una versión que lo aplicaba si el mínimo más al norte de la pareja quedaba por debajo de la latitud del máximo. Como los candidatos ya exigen latitud ≤ la del máximo, solo podía actuar con un mínimo exactamente a la latitud del máximo. Medido: 0 formaciones distintas con y sin bonus en los 60 pasos del caso largo y en los dos casos fijos. Redefinirlo con un umbral nuevo sería introducir un parámetro sin validar, así que se quita.
 
 | Paso | Máximo | Mínimo izq. antes → después | Mínimo der. antes → después |
 |---|---|---|---|
