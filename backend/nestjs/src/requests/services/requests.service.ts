@@ -157,6 +157,20 @@ export class RequestsService {
     await this.requestRepository.remove(id);
   }
 
+  /** Petición del usuario; si no existe o es de otro, NotFoundException (no se revela que exista). */
+  async findOneForUser(id: string, userId: string): Promise<Request> {
+    const request = await this.requestRepository.findOneByIdAndUser(id, userId);
+    if (!request) {
+      throw new NotFoundException(`Request with ID ${id} not found`);
+    }
+    return request;
+  }
+
+  async removeForUser(id: string, userId: string): Promise<void> {
+    await this.findOneForUser(id, userId);
+    await this.requestRepository.remove(id);
+  }
+
   async processResultMessage(message: MessageContent): Promise<void> {
     this.logger.log(`Processing result message: ${JSON.stringify(message)}`);
     try {

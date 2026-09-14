@@ -9,6 +9,8 @@ export interface IRequestRepository {
   findByRequestHash(requestHash: string): Promise<Request | null>;
   findAllByRequestHashes(requestHashes: string[]): Promise<Request[]>;
   findByUserId(userId: string): Promise<Request[]>;
+  /** Petición con ese id solo si pertenece al usuario; null en otro caso (WEB-103). */
+  findOneByIdAndUser(id: string, userId: string): Promise<Request | null>;
   create(request: Request): Promise<Request>;
   update(request: Request): Promise<Request>;
   remove(id: string): Promise<void>;

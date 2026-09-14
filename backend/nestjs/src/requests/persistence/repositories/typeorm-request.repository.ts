@@ -51,6 +51,16 @@ export class TypeOrmRequestRepository implements IRequestRepository {
     return requestEntities.map(requestEntity => RequestMapper.toDomain(requestEntity));
   }
 
+  async findOneByIdAndUser(id: string, userId: string): Promise<Request | null> {
+    const requestEntity = await this.requestRepository
+      .createQueryBuilder("request")
+      .innerJoin("request.users", "user", "user.id = :userId", { userId })
+      .where("request.id = :id", { id })
+      .getOne();
+
+    return requestEntity ? RequestMapper.toDomain(requestEntity) : null;
+  }
+
   async create(request: Request): Promise<Request> {
     const requestEntity = RequestMapper.toPersistence(request);
     const savedRequestEntity = await this.requestRepository.save(requestEntity);
