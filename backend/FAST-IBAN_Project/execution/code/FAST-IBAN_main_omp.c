@@ -7,7 +7,7 @@
 
 int main(int argc, char **argv) {
     int ncid, retval, i, j, k, time, size_x, size_y, step, id, chunk_size;
-    double scale_factor, offset, t_ini, t_fin, t_total;
+    double scale_factor, offset, t_ini, t_fin, t_total = 0.0;
     short ***z_in;
     char long_name[NC_MAX_NAME+1] = "";
     FILE *fp;

@@ -1,8 +1,5 @@
 /usr/include/x86_64-linux-gnu/bits/string_fortified.h: ‘__builtin___strncpy_chk’ output truncated before terminating nul copying as many bytes from a string as its length [-Wstringop-truncation]
-FAST-IBAN_main.c: ‘t_total’ may be used uninitialized [-Wmaybe-uninitialized]
-FAST-IBAN_main.c: ‘t_total’ may be used uninitialized [-Wmaybe-uninitialized]
 FAST-IBAN_main_omp.c: variable ‘chunk_size’ set but not used [-Wunused-but-set-variable]
-FAST-IBAN_main_omp.c: ‘t_total’ may be used uninitialized [-Wmaybe-uninitialized]
 src/calc.c: statement with no effect [-Wunused-value]
 src/calc.c: statement with no effect [-Wunused-value]
 src/calc.c: statement with no effect [-Wunused-value]
