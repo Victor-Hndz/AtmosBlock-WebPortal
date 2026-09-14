@@ -13,6 +13,7 @@ import {
 } from "@nestjs/common";
 import { ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { ConfigService } from "@nestjs/config";
+import { SkipThrottle } from "@nestjs/throttler";
 import { MinioService } from "../services/minio.service";
 import { firmaValida } from "../signed-url";
 import { Response } from "express";
@@ -20,6 +21,8 @@ import { Readable } from "stream";
 
 @ApiTags("files")
 @Controller("files")
+// A results page loads many files at once; the proxy is already protected by signed, expiring URLs.
+@SkipThrottle()
 export class FilesController {
   private readonly logger = new Logger(FilesController.name);
 
