@@ -8,8 +8,8 @@
 
 int main(int argc, char **argv) {
     int ncid, retval, i, j, k, time, lat, lon, size_x, size_y, step, bearing_count, bearing_count2, id;
-    double scale_factor, offset, t_ini, t_fin, t_total;
-    short z_aux_selected;
+    double scale_factor, offset, t_ini, t_fin, t_total = 0.0;
+    short z_aux_selected; bool interp_ok;
     short ***z_in = NULL;
     char long_name[NC_MAX_NAME+1] = "";
     FILE *fp = NULL;
@@ -123,10 +123,10 @@ int main(int argc, char **argv) {
                 selected_points[lat][lon] = create_selected_point(create_point(lats[lat*step], lons[lon*step]), z_in[time][lat*step][lon*step], NO_TYPE, -1);
 
                 for(i=0; i<N_BEARINGS*2;i++) {
-                    z_aux_selected = bilinear_interpolation(coord_from_great_circle(create_point(lats[lat*step], lons[lon*step]), DIST, BEARING_START + i*BEARING_STEP), z_in[time], lats, lons);
+                    interp_ok = bilinear_interpolation(coord_from_great_circle(create_point(lats[lat*step], lons[lon*step]), DIST, BEARING_START + i*BEARING_STEP), z_in[time], lats, lons, &z_aux_selected);
                     
                     //Si se sale de la zona delimitada por los límites de latitud y longitud , no se tiene en cuenta.
-                    if(z_aux_selected == -1) {
+                    if(!interp_ok) {
                         bearing_count++;
                         continue;
                     }
@@ -185,6 +185,15 @@ int main(int argc, char **argv) {
             }
         }
         free(clusters_aux);
+
+        // ALG-108: invierte el orden de los clusters (conservando sus id) para comprobar
+        // que las formaciones no dependen del orden en que se recorren.
+        if(getenv("FAST_IBAN_INVERTIR_CLUSTERS") != NULL)
+            for(k=0; k<j/2; k++) {
+                points_cluster aux = clusters[k];
+                clusters[k] = clusters[j-1-k];
+                clusters[j-1-k] = aux;
+            }
 
         t_fin = omp_get_wtime();
         t_total += (t_fin-t_ini);

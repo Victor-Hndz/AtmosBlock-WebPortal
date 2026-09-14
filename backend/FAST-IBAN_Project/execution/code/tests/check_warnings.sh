@@ -32,4 +32,12 @@ if [ -n "$nuevos" ]; then
     echo "$nuevos"
     exit 1
 fi
+
+# La línea base solo puede encoger: un aviso corregido debe salir de ella.
+obsoletos=$(LC_ALL=C comm -23 "$BASE" "$BUILD/avisos.txt")
+if [ -n "$obsoletos" ]; then
+    echo "Avisos de $BASE que ya no aparecen (quítalos con --actualizar):"
+    echo "$obsoletos"
+    exit 1
+fi
 echo "Sin avisos nuevos: $(wc -l < "$BUILD/avisos.txt") actuales, $(wc -l < "$BASE") en la línea base"

@@ -45,7 +45,7 @@
 #define N_BEARINGS 32 // Number of bearings to use in the great circle method
 #define DIST 500 // Distance in km to use in the great circle method
 #define PASS_PERCENT 0.9 // Percentage of points to pass in the bearing method
-#define BEARING_STEP (360/(N_BEARINGS*2)) // Bearing step in degrees to use in the great circle method
+#define BEARING_STEP (360.0/(N_BEARINGS*2)) // Bearing step in degrees (5.625 for 64 rays; B2: was integer division = 5)
 #define BEARING_START (-180) // Bearing start in degrees to use in the great circle method
 #define CONTOUR_STEP 20
 #define INF (1.0E+30)
