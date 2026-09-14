@@ -5,6 +5,7 @@ import { Request } from "@/requests/domain/entities/request.entity";
 import { IRequestRepository } from "@/requests/domain/repositories/request.repository.interface";
 import { RequestEntity } from "../entities/request.entity";
 import { RequestMapper } from "../mappers/request.mapper";
+import { UserEntity } from "@/users/persistence/entities/user.entity";
 
 @Injectable()
 export class TypeOrmRequestRepository implements IRequestRepository {
@@ -59,6 +60,20 @@ export class TypeOrmRequestRepository implements IRequestRepository {
       .getOne();
 
     return requestEntity ? RequestMapper.toDomain(requestEntity) : null;
+  }
+
+  async removeUser(id: string, userId: string): Promise<void> {
+    // Lado propietario de la relación (UserEntity.requests, @JoinTable user_requests)
+    await this.requestRepository.manager.createQueryBuilder().relation(UserEntity, "requests").of(userId).remove(id);
+  }
+
+  async countUsers(id: string): Promise<number> {
+    // Se cuenta desde UserEntity: getCount() cuenta entidades principales distintas, no filas del join.
+    return this.requestRepository.manager
+      .getRepository(UserEntity)
+      .createQueryBuilder("user")
+      .innerJoin("user.requests", "request", "request.id = :id", { id })
+      .getCount();
   }
 
   async create(request: Request): Promise<Request> {

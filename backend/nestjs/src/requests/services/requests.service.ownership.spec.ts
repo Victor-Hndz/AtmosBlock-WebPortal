@@ -8,16 +8,19 @@ import { UsersService } from "@/users/services/users.service";
 import { MinioService } from "@/minio/services/minio.service";
 
 // WEB-103 (V3): la propiedad se comprueba en la consulta al repositorio, no después de cargar.
+// Una petición puede pertenecer a varios usuarios (se reutiliza por hash): borrarla solo desvincula
+// al usuario, y la petición desaparece cuando ya no le queda ninguno.
 describe("RequestsService: propiedad de las peticiones", () => {
   let service: RequestsService;
   const repositorio = {
     findOneByIdAndUser: jest.fn(),
+    removeUser: jest.fn(),
+    countUsers: jest.fn(),
     remove: jest.fn(),
   };
 
   beforeEach(async () => {
-    repositorio.findOneByIdAndUser.mockReset();
-    repositorio.remove.mockReset();
+    Object.values(repositorio).forEach(fn => fn.mockReset());
 
     const moduleRef = await Test.createTestingModule({
       providers: [
@@ -47,17 +50,32 @@ describe("RequestsService: propiedad de las peticiones", () => {
     await expect(service.findOneForUser("ajena", "usuario-1")).rejects.toBeInstanceOf(NotFoundException);
   });
 
-  it("removeForUser no borra una petición ajena", async () => {
+  it("removeForUser no toca una petición ajena", async () => {
     repositorio.findOneByIdAndUser.mockResolvedValue(null);
 
     await expect(service.removeForUser("ajena", "usuario-1")).rejects.toBeInstanceOf(NotFoundException);
+    expect(repositorio.removeUser).not.toHaveBeenCalled();
     expect(repositorio.remove).not.toHaveBeenCalled();
   });
 
-  it("removeForUser borra una petición propia", async () => {
+  it("removeForUser en una petición compartida solo desvincula al usuario", async () => {
     repositorio.findOneByIdAndUser.mockResolvedValue({ id: "peticion-1" });
+    repositorio.countUsers.mockResolvedValue(1);
 
     await service.removeForUser("peticion-1", "usuario-1");
+
+    expect(repositorio.removeUser).toHaveBeenCalledWith("peticion-1", "usuario-1");
+    expect(repositorio.countUsers).toHaveBeenCalledWith("peticion-1");
+    expect(repositorio.remove).not.toHaveBeenCalled();
+  });
+
+  it("removeForUser borra la petición cuando el usuario era el último", async () => {
+    repositorio.findOneByIdAndUser.mockResolvedValue({ id: "peticion-1" });
+    repositorio.countUsers.mockResolvedValue(0);
+
+    await service.removeForUser("peticion-1", "usuario-1");
+
+    expect(repositorio.removeUser).toHaveBeenCalledWith("peticion-1", "usuario-1");
     expect(repositorio.remove).toHaveBeenCalledWith("peticion-1");
   });
 });
