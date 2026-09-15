@@ -1,0 +1,13 @@
+{
+  "name": "atmosblock-e2e",
+  "private": true,
+  "description": "Pruebas de extremo a extremo del portal con Playwright (WEB-217)",
+  "scripts": {
+    "test": "playwright test --project=portal",
+    "test:pipeline": "playwright test --project=pipeline",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}

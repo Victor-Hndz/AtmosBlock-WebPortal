@@ -1,0 +1,68 @@
+name: E2E pipeline
+
+# WEB-217: una petición real de principio a fin (configurador → núcleo en C → mapas → resultados) sin el CDS:
+# el caso de ejemplo se copia al volumen del configurador, que no descarga si el fichero ya existe.
+# Construye todas las imágenes (varios minutos): no es un check obligatorio.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * 1"
+  pull_request:
+    paths:
+      - "backend/FAST-IBAN_Project/**"
+      - "docker-compose.yml"
+      - "e2e/**"
+      - ".github/workflows/e2e-pipeline.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-pipeline-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            frontend/package-lock.json
+            e2e/package-lock.json
+      - name: Entorno de pruebas (secretos aleatorios, sin clave del CDS)
+        run: |
+          SECRETO=$(openssl rand -hex 24)
+          sed "s/change-me-min-8-chars/$SECRETO/; s/change-me/$SECRETO/g" .env.example > .env
+          cp frontend/.env.example frontend/.env
+      - name: Pila completa
+        run: |
+          docker compose up -d --build
+          timeout 300 sh -c 'until curl -fs http://localhost:3000/api/health; do sleep 5; done'
+      - name: Caso de ejemplo en el volumen del configurador
+        run: >
+          docker compose cp
+          backend/FAST-IBAN_Project/execution/code/tests/fixtures/geopot_500hPa_2022-03-14_00-06-12-18UTC.nc
+          "configurator_module:/app/config/data/geopotential_500hPa_2022-03-(14)_00-06-12-18UTC.nc"
+      - name: Dependencias del frontend
+        working-directory: frontend
+        run: npm ci
+      - name: Playwright y Chromium
+        working-directory: e2e
+        run: npm ci && npx playwright install --with-deps chromium
+      - name: Pipeline completo
+        working-directory: e2e
+        run: npm run test:pipeline
+      - name: Logs de la pila
+        if: failure()
+        run: docker compose logs --no-color nest_api configurator_module handler_module execution_module visualization_module
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: failure()
+        with:
+          name: playwright-report-pipeline
+          path: e2e/playwright-report
+          retention-days: 7

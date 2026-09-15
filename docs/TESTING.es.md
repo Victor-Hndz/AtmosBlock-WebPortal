@@ -279,6 +279,38 @@ docker compose down        # parar, conservando los datos
 docker compose down -v     # parar y borrar volúmenes: base de datos, resultados y datos descargados
 ```
 
+## 4. Pruebas de extremo a extremo en navegador (Playwright)
+
+El proyecto `e2e/` maneja un navegador real y la API contra la pila levantada. Toma los textos de las
+traducciones del frontend, así que no depende de literales.
+
+| Proyecto | Qué comprueba | Requisitos | En el CI |
+|---|---|---|---|
+| `portal` | Portada, cambio de idioma, pie y enlaces, 404, accesos que exigen sesión, registro, cierre de sesión e inicio de sesión, perfil e historial de solicitudes; salud de la API, cabeceras de seguridad, CORS, Swagger UI con la CSP, 401 sin token y 400 con variables no soportadas | Pila de la API (nivel 3.3) y frontend | Job `e2e` en cada pull request |
+| `pipeline` | Una petición real de principio a fin (configurador, núcleo en C, mapas, página de resultados, caché) con el caso de ejemplo, sin el CDS | Pila completa y el caso de ejemplo copiado al volumen del configurador | Workflow `E2E pipeline`: manual, semanal y con cambios en el pipeline |
+
+Con la pila levantada (3.3) y el frontend en <http://localhost:5173> (3.4):
+
+```bash
+cd e2e
+npm ci
+npx playwright install chromium
+npm test                    # proyecto portal
+```
+
+La primera ejecución registra por API un usuario de prueba desechable. Si el frontend no está levantado,
+Playwright lo arranca. Para el pipeline completo, copia antes el caso de ejemplo al volumen del configurador:
+
+```bash
+docker compose cp backend/FAST-IBAN_Project/execution/code/tests/fixtures/geopot_500hPa_2022-03-14_00-06-12-18UTC.nc \
+  "configurator_module:/app/config/data/geopotential_500hPa_2022-03-(14)_00-06-12-18UTC.nc"
+cd e2e && npm run test:pipeline
+```
+
+En Git Bash, antepón `MSYS_NO_PATHCONV=1` a `docker compose cp`. `npm run report` abre el informe HTML de
+la última ejecución. La API de autenticación admite 5 peticiones por minuto: espera un minuto antes de
+lanzar la batería dos veces seguidas.
+
 ## Solución de problemas
 
 | Síntoma | Causa y solución |

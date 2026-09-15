@@ -150,6 +150,45 @@ jobs:
             python3 "$t" || exit 1
           done
 
+  e2e:
+    # WEB-217: navegador y API contra la pila real (sin el pipeline de cálculo ni el CDS)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            frontend/package-lock.json
+            e2e/package-lock.json
+      - name: Entorno de pruebas (secretos aleatorios, sin clave del CDS)
+        run: |
+          SECRETO=$(openssl rand -hex 24)
+          sed "s/change-me-min-8-chars/$SECRETO/; s/change-me/$SECRETO/g" .env.example > .env
+          cp frontend/.env.example frontend/.env
+      - name: API y los servicios de los que depende
+        run: docker compose up -d --build --wait nest_api
+      - name: Dependencias del frontend
+        working-directory: frontend
+        run: npm ci
+      - name: Playwright y Chromium
+        working-directory: e2e
+        run: npm ci && npx playwright install --with-deps chromium
+      - name: Pruebas del portal
+        working-directory: e2e
+        run: npm test
+      - name: Logs de la API
+        if: failure()
+        run: docker compose logs --no-color nest_api
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: failure()
+        with:
+          name: playwright-report
+          path: e2e/playwright-report
+          retention-days: 7
+
   dependency-review:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
