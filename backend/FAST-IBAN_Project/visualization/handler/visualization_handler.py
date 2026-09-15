@@ -95,7 +95,7 @@ async def handle_message(body, rabbitmq_client):
         if all(results) and results:
             print("\n✅ Generación de mapas completada exitosamente.")
             message = {
-                "request_type": NOTIFY_VISUALIZATION,
+                "request_type": NOTIFY_VISUALIZATION, "request_hash": data["request_hash"],
                 "exec_status": STATUS_OK, 
                 "exec_message": f"Map generation completed successfully. Generated {len(results)} maps in {duration:.2f} seconds."
             }
@@ -112,7 +112,7 @@ async def handle_message(body, rabbitmq_client):
         else:
             error_msg = f"Failed to generate {results.count(False)} of {len(results)} maps"
             print(f"Error: {error_msg}")
-            message = { "request_type": NOTIFY_VISUALIZATION, "exec_status": STATUS_ERROR, "exec_message": error_msg}
+            message = { "request_type": NOTIFY_VISUALIZATION, "request_hash": data["request_hash"], "exec_status": STATUS_ERROR, "exec_message": error_msg}
             await rabbitmq_client.publish(
                 NOTIFICATIONS_EXCHANGE,
                 NOTIFY_HANDLER_KEY,
@@ -127,7 +127,7 @@ async def handle_message(body, rabbitmq_client):
     except Exception as e:
         error_msg = f"Error in map generation: {str(e)}"
         print(f"Error: {error_msg}")
-        message = { "request_type": NOTIFY_VISUALIZATION, "exec_status": STATUS_ERROR, "exec_message": error_msg}
+        message = { "request_type": NOTIFY_VISUALIZATION, "request_hash": data["request_hash"], "exec_status": STATUS_ERROR, "exec_message": error_msg}
         await rabbitmq_client.publish(
             NOTIFICATIONS_EXCHANGE,
             NOTIFY_HANDLER_KEY,

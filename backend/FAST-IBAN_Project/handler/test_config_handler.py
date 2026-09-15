@@ -1,4 +1,4 @@
-"""WEB-211: un error de ejecución o de mapas se envía a la API como resultado con estado ERROR.
+"""Handler de configuración: errores notificados a la API (WEB-211) y peticiones independientes (WEB-222).
 
 Uso: python backend/FAST-IBAN_Project/handler/test_config_handler.py
 """
@@ -21,69 +21,107 @@ def _stub(nombre, **atributos):
     sys.modules.setdefault(nombre, modulo)
 
 
+limpiados = []
 _stub("dotenv", load_dotenv=lambda *args, **kwargs: None)
 _stub("utils.rabbitMQ.rabbitmq", RabbitMQ=object)
 _stub("utils.minio.upload_files", upload_files_to_request_hash=lambda *args, **kwargs: None)
-_stub("utils.clean_folder_files", clean_directory=lambda *args, **kwargs: None)
+_stub("utils.clean_folder_files", clean_directory=limpiados.append)
 
 _spec = importlib.util.spec_from_file_location("config_handler", RAIZ / "handler" / "config_handler.py")
 config_handler = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(config_handler)
 
 from utils.consts.consts import STATUS_ERROR, STATUS_OK  # noqa: E402
-from utils.rabbitMQ.rabbit_consts import NOTIFY_EXECUTION, NOTIFY_VISUALIZATION, RESULTS_DONE_KEY  # noqa: E402
+from utils.rabbitMQ.rabbit_consts import (  # noqa: E402
+    EXECUTION_ALGORITHM_KEY,
+    EXECUTION_VISUALIZATION_KEY,
+    NOTIFY_EXECUTION,
+    NOTIFY_VISUALIZATION,
+    RESULTS_DONE_KEY,
+)
 
 
 class RabbitFalso:
+    """Solo publica: el handler se suscribe a las notificaciones una vez, al arrancar (WEB-222)."""
+
     def __init__(self):
         self.publicados = []
 
     async def publish(self, exchange, routing_key, message):
         self.publicados.append((routing_key, json.loads(message)))
 
-    def resultados(self):
-        return [m for clave, m in self.publicados if clave == RESULTS_DONE_KEY]
+    def con_clave(self, clave):
+        return [m for k, m in self.publicados if k == clave]
 
 
 def mensaje(**contenido):
     return json.dumps({"status": STATUS_OK, "message": "", "content": contenido}).encode()
 
 
-class ConfigHandlerErroresTest(unittest.TestCase):
-    def _handler(self):
-        rabbit = RabbitFalso()
-        handler = config_handler.ConfigHandler(rabbit)
-        handler.request_hash = "h1"
-        return handler, rabbit
+def configuracion(request_hash, **cambios):
+    return mensaje(**{
+        "file": f"/app/config/data/{request_hash}.nc", "requestHash": request_hash, "variableName": "geopotential",
+        "pressureLevel": ["500"], "years": ["2022"], "months": ["03"], "days": ["14"], "hours": ["12"],
+        "areaCovered": ["90", "-180", "-90", "180"], "mapTypes": ["comb"], "mapLevels": ["20"], "fileFormat": "png",
+        "noData": False, "noMaps": False, "omp": False, "mpi": False, "nThreads": None, "nProces": None, **cambios,
+    })
+
+
+class ConfigHandlerTest(unittest.TestCase):
+    def setUp(self):
+        self.rabbit = RabbitFalso()
+        self.handler = config_handler.ConfigHandler(self.rabbit)
+        limpiados.clear()
+
+    def notificar(self, tipo, request_hash, estado, texto=""):
+        manejador = (
+            self.handler.handle_execution_message if tipo == NOTIFY_EXECUTION else self.handler.handle_map_generation_message
+        )
+        asyncio.run(manejador(mensaje(request_type=tipo, request_hash=request_hash, exec_status=estado, exec_message=texto)))
 
     def test_error_de_ejecucion_se_notifica_a_la_api(self):
-        handler, rabbit = self._handler()
+        asyncio.run(self.handler.handle_config_message(configuracion("h1")))
+        self.notificar(NOTIFY_EXECUTION, "h1", STATUS_ERROR, "segfault")
 
-        asyncio.run(
-            handler.handle_execution_message(
-                mensaje(request_type=NOTIFY_EXECUTION, exec_status=STATUS_ERROR, exec_message="segfault")
-            )
-        )
-
-        resultados = rabbit.resultados()
+        resultados = self.rabbit.con_clave(RESULTS_DONE_KEY)
         self.assertEqual(len(resultados), 1)
         self.assertEqual(resultados[0]["status"], STATUS_ERROR)
         self.assertEqual(resultados[0]["content"]["requestHash"], "h1")
         self.assertIn("segfault", resultados[0]["content"]["content"])
 
     def test_error_de_mapas_se_notifica_a_la_api(self):
-        handler, rabbit = self._handler()
+        asyncio.run(self.handler.handle_config_message(configuracion("h1")))
+        self.notificar(NOTIFY_EXECUTION, "h1", STATUS_OK)
+        self.notificar(NOTIFY_VISUALIZATION, "h1", STATUS_ERROR, "cartopy")
 
-        asyncio.run(
-            handler.handle_map_generation_message(
-                mensaje(request_type=NOTIFY_VISUALIZATION, exec_status=STATUS_ERROR, exec_message="cartopy")
-            )
-        )
-
-        resultados = rabbit.resultados()
+        resultados = self.rabbit.con_clave(RESULTS_DONE_KEY)
         self.assertEqual(len(resultados), 1)
         self.assertEqual(resultados[0]["status"], STATUS_ERROR)
         self.assertIn("cartopy", resultados[0]["content"]["content"])
+
+    def test_cada_paso_publica_sin_volver_a_suscribirse(self):
+        # Antes, process_file y process_map_generation llamaban otra vez a consume(NOTIFICATIONS_QUEUE).
+        asyncio.run(self.handler.handle_config_message(configuracion("h1")))
+        self.notificar(NOTIFY_EXECUTION, "h1", STATUS_OK)
+
+        self.assertEqual(len(self.rabbit.con_clave(EXECUTION_ALGORITHM_KEY)), 1)
+        self.assertEqual(len(self.rabbit.con_clave(EXECUTION_VISUALIZATION_KEY)), 1)
+
+    def test_peticiones_simultaneas_no_se_pisan(self):
+        asyncio.run(self.handler.handle_config_message(configuracion("a", noMaps=True)))
+        asyncio.run(self.handler.handle_config_message(configuracion("b")))
+
+        self.notificar(NOTIFY_EXECUTION, "a", STATUS_OK)
+
+        resultados = self.rabbit.con_clave(RESULTS_DONE_KEY)
+        self.assertEqual([r["content"]["requestHash"] for r in resultados], ["a"])
+        self.assertEqual(resultados[0]["status"], STATUS_OK)
+        self.assertEqual(self.rabbit.con_clave(EXECUTION_VISUALIZATION_KEY), [], "a no pidió mapas")
+        self.assertEqual(limpiados, ["./out/a"])
+
+        self.notificar(NOTIFY_EXECUTION, "b", STATUS_OK)
+        mapas = self.rabbit.con_clave(EXECUTION_VISUALIZATION_KEY)
+        self.assertEqual([m["content"]["request_hash"] for m in mapas], ["b"])
 
 
 if __name__ == "__main__":

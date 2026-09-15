@@ -1,4 +1,14 @@
-import { IsString, IsBoolean, IsArray, ValidateIf, IsNotEmpty, IsOptional, IsUUID, IsNumber } from "class-validator";
+import {
+  IsString,
+  IsBoolean,
+  IsArray,
+  ValidateIf,
+  IsNotEmpty,
+  IsOptional,
+  IsUUID,
+  IsNumber,
+  IsIn,
+} from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Request } from "@/requests/domain/entities/request.entity";
 import { requestStatus } from "@/shared/enums/requestStatus.enum";
@@ -12,6 +22,8 @@ export class CreateRequestDto {
   @ApiProperty({ description: "Name of the variable to process" })
   @IsString()
   @IsNotEmpty()
+  // WEB-221: only the variables the pipeline can process; any other one used to reach the CDS and hang
+  @IsIn(["geopotential", "temperature"])
   variableName: string;
 
   @ApiProperty({ description: "Pressure levels for the data", type: [String] })

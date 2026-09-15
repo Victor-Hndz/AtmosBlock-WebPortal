@@ -23,7 +23,8 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <DropdownMenu.Root>
+    // modal={false}: a modal menu locks page scroll and hides the scrollbar, shifting the fixed header and footer
+    <DropdownMenu.Root modal={false}>
       <DropdownMenu.Trigger asChild>
         <button
           className="flex items-center gap-1 rounded-md px-2 py-1 text:white hover:text-blue-300"

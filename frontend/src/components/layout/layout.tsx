@@ -11,6 +11,11 @@ import UserProfileMenu from "@/components/shared/UserProfileMenu";
 import { useAppSelector } from "@/redux/hooks";
 import "./layout.css";
 
+const FIRST_YEAR = 2025;
+const CURRENT_YEAR = new Date().getFullYear();
+/** Copyright years, from first publication to the current year */
+const COPYRIGHT_YEARS = CURRENT_YEAR > FIRST_YEAR ? `${FIRST_YEAR}-${CURRENT_YEAR}` : `${FIRST_YEAR}`;
+
 /**
  * Type for Lucide icon components
  */
@@ -174,7 +179,7 @@ const Layout: React.FC = (): JSX.Element => {
     <div className="flex flex-col min-h-screen relative">
       {/* Navbar using Radix UI NavigationMenu */}
       <NavigationMenu.Root className="fixed top-0 left-0 right-0 bg-gray-800 text-white p-4 z-50 shadow-md">
-        <NavigationMenu.List className="w-full max-w-[1024px] mx-auto">
+        <NavigationMenu.List className="w-full max-w-5xl mx-auto">
           {/* Desktop Navigation and Non-collapsible Items */}
           <div className="flex w-full justify-between items-center">
             {/* Left aligned items */}
@@ -214,7 +219,7 @@ const Layout: React.FC = (): JSX.Element => {
             {hasCollapsibleItems && (
               <div className="md:hidden flex flex-1 justify-between items-center">
                 {/* Hamburger menu */}
-                <DropdownMenu.Root>
+                <DropdownMenu.Root modal={false}>
                   <DropdownMenu.Trigger asChild>
                     <button
                       className="p-2 rounded-md transition-colors duration-200 hover:bg-gray-700"
@@ -225,7 +230,7 @@ const Layout: React.FC = (): JSX.Element => {
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Portal>
                     <DropdownMenu.Content
-                      className="bg-gray-800 rounded-md shadow-lg p-2 min-w-[150px] origin-top-left z-50"
+                      className="bg-gray-800 rounded-md shadow-lg p-2 min-w-37.5 origin-top-left z-50"
                       sideOffset={5}
                       align="start"
                     >
@@ -247,14 +252,25 @@ const Layout: React.FC = (): JSX.Element => {
       </NavigationMenu.Root>
 
       {/* Main content with padding to avoid overlap with fixed elements */}
-      <main className="flex-1 mt-16 mb-20 p-4 mx-auto w-full max-w-[1024px] transition-all duration-300" role="main">
+      <main className="flex-1 mt-16 mb-20 p-4 mx-auto w-full max-w-5xl transition-all duration-300" role="main">
         <Outlet /> {/* Render the content of each route */}
       </main>
 
       {/* Footer */}
       <footer className="fixed bottom-0 left-0 right-0 bg-gray-800 text-white p-4 shadow-md" role="contentinfo">
         <div className="flex justify-center items-center gap-2 flex-wrap">
-          <p className="transition-opacity duration-300 hover:opacity-80">&copy; 2025 AtmosBlock Web Portal</p>
+          {/* MIT: the author keeps the copyright and grants the rights, so no "all rights reserved" */}
+          <p className="transition-opacity duration-300 hover:opacity-80">
+            &copy; {COPYRIGHT_YEARS} Víctor Hernández ·{" "}
+            <a
+              href="https://github.com/Victor-Hndz/AtmosBlock-WebPortal/blob/main/LICENSE"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline-offset-2 hover:underline"
+            >
+              {t("navigation-footer.license")}
+            </a>
+          </p>
           <Separator.Root className="h-4 w-px bg-gray-500 mx-2" decorative orientation="vertical" />
           <Tooltip.Provider delayDuration={300}>
             <Tooltip.Root>

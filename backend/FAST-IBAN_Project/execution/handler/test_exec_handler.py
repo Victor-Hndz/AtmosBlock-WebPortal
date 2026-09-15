@@ -71,6 +71,8 @@ class ExecHandlerTest(unittest.TestCase):
         popen.assert_not_called()
         self.assertEqual(len(rabbit.errores()), 1)
         self.assertIn("humidity", rabbit.errores()[0]["exec_message"])
+        # WEB-222: el handler enruta la notificación a su petición por el hash.
+        self.assertEqual(rabbit.errores()[0]["request_hash"], "h1")
 
     def test_fallo_inesperado_notifica_error(self):
         rabbit = RabbitFalso()

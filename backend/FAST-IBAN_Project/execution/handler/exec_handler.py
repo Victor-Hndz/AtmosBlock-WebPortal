@@ -20,9 +20,14 @@ BUILD_FOLDERS = {
 }
 
 
-async def notify_execution(rabbitmq_client, exec_status, exec_message):
-    """Notify the general handler of the result of the execution."""
-    message = {"request_type": NOTIFY_EXECUTION, "exec_status": exec_status, "exec_message": exec_message}
+async def notify_execution(rabbitmq_client, request_hash, exec_status, exec_message):
+    """Notify the general handler of the result of the execution of a request (WEB-222: with its hash)."""
+    message = {
+        "request_type": NOTIFY_EXECUTION,
+        "request_hash": request_hash,
+        "exec_status": exec_status,
+        "exec_message": exec_message,
+    }
     await rabbitmq_client.publish(
         NOTIFICATIONS_EXCHANGE,
         NOTIFY_HANDLER_KEY,
@@ -40,20 +45,21 @@ async def handle_message(body, rabbitmq_client):
         return await run_algorithm(data, rabbitmq_client)
     except Exception as e:
         print(f"\n❌ Error inesperado en la ejecución: {e}")
-        await notify_execution(rabbitmq_client, STATUS_ERROR, f"Error inesperado en la ejecución: {e}")
+        await notify_execution(rabbitmq_client, data.get("request_hash"), STATUS_ERROR, f"Error inesperado en la ejecución: {e}")
         return False
 
 
 async def run_algorithm(data, rabbitmq_client):
     """Compile and run the C core for the requested variable, then upload the results."""
 
+    request_hash = data["request_hash"]
     build_folder = BUILD_FOLDERS.get(data["variable_name"])
     if build_folder is None:
         print(f"\n❌ Variable no soportada: {data['variable_name']}")
-        await notify_execution(rabbitmq_client, STATUS_ERROR, f"Variable no soportada: {data['variable_name']}")
+        await notify_execution(rabbitmq_client, request_hash, STATUS_ERROR, f"Variable no soportada: {data['variable_name']}")
         return False
 
-    await notify_update(rabbitmq_client, data["request_hash"], 1, "EXEC: Compilando algoritmo.")
+    await notify_update(rabbitmq_client, request_hash, 1, "EXEC: Compilando algoritmo.")
 
     os.makedirs(build_folder, exist_ok=True)
     print("\n[ ] Compilando el algoritmo en la carpeta: ", build_folder)
@@ -75,12 +81,12 @@ async def run_algorithm(data, rabbitmq_client):
         print("\n✅ Build completado exitosamente.")
     else:
         print("\n❌ Error al ejecutar el build:")
-        await notify_execution(rabbitmq_client, STATUS_ERROR, "Error al compilar")
+        await notify_execution(rabbitmq_client, request_hash, STATUS_ERROR, "Error al compilar")
         return False
 
     run_cmd = data["cmd"]
 
-    await notify_update(rabbitmq_client, data["request_hash"], 1, "EXEC: Ejecutando algoritmo.")
+    await notify_update(rabbitmq_client, request_hash, 1, "EXEC: Ejecutando algoritmo.")
 
     print("\n[ ] Ejecutando comando: ", run_cmd)
     result = subprocess.run(run_cmd, capture_output=True, text=True, cwd=build_folder)
@@ -89,14 +95,14 @@ async def run_algorithm(data, rabbitmq_client):
         print("\n✅ Ejecución exitosa.")
 
         #save the files in minio
-        upload_files_to_request_hash(data["request_hash"], local_folder="./out/"+data["request_hash"])
+        upload_files_to_request_hash(request_hash, local_folder="./out/"+request_hash)
         print("\n[ ] Archivos subidos a minio.")
 
-        await notify_execution(rabbitmq_client, STATUS_OK, "Ejecutado correctamente")
+        await notify_execution(rabbitmq_client, request_hash, STATUS_OK, "Ejecutado correctamente")
         return True
     else:
         print("\n❌ Ejecución fallida.")
-        await notify_execution(rabbitmq_client, STATUS_ERROR, result.stderr)
+        await notify_execution(rabbitmq_client, request_hash, STATUS_ERROR, result.stderr)
         return False
 
 
