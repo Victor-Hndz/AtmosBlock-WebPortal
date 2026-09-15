@@ -1,49 +1,27 @@
-# PROYECTO FAST-IBA<sup>3</sup>N (FAST - Identificación de Bloqueos Atmosféricos Automático en el Atlántico Norte)
-Código del proyecto desarrollado en el Trabajo de Fin de Grado para la Universidad Miguel Hernández de Elche.
+# FAST-IBAN
 
-**Autor: Víctor Hernández Sánchez**
+**English** · [Español](#español)
 
-**Tutores: José Antonio García Orza y Héctor Francisco Migallon Gomis**
+Processing services of AtmosBlock: the FAST-IBAN detector in C (`execution/code`) and the Python
+services that download ERA5 data (`configurator`), orchestrate a request (`handler`) and draw the maps
+(`visualization`).
 
-## Uso del programa
-Se usa un archivo de entrada .nc
+- Method, architecture and citation: [main README](../../README.md).
+- Building, testing and running the detector: [testing guide](../../docs/TESTING.md).
 
-Genera una carpeta out (si no existe) y dentro mete todos los ficheros de salida .csv, -txt y, si se requiere, salida de mapas con el formato que se especifique.
+FAST-IBA³N started as a bachelor's thesis at Universidad Miguel Hernández de Elche.
+Author: Víctor Hernández Sánchez. Supervisors: José Antonio García Orza and Héctor Francisco Migallón Gomis.
 
-En python visualizer, a partir de un fichero csv se ejecuta el script y genera una imagen que es un mapa representando los valores del csv. Se usa un fichero de configuración config.yaml
+---
 
-para usar únicamente el código en Cm se usa cmake:
-- cd execution/code/
-- mkdir build (si no hay build)
-- cd build
-- cmake -G "MinGW Makefiles" .. (Windows)
-- cmake .. (linux)
-- cmake --build .
+## Español
 
-Posteriormente, para lanzar tests, dentro de build:
-- ctest
-- ctest -V para más info
+Servicios de procesamiento de AtmosBlock: el detector FAST-IBAN en C (`execution/code`) y los
+servicios de Python que descargan los datos ERA5 (`configurator`), orquestan una petición (`handler`)
+y dibujan los mapas (`visualization`).
 
-para añadir tests: 
-- en la carpeta tests un .c con el test
-- en el CMakeLists.c de la carpeta tests: 
-    - añadir en add_executable al final el nombre del archivo .c
-    - añadir al final un add_test con la misma forma que el que ya hay, en el NAME el nombre que quieras y lo otro lo dejas igual
+- Método, arquitectura y cómo citar: [README principal](../../README.es.md).
+- Compilar, probar y ejecutar el detector: [guía de pruebas](../../docs/TESTING.es.md).
 
-para debug:
-- descomentar en cmakelists: set(CMAKE_BUILD_TYPE Debug) y enable_testing()
-- comentar la parte de release
-- lanzar el CLI la ejecución con --debug o usar gdb si solo se quiere la parte de C.
-
-
-Comando de ejemplo para uso del CLI: python configurator_CLI.py -d config/data/geopot_500hPa_2022-03-14_00-06-12-18UTC_HN.nc -t forms -r comb -l 20 -i 0 1 2 -la 25 85 -lo -180 180 -f svg
-
-Otras opciones de ejecución con otros mapas de archivos .nc:
-
-python configurator_CLI.py -d "config/data/geopot_500hPa_2003-08-(01-15)_00-06-12-18UTC.nc" -t comb -r comb -l 20 -i 8 -la 25 90 -lo -180 180 -f svg
-
-python configurator_CLI.py -d "config/data/geopot_500hPa_2022-03-(12-16)_00-06-12-18UTC.nc" -t comb -r comb -l 20 -i 8 -la 25 90 -lo -180 180 -f svg
-
-python configurator_CLI.py -d config/data/geopot_500hPa_2022-03-14_00-06-12-18UTC.nc -t comb -r comb -l 20 -i 0 -la 25 90 -lo -180 180 -f svg
-
-python configurator_CLI.py -d config/data/geopot_500hPa_2019-06-26_00-06-12-18UTC.nc -t comb -r comb -l 20 -i 0 -la 25 90 -lo -180 180 -f svg
+FAST-IBA³N nació como Trabajo Fin de Grado en la Universidad Miguel Hernández de Elche.
+Autor: Víctor Hernández Sánchez. Tutores: José Antonio García Orza y Héctor Francisco Migallón Gomis.

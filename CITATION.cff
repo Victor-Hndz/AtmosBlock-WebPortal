@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "AtmosBlock: deterministic detection and morphological classification of atmospheric blocking"
+abstract: >-
+  AtmosBlock combines FAST-IBAN, a deterministic C implementation (OpenMP/MPI) of an atmospheric
+  blocking detector based on great-circle sampling of 500 hPa geopotential with Omega/Rex
+  morphological classification, and a web portal that runs it on demand on ERA5 reanalysis data.
+authors:
+  - family-names: "Hernández Sánchez"
+    given-names: "Víctor"
+repository-code: "https://github.com/Victor-Hndz/AtmosBlock-WebPortal"
+license: MIT
+keywords:
+  - atmospheric blocking
+  - geopotential height
+  - ERA5
+  - climate diagnostics
+  - reproducibility
+  - OpenMP
+  - MPI

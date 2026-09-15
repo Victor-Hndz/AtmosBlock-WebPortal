@@ -28,11 +28,11 @@ Please **do not** open a public issue or discuss vulnerabilities openly until a 
 
 ## Supported Versions
 
-We support the latest stable version of **AtmosBlock-WebPortal**. Please upgrade to the latest release to receive security updates.
+There are no versioned releases yet. Security fixes are applied to the latest commit on the `main`
+branch only.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
+The web portal is still being hardened and is **not yet intended for public deployment**. If you
+run it, keep it on a trusted network.
 
 
 ## Security Best Practices for Users
