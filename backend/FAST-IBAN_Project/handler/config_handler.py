@@ -1,3 +1,4 @@
+import os
 import sys
 from typing import List, Optional
 import asyncio
@@ -166,14 +167,26 @@ class ConfigHandler:
         """
         out_dir = OUT_DIR+"/"+config["requestHash"]+"/"
         area = [config["file"], str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), out_dir]
-        if config["omp"] and not config["mpi"]:
-            return [EXEC_FILE, *area, config["nThreads"]]
-        elif config["mpi"] and not config["omp"]:
-            return ["mpirun", "-n", config["nProces"], EXEC_FILE, *area, "1"]
-        elif config["omp"] and config["mpi"]:
-            return ["mpirun", "-n", config["nProces"], EXEC_FILE, *area, config["nThreads"]]
+
+        # WEB-218: each mode has its own binary (./FAST-IBAN, _omp, _mpi, _omp_mpi). Only the geopotential core
+        # (code/) builds the parallel variants; the temperature core (code_t/) is serial only.
+        parallel = config["variableName"].lower() == "geopotential"
+        omp = bool(config["omp"]) and parallel
+        mpi = bool(config["mpi"]) and parallel
+
+        # ponytail: defaults from this container's CPU count (the execution container runs on the same host);
+        # the form has no thread/process fields yet.
+        cpus = os.cpu_count() or 1
+        if omp and mpi:
+            processes = config["nProces"] or 2
+            threads = config["nThreads"] or max(1, cpus // processes)
         else:
-            return [EXEC_FILE, *area, "1"]
+            processes = config["nProces"] or cpus
+            threads = config["nThreads"] or cpus
+
+        binary = EXEC_FILE + ("_omp" if omp else "") + ("_mpi" if mpi else "")
+        cmd = [binary, *area, str(threads) if omp else "1"]
+        return ["mpirun", "-n", str(processes), *cmd] if mpi else cmd
 
     async def process_map_generation(self, config: dict) -> None:
         """

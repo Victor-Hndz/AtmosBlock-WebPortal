@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { AmqpService } from "./amqp.service";
 import { MessageContent } from "../interfaces/messageContentInterface.interface";
+import { RabbitMQRoutingKeys } from "../enums/rabbitmqQueues.enum";
 import { Observable } from "rxjs";
 
 /**
@@ -20,9 +21,9 @@ export class RabbitMQService {
     await this.amqpService.disconnect();
   }
 
-  emit(pattern: string, data: MessageContent): Observable<any> {
+  emit(pattern: string, data: MessageContent): Observable<unknown> {
     // Call async emit but return Observable for compatibility
-    this.amqpService.emit(pattern as any, data);
+    this.amqpService.emit(pattern as RabbitMQRoutingKeys, data);
     return new Observable();
   }
 }

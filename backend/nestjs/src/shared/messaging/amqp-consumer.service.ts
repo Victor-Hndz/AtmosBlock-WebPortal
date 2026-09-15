@@ -1,13 +1,14 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import * as amqp from "amqplib";
 import { ConfigService } from "@nestjs/config";
+import { errorMessage } from "../utils/errorMessage";
 import { ExtendedConnection, ExtendedChannel, asConnection, asChannel } from "./amqp-types";
 
 interface ConsumerHandler {
   routingKey: string;
   queue: string;
   exchange: string;
-  handler: (message: any) => Promise<void>;
+  handler: (message: unknown) => Promise<void>;
 }
 
 /**
@@ -36,9 +37,9 @@ export class AmqpConsumerService implements OnModuleInit {
    * @param routingKey The routing key to listen for
    * @param queue The queue name
    * @param exchange The exchange name
-   * @param handler The handler function to process messages
+   * @param handler The handler function to process messages (it receives the parsed JSON body)
    */
-  registerHandler(routingKey: string, queue: string, exchange: string, handler: (message: any) => Promise<void>) {
+  registerHandler(routingKey: string, queue: string, exchange: string, handler: (message: unknown) => Promise<void>) {
     const key = `${exchange}:${routingKey}:${queue}`;
     this.handlers.set(key, { routingKey, queue, exchange, handler });
     this.logger.log(`Handler registered for ${exchange}:${routingKey} on queue ${queue}`);
@@ -46,7 +47,7 @@ export class AmqpConsumerService implements OnModuleInit {
     // If we're already connected, set up the consumer
     if (this.channel) {
       this.setupConsumer({ routingKey, queue, exchange, handler }).catch(err => {
-        this.logger.error(`Failed to set up consumer for ${key}: ${err.message}`);
+        this.logger.error(`Failed to set up consumer for ${key}: ${errorMessage(err)}`);
       });
     }
   }
@@ -94,10 +95,10 @@ export class AmqpConsumerService implements OnModuleInit {
 
           // Break the retry loop on successful connection
           break;
-        } catch (connectError: any) {
+        } catch (connectError: unknown) {
           retries += 1;
           this.logger.warn(
-            `RabbitMQ consumer connection attempt ${retries}/${maxRetries} failed: ${connectError.message}`
+            `RabbitMQ consumer connection attempt ${retries}/${maxRetries} failed: ${errorMessage(connectError)}`
           );
 
           if (retries >= maxRetries) {
@@ -110,8 +111,8 @@ export class AmqpConsumerService implements OnModuleInit {
           await new Promise(resolve => setTimeout(resolve, delay));
         }
       }
-    } catch (error: any) {
-      this.logger.error(`Failed to connect RabbitMQ consumer after several attempts: ${error.message}`);
+    } catch (error: unknown) {
+      this.logger.error(`Failed to connect RabbitMQ consumer after several attempts: ${errorMessage(error)}`);
       this.scheduleReconnect();
     }
   }
@@ -130,8 +131,8 @@ export class AmqpConsumerService implements OnModuleInit {
     this.reconnectTimer = setTimeout(async () => {
       try {
         await this.connect();
-      } catch (error: any) {
-        this.logger.error(`Reconnect failed: ${error.message}`);
+      } catch (error: unknown) {
+        this.logger.error(`Reconnect failed: ${errorMessage(error)}`);
         this.scheduleReconnect();
       }
     }, 5000); // Try to reconnect after 5 seconds
@@ -165,7 +166,7 @@ export class AmqpConsumerService implements OnModuleInit {
           }
 
           try {
-            const content = JSON.parse(msg.content.toString());
+            const content: unknown = JSON.parse(msg.content.toString());
             this.logger.log(`Received message on ${handler.queue} with routing key ${msg.fields.routingKey}`);
 
             try {
@@ -173,15 +174,15 @@ export class AmqpConsumerService implements OnModuleInit {
               if (this.channel) {
                 this.channel.ack(msg); // Acknowledge the message after successful processing
               }
-            } catch (processingError: any) {
-              this.logger.error(`Error processing message: ${processingError.message}`);
+            } catch (processingError: unknown) {
+              this.logger.error(`Error processing message: ${errorMessage(processingError)}`);
               // Acknowledge anyway to prevent redelivery loops, as the error is likely in our code
               if (this.channel) {
                 this.channel.ack(msg);
               }
             }
-          } catch (parseError: any) {
-            this.logger.error(`Error parsing message: ${parseError.message}`);
+          } catch (parseError: unknown) {
+            this.logger.error(`Error parsing message: ${errorMessage(parseError)}`);
             // Acknowledge malformed messages to avoid redelivery loops
             if (this.channel) {
               this.channel.ack(msg);
@@ -192,10 +193,10 @@ export class AmqpConsumerService implements OnModuleInit {
       );
 
       this.logger.log(`Consumer set up for ${handler.exchange}:${handler.routingKey} on queue ${handler.queue}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.logger.error(
         `Failed to set up consumer for ${handler.exchange}:${handler.routingKey} ` +
-          `on queue ${handler.queue}: ${error.message}`
+          `on queue ${handler.queue}: ${errorMessage(error)}`
       );
     }
   }
@@ -221,8 +222,8 @@ export class AmqpConsumerService implements OnModuleInit {
       }
 
       this.logger.log("AmqpConsumerService disconnected");
-    } catch (error: any) {
-      this.logger.error(`Error closing AMQP consumer connections: ${error.message}`);
+    } catch (error: unknown) {
+      this.logger.error(`Error closing AMQP consumer connections: ${errorMessage(error)}`);
     }
   }
 }
