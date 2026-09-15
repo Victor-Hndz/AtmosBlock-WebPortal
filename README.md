@@ -159,9 +159,10 @@ Progress and notes are also published in the [project wiki](https://github.com/V
 
 ## Academic origin
 
-- **FAST-IBA³N** (*Automatic identification of atmospheric blocking in the North Atlantic*) started
-  as a bachelor's thesis at Universidad Miguel Hernández de Elche, supervised by José Antonio García
-  Orza and Héctor Francisco Migallón Gomis.
+- **FAST-IBA³N** started as a bachelor's thesis (Computer Engineering, Universidad Miguel Hernández
+  de Elche, 2024), supervised by José Antonio García Orza and Héctor Francisco Migallón Gomis:
+  Hernández Sánchez, V. *Diseño y aceleración de nuevos procedimientos de identificación automatizada
+  de bloqueos atmosféricos en el Atlántico Norte*. [hdl:11000/32775](https://hdl.handle.net/11000/32775)
 - **The web portal** was developed as a master's thesis at Universidad de Murcia.
 
 The project has since been extended beyond both theses.
@@ -185,16 +186,20 @@ be made of the Copernicus information or data it contains.
 
 - Davini, P., Cagnazzo, C., Gualdi, S., & Navarra, A. (2012). Bidimensional diagnostics,
   variability, and trends of Northern Hemisphere blocking. *Journal of Climate*, 25(19), 6496–6509.
+  [doi:10.1175/JCLI-D-12-00032.1](https://doi.org/10.1175/JCLI-D-12-00032.1)
 - Hersbach, H., et al. (2020). The ERA5 global reanalysis. *Quarterly Journal of the Royal
-  Meteorological Society*, 146(730), 1999–2049.
+  Meteorological Society*, 146(730), 1999–2049. [doi:10.1002/qj.3803](https://doi.org/10.1002/qj.3803)
 - Tibaldi, S., & Molteni, F. (1990). On the operational predictability of blocking. *Tellus A*,
-  42(3), 343–365.
+  42(3), 343–365. [doi:10.3402/tellusa.v42i3.11882](https://doi.org/10.3402/tellusa.v42i3.11882)
 - Ullrich, P. A., & Zarzycki, C. M. (2017). TempestExtremes: a framework for scale-insensitive
   pointwise feature tracking on unstructured grids. *Geoscientific Model Development*, 10(3), 1069–1090.
+  [doi:10.5194/gmd-10-1069-2017](https://doi.org/10.5194/gmd-10-1069-2017)
 - Woollings, T., et al. (2018). Blocking and its response to climate change. *Current Climate Change
-  Reports*, 4(3), 287–300.
+  Reports*, 4(3), 287–300. [doi:10.1007/s40641-018-0108-z](https://doi.org/10.1007/s40641-018-0108-z)
 
 ## License and contact
+
+Author: Víctor Hernández Sánchez · ORCID [0009-0002-2391-1256](https://orcid.org/0009-0002-2391-1256)
 
 Released under the [MIT License](LICENSE). Security issues: see [SECURITY.md](SECURITY.md).
 Questions and collaboration: [open an issue](https://github.com/Victor-Hndz/AtmosBlock-WebPortal/issues)
