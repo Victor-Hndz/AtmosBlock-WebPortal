@@ -1,4 +1,4 @@
-"""WEB-221: un fallo al descargar o preparar los datos se notifica a la API como resultado con estado ERROR.
+"""Configurador: fallos notificados a la API (WEB-221) y peticiones simultáneas independientes (WEB-222).
 
 Antes, request_data imprimía el error del CDS y seguía; adapt_netcdf fallaba con un fichero inexistente,
 el wrapper del consumidor tragaba la excepción y la petición se quedaba en GENERATING para siempre.
@@ -12,6 +12,7 @@ import pathlib
 import sys
 import types
 import unittest
+from unittest import mock
 
 RAIZ = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ))
@@ -50,7 +51,7 @@ _stub("utils.netcdf_editor", adapt_netcdf=llamadas_adapt.append)
 configurator = _cargar("configurator_CLI", RAIZ / "configurator" / "configurator_CLI.py")
 
 from utils.consts.consts import STATUS_ERROR, STATUS_OK  # noqa: E402
-from utils.rabbitMQ.rabbit_consts import HANDLER_START_KEY, RESULTS_DONE_KEY  # noqa: E402
+from utils.rabbitMQ.rabbit_consts import HANDLER_START_KEY, PROGRESS_UPDATE_KEY, RESULTS_DONE_KEY  # noqa: E402
 
 
 class RabbitFalso:
@@ -58,6 +59,8 @@ class RabbitFalso:
         self.publicados = []
 
     async def publish(self, exchange, routing_key, message):
+        # Cede el control como una publicación real: otra petición puede avanzar mientras tanto.
+        await asyncio.sleep(0)
         self.publicados.append((routing_key, json.loads(message)))
 
     def con_clave(self, clave):
@@ -92,6 +95,30 @@ class ConfiguratorErroresTest(unittest.TestCase):
         self.assertEqual(resultados[0]["content"]["requestHash"], "h1")
         self.assertEqual(llamadas_adapt, [], "no debe adaptar un fichero que no se ha descargado")
         self.assertEqual(rabbit.con_clave(HANDLER_START_KEY), [], "no debe lanzar el handler")
+
+
+class ConfiguratorConcurrenciaTest(unittest.TestCase):
+    def test_peticiones_simultaneas_no_se_pisan(self):
+        # WEB-222: el configurador es una instancia única; los argumentos de una petición no pueden
+        # sobrescribir los de otra que sigue en curso.
+        rabbit = RabbitFalso()
+        conf = configurator.Configurator(rabbit)
+
+        async def ambas():
+            await asyncio.gather(
+                conf.process_message(peticion(requestHash="a", variableName="geopotential", hours=["0"])),
+                conf.process_message(peticion(requestHash="b", variableName="geopotential", hours=["6"])),
+            )
+
+        with mock.patch.object(configurator.os.path, "exists", return_value=True):
+            asyncio.run(ambas())
+
+        enviados = {m["content"]["requestHash"]: m["content"]["file"] for m in rabbit.con_clave(HANDLER_START_KEY)}
+        self.assertEqual(sorted(enviados), ["a", "b"])
+        self.assertTrue(enviados["a"].endswith("_00UTC.nc"), enviados["a"])
+        self.assertTrue(enviados["b"].endswith("_06UTC.nc"), enviados["b"])
+        progreso = [m["content"]["requestHash"] for m in rabbit.con_clave(PROGRESS_UPDATE_KEY)]
+        self.assertEqual((progreso.count("a"), progreso.count("b")), (3, 3))
 
 
 if __name__ == "__main__":

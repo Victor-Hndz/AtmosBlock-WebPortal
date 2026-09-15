@@ -1,5 +1,5 @@
 import sys
-from typing import List
+from typing import List, Optional
 import asyncio
 
 sys.path.append('/app/')
@@ -8,7 +8,6 @@ from utils.rabbitMQ.rabbitmq import RabbitMQ
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
 from utils.rabbitMQ.rabbit_consts import HANDLER_QUEUE, NOTIFICATIONS_QUEUE, EXECUTION_EXCHANGE, EXECUTION_ALGORITHM_KEY, EXECUTION_VISUALIZATION_KEY, NOTIFY_EXECUTION, NOTIFY_VISUALIZATION
-from utils.minio.upload_files import upload_files_to_request_hash
 from utils.clean_folder_files import clean_directory
 from utils.rabbitMQ.notify_results import notify_result
 from utils.consts.consts import EXEC_FILE, STATUS_OK, STATUS_ERROR
@@ -19,240 +18,202 @@ OUT_DIR = "./out"
 class ConfigHandler:
     """
     Main orchestrator for the FAST-IBAN processing pipeline.
-    
-    This class handles configuration loading, executes the processing steps
-    in sequence, and manages communication between different components.
+
+    Keeps the configuration of every request in progress by its hash. Execution and visualization
+    notifications carry that hash, so concurrent requests do not overwrite each other (WEB-222).
     """
-    
+
     def __init__(self, rabbitmq_client: RabbitMQ):
         """
-        Initialize the configuration handler with default values.
-        
+        Initialize the configuration handler.
+
         Args:
             rabbitmq_client: RabbitMQ client instance for messaging
         """
-        # Store the RabbitMQ client
         self.rabbitmq = rabbitmq_client
-        
-        # Configuration properties
-        self.file_name = None
-        self.request_hash = None
-        self.variable_name = None
-        self.pressure_level = None
-        self.years = None
-        self.months = None
-        self.days = None
-        self.hours = None
-        self.area_covered = None
-        self.map_types = None
-        self.map_levels = None
-        self.file_format = None
-        self.no_data = None
-        self.no_maps = None
-        self.omp = None
-        self.mpi = None
-        self.n_threads = None
-        self.n_processes = None
-        
-        # Processing state
-        self.execution_completed = False
-        self.maps_generated = False
-
-
-    def init(self, data) -> None:
-        """
-        Initialize variables from a configuration file.
-        
-        Args:
-            data: Configuration data in JSON format
-        """
-            
-        # Extract configuration values
-        self.file_name = data["file"]
-        self.request_hash = data["requestHash"]
-        self.variable_name = data["variableName"]
-        self.pressure_level = data["pressureLevel"]
-        self.years = data["years"]
-        self.months = data["months"]
-        self.days = data["days"]
-        self.hours = data["hours"]
-        self.area_covered = data["areaCovered"]
-        self.map_types = data["mapTypes"]
-        self.map_levels = data["mapLevels"]
-        self.file_format = data["fileFormat"]
-        self.no_data = data["noData"]
-        self.no_maps = data["noMaps"]
-        self.omp = data["omp"]
-        self.mpi = data["mpi"]
-        self.n_threads = data["nThreads"]
-        self.n_processes = data["nProces"]
+        # Configuration of the requests in progress, by request hash
+        self.requests = {}
 
     async def handle_config_message(self, body: bytes) -> None:
         """
         Process a configuration message and begin the orchestration flow.
-        
+
         Args:
             body: Raw message body from RabbitMQ
         """
-        data = process_body(body)
-        print(f"\n✅ Mensaje recibido en handler: {data}")
+        config = process_body(body)
+        print(f"\n✅ Mensaje recibido en handler: {config}")
         print("\n✅ Archivo válido recibido. Iniciando procesamiento...")
-        
-        # Start the orchestration flow
-        self.init(data)
-        print(f"Archivo a procesar: {self.file_name}")
-        await self.process_file()
+
+        self.requests[config["requestHash"]] = config
+        print(f"Archivo a procesar: {config['file']}")
+        await self.process_file(config)
 
     async def handle_general_notification_message(self, body: bytes) -> None:
         """
         Handle general notification messages.
-        
+
         Args:
             body: Raw message body from RabbitMQ
         """
         data = process_body(body)
         print(f"\n[ ] Mensaje de notificación recibido: {data}")
-        
+
         # Process the message based on its type
         if data["request_type"] == NOTIFY_EXECUTION:
             await self.handle_execution_message(body)
         elif data["request_type"] == NOTIFY_VISUALIZATION:
             await self.handle_map_generation_message(body)
-    
+
+    def request_of(self, message: dict) -> Optional[dict]:
+        """Configuration of the request a notification belongs to, or None if it is unknown."""
+        config = self.requests.get(message.get("request_hash"))
+        if config is None:
+            print(f"\n⚠️ Notificación de una petición desconocida: {message.get('request_hash')}")
+        return config
+
     async def handle_execution_message(self, body: bytes) -> None:
         """
         Handle execution completion messages and proceed to the next step.
-        
+
         Args:
             body: Raw message body from RabbitMQ
         """
         message = process_body(body)
-        
+        config = self.request_of(message)
+        if config is None:
+            return
+        request_hash = config["requestHash"]
+
         if message["exec_status"] == STATUS_ERROR:
             print("\n❌ Error al ejecutar el programa.")
             print(f"\t❌ Error: {message['exec_message']}")
+            self.requests.pop(request_hash, None)
             # WEB-211: la API marca la petición como fallida en vez de dejarla en GENERATING.
-            await notify_result(self.rabbitmq, f"Error al ejecutar el algoritmo: {message['exec_message']}", self.request_hash, STATUS_ERROR)
+            await notify_result(self.rabbitmq, f"Error al ejecutar el algoritmo: {message['exec_message']}", request_hash, STATUS_ERROR)
             return
-        elif message["exec_status"] == STATUS_OK:
-            # print(f"\n[ ] Se recibió un mensaje de ejecución: {message['exec_message']}")
-            print("\n✅ Ejecución completada exitosamente.")
-            self.execution_completed = True
-        
+
+        print("\n✅ Ejecución completada exitosamente.")
+
         # Continue with the next steps in the pipeline
-        if not self.no_maps:
-            await self.process_map_generation()
+        if not config["noMaps"]:
+            await self.process_map_generation(config)
         else:
-            print("\n✅ Procesamiento completado.")
-            await notify_result(self.rabbitmq, "Processing completed successfully.", self.request_hash)
-            clean_directory(OUT_DIR+"/"+self.request_hash)
+            await self.finish(request_hash)
 
     async def handle_map_generation_message(self, body: bytes) -> None:
         """
         Handle map generation completion messages and proceed to the next step.
-        
+
         Args:
             body: Raw message body from RabbitMQ
         """
         message = process_body(body)
         print("\n[ ] Se recibió un mensaje de generación de mapas.")
-        
+        config = self.request_of(message)
+        if config is None:
+            return
+        request_hash = config["requestHash"]
+
         if message["exec_status"] == STATUS_ERROR:
             print("\n❌ Error al generar los mapas.")
             print(f"\t❌ Error: {message['exec_message']}")
-            await notify_result(self.rabbitmq, f"Error al generar los mapas: {message['exec_message']}", self.request_hash, STATUS_ERROR)
+            self.requests.pop(request_hash, None)
+            await notify_result(self.rabbitmq, f"Error al generar los mapas: {message['exec_message']}", request_hash, STATUS_ERROR)
             return
-        
+
         print("\n✅ Generación de mapas completada exitosamente.")
-        self.maps_generated = True
-        
+        await self.finish(request_hash)
+
+    async def finish(self, request_hash: str) -> None:
+        """Notify the successful result and remove the local output of the request."""
+        self.requests.pop(request_hash, None)
         print("\n✅ Procesamiento completado.")
-        await notify_result(self.rabbitmq, "Processing completed successfully.", self.request_hash)
-        clean_directory(OUT_DIR+"/"+self.request_hash)
+        await notify_result(self.rabbitmq, "Processing completed successfully.", request_hash)
+        clean_directory(OUT_DIR+"/"+request_hash)
 
-    async def process_file(self) -> None:
+    async def process_file(self, config: dict) -> None:
         """
-        Process the configuration file and execute the algorithm.
+        Send the execution of the algorithm for a request.
         """
-        lat_range = [int(self.area_covered[2]), int(self.area_covered[0])]
-        lon_range = [int(self.area_covered[1]), int(self.area_covered[3])]
-        
-        print(f"\n[ ] Ejecutando el programa para el archivo: {self.file_name}")
+        area_covered = config["areaCovered"]
+        lat_range = [int(area_covered[2]), int(area_covered[0])]
+        lon_range = [int(area_covered[1]), int(area_covered[3])]
 
-        cmd = self.prepare_execution_command(lat_range, lon_range)
-        
+        print(f"\n[ ] Ejecutando el programa para el archivo: {config['file']}")
+
+        cmd = self.prepare_execution_command(config, lat_range, lon_range)
+
         print("\n[ ] Enviando mensaje a la cola de ejecución...")
-        
-        data = {"cmd": cmd, "request_hash": self.request_hash, "variable_name": self.variable_name.lower()}
-        
-        # Send execution request and wait for response
+
+        data = {"cmd": cmd, "request_hash": config["requestHash"], "variable_name": config["variableName"].lower()}
+
+        # The result arrives on NOTIFICATIONS_QUEUE, consumed once at startup
         message = create_message(STATUS_OK, "", data)
         await self.rabbitmq.publish(EXECUTION_EXCHANGE, EXECUTION_ALGORITHM_KEY, message)
-        await self.rabbitmq.consume(NOTIFICATIONS_QUEUE, callback=self.handle_general_notification_message)
 
-    def prepare_execution_command(self, lat_range: List[int], lon_range: List[int]) -> List[str]:
+    def prepare_execution_command(self, config: dict, lat_range: List[int], lon_range: List[int]) -> List[str]:
         """
         Prepare the execution command based on configuration.
-        
+
         Args:
+            config: Configuration of the request
             lat_range: Latitude range [min, max]
             lon_range: Longitude range [min, max]
-            
+
         Returns:
             List of command arguments
         """
-        if self.omp and not self.mpi:
-            return [EXEC_FILE, self.file_name, str(lat_range[0]), str(lat_range[1]), 
-                    str(lon_range[0]), str(lon_range[1]), OUT_DIR+"/"+self.request_hash+"/", self.n_threads]
-        elif self.mpi and not self.omp:
-            return ["mpirun", "-n", self.n_processes, EXEC_FILE, self.file_name, 
-                    str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), OUT_DIR+"/"+self.request_hash+"/", "1"]
-        elif self.omp and self.mpi:
-            return ["mpirun", "-n", self.n_processes, EXEC_FILE, self.file_name, 
-                    str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), OUT_DIR+"/"+self.request_hash+"/", self.n_threads]
+        out_dir = OUT_DIR+"/"+config["requestHash"]+"/"
+        area = [config["file"], str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), out_dir]
+        if config["omp"] and not config["mpi"]:
+            return [EXEC_FILE, *area, config["nThreads"]]
+        elif config["mpi"] and not config["omp"]:
+            return ["mpirun", "-n", config["nProces"], EXEC_FILE, *area, "1"]
+        elif config["omp"] and config["mpi"]:
+            return ["mpirun", "-n", config["nProces"], EXEC_FILE, *area, config["nThreads"]]
         else:
-            return [EXEC_FILE, self.file_name, str(lat_range[0]), str(lat_range[1]), 
-                    str(lon_range[0]), str(lon_range[1]), OUT_DIR+"/"+self.request_hash+"/", "1"]
-        
-    async def process_map_generation(self) -> None:
+            return [EXEC_FILE, *area, "1"]
+
+    async def process_map_generation(self, config: dict) -> None:
         """
-        Generate maps based on the configuration.
+        Send the map generation of a request.
         """
-        
+
         data = {
-            "file_name": self.file_name,
-            "request_hash": self.request_hash,
-            "variable_name": self.variable_name,
-            "pressure_level": self.pressure_level,
-            "years": self.years,
-            "months": self.months,
-            "days": self.days,
-            "hours": self.hours,
-            "map_types": self.map_types,
-            "map_levels": self.map_levels,
-            "file_format": self.file_format,
-            "area_covered": self.area_covered,
+            "file_name": config["file"],
+            "request_hash": config["requestHash"],
+            "variable_name": config["variableName"],
+            "pressure_level": config["pressureLevel"],
+            "years": config["years"],
+            "months": config["months"],
+            "days": config["days"],
+            "hours": config["hours"],
+            "map_types": config["mapTypes"],
+            "map_levels": config["mapLevels"],
+            "file_format": config["fileFormat"],
+            "area_covered": config["areaCovered"],
         }
-       
-        # Send execution request and wait for response
+
+        # The result arrives on NOTIFICATIONS_QUEUE, consumed once at startup
         print("\n[ ] Enviando mensaje a la cola de generación de mapas...")
         message = create_message(STATUS_OK, "", data)
         await self.rabbitmq.publish(EXECUTION_EXCHANGE, EXECUTION_VISUALIZATION_KEY, message)
-        await self.rabbitmq.consume(NOTIFICATIONS_QUEUE, callback=self.handle_general_notification_message)
-    
+
 # Update the main entry point to use asyncio
 if __name__ == "__main__":
     async def main():
         # Initialize the RabbitMQ connection
         rabbitmq_client = RabbitMQ()
         await rabbitmq_client.initialize()
-        
+
         # Initialize the handler with the RabbitMQ client
         handler = ConfigHandler(rabbitmq_client)
-        
-        # Start consuming messages
+
+        # Start consuming messages: new requests and the notifications of every step (WEB-222: once)
         await rabbitmq_client.consume(HANDLER_QUEUE, callback=handler.handle_config_message)
-        
+        await rabbitmq_client.consume(NOTIFICATIONS_QUEUE, callback=handler.handle_general_notification_message)
+
         # Keep the application running
         try:
             # Run forever
@@ -262,6 +223,6 @@ if __name__ == "__main__":
         finally:
             # Close the connection when done
             await rabbitmq_client.close()
-    
+
     # Run the async main function
     asyncio.run(main())

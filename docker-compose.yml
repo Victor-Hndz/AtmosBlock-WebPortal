@@ -57,6 +57,7 @@ services:
         condition: service_started
     volumes:
       - config_data:/app/config
+      - out_data:/app/out  # WEB-222: el handler borra la salida local de cada petición al terminar
     stdin_open: true
     tty: true
     working_dir: /app
