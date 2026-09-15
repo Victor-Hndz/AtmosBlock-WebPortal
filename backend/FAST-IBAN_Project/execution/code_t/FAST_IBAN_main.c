@@ -39,6 +39,9 @@ int main(int argc, char **argv) {
     for(i = 0; i < NTIME * NLAT; i++) 
         t_in[0][i] = t_in[0][0] + i * NLON;
 
+    // ALG-301: datos y coordenadas se leen antes de dimensionar la rejilla, porque RES sale de ellas.
+    init_nc_variables(ncid, t_in, lats, lons, &scale_factor, &offset, long_name);
+
     step = 3;
     size_x = (int)((FILT_LAT(LAT_LIM_MIN))/step)+1;
     size_y = (int)((NLON)/step);
@@ -56,8 +59,6 @@ int main(int argc, char **argv) {
     }
 
 
-    //Extract the data from the netcdf file.
-    init_nc_variables(ncid, t_in, lats, lons, &scale_factor, &offset, long_name);   
 
     // Close the file.
     if ((retval = nc_close(ncid)))
