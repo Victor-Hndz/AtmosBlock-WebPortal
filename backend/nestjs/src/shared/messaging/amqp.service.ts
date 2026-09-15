@@ -4,6 +4,7 @@ import * as amqp from "amqplib";
 import { ConfigService } from "@nestjs/config";
 import { RabbitMQExchanges, RabbitMQRoutingKeys } from "../enums/rabbitmqQueues.enum";
 import { MessageContent } from "../interfaces/messageContentInterface.interface";
+import { errorMessage } from "../utils/errorMessage";
 import { ExtendedConnection, ExtendedChannel, asConnection, asChannel } from "./amqp-types";
 
 @Injectable()
@@ -59,9 +60,11 @@ export class AmqpService implements OnModuleInit, OnModuleDestroy {
 
           // Break the retry loop on successful connection
           break;
-        } catch (connectError: any) {
+        } catch (connectError: unknown) {
           retries += 1;
-          this.logger.warn(`RabbitMQ connection attempt ${retries}/${maxRetries} failed: ${connectError.message}`);
+          this.logger.warn(
+            `RabbitMQ connection attempt ${retries}/${maxRetries} failed: ${errorMessage(connectError)}`
+          );
 
           if (retries >= maxRetries) {
             throw connectError;
@@ -73,8 +76,8 @@ export class AmqpService implements OnModuleInit, OnModuleDestroy {
           await new Promise(resolve => setTimeout(resolve, delay));
         }
       }
-    } catch (error: any) {
-      this.logger.error(`Failed to connect to RabbitMQ after several attempts: ${error.message}`);
+    } catch (error: unknown) {
+      this.logger.error(`Failed to connect to RabbitMQ after several attempts: ${errorMessage(error)}`);
       throw error;
     }
   }
@@ -84,8 +87,8 @@ export class AmqpService implements OnModuleInit, OnModuleDestroy {
       try {
         // Close existing channel if it's still there
         await this.channel.close();
-      } catch (err: any) {
-        this.logger.error(`Error closing existing channel: ${err.message}`);
+      } catch (err: unknown) {
+        this.logger.error(`Error closing existing channel: ${errorMessage(err)}`);
       }
     }
 
@@ -93,8 +96,8 @@ export class AmqpService implements OnModuleInit, OnModuleDestroy {
       try {
         // Close existing connection if it's still there
         await this.connection.close();
-      } catch (err: any) {
-        this.logger.error(`Error closing existing connection: ${err.message}`);
+      } catch (err: unknown) {
+        this.logger.error(`Error closing existing connection: ${errorMessage(err)}`);
       }
     }
 
@@ -103,8 +106,8 @@ export class AmqpService implements OnModuleInit, OnModuleDestroy {
 
     try {
       await this.connect();
-    } catch (error: any) {
-      this.logger.error(`Failed to reconnect: ${error.message}`);
+    } catch (error: unknown) {
+      this.logger.error(`Failed to reconnect: ${errorMessage(error)}`);
     }
   }
 
@@ -119,8 +122,8 @@ export class AmqpService implements OnModuleInit, OnModuleDestroy {
         this.connection = null;
       }
       this.logger.log("Disconnected from RabbitMQ");
-    } catch (error: any) {
-      this.logger.error(`Error disconnecting from RabbitMQ: ${error.message}`);
+    } catch (error: unknown) {
+      this.logger.error(`Error disconnecting from RabbitMQ: ${errorMessage(error)}`);
     }
   }
 
@@ -179,8 +182,8 @@ export class AmqpService implements OnModuleInit, OnModuleDestroy {
       }
 
       return result;
-    } catch (error: any) {
-      this.logger.error(`Error emitting message to ${routingKey}: ${error.message}`);
+    } catch (error: unknown) {
+      this.logger.error(`Error emitting message to ${routingKey}: ${errorMessage(error)}`);
       // Try to reconnect on failure
       await this.tryReconnect();
       return false;

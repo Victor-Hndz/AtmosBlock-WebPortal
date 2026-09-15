@@ -47,7 +47,6 @@ export default [...compat.extends(
             argsIgnorePattern: "^_",
         }],
 
-        "@typescript-eslint/no-explicit-any": "off",
         "prefer-const": "error",
         eqeqeq: "error",
         "consistent-return": "error",

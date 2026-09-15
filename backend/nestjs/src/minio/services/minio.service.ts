@@ -75,7 +75,7 @@ export class MinioService {
    * @param filePath The path of the file in the bucket
    * @returns Object with file stream and metadata
    */
-  async getFile(filePath: string): Promise<{ stream: Readable; metadata: any }> {
+  async getFile(filePath: string): Promise<{ stream: Readable; metadata: Awaited<ReturnType<Client["statObject"]>> }> {
     try {
       this.logger.log(`Getting file from MinIO: bucket=${this.bucketName}, path=${filePath}`);
 

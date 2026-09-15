@@ -11,10 +11,10 @@ export interface ExtendedChannel extends amqp.Channel {
 }
 
 // Type assertion functions
-export function asConnection(conn: any): ExtendedConnection {
+export function asConnection(conn: unknown): ExtendedConnection {
   return conn as ExtendedConnection;
 }
 
-export function asChannel(channel: any): ExtendedChannel {
+export function asChannel(channel: unknown): ExtendedChannel {
   return channel as ExtendedChannel;
 }

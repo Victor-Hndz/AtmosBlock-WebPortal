@@ -298,7 +298,7 @@ export class RequestsService {
       "nProces",
     ];
 
-    const normalized: Record<string, any> = {};
+    const normalized: Record<string, unknown> = {};
 
     for (const key of orderedKeys) {
       const value = dto[key];
