@@ -37,6 +37,9 @@
 
 #define K_TO_C 273.15
 
+// Cluster of a point that did not pass the temperature threshold: it belongs to no cluster (ALG-114).
+#define NOT_SELECTED -2
+
 
 extern int NTIME, NLAT, NLON, LAT_LIM_MIN, LAT_LIM_MAX, LON_LIM_MIN, LON_LIM_MAX, N_THREADS;
 extern char* FILE_NAME, *OUT_DIR_NAME;
@@ -63,6 +66,9 @@ void init_file(char* filename, char* long_name);
 selected_point create_selected_point(coord_point point, short t,  int cluster);
 coord_point create_point(float lat, float lon);
 void expandCluster(selected_point **filtered_points, int size_x, int size_y, int i, int j, int id, double eps);
+int cluster_points(selected_point **filtered_points, int size_x, int size_y, double eps);
+void write_selected_points(FILE *fp, selected_point **filtered_points, int size_x, int size_y, int n_clusters,
+                           int time_step, double scale_factor, double offset);
 
 #endif // LIB
 
