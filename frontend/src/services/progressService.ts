@@ -2,6 +2,7 @@ import { API_URL } from "@/consts/apiConsts";
 import { MAX_PROGRESS } from "@/consts/progressConsts";
 
 export interface ProgressUpdateData {
+  /** Accumulated progress of the request, 0-100 (the API keeps the historical name "increment") */
   increment: number;
   message: string;
   timestamp?: string;
