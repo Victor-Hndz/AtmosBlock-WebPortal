@@ -46,6 +46,9 @@ int main(int argc, char **argv) {
 
     float lats[NLAT], lons[NLON];
 
+    // ALG-301: las coordenadas se leen antes de dimensionar la rejilla, porque RES sale de ellas.
+    z_varid = init_nc_variables(ncid, lats, lons, &scale_factor, &offset, long_name);
+
     //Allocate contiguous memory for the data.
     // ALG-204: memoria para un solo paso temporal; el fichero se lee paso a paso.
     z = malloc(NLAT*sizeof(short*));
@@ -78,8 +81,6 @@ int main(int argc, char **argv) {
         return 2;
     }
 
-    //Extract the data from the netcdf file.
-    z_varid = init_nc_variables(ncid, lats, lons, &scale_factor, &offset, long_name);    
 
     //Check the coordinates and correct them if necessary.
     swap_lon = check_coords(lons);

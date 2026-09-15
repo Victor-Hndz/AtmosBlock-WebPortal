@@ -235,6 +235,17 @@ void read_time_step(int ncid, int z_varid, int time, bool swap_lon, short **z) {
 }
 
 
+// ALG-301: paso de una coordenada si es uniforme (con la tolerancia de float32); -1 si no lo es.
+static double paso_uniforme(const float *v, int n) {
+    if (n < 2)
+        return -1;
+    double paso = fabs((double)v[n - 1] - v[0]) / (n - 1);
+    for (int i = 1; i < n; i++)
+        if (fabs(fabs((double)v[i] - v[i - 1]) - paso) > TOL_PASO)
+            return -1;
+    return paso;
+}
+
 //Function to initialize the netcdf variables. Returns the varid of z, whose data is read per time step.
 int init_nc_variables(int ncid, float lats[NLAT], float lons[NLON], double *scale_factor, double *offset, char *long_name) {
     int retval, lat_varid, lon_varid, z_varid, ndims;
@@ -265,6 +276,14 @@ int init_nc_variables(int ncid, float lats[NLAT], float lons[NLON], double *scal
 
     if ((retval = nc_get_var_float(ncid, lon_varid, &lons[0])))
         ERR(retval)
+
+    // ALG-301 (L1): la resolución sale de la rejilla del fichero, con el mismo paso uniforme en latitud y longitud.
+    double paso_lat = paso_uniforme(lats, NLAT), paso_lon = paso_uniforme(lons, NLON);
+    if (paso_lat <= 0 || paso_lon <= 0 || fabs(paso_lat - paso_lon) > TOL_PASO) {
+        fprintf(stderr, "Error: la rejilla debe tener un paso uniforme e igual en latitud y longitud (latitud %g, longitud %g).\n", paso_lat, paso_lon);
+        exit(EXIT_FAILURE);
+    }
+    RES = paso_lat;
 
     // Read the scale factor, offset and long_name of z.
     if ((retval = nc_get_att_double(ncid, z_varid, SCALE_FACTOR, scale_factor)))

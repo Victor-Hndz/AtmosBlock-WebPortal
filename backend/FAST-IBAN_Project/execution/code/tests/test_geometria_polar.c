@@ -8,6 +8,7 @@
 int main(void) {
     const double lats[] = {30, 50, 70, 80, 85, 87, 89, 89.5};
     int fallos = 0;
+    RES = 0.25;  // ALG-301: sin NetCDF, la rejilla de producción (ERA5) se fija a mano
 
     printf("lat | celdas distintas de %d rayos\n", N_RAYOS);
     for (int hemi = 1; hemi >= -1; hemi -= 2) {

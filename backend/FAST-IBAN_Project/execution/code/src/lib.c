@@ -1,6 +1,8 @@
 #include "../libraries/lib.h"
 #include "../libraries/utils.h"
 
+double RES;  // ALG-301: la fija init_nc_variables a partir de la rejilla del NetCDF
+
 // Function to create a coord_point struct from a latitude and longitude.
 coord_point create_point(float lat, float lon) {
     coord_point point = {lat, lon};
