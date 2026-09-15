@@ -9,6 +9,7 @@ abstract: >-
 authors:
   - family-names: "Hernández Sánchez"
     given-names: "Víctor"
+    orcid: "https://orcid.org/0009-0002-2391-1256"
 repository-code: "https://github.com/Victor-Hndz/AtmosBlock-WebPortal"
 license: MIT
 keywords:

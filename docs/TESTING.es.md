@@ -20,6 +20,11 @@ Todos los comandos se lanzan desde la raíz del repositorio.
 - Para los niveles 2 y 3: [Node.js 22](https://nodejs.org/) con npm, y Python 3.10 o posterior.
 - Para el nivel 3: una cuenta gratuita en el [Climate Data Store de Copernicus](https://cds.climate.copernicus.eu).
 
+**Un único procedimiento para todos los sistemas.** En Linux y macOS usa tu terminal habitual. En
+Windows usa **Git Bash** (se instala con [Git for Windows](https://gitforwindows.org/)): los comandos de
+esta guía son los mismos, y se indican los pocos casos en que Git Bash necesita una opción adicional.
+Si en Windows no se encuentra `python3`, usa `python`.
+
 No hace falta instalar un compilador de C ni NetCDF. El núcleo se compila dentro de la misma imagen
 de Docker que usa el CI, fijada por digest:
 
@@ -227,8 +232,7 @@ Edita `.env` y sustituye **todos** los valores `change-me`:
   `RABBITMQ_URL` debe repetir el usuario y la contraseña de RabbitMQ.
 - `CDSAPI_KEY`: tu token del CDS.
 
-Toma `.env.example` como referencia. El script antiguo `generate_env.sh` no genera todas las
-variables que necesitan los servicios. No subas nunca `.env` al repositorio.
+`.env.example` documenta todas las variables (el CI lo comprueba). No subas nunca `.env` al repositorio.
 
 ### 3.3 Levantar los servicios
 
