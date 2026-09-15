@@ -161,7 +161,8 @@ services:
     restart: unless-stopped
 
   minio:
-    image: minio/minio:latest
+    # minio/minio ya no existe en Docker Hub (2026-09): última versión comunitaria en quay.io, congelada y sin parches.
+    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
     container_name: minio
     env_file: .env
     environment:
@@ -175,7 +176,8 @@ services:
     restart: unless-stopped
 
   minio-init:
-    image: minio/minio:latest
+    # minio/minio ya no existe en Docker Hub (2026-09): última versión comunitaria en quay.io, congelada y sin parches.
+    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
     depends_on:
       minio:
         condition: service_started
