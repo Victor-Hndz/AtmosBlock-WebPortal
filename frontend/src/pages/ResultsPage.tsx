@@ -235,10 +235,10 @@ export default function ResultsPage(): React.ReactElement {
             setProgressMessage(data.message);
           }
 
-          // Handle progress updates
+          // WEB-213: the API sends the accumulated progress of the request (0-100), not a delta.
+          // The bar never goes back and never exceeds MAX_PROGRESS.
           if (data.increment > 0) {
-            // Update total progress, ensuring it doesn't exceed MAX_PROGRESS
-            setTotalProgress(prev => Math.min(prev + data.increment, MAX_PROGRESS));
+            setTotalProgress(prev => Math.max(prev, Math.min(data.increment, MAX_PROGRESS)));
           }
 
           // If completed flag is sent, set progress to 100%
