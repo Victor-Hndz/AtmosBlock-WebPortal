@@ -39,5 +39,14 @@ int main(void) {
     ok = bilinear_interpolation(create_point(90.1f, 10.1f), filas, lats, lons, &z);
     comprobar("lat 90.1 (fuera del dominio)", ok, false, z, 0);
 
+    // B10 (ALG-357): campo plano z = 100·lat + 40·lon (entero en la rejilla de 0,25°). La interpolación
+    // bilineal lo reproduce exactamente; con fracciones de celda distintas en lat y lon, un intercambio de
+    // los pesos de las esquinas p12 y p21 da el valor del punto con lat y lon traspuestas en la celda.
+    for (int i = 0; i < N_LAT; i++) for (int j = 0; j < N_LON; j++) datos[i][j] = (short)(100 * lats[i] + 40 * lons[j]);
+    ok = bilinear_interpolation(create_point(45.05f, 10.20f), filas, lats, lons, &z);
+    comprobar("plano en (45.05, 10.20)", ok, true, z, 4913);
+    ok = bilinear_interpolation(create_point(45.20f, 10.10f), filas, lats, lons, &z);
+    comprobar("plano en (45.20, 10.10)", ok, true, z, 4924);
+
     return fallos != 0;
 }
