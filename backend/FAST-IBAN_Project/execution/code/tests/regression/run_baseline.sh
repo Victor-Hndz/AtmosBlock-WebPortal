@@ -20,7 +20,10 @@ BASE="${BASE:-$AQUI/baseline.sha256}"
 TMP=$(mktemp -d)
 cd "$TMP"
 # stderr aparte: el stdout con búfer puede partir las líneas de los contadores si comparten fichero.
-if ! "$BIN" "$CASO" 25 85 -180 180 out/ "$HILOS" > ejecucion.log 2> errores.log; then
+# LANZADOR (ALG-206) antepone un lanzador al binario, p. ej. "mpirun -np 3"; sin comillas a propósito,
+# para que se separe en palabras.
+# shellcheck disable=SC2086
+if ! ${LANZADOR:-} "$BIN" "$CASO" 25 85 -180 180 out/ "$HILOS" > ejecucion.log 2> errores.log; then
     cat ejecucion.log errores.log
     echo "ERROR: FAST-IBAN terminó con error"
     exit 1
