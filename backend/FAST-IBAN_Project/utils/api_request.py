@@ -7,26 +7,26 @@ DATA_FORMAT = "netcdf"
 
 
 def request_data(variable, years, months, days, hours, pressure_levels, area_covered, file_name):
-    """Request data from the CDS API and save it to a file."""
+    """Request data from the CDS API and save it to a file.
 
-    try:
-        request = {
-            "product_type": [PRODUCT_TYPE],
-            "variable": variable,
-            "year": years,
-            "month": months,
-            "day": days,
-            "time": hours,
-            "pressure_level": pressure_levels,
-            "data_format": DATA_FORMAT,
-            "download_format": DOWNLOAD_FORMAT,
-            "area": area_covered
-        }
-        print(f"Request: {request}")
+    CDS errors propagate to the caller, which notifies the request as failed (WEB-221).
+    """
 
-        client = cdsapi.Client()
+    request = {
+        "product_type": [PRODUCT_TYPE],
+        "variable": variable,
+        "year": years,
+        "month": months,
+        "day": days,
+        "time": hours,
+        "pressure_level": pressure_levels,
+        "data_format": DATA_FORMAT,
+        "download_format": DOWNLOAD_FORMAT,
+        "area": area_covered
+    }
+    print(f"Request: {request}")
 
-        # Put the file in /app/config/data
-        client.retrieve(DATASET, request, file_name)
-    except Exception as e:
-        print(f"Error en la petición de datos: {e}")
+    client = cdsapi.Client()
+
+    # Put the file in /app/config/data
+    client.retrieve(DATASET, request, file_name)

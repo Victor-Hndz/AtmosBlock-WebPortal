@@ -10,8 +10,9 @@ from utils.rabbitMQ.rabbitmq import RabbitMQ
 from utils.rabbitMQ.process_body import process_body
 from utils.rabbitMQ.create_message import create_message
 from utils.rabbitMQ.notify_updates import notify_update
+from utils.rabbitMQ.notify_results import notify_result
 from utils.rabbitMQ.rabbit_consts import CONFIG_QUEUE, REQUESTS_EXCHANGE, HANDLER_START_KEY
-from utils.consts.consts import API_FOLDER, ARGUMENTS, STATUS_OK
+from utils.consts.consts import API_FOLDER, ARGUMENTS, STATUS_OK, STATUS_ERROR
 
 
 def format_range(values: list) -> str:
@@ -63,9 +64,20 @@ class Configurator:
         config = process_body(body)
         self.args = {key: config.get(key, None) for key in ARGUMENTS}
 
+        # WEB-221: a failed download or preparation ends the request as failed instead of leaving it
+        # waiting forever (the consumer wrapper only logs exceptions).
+        try:
+            await self.prepare_request()
+        except Exception as e:
+            print(f"\n❌ Error al preparar los datos: {e}")
+            await notify_result(self.rabbitmq, f"Error al preparar los datos: {e}", self.args["requestHash"], STATUS_ERROR)
+
+    async def prepare_request(self) -> None:
+        """Download and adapt the NetCDF file, then send the configuration to the handler."""
+
         print("\n✅ Argumentos cargados y validados con éxito.\n")
         print(f"Argumentos: {self.args}")
-        
+
         await notify_update(self.rabbitmq, self.args["requestHash"], 1, "CONFIG: argumentos recibidos con éxito.")
 
         self.mount_file_name()
@@ -84,13 +96,13 @@ class Configurator:
                 self.file_name,
             )
             print(f"\n✅ Archivo {self.file_name} descargado con éxito.")
-            
+
         await notify_update(self.rabbitmq, self.args["requestHash"], 1, "CONFIG: descarga del archivo NetCDF realizada con éxito.")
 
 
         adapt_netcdf(self.file_name)
         print(f"\n✅ Archivo {self.file_name} adaptado con éxito.")
-        
+
         await notify_update(self.rabbitmq, self.args["requestHash"], 1, "CONFIG: Fichero NetCDF adaptado con éxito.")
 
         # Create the configuration file
@@ -156,13 +168,13 @@ if __name__ == "__main__":
         # Initialize the RabbitMQ connection
         rabbitmq_client = RabbitMQ()
         await rabbitmq_client.initialize()
-        
+
         # Initialize the configurator with the RabbitMQ client
         configurator = Configurator(rabbitmq_client)
-        
+
         # Start consuming messages
         await rabbitmq_client.consume(CONFIG_QUEUE, callback=configurator.process_message)
-        
+
         # Keep the application running
         try:
             # Run forever
@@ -172,6 +184,6 @@ if __name__ == "__main__":
         finally:
             # Close the connection when done
             await rabbitmq_client.close()
-    
+
     # Run the async main function
     asyncio.run(main())
