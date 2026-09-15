@@ -159,9 +159,10 @@ El avance y otras notas se publican también en la [wiki del proyecto](https://g
 
 ## Origen académico
 
-- **FAST-IBA³N** (*Identificación de Bloqueos Atmosféricos Automático en el Atlántico Norte*) nació
-  como Trabajo Fin de Grado en la Universidad Miguel Hernández de Elche, dirigido por José Antonio
-  García Orza y Héctor Francisco Migallón Gomis.
+- **FAST-IBA³N** nació como Trabajo Fin de Grado (Ingeniería Informática, Universidad Miguel Hernández
+  de Elche, 2024), dirigido por José Antonio García Orza y Héctor Francisco Migallón Gomis:
+  Hernández Sánchez, V. *Diseño y aceleración de nuevos procedimientos de identificación automatizada
+  de bloqueos atmosféricos en el Atlántico Norte*. [hdl:11000/32775](https://hdl.handle.net/11000/32775)
 - **El portal web** se desarrolló como Trabajo Fin de Máster en la Universidad de Murcia.
 
 Desde entonces el proyecto ha ido más allá de ambos trabajos.
@@ -185,16 +186,20 @@ haga de la información de Copernicus ni de los datos que contiene.
 
 - Davini, P., Cagnazzo, C., Gualdi, S., & Navarra, A. (2012). Bidimensional diagnostics,
   variability, and trends of Northern Hemisphere blocking. *Journal of Climate*, 25(19), 6496–6509.
+  [doi:10.1175/JCLI-D-12-00032.1](https://doi.org/10.1175/JCLI-D-12-00032.1)
 - Hersbach, H., et al. (2020). The ERA5 global reanalysis. *Quarterly Journal of the Royal
-  Meteorological Society*, 146(730), 1999–2049.
+  Meteorological Society*, 146(730), 1999–2049. [doi:10.1002/qj.3803](https://doi.org/10.1002/qj.3803)
 - Tibaldi, S., & Molteni, F. (1990). On the operational predictability of blocking. *Tellus A*,
-  42(3), 343–365.
+  42(3), 343–365. [doi:10.3402/tellusa.v42i3.11882](https://doi.org/10.3402/tellusa.v42i3.11882)
 - Ullrich, P. A., & Zarzycki, C. M. (2017). TempestExtremes: a framework for scale-insensitive
   pointwise feature tracking on unstructured grids. *Geoscientific Model Development*, 10(3), 1069–1090.
+  [doi:10.5194/gmd-10-1069-2017](https://doi.org/10.5194/gmd-10-1069-2017)
 - Woollings, T., et al. (2018). Blocking and its response to climate change. *Current Climate Change
-  Reports*, 4(3), 287–300.
+  Reports*, 4(3), 287–300. [doi:10.1007/s40641-018-0108-z](https://doi.org/10.1007/s40641-018-0108-z)
 
 ## Licencia y contacto
+
+Autor: Víctor Hernández Sánchez · ORCID [0009-0002-2391-1256](https://orcid.org/0009-0002-2391-1256)
 
 Publicado con [licencia MIT](LICENSE). Problemas de seguridad: consulta [SECURITY.md](SECURITY.md).
 Dudas y colaboraciones: [abre una issue](https://github.com/Victor-Hndz/AtmosBlock-WebPortal/issues)
