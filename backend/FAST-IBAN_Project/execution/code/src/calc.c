@@ -71,9 +71,12 @@ bool bilinear_interpolation(coord_point p, short **z_mat, float *lats, float *lo
         return false;
     }
 
+    // B10 (ALG-357): la fórmula pondera z2 con (lat - lat_inf)(lon_sup - lon), el peso de la esquina p21
+    // (latitud superior, longitud inferior), y z3 con el de p12. Antes z2 tomaba el valor de p12 y z3 el de
+    // p21, así que se interpolaba con latitud y longitud traspuestas dentro de la celda.
     z1 = z_mat[i11][j11];
-    z2 = z_mat[i12][j12];
-    z3 = z_mat[i21][j21];
+    z2 = z_mat[i21][j21];
+    z3 = z_mat[i12][j12];
     z4 = z_mat[i22][j22];
     
     //Calculate the interpolation.

@@ -26,7 +26,34 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 
 | B8 `expandCluster` recursivo: desbordaba la pila con clusters grandes | ALG-403 | sin cambios | 99 / 14 | **0**: CSV de clusters, formaciones y contadores idénticos byte a byte en los 60 pasos |
 
-B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2 y B1 sí, porque cambian el muestreo. B7 cambia un solo punto.
+| B10 `bilinear_interpolation` intercambiaba los pesos de las esquinas `p12` y `p21` | ALG-357 | puntos en clusters 1367 → 1373; sigue 1 OMEGA, desplazada una celda | **101 / 15** | **Moderado:** ~2 % de los puntos cambian de clasificación; 111 de 113 formaciones se conservan a ≤1°, 2 desaparecen y 5 aparecen. Ver sección B10 |
+
+B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2, B1 y B10 sí, porque cambian el muestreo. B7 cambia un solo punto.
+
+## B10: pesos de la interpolación bilineal
+
+La fórmula pondera `z2` con `(lat − lat_inf)(lon_sup − lon)`, que es el peso de la esquina `p21` (latitud superior, longitud inferior), y `z3` con el de `p12`. Pero `z2` tomaba el valor de `p12` y `z3` el de `p21`, así que cada rayo se interpolaba como si latitud y longitud estuvieran traspuestas dentro de la celda de 0,25°. Con la misma fracción de celda en ambas direcciones el error se anula, por eso ningún test lo veía.
+
+`test_bilinear` añade un campo plano `z = 100·lat + 40·lon`, que la interpolación bilineal reproduce exactamente:
+- en (45.05, 10.20), antes 4922 y ahora 4913 (exacto);
+- en (45.20, 10.10), antes 4918 y ahora 4924 (exacto).
+
+| Medida | Caso fijo | Caso largo (60 pasos) |
+|---|---|---|
+| Puntos en clusters | 1367 → 1373 | 32 974 → 33 060 |
+| MAX / MIN | 288 / 1079 → 291 / 1082 | 13 258 / 19 716 → 13 305 / 19 755 |
+| Clusters | 77 → 78 | 1906 → 1918 |
+| Puntos (paso, lat, lon, tipo) que cambian | 24 salen, 30 entran | 644 salen, 730 entran (~2 %) |
+| Formaciones (OMEGA / REX) | 1 / 0 → 1 / 0 | 99 / 14 → 101 / 15 |
+
+**Formaciones del caso largo**, emparejadas por paso, tipo y centroides del máximo y de los mínimos a ≤1°:
+- **111 de 113 se conservan.** La mayoría cambian de centroide en una celda, porque sus clusters ganan o pierden algún punto.
+- **Desaparecen 2:** dos OMEGA del paso 52, sustituidas por otra OMEGA en la misma zona.
+- **Aparecen 5:** OMEGA en los pasos 6, 29, 52 y 53, y una REX en el paso 46.
+
+La OMEGA del caso fijo es la misma: su máximo pasa de 54,00° a 54,25° de latitud y su mínimo izquierdo de −14,75° a −14,50° de longitud.
+
+Se mantienen la invariancia a hilos y procesos (`invariancia_omp_*`, `invariancia_mpi_*`, `invariancia_omp_mpi_3x2`) y al orden de los clusters (`invariancia_orden`). Líneas base de `regresion_hash` y `regresion_hash_2003` actualizadas.
 
 ## B8: `expandCluster` iterativo
 
