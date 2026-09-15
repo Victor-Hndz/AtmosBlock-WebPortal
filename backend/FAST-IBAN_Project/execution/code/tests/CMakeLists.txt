@@ -71,6 +71,17 @@ foreach(hilos 1 4 16)
     set_tests_properties(invariancia_omp_${hilos} PROPERTIES TIMEOUT 900)
 endforeach()
 
+# ALG-206: MPI reparte los pasos temporales entre procesos; la salida (y los contadores sumados) debe
+# ser la misma línea base con cualquier número de procesos, también combinando procesos e hilos.
+foreach(procesos 1 2 3)
+    add_test(NAME invariancia_mpi_${procesos} COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN_mpi>)
+    set_tests_properties(invariancia_mpi_${procesos} PROPERTIES TIMEOUT 900 ENVIRONMENT
+        "LANZADOR=${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} ${procesos}")
+endforeach()
+add_test(NAME invariancia_omp_mpi_3x2 COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN_omp_mpi> 2)
+set_tests_properties(invariancia_omp_mpi_3x2 PROPERTIES TIMEOUT 900 ENVIRONMENT
+    "LANZADOR=${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} 3")
+
 # ALG-108: las formaciones no deben depender del orden de los clusters (caso donde B5 lo hacía visible)
 add_test(NAME invariancia_orden COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_orden.sh $<TARGET_FILE:FAST-IBAN> ${CMAKE_CURRENT_SOURCE_DIR}/fixtures/geopot_500hPa_2003-08-14-15_18-00UTC.nc)
 set_tests_properties(invariancia_orden PROPERTIES TIMEOUT 900)

@@ -130,3 +130,50 @@ La memoria del caso fijo no cambia (22–23 MB): solo tiene 4 pasos.
   medición; con 12 hilos pasa a ser más de la mitad del tiempo total, así que es el siguiente cuello
   de botella.
 - **ALG-203** no cambia el tiempo: elimina fugas (`valgrind` limpio, comprobado en CI).
+
+### Escalado OpenMP, MPI e híbrido (ALG-206, 2026-09-15)
+
+Tras corregir las variantes MPI (reparto de pasos, ficheros de salida y contadores) y compilarlas en
+CMake. Caso largo (60 pasos), medianas de 3 repeticiones; las 45 ejecuciones producen la misma
+salida que la versión en serie. Rama sobre `main` en `87e7133` (sin ALG-209).
+
+```bash
+python3 tests/benchmark/benchmark.py --bin-dir /tmp/b --caso <caso.nc> \
+  --hilos 1,2,4,6,12 --procesos 1,2,4,6,12 --hibrido 2x6,3x4,4x3,6x2 --reps 3
+```
+
+| Binario | Procesos | Hilos | Pared (s) | Aceleración | Fase 1 (s) † | Fase 2 (s) † | RSS por proceso (MB) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `FAST-IBAN` | 1 | 1 | 17,17 | 1,0× | 14,03 | 2,77 | 16 |
+| `FAST-IBAN_omp` | 1 | 2 | 10,40 | 1,7× | 7,29 | 2,78 | 17 |
+| `FAST-IBAN_omp` | 1 | 4 | 6,86 | 2,5× | 3,73 | 2,79 | 17 |
+| `FAST-IBAN_omp` | 1 | 6 | 5,97 | 2,9× | 2,87 | 2,79 | 17 |
+| `FAST-IBAN_omp` | 1 | 12 | 5,33 | 3,2× | 2,19 | 2,83 | 17 |
+| `FAST-IBAN_mpi` | 2 | 1 | 9,01 | 1,9× | 14,03 | 2,90 | 27 |
+| `FAST-IBAN_mpi` | 4 | 1 | 4,85 | 3,5× | 14,34 | 2,94 | 27 |
+| `FAST-IBAN_mpi` | 6 | 1 | 3,64 | 4,7× | 15,83 | 3,16 | 27 |
+| `FAST-IBAN_mpi` | 12 | 1 | **2,62** | **6,6×** | 20,95 | 3,95 | 27 |
+| `FAST-IBAN_omp_mpi` | 2 | 6 | 3,72 | 4,6× | 3,38 | 3,04 | 27 |
+| `FAST-IBAN_omp_mpi` | 3 | 4 | 3,44 | 5,0× | 5,34 | 3,20 | 27 |
+| `FAST-IBAN_omp_mpi` | 4 | 3 | 2,98 | 5,8× | 6,64 | 3,24 | 27 |
+| `FAST-IBAN_omp_mpi` | 6 | 2 | 2,72 | 6,3× | 9,95 | 3,49 | 27 |
+
+† Con MPI, las fases son la **suma** de los tiempos de todos los procesos (tiempo de CPU acumulado),
+no tiempo de pared.
+
+**Lectura**
+
+- **MPI escala mejor que OpenMP en una máquina**: con 12 procesos, 2,62 s (6,6×) frente a 5,33 s
+  (3,2×) con 12 hilos. MPI reparte pasos temporales completos, así que paraleliza también la fase 2
+  (clusters, contornos y formaciones), que en OpenMP sigue siendo secuencial (~2,8 s, el 53 % del
+  tiempo con 12 hilos).
+- **Eficiencia**: MPI mantiene un 95 % con 2 procesos y un 88 % con 4; baja al 55 % con 12, en parte
+  porque la máquina tiene 6 núcleos físicos (12 hilos lógicos). La suma de CPU de la fase 1 crece de
+  13,7 a 21,0 s entre 1 y 12 procesos, la firma del *hyperthreading* y de la competencia por memoria.
+- **Híbrido**: con 12 unidades de cómputo, más procesos y menos hilos es mejor (6×2 = 2,72 s; 2×6 =
+  3,72 s), por el mismo motivo: los hilos no aceleran la fase 2.
+- **Memoria**: cada proceso MPI usa ~27 MB (frente a 17 MB en serie), así que 12 procesos rondan los
+  320 MB; asumible, y muy por debajo de los 75 MB por proceso de antes de ALG-204.
+- **Límites**: una sola máquina y un caso de 60 pasos. Con pocos pasos por proceso el reparto
+  temporal se agota (no se puede usar más procesos que pasos); en climatologías de décadas y varios
+  nodos es donde MPI aporta, y eso no está medido aquí.

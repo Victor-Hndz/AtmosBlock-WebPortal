@@ -70,6 +70,12 @@ target_link_libraries(FAST-IBAN PRIVATE LIB)
 add_executable(FAST-IBAN_omp FAST-IBAN_main_omp.c)
 target_link_libraries(FAST-IBAN_omp PRIVATE netcdf OpenMP::OpenMP_C UTILS CALC INIT LIB)
 
+# ALG-206: variantes MPI (reparto por pasos temporales) y MPI+OpenMP, con tests de invariancia al número de procesos
+add_executable(FAST-IBAN_mpi FAST-IBAN_main_mpi.c)
+target_link_libraries(FAST-IBAN_mpi PRIVATE netcdf OpenMP::OpenMP_C MPI::MPI_C UTILS CALC INIT LIB)
+add_executable(FAST-IBAN_omp_mpi FAST-IBAN_main_omp_mpi.c)
+target_link_libraries(FAST-IBAN_omp_mpi PRIVATE netcdf OpenMP::OpenMP_C MPI::MPI_C UTILS CALC INIT LIB)
+
 
 # target_include_directories(FAST-IBAN PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # set_target_properties(FAST-IBAN PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../)
