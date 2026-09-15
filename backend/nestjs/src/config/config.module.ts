@@ -30,6 +30,8 @@ import * as Joi from "joi";
         MINIO_ENDPOINT: Joi.string().required(),
         MINIO_HOST: Joi.string().required(),
         MINIO_PORT: Joi.number().required(),
+        // Boolean in the validated config: the MinIO client rejects the "false" string (WEB-212)
+        MINIO_USE_SSL: Joi.boolean().default(false),
         MINIO_USER: Joi.string().required(),
         MINIO_PASSWORD: Joi.string().required(),
         MINIO_BUCKET: Joi.string().required(),
