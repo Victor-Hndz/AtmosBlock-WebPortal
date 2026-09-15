@@ -182,47 +182,62 @@ void init_files(char* filename, char* filename2, char* log_file, char* speed_fil
 
 
 /**
- * @brief Comprobar si las coordenadas están en el rango [-180, 180] o [0, 360] y corregirlas si es necesario.
+ * @brief Corregir las longitudes si vienen en [0, 360) para que queden en [-180, 180).
  * 
- * @param z_in Matriz de alturas.
- * @param lons
+ * @param lons Longitudes; se corrigen in-place.
+ * @return true si los datos deben intercambiar sus dos mitades de longitud al leer cada paso (read_time_step).
  */
-void check_coords(short*** z_in, float lons[NLON]) {
-    int i,j,k;
-    
-    // Check if the longitudes are in the range [-180, 180] or [0, 360] and correct them if necessary.
-    if(lons[NLON-1] > 180) {
-        float aux1;
-        short aux2;
-        
-        printf("Corrigiendo longitudes...\n");
-        
-        for(i=0;i<NLON; i++) {
-            if(lons[i] >= 180)
-                lons[i] -= 360;
-        }
+bool check_coords(float lons[NLON]) {
+    int i;
+    float aux;
 
-        //intercambiar las dos mitades del array de longitudes.
-        for(i=0;i<NLON/2; i++) {
-            aux1 = lons[i];
-            lons[i] = lons[NLON/2+i];
-            lons[NLON/2+i] = aux1;
-        }
+    if(lons[NLON-1] <= 180)
+        return false;
 
-        for(i=0;i<NTIME;i++)
-            for(j=0;j<NLAT;j++)
-                for(k=0;k<NLON/2;k++) {
-                    aux2 = z_in[i][j][k];
-                    z_in[i][j][k] = z_in[i][j][NLON/2+k];
-                    z_in[i][j][NLON/2+k] = aux2;
-                }
+    printf("Corrigiendo longitudes...\n");
+
+    for(i=0;i<NLON; i++) {
+        if(lons[i] >= 180)
+            lons[i] -= 360;
     }
+
+    //intercambiar las dos mitades del array de longitudes.
+    for(i=0;i<NLON/2; i++) {
+        aux = lons[i];
+        lons[i] = lons[NLON/2+i];
+        lons[NLON/2+i] = aux;
+    }
+    return true;
 }
 
 
-//Function to initialize the netcdf variables.
-void init_nc_variables(int ncid, short*** z_in, float lats[NLAT], float lons[NLON], double *scale_factor, double *offset, char *long_name) {
-    int retval, lat_varid, lon_varid, z_varid;
+/**
+ * @brief Leer un paso temporal de z (ALG-204, R2): NLAT×NLON en vez del cubo NTIME×NLAT×NLON.
+ * 
+ * @param z Matriz contigua NLAT×NLON de destino.
+ * @param swap_lon Intercambiar las dos mitades de longitud (lo decide check_coords).
+ */
+void read_time_step(int ncid, int z_varid, int time, bool swap_lon, short **z) {
+    int retval, j, k;
+    short aux;
+    size_t start[3] = {(size_t)time, 0, 0}, count[3] = {1, (size_t)NLAT, (size_t)NLON};
+
+    if ((retval = nc_get_vara_short(ncid, z_varid, start, count, &z[0][0])))
+        ERR(retval)
+
+    if(swap_lon)
+        for(j=0;j<NLAT;j++)
+            for(k=0;k<NLON/2;k++) {
+                aux = z[j][k];
+                z[j][k] = z[j][NLON/2+k];
+                z[j][NLON/2+k] = aux;
+            }
+}
+
+
+//Function to initialize the netcdf variables. Returns the varid of z, whose data is read per time step.
+int init_nc_variables(int ncid, float lats[NLAT], float lons[NLON], double *scale_factor, double *offset, char *long_name) {
+    int retval, lat_varid, lon_varid, z_varid, ndims;
 
     
     // Get the varids of the latitude and longitude coordinate variables.
@@ -236,6 +251,14 @@ void init_nc_variables(int ncid, short*** z_in, float lats[NLAT], float lons[NLO
     if ((retval = nc_inq_varid(ncid, Z_NAME, &z_varid)))
         ERR(retval)
 
+    // z must be (time, latitude, longitude): read_time_step reads one time step at a time.
+    if ((retval = nc_inq_varndims(ncid, z_varid, &ndims)))
+        ERR(retval)
+    if (ndims != 3) {
+        fprintf(stderr, "Error: %s debe tener 3 dimensiones (tiempo, latitud, longitud) y tiene %d.\n", Z_NAME, ndims);
+        exit(EXIT_FAILURE);
+    }
+
     // Read the coordinates variables data.
     if ((retval = nc_get_var_float(ncid, lat_varid, &lats[0])))
         ERR(retval)
@@ -243,10 +266,7 @@ void init_nc_variables(int ncid, short*** z_in, float lats[NLAT], float lons[NLO
     if ((retval = nc_get_var_float(ncid, lon_varid, &lons[0])))
         ERR(retval)
 
-    // Read the data, scale factor, offset and long_name of z.
-    if ((retval = nc_get_var_short(ncid, z_varid, &z_in[0][0][0])))
-        ERR(retval)
-
+    // Read the scale factor, offset and long_name of z.
     if ((retval = nc_get_att_double(ncid, z_varid, SCALE_FACTOR, scale_factor)))
         ERR(retval)
 
@@ -255,6 +275,8 @@ void init_nc_variables(int ncid, short*** z_in, float lats[NLAT], float lons[NLO
     
     if ((retval = nc_get_att_text(ncid, z_varid, LONG_NAME, long_name)))
         ERR(retval)
+
+    return z_varid;
 }
 
 
