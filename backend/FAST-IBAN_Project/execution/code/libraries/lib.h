@@ -55,7 +55,20 @@
 extern int NTIME, NLAT, NLON, LAT_LIM_MIN, LAT_LIM_MAX, LON_LIM_MIN, LON_LIM_MAX, N_THREADS;
 extern char* FILE_NAME, *OUT_DIR_NAME;
 // ALG-005: diagnóstico de findIndex == -1 (B1); se imprimen por stderr al terminar.
-extern long long FINDINDEX_CALLS, FINDINDEX_MISSES, INTERP_CALLS, INTERP_FAILS;
+// ALG-208: un contador por hilo, sin "omp atomic" en el camino caliente (frenaba el escalado de
+// la fase 1). Cada entrada ocupa su propia línea de caché para que los hilos no se estorben;
+// contadores_totales() los suma al terminar, con el mismo resultado exacto.
+// ponytail: tabla fija; con más de MAX_HILOS_CONTADORES hilos dos comparten entrada y el total
+// podría perder incrementos (solo el diagnóstico, nunca las detecciones).
+#include <omp.h>
+#define MAX_HILOS_CONTADORES 256
+typedef struct {
+    _Alignas(64) long long findindex_calls;
+    long long findindex_misses, interp_calls, interp_fails;
+} contadores_hilo;
+extern contadores_hilo CONTADORES[MAX_HILOS_CONTADORES];
+#define CONTADOR_HILO() (CONTADORES[omp_get_thread_num() % MAX_HILOS_CONTADORES])
+contadores_hilo contadores_totales(void);
 
 /*STRUCTS*/
 enum Tipo_form{MAX, MIN, NO_TYPE};
