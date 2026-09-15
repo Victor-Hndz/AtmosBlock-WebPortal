@@ -284,6 +284,38 @@ docker compose down        # stop, keeping data
 docker compose down -v     # stop and delete volumes: database, stored results and downloaded data
 ```
 
+## 4. Browser end-to-end tests (Playwright)
+
+The `e2e/` project drives a real browser and the API against the running stack. It uses the texts of
+the frontend translations, so it does not depend on literal strings.
+
+| Project | What it checks | Requirements | In CI |
+|---|---|---|---|
+| `portal` | Home, language switch, footer and links, 404, session gates, registration, logout and login, profile and request history; API health, security headers, CORS, Swagger UI with the CSP, 401 without a token and 400 for unsupported variables | API stack (level 3.3) and frontend | `e2e` job on every pull request |
+| `pipeline` | A real request from start to finish (configurator, C core, maps, results page, cache) using the sample case, without the CDS | Full stack and the sample case copied into the configurator volume | `E2E pipeline` workflow: manual, weekly and on changes to the pipeline |
+
+With the stack running (3.3) and the frontend on <http://localhost:5173> (3.4):
+
+```bash
+cd e2e
+npm ci
+npx playwright install chromium
+npm test                    # portal project
+```
+
+The first run registers a disposable test user through the API. If the frontend is not running,
+Playwright starts it. To run the full pipeline, copy the sample case into the configurator volume first:
+
+```bash
+docker compose cp backend/FAST-IBAN_Project/execution/code/tests/fixtures/geopot_500hPa_2022-03-14_00-06-12-18UTC.nc \
+  "configurator_module:/app/config/data/geopotential_500hPa_2022-03-(14)_00-06-12-18UTC.nc"
+cd e2e && npm run test:pipeline
+```
+
+In Git Bash, prefix `docker compose cp` with `MSYS_NO_PATHCONV=1`. `npm run report` opens the HTML report
+of the last run. The authentication API allows 5 requests per minute: wait a minute before running the
+suite twice in a row.
+
 ## Troubleshooting
 
 | Symptom | Cause and fix |
