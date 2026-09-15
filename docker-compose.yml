@@ -57,7 +57,7 @@ services:
         condition: service_started
     volumes:
       - config_data:/app/config
-      - out_data:/app/out  # WEB-222: el handler borra la salida local de cada petición al terminar
+      - out_data:/app/out  # WEB-222: el handler borra la salida local de cada peticiÃ³n al terminar
     stdin_open: true
     tty: true
     working_dir: /app
@@ -186,7 +186,7 @@ services:
       /bin/sh -c "
         sleep 5;
         mc alias set local http://${MINIO_ENDPOINT} ${MINIO_USER} ${MINIO_PASSWORD} &&
-        mc mb local/${MINIO_BUCKET}
+        mc mb --ignore-existing local/${MINIO_BUCKET}
       "
     networks:
       - app-network
