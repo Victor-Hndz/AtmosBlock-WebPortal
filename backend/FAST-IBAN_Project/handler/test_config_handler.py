@@ -1,4 +1,5 @@
-"""Handler de configuración: errores notificados a la API (WEB-211) y peticiones independientes (WEB-222).
+"""Handler de configuración: errores notificados a la API (WEB-211), peticiones independientes (WEB-222)
+y comando del núcleo según el paralelismo pedido (WEB-218).
 
 Uso: python backend/FAST-IBAN_Project/handler/test_config_handler.py
 """
@@ -9,6 +10,7 @@ import pathlib
 import sys
 import types
 import unittest
+from unittest import mock
 
 RAIZ = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ))
@@ -58,13 +60,17 @@ def mensaje(**contenido):
     return json.dumps({"status": STATUS_OK, "message": "", "content": contenido}).encode()
 
 
-def configuracion(request_hash, **cambios):
-    return mensaje(**{
+def datos_configuracion(request_hash, **cambios):
+    return {
         "file": f"/app/config/data/{request_hash}.nc", "requestHash": request_hash, "variableName": "geopotential",
         "pressureLevel": ["500"], "years": ["2022"], "months": ["03"], "days": ["14"], "hours": ["12"],
         "areaCovered": ["90", "-180", "-90", "180"], "mapTypes": ["comb"], "mapLevels": ["20"], "fileFormat": "png",
         "noData": False, "noMaps": False, "omp": False, "mpi": False, "nThreads": None, "nProces": None, **cambios,
-    })
+    }
+
+
+def configuracion(request_hash, **cambios):
+    return mensaje(**datos_configuracion(request_hash, **cambios))
 
 
 class ConfigHandlerTest(unittest.TestCase):
@@ -122,6 +128,41 @@ class ConfigHandlerTest(unittest.TestCase):
         self.notificar(NOTIFY_EXECUTION, "b", STATUS_OK)
         mapas = self.rabbit.con_clave(EXECUTION_VISUALIZATION_KEY)
         self.assertEqual([m["content"]["request_hash"] for m in mapas], ["b"])
+
+
+class ComandoEjecucionTest(unittest.TestCase):
+    """WEB-218: el portal lanzaba siempre ./FAST-IBAN (serie) y pasaba None como hilos o procesos."""
+
+    AREA = ["/app/config/data/h.nc", "-90", "90", "-180", "180", "./out/h/"]
+
+    def comando(self, **cambios):
+        handler = config_handler.ConfigHandler(RabbitFalso())
+        with mock.patch.object(config_handler.os, "cpu_count", return_value=8):
+            cmd = handler.prepare_execution_command(datos_configuracion("h", **cambios), [-90, 90], [-180, 180])
+        self.assertTrue(all(isinstance(arg, str) for arg in cmd), f"subprocess exige texto: {cmd}")
+        return cmd
+
+    def test_serie(self):
+        self.assertEqual(self.comando(), ["./FAST-IBAN", *self.AREA, "1"])
+
+    def test_openmp_usa_su_binario_y_todos_los_nucleos_por_defecto(self):
+        self.assertEqual(self.comando(omp=True), ["./FAST-IBAN_omp", *self.AREA, "8"])
+
+    def test_openmp_respeta_los_hilos_pedidos(self):
+        self.assertEqual(self.comando(omp=True, nThreads=3), ["./FAST-IBAN_omp", *self.AREA, "3"])
+
+    def test_mpi_usa_mpirun_y_su_binario(self):
+        self.assertEqual(self.comando(mpi=True), ["mpirun", "-n", "8", "./FAST-IBAN_mpi", *self.AREA, "1"])
+        self.assertEqual(self.comando(mpi=True, nProces=3), ["mpirun", "-n", "3", "./FAST-IBAN_mpi", *self.AREA, "1"])
+
+    def test_hibrido_reparte_los_nucleos_entre_procesos_e_hilos(self):
+        self.assertEqual(
+            self.comando(omp=True, mpi=True), ["mpirun", "-n", "2", "./FAST-IBAN_omp_mpi", *self.AREA, "4"]
+        )
+
+    def test_temperatura_solo_tiene_version_en_serie(self):
+        # code_t solo compila el binario en serie.
+        self.assertEqual(self.comando(variableName="temperature", omp=True, mpi=True), ["./FAST-IBAN", *self.AREA, "1"])
 
 
 if __name__ == "__main__":
