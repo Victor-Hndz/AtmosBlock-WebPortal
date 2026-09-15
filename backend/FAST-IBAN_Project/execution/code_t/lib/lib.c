@@ -271,26 +271,50 @@ selected_point create_selected_point(coord_point point, short t,  int cluster) {
     return new_point;
 }
 
+// B8 (ALG-112): recorrido iterativo con pila explícita, como en code/ (ALG-403). El DFS recursivo anterior
+// desbordaba la pila con clusters grandes. Marca la misma componente: vecindad 8 y dentro de eps.
 void expandCluster(selected_point **filtered_points, int size_x, int size_y, int i, int j, int id, double eps) {
-    int x, y;
+    int capacidad = 64, n = 0;
+    int *pila = malloc(2 * capacidad * sizeof(int));
+    if (pila == NULL) {
+        perror("expandCluster: sin memoria");
+        exit(EXIT_FAILURE);
+    }
+    pila[0] = i;
+    pila[1] = j;
+    n = 1;
 
-    for(x=i-1;x<=i+1;x++) {
-        if(x<0 || x>size_x-1)
-            continue;
-        for(y=j-1;y<=j+1;y++) {
-            // printf("x: %d, y: %d\n", x, y);
-            if(y<0 || y>size_y-1)
-                continue;
-            if(x == i && y == j)
-                continue;
+    while (n > 0) {
+        n--;
+        int ci = pila[2 * n], cj = pila[2 * n + 1];
 
-            if(filtered_points[x][y].cluster != -1) 
+        for (int x = ci - 1; x <= ci + 1; x++) {
+            if (x < 0 || x > size_x - 1)
                 continue;
-
-            if(fabs(filtered_points[x][y].point.lat - filtered_points[i][j].point.lat) <= eps && fabs(filtered_points[x][y].point.lon - filtered_points[i][j].point.lon) <= eps) {
-                filtered_points[x][y].cluster = id;
-                expandCluster(filtered_points, size_x, size_y, x, y, id, eps);
+            for (int y = cj - 1; y <= cj + 1; y++) {
+                if (y < 0 || y > size_y - 1 || (x == ci && y == cj))
+                    continue;
+                if (filtered_points[x][y].cluster != -1)
+                    continue;
+                if (fabs(filtered_points[x][y].point.lat - filtered_points[ci][cj].point.lat) <= eps &&
+                    fabs(filtered_points[x][y].point.lon - filtered_points[ci][cj].point.lon) <= eps) {
+                    filtered_points[x][y].cluster = id;
+                    if (n == capacidad) {
+                        capacidad *= 2;
+                        int *mayor = realloc(pila, 2 * capacidad * sizeof(int));
+                        if (mayor == NULL) {
+                            free(pila);
+                            perror("expandCluster: sin memoria");
+                            exit(EXIT_FAILURE);
+                        }
+                        pila = mayor;
+                    }
+                    pila[2 * n] = x;
+                    pila[2 * n + 1] = y;
+                    n++;
+                }
             }
         }
     }
+    free(pila);
 }
