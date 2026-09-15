@@ -18,9 +18,10 @@ contadores_hilo contadores_totales(void) {
 // Índice de target en una rejilla regular arr[i] = arr[0] + i*paso, en O(1) (B1, ALG-105).
 // target debe ser un nodo de la rejilla (tolerancia de 0,001 pasos). Si la rejilla cubre 360
 // grados (longitud), el índice da la vuelta: 180 es -180. Si no, fuera de rango devuelve -1.
-int findIndex(float *arr, int n, float target) {
+// ALG-209: sin contadores. bilinear_interpolation, el camino caliente, la usa y cuenta una sola vez
+// por interpolación; el resto del código usa findIndex, que sí cuenta.
+int findIndex_sin_contar(float *arr, int n, float target) {
     int idx = -1;
-    CONTADOR_HILO().findindex_calls++;
 
     if (n == 1) {
         idx = arr[0] == target ? 0 : -1;
@@ -36,9 +37,17 @@ int findIndex(float *arr, int n, float target) {
         }
     }
 
-    if (idx == -1) {
-        CONTADOR_HILO().findindex_misses++;
-    }
+    return idx;
+}
+
+// findIndex con los contadores de diagnóstico de ALG-005.
+int findIndex(float *arr, int n, float target) {
+    int idx = findIndex_sin_contar(arr, n, target);
+    contadores_hilo *contador = &CONTADOR_HILO();
+
+    contador->findindex_calls++;
+    if (idx == -1)
+        contador->findindex_misses++;
     return idx;
 }
 
