@@ -177,3 +177,100 @@ no tiempo de pared.
 - **Límites**: una sola máquina y un caso de 60 pasos. Con pocos pasos por proceso el reparto
   temporal se agota (no se puede usar más procesos que pasos); en climatologías de décadas y varios
   nodos es donde MPI aporta, y eso no está medido aquí.
+
+### Coste de cálculo frente a TempestExtremes (ALG-207, 2026-09-15)
+
+**Qué se compara y qué no.** FAST-IBAN y TempestExtremes (TE) no hacen el mismo cálculo, así que
+esta sección publica el **coste de cada uno en las mismas condiciones**, no una razón de velocidad
+ni de calidad:
+
+- FAST-IBAN detecta máximos y mínimos con 64 rayos por punto y clasifica formaciones.
+- `DetectBlobs` marca celdas por encima de un umbral y filtra por área.
+- `StitchBlobs` añade la persistencia temporal, que FAST-IBAN no tiene.
+
+Las detecciones no se comparan aquí: requieren máscara NetCDF, área ponderada y vecindad con vuelta
+en longitud, y una climatología real. Eso llegará con la integración de TE en el pipeline.
+
+**Condiciones**
+
+- **Máquina y entorno:** los mismos que el resto de este documento. TE **v2.4.2** (tag
+  `v2.4.2`, código fuente con sha256 `a370faad…94267`, licencia BSD-2-Clause), compilado en la misma
+  imagen `netcdf-base` en `Release`, con y sin MPI.
+- **Misma pila de lectura:** TE se compiló contra la **misma NetCDF 4.8.1 y HDF5 1.10 de apt** que
+  enlaza FAST-IBAN. La imagen trae además una NetCDF 4.9.2 en `/usr/local`, que CMake elige por
+  defecto; se comprobó con `ldd`.
+- **Entrada:** ERA5 Z500 a 0,25°, 90N–0 y 360°, copiada dentro del contenedor. Franja 25–85°N en ambas
+  herramientas.
+- **Lectura del dato empaquetado:** TE lee bien el `short` empaquetado. En el caso fijo, `DetectBlobs`
+  sin filtro de área marca 3532, 0, 0 y 478 celdas por paso, frente a 3532, 0, 0 y 477 calculadas en
+  Python; la diferencia de una celda es redondeo en el borde del umbral.
+- **Umbral de `DetectBlobs`:** `media + max(980, 1,5·σ)` en m² s⁻², calculado sobre los pasos del
+  propio fichero. **Solo sirve para medir tiempos: no es una climatología** y no produce detecciones
+  de bloqueo. Marca de media ~9600 celdas por paso en el caso largo. `_DIFF(z,z_threshold),>=,0,0`,
+  `area,>=,1000000km2`.
+- **`StitchBlobs`:** `--mintime 12 --min_overlap_prev 0`, con y sin `--flatten`, sobre la máscara de
+  `DetectBlobs` del caso largo, generada una vez y no medida.
+- **Rondas:** una ronda de calentamiento descartada y 5 rondas **intercaladas** entre herramientas.
+  Mediana y rango del tiempo de pared; RSS pico por proceso.
+
+**Cómo reproducirlo** (scripts en `tests/benchmark/tempestextremes/`; montar el repo en `/src` y un
+directorio de trabajo en `/s` con `caso_largo/` y `te/`):
+
+```bash
+# 1. Compilar TE contra la NetCDF de apt (en netcdf-base), sin y con MPI
+PATH=/usr/bin:/bin cmake -S tempestextremes-2.4.2 -B /tmp/te -DCMAKE_BUILD_TYPE=Release \
+  -DENABLE_MPI=OFF -DCMAKE_PREFIX_PATH=/usr -DCMAKE_IGNORE_PREFIX_PATH=/usr/local
+PATH=/usr/bin:/bin cmake --build /tmp/te --parallel --target DetectBlobs StitchBlobs
+# 2. Umbrales de temporización, copias decodificadas y ficheros diarios (python:3.11-slim + netCDF4)
+python tests/benchmark/tempestextremes/preparar_entradas.py
+# 3. Medición intercalada (en netcdf-base, con FAST-IBAN compilado en /tmp/fi)
+python3 tests/benchmark/tempestextremes/medir.py 5
+```
+
+**Qué calcula cada etapa en cada paso temporal**
+
+| Etapa | Cálculo | Puntos o celdas evaluados por paso |
+|---|---|---:|
+| FAST-IBAN, fase 1 | 64 interpolaciones bilineales por punto de una rejilla de 1,25° | ~1,4·10⁴ puntos |
+| FAST-IBAN, fase 2 | Clusters, contornos cerrados y clasificación Omega/Rex | Clusters del paso |
+| `DetectBlobs` | Umbral celda a celda, componentes conexas y área | ~3,5·10⁵ celdas |
+| `StitchBlobs` | Solapamiento entre pasos y persistencia | Objetos de la máscara |
+
+**Resultados**
+
+| Caso | Herramienta | Paralelismo | Pasos | Pared mediana (s) | Rango (s) | s/paso | RSS por proceso (MB) |
+|---|---|---|---:|---:|---:|---:|---:|
+| fijo | FAST-IBAN | serie | 4 | 1,04 | 1,00–1,05 | 0,259 | 23 |
+| fijo | FAST-IBAN | OpenMP 12 hilos | 4 | 0,26 | 0,26–0,28 | 0,065 | 23 |
+| fijo | `DetectBlobs` | serie, 1 fichero | 4 | 0,16 | 0,16–0,17 | 0,039 | 73 |
+| largo | FAST-IBAN | serie | 60 | 16,66 | 16,41–16,80 | 0,278 | 16 |
+| largo | FAST-IBAN | OpenMP 12 hilos | 60 | 5,07 | 4,98–5,11 | 0,085 | 16 |
+| largo | FAST-IBAN | MPI 6 procesos | 60 | 3,71 | 3,61–3,78 | 0,062 | 27 |
+| largo | `DetectBlobs` | serie, 1 fichero | 60 | 0,67 | 0,65–0,68 | 0,011 | 70 |
+| largo | `DetectBlobs` | MPI 1 proceso, 15 ficheros diarios * | 60 | 1,56 | 1,54–1,58 | 0,026 | 79 |
+| largo | `DetectBlobs` | MPI 2 procesos, 15 ficheros diarios * | 60 | 1,05 | 1,02–1,07 | 0,018 | 79 |
+| largo | `DetectBlobs` | MPI 4 procesos, 15 ficheros diarios * | 60 | 0,76 | 0,73–0,77 | 0,013 | 79 |
+| largo | `DetectBlobs` | MPI 6 procesos, 15 ficheros diarios * | 60 | 0,74 | 0,72–0,76 | 0,012 | 79 |
+| largo | `StitchBlobs` | serie (IDs) | 60 | 0,53 | 0,52–0,55 | 0,009 | 83 |
+| largo | `StitchBlobs` | serie (`--flatten`) | 60 | 0,53 | 0,52–0,55 | 0,009 | 83 |
+
+\* TE reparte con MPI **ficheros, no pasos**, y no tiene OpenMP. Para esas filas el caso largo se
+partió en 15 ficheros diarios **decodificados** (float32, NetCDF-4), mientras que la fila de un
+fichero lee el original empaquetado (`short`). Abrir 15 ficheros y leer otro formato cambia el coste
+de E/S, así que **no son comparables con la fila de un fichero**; solo muestran el escalado de TE en
+su propio modelo (1,56 → 0,74 s de 1 a 6 procesos).
+
+**Lectura**
+
+- En este caso (ERA5 Z500 a 0,25°, 60 pasos, 25–85°N) y esta máquina:
+  - `DetectBlobs`, con un umbral celda a celda, tarda 0,67 s en serie;
+  - FAST-IBAN, con 64 interpolaciones por punto más clusters y clasificación, tarda 16,66 s en serie,
+    5,07 s con 12 hilos y 3,71 s con 6 procesos MPI.
+
+  **Son cálculos distintos: las cifras estiman el coste de encadenarlos, no la calidad de ninguno.**
+- **Encadenar TE tras FAST-IBAN es barato:** `DetectBlobs` más `StitchBlobs` añaden ~1,2 s en serie
+  al caso largo. El coste del pipeline lo domina FAST-IBAN.
+- **Memoria:** TE usa ~70–83 MB por proceso en estos casos, frente a 16–27 MB de FAST-IBAN tras la
+  lectura por paso.
+- **Límites:** una sola máquina, dos casos cortos y un umbral que no es climatológico. No extrapolar a
+  otras máquinas, a HPC, a climatologías de décadas ni a la calidad de las detecciones.
