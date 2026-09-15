@@ -21,6 +21,16 @@ a 00, 06, 12 y 18 UTC, de 90°N a 0° y de 180°W a 180°E, rejilla de 0,25°.
   con `xarray` (`open_dataset(..., mask_and_scale=False)`, `isel(time=[55, 56])`), recomprimiendo con
   zlib sin tocar los valores.
 
+## Caso de temperatura
+
+`temp_850hPa_2019-06-28_00-06-12-18UTC.nc`: temperatura en 850 hPa del 28 de junio de 2019 (ola de calor
+en Europa) a 00, 06, 12 y 18 UTC, mismo dominio y rejilla.
+
+- **Uso:** entrada de `regresion_hash_t` de la variante de temperatura (`code_t/tests/run_baseline.sh`, ALG-112).
+- **Por qué 850 hPa y esa fecha:** `code_t` solo selecciona puntos por encima de 28 °C. A 500 hPa no
+  selecciona ninguno y la salida sería solo la cabecera, sin ejercitar el agrupamiento.
+- **Cómo se generó:** `descargar_caso.py temperature`, igual que el caso de geopotencial.
+
 ## Atribución
 
 Contiene información modificada del Copernicus Climate Change Service (2026).

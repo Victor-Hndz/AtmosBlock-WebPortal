@@ -74,6 +74,8 @@ jobs:
         run: |
           cmake -S . -B build -DFAST_IBAN_WERROR=ON
           cmake --build build --parallel
+      - name: CTest de la variante de temperatura (ALG-112)
+        run: ctest --test-dir backend/FAST-IBAN_Project/execution/code_t/build --output-on-failure
 
   imagenes-sin-secretos:
     runs-on: ubuntu-latest
