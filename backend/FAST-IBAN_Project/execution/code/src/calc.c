@@ -27,7 +27,6 @@ coord_point coord_from_great_circle(coord_point initial, double dist, double bea
 // No se usa -1 como centinela porque -1 es un valor empaquetado válido.
 bool bilinear_interpolation(coord_point p, short **z_mat, float *lats, float *lons, short *z_out) {
     double z, z1, z2, z3, z4;
-    CONTADOR_HILO().interp_calls++;
 
     //Calculate the 4 points of the square.
     coord_point p11 = {floor(p.lat/RES)*RES, floor(p.lon/RES)*RES}; //p1
@@ -45,22 +44,30 @@ bool bilinear_interpolation(coord_point p, short **z_mat, float *lats, float *lo
         p22.lon += RES;
     }
 
-    int i11 = findIndex(lats, NLAT, p11.lat);
-    int j11 = findIndex(lons, NLON, p11.lon);
+    int i11 = findIndex_sin_contar(lats, NLAT, p11.lat);
+    int j11 = findIndex_sin_contar(lons, NLON, p11.lon);
 
-    int i12 = findIndex(lats, NLAT, p12.lat);
-    int j12 = findIndex(lons, NLON, p12.lon);
+    int i12 = findIndex_sin_contar(lats, NLAT, p12.lat);
+    int j12 = findIndex_sin_contar(lons, NLON, p12.lon);
 
-    int i21 = findIndex(lats, NLAT, p21.lat);
-    int j21 = findIndex(lons, NLON, p21.lon);
+    int i21 = findIndex_sin_contar(lats, NLAT, p21.lat);
+    int j21 = findIndex_sin_contar(lons, NLON, p21.lon);
 
-    int i22 = findIndex(lats, NLAT, p22.lat);
-    int j22 = findIndex(lons, NLON, p22.lon);
+    int i22 = findIndex_sin_contar(lats, NLAT, p22.lat);
+    int j22 = findIndex_sin_contar(lons, NLON, p22.lon);
+
+    // ALG-209: una sola consulta del hilo por interpolación (antes, una por cada findIndex).
+    // Mismos totales exactos que contar dentro de las 8 llamadas a findIndex.
+    contadores_hilo *contador = &CONTADOR_HILO();
+    contador->interp_calls++;
+    contador->findindex_calls += 8;
+    contador->findindex_misses += (i11 == -1) + (j11 == -1) + (i12 == -1) + (j12 == -1)
+                                + (i21 == -1) + (j21 == -1) + (i22 == -1) + (j22 == -1);
 
     //si alguno de ellos es -1, no se puede interpolar.
     if(i11 == -1 || j11 == -1 || i12 == -1 || j12 == -1 || i21 == -1 || j21 == -1 || i22 == -1 || j22 == -1) {
         //perror("Error: No se ha encontrado el punto en la lista.\n");
-        CONTADOR_HILO().interp_fails++;
+        contador->interp_fails++;
         return false;
     }
 
