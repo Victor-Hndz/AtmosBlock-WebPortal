@@ -10,7 +10,9 @@ int main(int argc, char **argv) {
     int ncid, retval, i, j, k, time, lat, lon, size_x, size_y, step, bearing_count, bearing_count2, id, rank, size, time_start, time_end, chunk_size, resto, base_chunk;
     double scale_factor, offset, t_ini, t_fin, t_total = 0.0;
     short z_aux_selected;
-    short ***z_in;
+    short **z = NULL;
+    int z_varid;
+    bool swap_lon;
     char long_name[NC_MAX_NAME+1] = "";
     FILE *fp;
     selected_point **selected_points, **filtered_points;
@@ -46,15 +48,12 @@ int main(int argc, char **argv) {
     float lats[NLAT], lons[NLON];
 
     //Allocate contiguous memory for the data.
-    z_in = malloc(NTIME*sizeof(short**));
-    z_in[0] = malloc(sizeof(short*)*NTIME*NLAT);
-    z_in[0][0] = malloc(sizeof(short)*NTIME*NLAT*NLON);
+    // ALG-204: memoria para un solo paso temporal; el fichero se lee paso a paso.
+    z = malloc(NLAT*sizeof(short*));
+    z[0] = malloc(sizeof(short)*NLAT*NLON);
     
-    for(i = 0; i < NTIME; i++) 
-        z_in[i] = z_in[0] + i * NLAT;
-    
-    for(i = 0; i < NTIME * NLAT; i++) 
-        z_in[0][i] = z_in[0][0] + i * NLON;
+    for(i = 0; i < NLAT; i++) 
+        z[i] = z[0] + i * NLON;
 
     step = STEP;
     size_x = (int)((FILT_LAT(LAT_LIM_MIN))/step)+1;
@@ -75,20 +74,16 @@ int main(int argc, char **argv) {
     }
 
 
-    if (z_in == NULL || z_in[0] == NULL || z_in[0][0] == NULL || selected_points == NULL || selected_points[0] == NULL || filtered_points == NULL || filtered_points[0] == NULL) {
+    if (z == NULL || z[0] == NULL || selected_points == NULL || selected_points[0] == NULL || filtered_points == NULL || filtered_points[0] == NULL) {
         perror("Error: Couldn't allocate memory for data. ");
         return 2;
     }
 
     //Extract the data from the netcdf file.
-    init_nc_variables(ncid, z_in, lats, lons, &scale_factor, &offset, long_name);    
-
-    // Close the file.
-    if ((retval = nc_close(ncid)))
-        ERR(retval)
+    z_varid = init_nc_variables(ncid, lats, lons, &scale_factor, &offset, long_name);    
 
     //Check the coordinates and correct them if necessary.
-    check_coords(z_in, lons);
+    swap_lon = check_coords(lons);
 
     //Initialize the output files.
     init_files(filename, filename2, log_file, speed_file, long_name);
@@ -116,10 +111,11 @@ int main(int argc, char **argv) {
     // printf("Soy Rank: %d de Size: %d y voy de %d a %d.\n\n", rank, size, time_start, time_end);
 
     //Loop for every z value.
-    for (time=time_start; time<time_end; time++) { 
+    for (time=time_start; time<time_end; time++) {
+        read_time_step(ncid, z_varid, time, swap_lon, z);  // ALG-204
         t_ini = omp_get_wtime();
 
-        #pragma omp parallel num_threads(N_THREADS) shared(z_in, lats, lons, size_x, size_y, time, selected_points, filtered_points, step, scale_factor, offset, chunk_size) default(none)
+        #pragma omp parallel num_threads(N_THREADS) shared(z, lats, lons, size_x, size_y, time, selected_points, filtered_points, step, scale_factor, offset, chunk_size) default(none)
         {
             int lat, lon, it, bearing_count, bearing_count2;
             short z_aux_selected; bool interp_ok;
@@ -129,10 +125,10 @@ int main(int argc, char **argv) {
                 // printf("Processing time %d, lat %d\n", time, lat);
                 for(lon=0;lon<size_y;lon++) {
                     bearing_count = 0, bearing_count2 = 0;
-                    selected_points[lat][lon] = create_selected_point(create_point(lats[lat*step], lons[lon*step]), z_in[time][lat*step][lon*step], NO_TYPE, -1);
+                    selected_points[lat][lon] = create_selected_point(create_point(lats[lat*step], lons[lon*step]), z[lat*step][lon*step], NO_TYPE, -1);
 
                     for(it=0; it<N_BEARINGS*2;it++) {
-                        interp_ok = bilinear_interpolation(coord_from_great_circle(create_point(lats[lat*step], lons[lon*step]), DIST, BEARING_START + it*BEARING_STEP), z_in[time], lats, lons, &z_aux_selected);
+                        interp_ok = bilinear_interpolation(coord_from_great_circle(create_point(lats[lat*step], lons[lon*step]), DIST, BEARING_START + it*BEARING_STEP), z, lats, lons, &z_aux_selected);
                         
                         //Si se sale de la zona delimitada por los límites de latitud y longitud , no se tiene en cuenta.
                         if(!interp_ok) {
@@ -140,9 +136,9 @@ int main(int argc, char **argv) {
                             continue;
                         }
 
-                        if((((z_in[time][lat*step][lon*step] * scale_factor) + offset)/g_0) >= (((z_aux_selected * scale_factor) + offset)/g_0))
+                        if((((z[lat*step][lon*step] * scale_factor) + offset)/g_0) >= (((z_aux_selected * scale_factor) + offset)/g_0))
                             bearing_count++;
-                        if((((z_in[time][lat*step][lon*step] * scale_factor) + offset)/g_0) <= (((z_aux_selected * scale_factor) + offset)/g_0))
+                        if((((z[lat*step][lon*step] * scale_factor) + offset)/g_0) <= (((z_aux_selected * scale_factor) + offset)/g_0))
                             bearing_count2++;                 
                     }
                     if(bearing_count >= (int)(N_BEARINGS*2*PASS_PERCENT)) 
@@ -203,7 +199,7 @@ int main(int argc, char **argv) {
         t_ini = omp_get_wtime();
 
 
-        search_formation(clusters, j, z_in[time], lats, lons, scale_factor, offset, filename2, time);
+        search_formation(clusters, j, z, lats, lons, scale_factor, offset, filename2, time);
     
         t_fin = omp_get_wtime();
         printf("\n#4-%d. Búsqueda de formaciones realizada con éxito: %.6f s.\n", time, t_fin-t_ini);
@@ -233,13 +229,16 @@ int main(int argc, char **argv) {
         fclose(fp);
     }
     
-    free(z_in[0][0]);
-    free(z_in[0]);
+    // Close the file (ALG-204: it stays open to read each time step).
+    if ((retval = nc_close(ncid)))
+        ERR(retval)
+
+    free(z[0]);
     free(selected_points[0]);
     free(selected_points);
     free(filtered_points[0]);
     free(filtered_points);
-    free(z_in);
+    free(z);
     free(filename);
     free(filename2);
     free(speed_file);

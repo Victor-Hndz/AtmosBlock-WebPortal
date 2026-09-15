@@ -56,6 +56,11 @@ add_executable(TEST_expandcluster test_expandcluster.c)
 target_link_libraries(TEST_expandcluster CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
 add_test(NAME test_expandcluster COMMAND TEST_expandcluster)
 
+# ALG-204 (R2): lectura de un paso temporal y corrección de longitudes [0, 360) -> [-180, 180)
+add_executable(TEST_lectura_nc test_lectura_nc.c)
+target_link_libraries(TEST_lectura_nc INIT UTILS LIB m netcdf OpenMP::OpenMP_C)
+add_test(NAME test_lectura_nc COMMAND TEST_lectura_nc WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+
 # ALG-003: regresión por hash de la salida completa sobre el caso fijo
 add_test(NAME regresion_hash COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN>)
 set_tests_properties(regresion_hash PROPERTIES TIMEOUT 900)
