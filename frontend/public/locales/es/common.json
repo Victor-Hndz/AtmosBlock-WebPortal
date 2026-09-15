@@ -18,7 +18,8 @@
     "progress": "Ver actualizaciones de progreso en tiempo real"
   },
   "navigation-footer": {
-    "about": "Acerca de"
+    "about": "Acerca de",
+    "license": "Licencia MIT"
   },
   "language": {
     "switchLanguage": "Cambiar idioma",

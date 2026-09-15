@@ -73,7 +73,7 @@ const AboutPage: React.FC = (): JSX.Element => {
         <div className="flex justify-center">
           <div className="flex flex-wrap gap-4 items-center external-links-container">
             <a
-              href="https://github.com/Victor-Hndz"
+              href="https://github.com/Victor-Hndz/AtmosBlock-WebPortal"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-md hover:bg-slate-700 transition-colors"

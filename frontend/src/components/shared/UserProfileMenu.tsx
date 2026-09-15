@@ -69,7 +69,8 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ user }) => {
   };
 
   return (
-    <DropdownMenu.Root>
+    // modal={false}: a modal menu locks page scroll and hides the scrollbar, shifting the fixed header and footer
+    <DropdownMenu.Root modal={false}>
       <DropdownMenu.Trigger asChild>
         <button
           className="rounded-full h-8 w-8 flex items-center justify-center bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
