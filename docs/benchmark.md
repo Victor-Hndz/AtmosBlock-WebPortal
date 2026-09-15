@@ -82,3 +82,51 @@ Medianas de 5 ejecuciones. Las 30 ejecuciones de cada caso producen la misma sal
   leer por *hyperslab* (ALG-204) apenas cambiarán el tiempo en este caso. ALG-204 sí reduciría
   la memoria: el RSS pico (75 MB) sigue al tamaño del fichero (62 MB), porque se carga entero.
 - Sin MPI: su escalado se mide en ALG-206.
+
+### Después: ALG-201, ALG-203, ALG-204 y ALG-208 (`main` en `031cf27`, 2026-09-15)
+
+Docker Desktop se actualizó a 29.8.0 entre ambas mediciones, así que el "antes" (`e60e269`) se
+volvió a medir en la misma sesión que el "después". Medianas de 5 ejecuciones; las 30 ejecuciones
+de cada caso y versión producen la misma salida, y es la misma antes y después (sha256
+`6f1c0423…` en el caso fijo y `44a955d2…` en el largo).
+
+**Caso largo (60 pasos)**
+
+| Binario | Hilos | Pared antes (s) | Pared después (s) | Cambio | Fase 1 antes → después (s) | RSS antes → después (MB) |
+|---|---:|---:|---:|---:|---:|---:|
+| `FAST-IBAN` | 1 | 15,57 | 17,46 | +12 % * | 12,64 → 14,45 | 75 → 17 |
+| `FAST-IBAN_omp` | 1 | 15,55 | 17,12 | +10 % * | 12,62 → 14,02 | 75 → 17 |
+| `FAST-IBAN_omp` | 2 | 12,00 | 10,27 | −14 % | 9,07 → 7,23 | 75 → 17 |
+| `FAST-IBAN_omp` | 4 | 10,64 | 7,25 | −32 % | 7,61 → 3,95 | 75 → 17 |
+| `FAST-IBAN_omp` | 6 | 10,48 | 5,55 | −47 % | 7,40 → 2,65 | 75 → 17 |
+| `FAST-IBAN_omp` | 12 | 10,19 | **5,07** | **−50 %** | 6,82 → **2,09** | 75 → **17** |
+
+\* Estas repeticiones tuvieron mucho ruido (pared 16,62–18,63 s en serie). **Medición alternada en
+serie** (antes y después intercalados, 5 rondas): pared **15,67 → 16,71 s (+6,6 %)**, fase 1
+12,65 → 13,85 s (+9,5 %), con rangos 15,61–15,70 y 16,23–16,81 s.
+
+**Caso fijo (4 pasos)**
+
+| Binario | Hilos | Pared antes (s) | Pared después (s) | Cambio | Fase 1 antes → después (s) |
+|---|---:|---:|---:|---:|---:|
+| `FAST-IBAN` | 1 | 0,97 | 1,01 | +4 % | 0,85 → 0,89 |
+| `FAST-IBAN_omp` | 2 | 0,74 | 0,59 | −20 % | 0,61 → 0,46 |
+| `FAST-IBAN_omp` | 4 | 0,64 | 0,37 | −42 % | 0,51 → 0,25 |
+| `FAST-IBAN_omp` | 6 | 0,63 | 0,30 | −52 % | 0,49 → 0,18 |
+| `FAST-IBAN_omp` | 12 | 0,58 | **0,27** | **−53 %** | 0,44 → **0,14** |
+
+La memoria del caso fijo no cambia (22–23 MB): solo tiene 4 pasos.
+
+### Lectura del después
+
+- **Paralelo: el doble de rápido.** Con 12 hilos el caso largo pasa de 10,19 a 5,07 s. La fase 1
+  escala ahora 6,9× con 12 hilos (14,45 → 2,09 s), frente a 1,9× antes; el mérito es de ALG-208
+  (contadores de diagnóstico por hilo en vez de `omp atomic`).
+- **Memoria: −77 %** en el caso largo (75 → 17 MB) gracias a ALG-204, y ya no crece con el número
+  de pasos temporales.
+- **Serie: +6,6 % más lento.** Es el coste de `omp_get_thread_num()` en cada incremento de los
+  contadores (ALG-208). Recuperarlo es la tarea propuesta ALG-209.
+- **Fase 2 sin cambios apreciables** (~2,6–2,9 s). ALG-201 la bajó un 3 %, dentro del ruido de esta
+  medición; con 12 hilos pasa a ser más de la mitad del tiempo total, así que es el siguiente cuello
+  de botella.
+- **ALG-203** no cambia el tiempo: elimina fugas (`valgrind` limpio, comprobado en CI).
