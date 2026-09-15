@@ -112,3 +112,10 @@ set_tests_properties(init_hilos_incorrectos PROPERTIES PASS_REGULAR_EXPRESSION "
 set_tests_properties(init_sin_argumentos PROPERTIES PASS_REGULAR_EXPRESSION "No such file")
 set_tests_properties(init_directorio_salida_imposible PROPERTIES PASS_REGULAR_EXPRESSION "Error creating directory")
 set_tests_properties(init_z_sin_3_dimensiones PROPERTIES PASS_REGULAR_EXPRESSION "debe tener 3 dimensiones")
+
+# ALG-301 (L1): la resolución se lee del NetCDF; una rejilla con paso no uniforme se rechaza.
+add_executable(TEST_resolucion test_resolucion.c)
+target_link_libraries(TEST_resolucion CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
+add_test(NAME test_resolucion_medio_grado COMMAND TEST_resolucion WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+add_test(NAME init_rejilla_irregular COMMAND TEST_resolucion irregular WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+set_tests_properties(init_rejilla_irregular PROPERTIES PASS_REGULAR_EXPRESSION "paso uniforme")

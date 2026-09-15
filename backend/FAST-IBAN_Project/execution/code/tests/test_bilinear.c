@@ -21,6 +21,7 @@ int main(void) {
 
     NLAT = N_LAT;
     NLON = N_LON;
+    RES = 0.25;  // ALG-301: sin NetCDF, la resolución se fija a mano como NLAT y NLON
     for (int i = 0; i < N_LAT; i++) { lats[i] = 90.0f - 0.25f * i; filas[i] = datos[i]; }
     for (int j = 0; j < N_LON; j++) lons[j] = -180.0f + 0.25f * j;
 

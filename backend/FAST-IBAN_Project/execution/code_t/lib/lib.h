@@ -23,7 +23,11 @@
 
 #define ACTUAL_DIR "build"
 #define DIR_PERMS 0777
-#define RES 0.25 // Resolution of the map in degrees
+// ALG-301 (L1): resolución de la rejilla en grados, leída del NetCDF en init_nc_variables.
+// ponytail: exacta con pasos diádicos (0,25°, 0,5°, 1°); con pasos como 0,1° el redondeo de centroides
+// depende del último bit del float.
+extern double RES;
+#define TOL_PASO 1e-4 // Tolerancia en grados al comprobar que el paso de la rejilla es uniforme (float32)
 
 #define FILT_LAT(g) (360-(g) / RES)
 

@@ -42,6 +42,12 @@ add_executable(TEST_clusters_t tests/test_clusters.c)
 target_link_libraries(TEST_clusters_t PRIVATE LIB m netcdf)
 add_test(NAME test_clusters_t COMMAND TEST_clusters_t)
 add_test(NAME regresion_hash_t COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/tests/run_baseline.sh $<TARGET_FILE:FAST-IBAN>)
+# ALG-301 (L1): la resolución se lee del NetCDF; una rejilla con paso no uniforme se rechaza.
+add_executable(TEST_resolucion_t tests/test_resolucion.c)
+target_link_libraries(TEST_resolucion_t PRIVATE LIB m netcdf)
+add_test(NAME test_resolucion_t COMMAND TEST_resolucion_t WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+add_test(NAME init_rejilla_irregular_t COMMAND TEST_resolucion_t irregular WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+set_tests_properties(init_rejilla_irregular_t PROPERTIES PASS_REGULAR_EXPRESSION "paso uniforme")
 
 
 # target_include_directories(FAST-IBAN PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

@@ -17,6 +17,7 @@ static void comprobar(int condicion, const char *mensaje) {
 }
 
 int main(void) {
+    RES = 0.25;  // ALG-301: sin NetCDF, la resolución de los centroides se fija a mano
     selected_point *datos = malloc(sizeof(selected_point) * FILAS * COLUMNAS);
     selected_point **puntos = malloc(sizeof(selected_point *) * FILAS);
     if (datos == NULL || puntos == NULL)
