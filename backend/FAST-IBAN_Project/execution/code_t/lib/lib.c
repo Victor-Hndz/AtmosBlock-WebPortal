@@ -271,26 +271,119 @@ selected_point create_selected_point(coord_point point, short t,  int cluster) {
     return new_point;
 }
 
+// B8 (ALG-112): recorrido iterativo con pila explícita, como en code/ (ALG-403). El DFS recursivo anterior
+// desbordaba la pila con clusters grandes. Marca la misma componente: vecindad 8 y dentro de eps.
 void expandCluster(selected_point **filtered_points, int size_x, int size_y, int i, int j, int id, double eps) {
-    int x, y;
+    int capacidad = 64, n = 0;
+    int *pila = malloc(2 * capacidad * sizeof(int));
+    if (pila == NULL) {
+        perror("expandCluster: sin memoria");
+        exit(EXIT_FAILURE);
+    }
+    pila[0] = i;
+    pila[1] = j;
+    n = 1;
 
-    for(x=i-1;x<=i+1;x++) {
-        if(x<0 || x>size_x-1)
-            continue;
-        for(y=j-1;y<=j+1;y++) {
-            // printf("x: %d, y: %d\n", x, y);
-            if(y<0 || y>size_y-1)
-                continue;
-            if(x == i && y == j)
-                continue;
+    while (n > 0) {
+        n--;
+        int ci = pila[2 * n], cj = pila[2 * n + 1];
 
-            if(filtered_points[x][y].cluster != -1) 
+        for (int x = ci - 1; x <= ci + 1; x++) {
+            if (x < 0 || x > size_x - 1)
                 continue;
-
-            if(fabs(filtered_points[x][y].point.lat - filtered_points[i][j].point.lat) <= eps && fabs(filtered_points[x][y].point.lon - filtered_points[i][j].point.lon) <= eps) {
-                filtered_points[x][y].cluster = id;
-                expandCluster(filtered_points, size_x, size_y, x, y, id, eps);
+            for (int y = cj - 1; y <= cj + 1; y++) {
+                if (y < 0 || y > size_y - 1 || (x == ci && y == cj))
+                    continue;
+                if (filtered_points[x][y].cluster != -1)
+                    continue;
+                if (fabs(filtered_points[x][y].point.lat - filtered_points[ci][cj].point.lat) <= eps &&
+                    fabs(filtered_points[x][y].point.lon - filtered_points[ci][cj].point.lon) <= eps) {
+                    filtered_points[x][y].cluster = id;
+                    if (n == capacidad) {
+                        capacidad *= 2;
+                        int *mayor = realloc(pila, 2 * capacidad * sizeof(int));
+                        if (mayor == NULL) {
+                            free(pila);
+                            perror("expandCluster: sin memoria");
+                            exit(EXIT_FAILURE);
+                        }
+                        pila = mayor;
+                    }
+                    pila[2 * n] = x;
+                    pila[2 * n + 1] = y;
+                    n++;
+                }
             }
         }
     }
+    free(pila);
+}
+
+// ALG-114: agrupa solo los puntos seleccionados (cluster == -1); los no seleccionados llevan NOT_SELECTED y
+// expandCluster no los recorre. Antes también se agrupaban y formaban un único cluster enorme.
+// Devuelve el número de clusters.
+int cluster_points(selected_point **filtered_points, int size_x, int size_y, double eps) {
+    int id = 0;
+    for (int i = 0; i < size_x; i++)
+        for (int j = 0; j < size_y; j++)
+            if (filtered_points[i][j].cluster == -1) {
+                filtered_points[i][j].cluster = id;
+                expandCluster(filtered_points, size_x, size_y, i, j, id, eps);
+                id++;
+            }
+    return id;
+}
+
+// ALG-114: escribe cada punto seleccionado con el id de su cluster y el centroide del cluster (media vectorial 3D
+// redondeada a la rejilla, como en code/). Antes la columna cluster recibía el índice de fila y el centroide era el
+// propio punto.
+void write_selected_points(FILE *fp, selected_point **filtered_points, int size_x, int size_y, int n_clusters,
+                           int time_step, double scale_factor, double offset) {
+    if (n_clusters <= 0)
+        return;
+
+    double *x = calloc(n_clusters, sizeof(double)), *y = calloc(n_clusters, sizeof(double));
+    double *z = calloc(n_clusters, sizeof(double));
+    int *n = calloc(n_clusters, sizeof(int));
+    coord_point *center = malloc(n_clusters * sizeof(coord_point));
+    if (x == NULL || y == NULL || z == NULL || n == NULL || center == NULL) {
+        perror("write_selected_points: sin memoria");
+        exit(EXIT_FAILURE);
+    }
+
+    for (int i = 0; i < size_x; i++)
+        for (int j = 0; j < size_y; j++) {
+            int c = filtered_points[i][j].cluster;
+            if (c < 0)
+                continue;
+            double lat = filtered_points[i][j].point.lat * M_PI / 180, lon = filtered_points[i][j].point.lon * M_PI / 180;
+            x[c] += cos(lat) * cos(lon);
+            y[c] += cos(lat) * sin(lon);
+            z[c] += sin(lat);
+            n[c]++;
+        }
+
+    for (int c = 0; c < n_clusters; c++) {
+        x[c] /= n[c];
+        y[c] /= n[c];
+        z[c] /= n[c];
+        center[c].lat = round((atan2(z[c], sqrt(x[c] * x[c] + y[c] * y[c])) * 180 / M_PI) / RES) * RES;
+        center[c].lon = round((atan2(y[c], x[c]) * 180 / M_PI) / RES) * RES;
+    }
+
+    for (int i = 0; i < size_x; i++)
+        for (int j = 0; j < size_y; j++) {
+            selected_point p = filtered_points[i][j];
+            if (p.cluster < 0)
+                continue;
+            //time,latitude,longitude,t,cluster,centroid_lat,centroid_lon
+            fprintf(fp, "%d,%.2f,%.2f,%.2f,%d,%.2f,%.2f\n", time_step, p.point.lat, p.point.lon,
+                    p.t * scale_factor + offset - K_TO_C, p.cluster, center[p.cluster].lat, center[p.cluster].lon);
+        }
+
+    free(x);
+    free(y);
+    free(z);
+    free(n);
+    free(center);
 }

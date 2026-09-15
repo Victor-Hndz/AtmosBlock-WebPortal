@@ -33,6 +33,16 @@ target_link_libraries(FAST-IBAN PRIVATE netcdf)
 
 target_link_libraries(FAST-IBAN PRIVATE LIB)
 
+# ALG-112: pruebas de la variante de temperatura (ctest --test-dir build)
+enable_testing()
+add_executable(TEST_expandcluster_t tests/test_expandcluster.c)
+target_link_libraries(TEST_expandcluster_t PRIVATE LIB m netcdf)
+add_test(NAME test_expandcluster_t COMMAND TEST_expandcluster_t)
+add_executable(TEST_clusters_t tests/test_clusters.c)
+target_link_libraries(TEST_clusters_t PRIVATE LIB m netcdf)
+add_test(NAME test_clusters_t COMMAND TEST_clusters_t)
+add_test(NAME regresion_hash_t COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/tests/run_baseline.sh $<TARGET_FILE:FAST-IBAN>)
+
 
 # target_include_directories(FAST-IBAN PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # set_target_properties(FAST-IBAN PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../)
