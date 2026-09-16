@@ -28,7 +28,21 @@ int main(int argc, char **argv) {
     comprobar(PARAMS.search_radius_km == 3000, "search_radius_km == 3000");
     comprobar(PARAMS.contour_ray_step_km == 25, "contour_ray_step_km == 25");  // ALG-360
     comprobar(PARAMS.cluster_lat_min_deg == 30, "cluster_lat_min_deg == 30");
-    comprobar(PARAMS.cluster_lat_max_deg == 85, "cluster_lat_max_deg == 85");
+    comprobar(PARAMS.cluster_lat_max_deg == 90, "cluster_lat_max_deg == 90 (sin límite polar)");  // ALG-304
+
+    // ALG-304: con 90 no hay límite polar; un cluster que llega a la fila del polo sigue dentro, en ambos hemisferios.
+    points_cluster norte, sur;
+    memset(&norte, 0, sizeof(norte));
+    memset(&sur, 0, sizeof(sur));
+    norte.center = create_point(88, 0);
+    norte.point_sup.point = create_point(90, 0);
+    sur.center = create_point(-88, 0);
+    sur.point_inf.point = create_point(-90, 0);
+    comprobar(!fuera_de_latitudes(&norte), "límite 90: cluster hasta 90°N dentro");
+    comprobar(!fuera_de_latitudes(&sur), "límite 90: cluster hasta 90°S dentro");
+    PARAMS.cluster_lat_max_deg = 85;
+    comprobar(fuera_de_latitudes(&norte) && fuera_de_latitudes(&sur), "límite 85: clusters hasta ±90° fuera");
+    PARAMS.cluster_lat_max_deg = 90;
     comprobar(PARAMS.min_cluster_area_km2 == 22000, "min_cluster_area_km2 == 22000");  // ALG-306
     comprobar(PARAMS.rex_max_offset_km == 700, "rex_max_offset_km == 700");  // ALG-364
 

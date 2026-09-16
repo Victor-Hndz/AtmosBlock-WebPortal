@@ -163,12 +163,12 @@ int main(int argc, char **argv) {
         points_cluster *clusters_aux = fill_clusters(filtered_points, size_x, size_y, id, offset, scale_factor);
         int clusters_cont=0;
         for(i=0;i<id;i++) 
-            if(lat_polar_cluster(&clusters_aux[i]) >= PARAMS.cluster_lat_max_deg || lat_polar_cluster(&clusters_aux[i]) <= PARAMS.cluster_lat_min_deg || clusters_aux[i].area_km2 < PARAMS.min_cluster_area_km2)
+            if(fuera_de_latitudes(&clusters_aux[i]) || clusters_aux[i].area_km2 < PARAMS.min_cluster_area_km2)
                 clusters_cont++;
 
         points_cluster *clusters = malloc((id-clusters_cont)*sizeof(points_cluster));
         for(i=0, j=0;i<id;i++) {
-            if(lat_polar_cluster(&clusters_aux[i]) < PARAMS.cluster_lat_max_deg && lat_polar_cluster(&clusters_aux[i]) > PARAMS.cluster_lat_min_deg && clusters_aux[i].area_km2 >= PARAMS.min_cluster_area_km2) {
+            if(!fuera_de_latitudes(&clusters_aux[i]) && clusters_aux[i].area_km2 >= PARAMS.min_cluster_area_km2) {
                 clusters[j] = clusters_aux[i];
                 clusters[j].id = j;
                 
