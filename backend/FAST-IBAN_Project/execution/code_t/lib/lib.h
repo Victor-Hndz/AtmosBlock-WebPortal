@@ -29,7 +29,8 @@
 extern double RES;
 #define TOL_PASO 1e-4 // Tolerancia en grados al comprobar que el paso de la rejilla es uniforme (float32)
 
-#define FILT_LAT(g) (360-(g) / RES)
+// ALG-302: índice de la fila de LAT_LIM_MIN en las latitudes del fichero; lo fija init_nc_variables.
+extern int FILA_LAT_MIN;
 
 #define LONG_NAME "long_name"
 #define REC_NAME "time"

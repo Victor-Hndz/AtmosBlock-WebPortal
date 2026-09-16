@@ -1,5 +1,5 @@
 // ALG-301 (L1): la variante de temperatura lee la resolución de la rejilla del NetCDF, no de un #define.
-// Sin argumentos: rejilla de 0,5°; RES debe valer 0,5 (lo usan FILT_LAT, eps y el redondeo de centroides).
+// Sin argumentos: rejilla de 0,5°; RES debe valer 0,5 (lo usan la fila de LAT_LIM_MIN, eps y el redondeo de centroides).
 // "irregular": paso de latitud no uniforme; init_nc_variables termina con un mensaje (PASS_REGULAR_EXPRESSION).
 #include "../lib/lib.h"
 
