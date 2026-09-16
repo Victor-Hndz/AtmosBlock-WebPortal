@@ -213,10 +213,19 @@ double distancia_al_meridiano(coord_point p, coord_point referencia) {
     return R * asin(cos(p.lat * M_PI / 180) * fabs(sin(dl)));
 }
 
+/**
+ * @brief Forma del mínimo de un Rex al nivel `contour`: contorno hacia el ecuador y hacia el oeste en todo el sector,
+ * hacia el polo en la mayoría, y abierto hacia el este.
+ */
+bool minimo_rex_valido(points_cluster minimo, int contour) {
+    return check_contour_dir_rex(minimo, contour, 1, 0) && check_contour_dir_rex(minimo, contour, 0, -1) &&
+           check_contour_dir_omega(minimo, contour, -1, 0) && !check_contour_dir_rex(minimo, contour, 0, 1);
+}
+
 void search_formation(points_cluster *clusters, int size, short **z_in, float *lats, float *lons, double scale_factor, double offset, char* filename, int time) {
     int i, j, index_lat, index_lon, contour_top, lon_aux_max, lon_aux_min;
     double mean_dist, pair_score, best_score;
-    bool contour_top_aux, contour_bot, contour_izq, contour_der;
+    bool contour_bot, contour_izq, contour_der;
     points_cluster selected_izq, selected_der, selected_rex;
     formation formation;
 
@@ -322,11 +331,6 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                     contour_der = check_contour_dir_rex(clusters[i], contour_top, 0, 1);
                     
                     if(contour_bot && contour_der && !contour_izq) {
-                        contour_bot = false;
-                        contour_der = false;
-                        contour_izq = false;
-                        contour_top_aux = false;
-
                         for(j=0; j<size; j++) {
                             if(point_distance(clusters[j].center, clusters[i].center) > PARAMS.search_radius_km)
                                 continue;
@@ -335,11 +339,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                                 continue;
 
                             if(clusters[j].type == MIN && hemisferio(clusters[i].center.lat) * clusters[j].center.lat <= hemisferio(clusters[i].center.lat) * clusters[i].center.lat && distancia_al_meridiano(clusters[j].center, clusters[i].center) <= PARAMS.rex_max_offset_km) {
-                                contour_bot = check_contour_dir_rex(clusters[j], contour_top, 1, 0);
-                                contour_izq = check_contour_dir_rex(clusters[j], contour_top, 0, -1);
-                                contour_top_aux = check_contour_dir_omega(clusters[j], contour_top, -1, 0);
-
-                                if(contour_bot && contour_izq && contour_top_aux && !contour_der) 
+                                if(minimo_rex_valido(clusters[j], contour_top))
                                     if(point_distance(clusters[j].center, clusters[i].center) < point_distance(selected_rex.center, clusters[i].center)) 
                                         selected_rex = clusters[j];
                             }
