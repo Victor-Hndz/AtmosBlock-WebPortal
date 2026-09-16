@@ -31,8 +31,9 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 | Espaciado de candidatos de 1,25° a 1,0° *(decisión de diseño, no bug)* | ALG-359 | puntos en clusters 1373 → 2118; misma OMEGA | **104 / 16** | **Esperado:** +57 % de puntos candidatos (1,25² = 1,56), clusters +3,1 %; 106 de 116 formaciones se conservan a ≤1°. Ver sección ALG-359 |
 
 | Recorridos de contorno geodésicos *(decisión de diseño, no bug)* | ALG-360 | 1 OMEGA → 4 OMEGA + 2 REX, las nuevas junto a ±180°; la original se conserva | **107 / 15** | **Objetivo:** el acuerdo entre 0,25° y 1° pasa de 97 a 105 formaciones emparejadas. Puntos y clusters idénticos. Ver sección ALG-360 |
-| Vecindad de clusters con vuelta en ±180° y fila del polo como un punto | ALG-309 | 4 / 1 → 4 / 0 | 97 / 13 (=) | **Pequeño:** clusters partidos en ±180° pasan a ser uno; 108 de 110 formaciones iguales. Ver sección ALG-309 |
 | Filtro de tamaño por área de celda, 22 000 km² *(decisión de diseño)* | ALG-306 | 4 / 2 → 4 / 1 | **97 / 13** | Se pierden sobre todo formaciones apoyadas en clusters pequeños; acuerdo 0,25°/1° 85 % → 88 %. Ver sección ALG-306 |
+| Vecindad de clusters con vuelta en ±180° y fila del polo como un punto | ALG-309 | 4 / 1 → 4 / 0 | 97 / 13 (=) | **Pequeño:** clusters partidos en ±180° pasan a ser uno; 108 de 110 formaciones iguales. Ver sección ALG-309 |
+| Límite polar del filtro de latitud desactivado (90) *(decisión de diseño)* | ALG-304 | sin cambios | 97 / 13 (=) | **0 formaciones**; puntos en clusters del caso largo +29 % (clusters polares que antes se descartaban). Ver sección ALG-304 |
 
 B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2, B1, B10 y ALG-359 sí, porque cambian el muestreo. B7 cambia un solo punto. ALG-360 solo cambia las formaciones.
 
@@ -93,6 +94,14 @@ Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. E
 **Coste:** el caso largo con 12 hilos sigue en unos 6 s.
 
 Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
+
+## ALG-304: filtro de latitud sin límite polar
+
+El filtro descartaba los clusters cuyo punto más al norte no quedaba entre 30° y 85°. El 85 no tenía base física y dejaba fuera justo la franja de 75–90° que da sentido al método (asesoría física). Ahora el filtro usa el punto más cercano a su polo en valor absoluto (ALG-303), y `cluster_lat_max_deg` = 90 significa sin límite polar. Se mantiene 30° en ambos hemisferios: la climatología de bloqueo del HS está en 40–70°S. Se quita después de ALG-309 para que las altas que tocan el polo no salgan partidas.
+
+**Test** (`test_parametros`): con 90, un cluster que llega a 90°N o a 90°S sigue dentro; con 85 queda fuera.
+
+**Delta: 0 formaciones** en el caso fijo, en el largo y en el largo a 1°, también por bandas y en el acuerdo 0,25°/1°. Los puntos en clusters del caso largo pasan de 51 685 a 66 510 (+29 %): son clusters polares que ahora llegan a `search_formation`, pero cerca del polo el rayo hacia el polo apenas deja niveles de contorno y no forman Omega ni Rex (ALG-310 y ALG-311 los clasifican). La línea base del caso de 2003 cambia porque hay más clusters y se renumeran sus identificadores.
 
 ## ALG-309: vecindad con vuelta en ±180° y paso por el polo
 

@@ -24,9 +24,12 @@ search_radius_km: 3000
 # fina admitida (0,25° ≈ 27,8 km) ni la malla nativa de ERA5 (≈ 31 km), así que no depende de la resolución del fichero.
 contour_ray_step_km: 25
 
-# Se descartan los clusters cuyo punto más al norte no queda estrictamente entre estas latitudes, en grados.
+# Se descartan los clusters cuyo punto más cercano a su polo no queda estrictamente entre estas latitudes absolutas, en
+# grados, en ambos hemisferios (ALG-303, ALG-304). 90 en el máximo significa sin límite polar: la franja de 75-90° es
+# la que da sentido al método (el antiguo 85 no tenía base física y dejaba fuera las altas polares). Los mismos valores
+# en el HS: su climatología de bloqueo está en 40-70°S, lejos de 30° (asesoría física, 2026-09-16).
 cluster_lat_min_deg: 30
-cluster_lat_max_deg: 85
+cluster_lat_max_deg: 90
 
 # Área mínima de un cluster, en km²: suma de R²·Δλ·Δφ·cos φ de sus celdas de candidatos (ALG-306). Sustituye al número
 # mínimo de puntos, que dependía de la latitud y de la resolución. Es un filtro de robustez de la semilla, no de tamaño

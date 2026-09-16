@@ -131,6 +131,13 @@ static inline double lat_polar_cluster(const points_cluster *c) {
     return hemisferio(c->center.lat) > 0 ? c->point_sup.point.lat : -c->point_inf.point.lat;
 }
 
+// ALG-304: el cluster queda fuera del filtro de latitud: su punto más cercano al polo no está por encima (estricto) de
+// cluster_lat_min_deg o, si hay límite polar (cluster_lat_max_deg < 90), no está por debajo (estricto) de él.
+static inline bool fuera_de_latitudes(const points_cluster *c) {
+    double lat = lat_polar_cluster(c);
+    return lat <= PARAMS.cluster_lat_min_deg || (PARAMS.cluster_lat_max_deg < 90 && lat >= PARAMS.cluster_lat_max_deg);
+}
+
 
 // Functions
 coord_point create_point(float lat, float lon);
