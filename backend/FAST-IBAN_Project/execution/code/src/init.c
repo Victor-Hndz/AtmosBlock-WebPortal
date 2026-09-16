@@ -78,6 +78,7 @@ void escribir_cabecera(FILE *fp) {
     fprintf(fp, "# lat_limits_deg: %d %d\n", LAT_LIM_MIN, LAT_LIM_MAX);
     fprintf(fp, "# lon_limits_deg: %d %d\n", LON_LIM_MIN, LON_LIM_MAX);
     escribir_claves_yaml(fp, CLAVES_PARAMS, N_CLAVES_PARAMS);
+    fprintf(fp, "# polar_guard_deg: %.3f\n", guarda_polar_deg());  // ALG-310: derivada, no se lee
 }
 
 

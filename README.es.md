@@ -52,14 +52,16 @@ Para cada paso temporal de un campo Z500 (ERA5, 0,25°):
    tiene un centroide (media vectorial en 3D) y un contorno representativo en múltiplos de 20 mgp.
 4. **Clasificación morfológica.** Las altas se emparejan con las bajas vecinas mediante
    comprobaciones de contorno cerrado y de dirección, lo que da patrones **Omega** (una alta
-   flanqueada por dos bajas) y **Rex** (dipolo alta–baja).
+   flanqueada por dos bajas) y **Rex** (dipolo alta–baja). A menos de `ray_distance_km` del polo la
+   circunferencia de rayos envuelve el polo y las direcciones no están definidas: esas altas salen como
+   **POLAR_HIGH** (sin bajas).
 
 La salida se escribe en CSV:
 
 | Fichero | Contenido |
 |---|---|
 | `*_selected_*.csv` | Puntos seleccionados: tiempo, latitud, longitud, Z500, tipo (MAX/MIN), cluster y su centroide |
-| `*_formations_*.csv` | Patrones detectados: tiempo, ids de los clusters de alta y baja, tipo (OMEGA/REX) |
+| `*_formations_*.csv` | Patrones detectados: tiempo, ids de los clusters de alta y baja, tipo (OMEGA/REX/POLAR_HIGH) |
 | `speed_*.csv`, `log_*.txt` | Tiempos por etapa y registro de la ejecución |
 
 El alcance actual y las limitaciones están en la [hoja de ruta](#hoja-de-ruta). El algoritmo trabaja

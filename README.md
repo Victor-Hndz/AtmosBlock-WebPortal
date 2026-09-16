@@ -52,14 +52,15 @@ For each time step of a Z500 field (ERA5, 0.25°):
    centroid (3-D vector mean) and a representative contour at multiples of 20 gpm.
 4. **Morphological classification.** Highs are paired with neighbouring lows through closed-contour
    and directional checks, yielding **Omega** (a high flanked by two lows) and **Rex**
-   (high–low dipole) patterns.
+   (high–low dipole) patterns. Within `ray_distance_km` of the pole the ray circle wraps the pole and
+   directions are undefined, so those highs are reported as **POLAR_HIGH** (no lows) instead.
 
 Output is written as CSV:
 
 | File | Contents |
 |---|---|
 | `*_selected_*.csv` | Selected points: time, latitude, longitude, Z500, type (MAX/MIN), cluster and its centroid |
-| `*_formations_*.csv` | Detected patterns: time, high and low cluster ids, type (OMEGA/REX) |
+| `*_formations_*.csv` | Detected patterns: time, high and low cluster ids, type (OMEGA/REX/POLAR_HIGH) |
 | `speed_*.csv`, `log_*.txt` | Timings per stage and run log |
 
 Current scope and limitations are listed in the [roadmap](#roadmap). The algorithm operates on
