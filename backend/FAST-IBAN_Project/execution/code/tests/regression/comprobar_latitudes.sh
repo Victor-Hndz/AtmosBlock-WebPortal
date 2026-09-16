@@ -1,0 +1,39 @@
+#!/bin/sh
+# ALG-302: ejecuta un binario FAST-IBAN (code/ o code_t/) y comprueba que termina bien y que todas las latitudes
+# de los CSV de puntos quedan entre el límite inferior pedido y la primera latitud del fichero.
+# Uso: comprobar_latitudes.sh <binario> <caso.nc> <lat_min> <lat_max> <lat_superior_del_fichero>
+set -eu
+
+BIN=$(realpath "$1")
+CASO=$(realpath "$2")
+LAT_MIN=$3; LAT_MAX=$4; LAT_SUP=$5
+
+TMP=$(mktemp -d)
+cd "$TMP"
+# LANZADOR antepone, p. ej., "valgrind --error-exitcode=3": leer filas fuera de la rejilla no siempre rompe el
+# proceso, pero valgrind sí lo detecta. Sin comillas a propósito, para que se separe en palabras.
+# shellcheck disable=SC2086
+if ! ${LANZADOR:-} "$BIN" "$CASO" "$LAT_MIN" "$LAT_MAX" -180 180 out/ 1 > ejecucion.log 2>&1; then
+    tail -20 ejecucion.log
+    echo "ERROR: el binario terminó con error"
+    exit 1
+fi
+
+# CSV de puntos: los que tienen la latitud en la segunda columna (selected en code/, salida única en code_t/).
+filas=0
+for f in out/*.csv; do
+    case "$(head -1 "$f" | cut -d, -f2)" in lat*) ;; *) continue ;; esac
+    fuera=$(tail -n +2 "$f" | awk -F, -v min="$LAT_MIN" -v sup="$LAT_SUP" '$2 < min - 1e-4 || $2 > sup + 1e-4' | wc -l)
+    n=$(tail -n +2 "$f" | wc -l)
+    filas=$((filas + n))
+    if [ "$fuera" -ne 0 ]; then
+        echo "ERROR: $fuera de $n puntos de $(basename "$f") fuera de [$LAT_MIN, $LAT_SUP]; ejemplos:"
+        tail -n +2 "$f" | awk -F, -v min="$LAT_MIN" -v sup="$LAT_SUP" '$2 < min - 1e-4 || $2 > sup + 1e-4' | head -3
+        exit 1
+    fi
+done
+if [ "$filas" -eq 0 ]; then
+    echo "ERROR: ningún punto en la salida (la comprobación no diría nada)"
+    exit 1
+fi
+echo "OK: $filas puntos, todos con latitud en [$LAT_MIN, $LAT_SUP]"

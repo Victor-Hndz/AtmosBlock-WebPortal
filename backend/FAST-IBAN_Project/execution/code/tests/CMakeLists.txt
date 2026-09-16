@@ -119,3 +119,25 @@ target_link_libraries(TEST_resolucion CALC UTILS INIT LIB m netcdf OpenMP::OpenM
 add_test(NAME test_resolucion_medio_grado COMMAND TEST_resolucion WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 add_test(NAME init_rejilla_irregular COMMAND TEST_resolucion irregular WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 set_tests_properties(init_rejilla_irregular PROPERTIES PASS_REGULAR_EXPRESSION "paso uniforme")
+
+# ALG-302: la rejilla se recorre desde la primera fila del fichero hasta LAT_LIM_MIN, sin suponer 90°N ni 0,25°.
+# Variantes del caso fijo generadas al vuelo: desde 80°N, y a 1° tomando 1 de cada 4 puntos.
+add_executable(RECORTAR_NC recortar_nc.c)
+target_link_libraries(RECORTAR_NC netcdf)
+add_test(NAME preparar_caso_80N COMMAND RECORTAR_NC ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/caso_80N.nc z 80 1)
+add_test(NAME preparar_caso_1grado COMMAND RECORTAR_NC ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/caso_1grado.nc z 90 4)
+set_tests_properties(preparar_caso_80N preparar_caso_1grado PROPERTIES FIXTURES_SETUP recortes)
+set(COMPROBAR_LATITUDES ${CMAKE_CURRENT_SOURCE_DIR}/regression/comprobar_latitudes.sh)
+# Área de 80°N a 0°N, como la pide el portal: LAT_LIM_MIN = 0 (con 20, code/ descarta en la salida lo que lee de más).
+add_test(NAME latitudes_desde_80N COMMAND sh ${COMPROBAR_LATITUDES} $<TARGET_FILE:FAST-IBAN> ${CMAKE_CURRENT_BINARY_DIR}/caso_80N.nc 0 85 80)
+add_test(NAME latitudes_rejilla_1grado COMMAND sh ${COMPROBAR_LATITUDES} $<TARGET_FILE:FAST-IBAN> ${CMAKE_CURRENT_BINARY_DIR}/caso_1grado.nc 25 85 90)
+set_tests_properties(latitudes_desde_80N latitudes_rejilla_1grado PROPERTIES FIXTURES_REQUIRED recortes TIMEOUT 600)
+# Leer filas de más no siempre rompe el proceso; con valgrind (instalado en el CI) cualquier lectura fuera falla.
+find_program(VALGRIND valgrind)
+if(VALGRIND)
+    set_tests_properties(latitudes_desde_80N latitudes_rejilla_1grado PROPERTIES ENVIRONMENT
+        "LANZADOR=${VALGRIND} -q --error-exitcode=3")
+endif()
+# LAT_LIM_MIN por debajo de la última latitud del fichero (el caso fijo llega a 0°): error explicado.
+add_test(NAME init_latitud_fuera_del_fichero COMMAND FAST-IBAN ${CASO_FIJO} -10 85 -180 180 out/ 1)
+set_tests_properties(init_latitud_fuera_del_fichero PROPERTIES PASS_REGULAR_EXPRESSION "fuera de las latitudes del fichero")

@@ -155,7 +155,7 @@ bool check_closed_contour(points_cluster cluster, int contour, short **z_in, flo
             newX += dx[i];
             newY += dy[i];
 
-            if (newX < 0 || newX >= FILT_LAT(LAT_LIM_MIN)-1 || newY < 0 || newY >= NLON)
+            if (newX < 0 || newX >= FILA_LAT_MIN-1 || newY < 0 || newY >= NLON)
                 break;
             if(point_distance(cluster.center, create_point(lats[newX], lons[newY])) > 3000)
                 break;
@@ -208,7 +208,7 @@ bool check_contour_dir_rex(points_cluster cluster, int contour, int dir_lat, int
                 break;
             }
 
-            if (newX < 0 || newX >= FILT_LAT(LAT_LIM_MIN) - 1 || newY < 0 || newY >= NLON)
+            if (newX < 0 || newX >= FILA_LAT_MIN - 1 || newY < 0 || newY >= NLON)
                 break;
             if (point_distance(cluster.center, create_point(lats[newX], lons[newY])) > 3000)
                 break;
@@ -265,7 +265,7 @@ bool check_contour_dir_omega(points_cluster cluster, int contour, int dir_lat, i
                 break;
             }
 
-            if (newX < 0 || newX >= FILT_LAT(LAT_LIM_MIN) - 1 || newY < 0 || newY >= NLON)
+            if (newX < 0 || newX >= FILA_LAT_MIN - 1 || newY < 0 || newY >= NLON)
                 break;
             if (point_distance(cluster.center, create_point(lats[newX], lons[newY])) > 3000)
                 break;
@@ -317,7 +317,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
             selected_rex.id = -1;
 
             while(!exit) {
-                if(index_lon < 0 || index_lat < 0 || index_lat > FILT_LAT(LAT_LIM_MIN)-1 || index_lon > NLON-1){
+                if(index_lon < 0 || index_lat < 0 || index_lat > FILA_LAT_MIN-1 || index_lon > NLON-1){
                     exit = true;
                     break;
                 }

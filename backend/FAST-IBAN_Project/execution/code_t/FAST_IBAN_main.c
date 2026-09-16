@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
     init_nc_variables(ncid, t_in, lats, lons, &scale_factor, &offset, long_name);
 
     step = 3;
-    size_x = (int)((FILT_LAT(LAT_LIM_MIN))/step)+1;
+    size_x = FILA_LAT_MIN/step + 1;  // ALG-302
     size_y = (int)((NLON)/step);
     
     filtered_points = calloc(size_x, sizeof(selected_point*));

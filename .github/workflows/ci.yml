@@ -51,6 +51,9 @@ jobs:
       image: victorhndz/netcdf-base@sha256:6f448a9eda3a12073be2c427d524d984387a85fc408a2f5755b648f59361a429 # latest a 2025-02-03
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Antes de configurar CMake: los tests de latitudes de ALG-302 se lanzan con valgrind si está instalado.
+      - name: Instalar valgrind
+        run: apt-get update -qq && apt-get install -y -qq valgrind > /dev/null
       - name: Compilar con -Wall -Wextra -Werror
         working-directory: backend/FAST-IBAN_Project/execution/code
         run: |
@@ -60,7 +63,6 @@ jobs:
         run: ctest --test-dir backend/FAST-IBAN_Project/execution/code/build --output-on-failure
       - name: valgrind sin fugas en serie y OpenMP (ALG-203)
         run: |
-          apt-get update -qq && apt-get install -y -qq valgrind > /dev/null
           CODE=$GITHUB_WORKSPACE/backend/FAST-IBAN_Project/execution/code
           CASO=$CODE/tests/fixtures/geopot_500hPa_2022-03-14_00-06-12-18UTC.nc
           for ejecucion in "FAST-IBAN 1" "FAST-IBAN_omp 4"; do

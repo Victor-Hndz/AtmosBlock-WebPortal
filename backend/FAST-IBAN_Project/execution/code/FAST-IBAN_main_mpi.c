@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
         z[i] = z[0] + i * NLON;
 
     step = STEP;
-    size_x = (int)((FILT_LAT(LAT_LIM_MIN))/step)+1;
+    size_x = FILA_LAT_MIN/step + 1;  // ALG-302
     size_y = (int)((NLON)/step);
 
     selected_points = malloc((size_x)*sizeof(selected_point*));
