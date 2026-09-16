@@ -1,0 +1,29 @@
+# FAST-IBAN: parámetros del detector (ALG-305, L4). Se vuelcan completos en la cabecera de cada CSV de salida.
+# Formato: YAML plano, una clave por línea ("clave: valor"); "#" empieza un comentario.
+# Otra ruta: variable de entorno FAST_IBAN_PARAMS.
+
+# Espaciado entre puntos candidatos, en grados. Debe ser múltiplo entero de la resolución del fichero.
+candidate_spacing_deg: 1.25
+
+# Rayos de círculo máximo por punto (múltiplo de 8) y su longitud, en km.
+n_rays: 64
+ray_distance_km: 500
+
+# Fracción de rayos que deben quedar por debajo (máximo) o por encima (mínimo) del punto.
+pass_fraction: 0.9
+
+# Separación entre contornos, en metros de altura geopotencial.
+contour_step_m: 20
+
+# Radio máximo de búsqueda de contornos y de emparejamiento máximo-mínimos, en km.
+search_radius_km: 3000
+
+# Se descartan los clusters cuyo punto más al norte no queda estrictamente entre estas latitudes, en grados.
+cluster_lat_min_deg: 30
+cluster_lat_max_deg: 85
+
+# Número mínimo de puntos de un cluster. Depende de la rejilla: pasará a área mínima en km² (ALG-306).
+min_cluster_points: 2
+
+# Separación máxima en longitud entre el máximo y el mínimo de un Rex, en grados.
+rex_max_dlon_deg: 10

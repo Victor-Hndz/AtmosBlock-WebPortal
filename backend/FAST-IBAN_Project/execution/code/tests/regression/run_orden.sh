@@ -21,7 +21,7 @@ for modo in normal invertido; do
         echo "ERROR: FAST-IBAN terminó con error ($modo)"
         exit 1
     fi
-    tail -n +2 out/*_formations_*.csv | LC_ALL=C sort > "../$modo.txt"
+    grep -hv '^#' out/*_formations_*.csv | tail -n +2 | LC_ALL=C sort > "../$modo.txt"
     cd ..
 done
 

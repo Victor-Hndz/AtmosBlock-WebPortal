@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
     for(i = 0; i < NLAT; i++) 
         z[i] = z[0] + i * NLON;
 
-    step = STEP;
+    step = paso_candidatos();  // ALG-305
     size_x = FILA_LAT_MIN/step + 1;  // ALG-302
     size_y = (int)((NLON)/step);
 
@@ -119,8 +119,8 @@ int main(int argc, char **argv) {
                 bearing_count = 0, bearing_count2 = 0;
                 selected_points[lat][lon] = create_selected_point(create_point(lats[lat*step], lons[lon*step]), z[lat*step][lon*step], NO_TYPE, -1);
 
-                for(i=0; i<N_BEARINGS*2;i++) {
-                    interp_ok = bilinear_interpolation(coord_from_great_circle(create_point(lats[lat*step], lons[lon*step]), DIST, BEARING_START + i*BEARING_STEP), z, lats, lons, &z_aux_selected);
+                for(i=0; i<PARAMS.n_rays;i++) {
+                    interp_ok = bilinear_interpolation(coord_from_great_circle(create_point(lats[lat*step], lons[lon*step]), PARAMS.ray_distance_km, BEARING_START + i*BEARING_STEP), z, lats, lons, &z_aux_selected);
                     
                     //Si se sale de la zona delimitada por los límites de latitud y longitud , no se tiene en cuenta.
                     if(!interp_ok) {
@@ -133,9 +133,9 @@ int main(int argc, char **argv) {
                     if((((z[lat*step][lon*step] * scale_factor) + offset)/g_0) <= (((z_aux_selected * scale_factor) + offset)/g_0))
                         bearing_count2++;                 
                 }
-                if(bearing_count >= (int)(N_BEARINGS*2*PASS_PERCENT)) 
+                if(bearing_count >= (int)(PARAMS.n_rays*PARAMS.pass_fraction)) 
                     selected_points[lat][lon].type = MAX;
-                else if(bearing_count2 >= (int)(N_BEARINGS*2*PASS_PERCENT)) 
+                else if(bearing_count2 >= (int)(PARAMS.n_rays*PARAMS.pass_fraction)) 
                     selected_points[lat][lon].type = MIN;
                 filtered_points[lat][lon] = selected_points[lat][lon];
             }
@@ -163,12 +163,12 @@ int main(int argc, char **argv) {
         points_cluster *clusters_aux = fill_clusters(filtered_points, size_x, size_y, id, offset, scale_factor);
         int clusters_cont=0;
         for(i=0;i<id;i++) 
-            if(clusters_aux[i].point_sup.point.lat >= 85.00 || clusters_aux[i].point_sup.point.lat <= 30.00 || clusters_aux[i].n_points == 1)
+            if(clusters_aux[i].point_sup.point.lat >= PARAMS.cluster_lat_max_deg || clusters_aux[i].point_sup.point.lat <= PARAMS.cluster_lat_min_deg || clusters_aux[i].n_points < PARAMS.min_cluster_points)
                 clusters_cont++;
 
         points_cluster *clusters = malloc((id-clusters_cont)*sizeof(points_cluster));
         for(i=0, j=0;i<id;i++) {
-            if(clusters_aux[i].point_sup.point.lat < 85.00 && clusters_aux[i].point_sup.point.lat > 30.00 && clusters_aux[i].n_points != 1) {
+            if(clusters_aux[i].point_sup.point.lat < PARAMS.cluster_lat_max_deg && clusters_aux[i].point_sup.point.lat > PARAMS.cluster_lat_min_deg && clusters_aux[i].n_points >= PARAMS.min_cluster_points) {
                 clusters[j] = clusters_aux[i];
                 clusters[j].id = j;
                 

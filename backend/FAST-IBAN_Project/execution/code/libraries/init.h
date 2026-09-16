@@ -6,6 +6,9 @@
 #include <unistd.h>
 #include <sys/utsname.h>
 
+void cargar_parametros(const char *ruta);
+int paso_candidatos(void);
+void escribir_cabecera(FILE *fp);
 void process_entry(int argc, char **argv);
 void init_files(char* filename, char* filename2, char* log_file, char* speed_file, char* long_name);
 bool check_coords(float lons[NLON]);

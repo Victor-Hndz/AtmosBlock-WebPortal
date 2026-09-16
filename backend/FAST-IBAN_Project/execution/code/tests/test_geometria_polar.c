@@ -2,12 +2,14 @@
 // Con la función real y el paso de acimut de producción, los N_BEARINGS*2 rayos a DIST km
 // deben caer en celdas distintas de la rejilla de RES grados, en ambos hemisferios, hasta 89,5°.
 #include "../libraries/calc.h"
+#include "../libraries/init.h"
 
-#define N_RAYOS (N_BEARINGS * 2)
+#define N_RAYOS (PARAMS.n_rays)
 
 int main(void) {
     const double lats[] = {30, 50, 70, 80, 85, 87, 89, 89.5};
     int fallos = 0;
+    cargar_parametros(NULL);  // ALG-305: n_rays y ray_distance_km de producción
     RES = 0.25;  // ALG-301: sin NetCDF, la rejilla de producción (ERA5) se fija a mano
 
     printf("lat | celdas distintas de %d rayos\n", N_RAYOS);
@@ -17,7 +19,7 @@ int main(void) {
             int celdas[N_RAYOS][2], distintas = 0;
 
             for (int i = 0; i < N_RAYOS; i++) {
-                coord_point p = coord_from_great_circle(create_point(lat, 0), DIST, BEARING_START + i * BEARING_STEP);
+                coord_point p = coord_from_great_circle(create_point(lat, 0), PARAMS.ray_distance_km, BEARING_START + i * BEARING_STEP);
                 double lon = fmod(p.lon + 540.0, 360.0) - 180.0;  // normalizar a [-180, 180)
                 int c_lat = (int)round(p.lat / RES), c_lon = (int)round(lon / RES), repetida = 0;
 

@@ -37,8 +37,9 @@ if [ -z "$contadores" ]; then
 fi
 
 {
-    echo "$(cat out/*_selected_*.csv | sha256sum | cut -d' ' -f1)  selected.csv"
-    echo "$(cat out/*_formations_*.csv | sha256sum | cut -d' ' -f1)  formations.csv"
+    # ALG-305: sin las líneas "#" de cabecera (configuración), que no son detecciones.
+    echo "$(grep -hv '^#' out/*_selected_*.csv | sha256sum | cut -d' ' -f1)  selected.csv"
+    echo "$(grep -hv '^#' out/*_formations_*.csv | sha256sum | cut -d' ' -f1)  formations.csv"
     echo "$contadores"
 } > actual.sha256
 
