@@ -97,10 +97,10 @@ bool bilinear_interpolation(coord_point p, short **z_mat, float *lats, float *lo
  *
  * El rayo se detiene sin cruzar al bajar de LAT_LIM_MIN, al salir de las latitudes del fichero o de sus longitudes (si
  * no es global) o si la interpolación falla. Atraviesa el polo (ALG-363): al otro lado sigue el mismo círculo máximo.
- * cluster->extremo_polo es el extremo del rayo 0 (el meridiano del centro) solo hasta el polo: delimita los
- * niveles de contorno (niveles_hacia_el_polo), porque al otro lado "hacia el polo" pasa a ser hacia el sur.
- * ponytail: "hacia el polo" es el rayo 0 (norte); el hemisferio sur llega con ALG-303. Una muestra exactamente en ±90°
- * no se puede interpolar y termina el rayo.
+ * cluster->extremo_polo es el extremo del rayo hacia el polo del hemisferio del centro (el meridiano del centro: rayo
+ * 0 en el HN, rayo n_rays/2 en el HS; ALG-303) solo hasta el polo: delimita los niveles de contorno
+ * (niveles_hacia_el_polo), porque al otro lado "hacia el polo" pasa a ser hacia el ecuador.
+ * ponytail: una muestra exactamente en ±90° no se puede interpolar y termina el rayo.
  *
  * Reserva cluster->extremos (n_rays valores); lo libera search_formation.
  */
@@ -117,8 +117,9 @@ void calcular_extremos_rayos(points_cluster *cluster, short **z_in, float *lats,
         exit(EXIT_FAILURE);
     }
 
-    // El rayo 0 es el meridiano del centro: llega al polo a (90 - latitud) grados de arco.
-    double hasta_el_polo_km = (90.0 - cluster->center.lat) * M_PI / 180 * R;
+    // El rayo hacia el polo es el meridiano del centro: llega al polo a (90 - |latitud|) grados de arco.
+    int hemi = hemisferio(cluster->center.lat), rayo_polo = hemi > 0 ? 0 : n / 2;
+    double hasta_el_polo_km = (90.0 - hemi * cluster->center.lat) * M_PI / 180 * R;
     cluster->extremo_polo = cluster->type == MAX ? INF : -INF;
     for (int k = 0; k < n; k++) {
         double extremo = cluster->type == MAX ? INF : -INF;
@@ -134,7 +135,7 @@ void calcular_extremos_rayos(points_cluster *cluster, short **z_in, float *lats,
                 break;
             double h = ((z * scale_factor) + offset) / g_0;
             extremo = cluster->type == MAX ? fmin(extremo, h) : fmax(extremo, h);
-            if (k == 0 && paso * PARAMS.contour_ray_step_km <= hasta_el_polo_km)
+            if (k == rayo_polo && paso * PARAMS.contour_ray_step_km <= hasta_el_polo_km)
                 cluster->extremo_polo = cluster->type == MAX ? fmin(cluster->extremo_polo, h) : fmax(cluster->extremo_polo, h);
         }
         cluster->extremos[k] = extremo;
@@ -154,20 +155,21 @@ bool check_closed_contour(points_cluster cluster, int contour) {
     return true;
 }
 
-// ALG-360: rayo central del sector hacia (dir_lat, dir_lon). dir_lat > 0 es el sur (las filas crecen hacia el sur) y
-// dir_lon > 0 el este. El rayo k tiene acimut k·360/n_rays, desde el norte en sentido horario.
-static int rayo_central(int dir_lat, int dir_lon) {
-    int n = PARAMS.n_rays;
+// ALG-360: rayo central del sector hacia (dir_lat, dir_lon). dir_lat > 0 es hacia el ecuador y dir_lat < 0 hacia el
+// polo del hemisferio del centro (ALG-303; en el HN, sur y norte), y dir_lon > 0 el este. El rayo k tiene acimut
+// k·360/n_rays, desde el norte en sentido horario.
+static int rayo_central(const points_cluster *cluster, int dir_lat, int dir_lon) {
+    int n = PARAMS.n_rays, hacia_el_ecuador = hemisferio(cluster->center.lat) > 0 ? n / 2 : 0;
     if (dir_lat > 0)
-        return n / 2;
+        return hacia_el_ecuador;
     if (dir_lat < 0)
-        return 0;
+        return (hacia_el_ecuador + n / 2) % n;
     return dir_lon > 0 ? n / 4 : 3 * n / 4;
 }
 
 // Rex: todos los rayos del sector de ±45° (límites incluidos: n_rays/4 + 1 rayos) cruzan el contorno.
 bool check_contour_dir_rex(points_cluster cluster, int contour, int dir_lat, int dir_lon) {
-    int n = PARAMS.n_rays, centro = rayo_central(dir_lat, dir_lon);
+    int n = PARAMS.n_rays, centro = rayo_central(&cluster, dir_lat, dir_lon);
     for (int d = -n / 8; d <= n / 8; d++)
         if (!rayo_cruza(&cluster, (centro + d + n) % n, contour))
             return false;
@@ -176,7 +178,7 @@ bool check_contour_dir_rex(points_cluster cluster, int contour, int dir_lat, int
 
 // Omega: en el sector de ±45° cruzan el contorno más rayos de los que llegan a su límite sin cruzarlo.
 bool check_contour_dir_omega(points_cluster cluster, int contour, int dir_lat, int dir_lon) {
-    int n = PARAMS.n_rays, centro = rayo_central(dir_lat, dir_lon), cruzan = 0;
+    int n = PARAMS.n_rays, centro = rayo_central(&cluster, dir_lat, dir_lon), cruzan = 0;
     for (int d = -n / 8; d <= n / 8; d++)
         cruzan += rayo_cruza(&cluster, (centro + d + n) % n, contour);
     return cruzan > (n / 4 + 1) - cruzan;
@@ -274,7 +276,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                             lon_aux_min = clusters[j].center.lon;
                         }
 
-                        if(clusters[j].type == MIN && clusters[j].center.lat <= clusters[i].center.lat && lon_aux_min < lon_aux_max) {
+                        if(clusters[j].type == MIN && hemisferio(clusters[i].center.lat) * clusters[j].center.lat <= hemisferio(clusters[i].center.lat) * clusters[i].center.lat && lon_aux_min < lon_aux_max) {
                             if(check_closed_contour(clusters[j], contour_top))
                                 continue;
                             
@@ -290,7 +292,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                                 while(k < n_izq && cand_izq[k] != j) k++;
                                 if(k == n_izq) cand_izq[n_izq++] = j;
                             }
-                        } else if(clusters[j].type == MIN && clusters[j].center.lat <= clusters[i].center.lat && lon_aux_min > lon_aux_max) {
+                        } else if(clusters[j].type == MIN && hemisferio(clusters[i].center.lat) * clusters[j].center.lat <= hemisferio(clusters[i].center.lat) * clusters[i].center.lat && lon_aux_min > lon_aux_max) {
                             if(check_closed_contour(clusters[j], contour_top))
                                 continue;
 
@@ -326,7 +328,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                             if(check_closed_contour(clusters[j], contour_top))
                                 continue;
 
-                            if(clusters[j].type == MIN && clusters[j].center.lat <= clusters[i].center.lat && distancia_al_meridiano(clusters[j].center, clusters[i].center) <= PARAMS.rex_max_offset_km) {
+                            if(clusters[j].type == MIN && hemisferio(clusters[i].center.lat) * clusters[j].center.lat <= hemisferio(clusters[i].center.lat) * clusters[i].center.lat && distancia_al_meridiano(clusters[j].center, clusters[i].center) <= PARAMS.rex_max_offset_km) {
                                 contour_bot = check_contour_dir_rex(clusters[j], contour_top, 1, 0);
                                 contour_izq = check_contour_dir_rex(clusters[j], contour_top, 0, -1);
                                 contour_top_aux = check_contour_dir_omega(clusters[j], contour_top, -1, 0);

@@ -120,6 +120,16 @@ typedef struct cluster {
     double extremo_polo;  // ALG-363: extremo del rayo hacia el polo solo hasta el polo; delimita los niveles de contorno
 } points_cluster;
 
+// ALG-303 (L2): hemisferio de una latitud (+1 norte, -1 sur). Las comparaciones de latitud usan hemi·lat, nunca el HN.
+static inline int hemisferio(double lat) {
+    return lat < 0 ? -1 : 1;
+}
+
+// ALG-303: latitud absoluta del punto del cluster más cercano a su polo (el más al norte en el HN, el más al sur en el HS).
+static inline double lat_polar_cluster(const points_cluster *c) {
+    return hemisferio(c->center.lat) > 0 ? c->point_sup.point.lat : -c->point_inf.point.lat;
+}
+
 
 // Functions
 coord_point create_point(float lat, float lon);

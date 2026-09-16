@@ -141,6 +141,14 @@ endif()
 # LAT_LIM_MIN por debajo de la última latitud del fichero (el caso fijo llega a 0°): error explicado.
 add_test(NAME init_latitud_fuera_del_fichero COMMAND FAST-IBAN ${CASO_FIJO} -10 85 -180 180 out/ 1)
 set_tests_properties(init_latitud_fuera_del_fichero PROPERTIES PASS_REGULAR_EXPRESSION "fuera de las latitudes del fichero")
+
+# ALG-303/307: simetría hemisférica. El caso fijo reflejado en el ecuador y recortado a 25°S debe dar las mismas
+# detecciones que el original con la latitud cambiada de signo.
+add_test(NAME preparar_caso_espejo COMMAND RECORTAR_NC ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/caso_espejo.nc z -25 1 espejo)
+set_tests_properties(preparar_caso_espejo PROPERTIES FIXTURES_SETUP recortes)
+add_test(NAME simetria_hemisferica COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/comprobar_simetria.sh
+    $<TARGET_FILE:FAST-IBAN> ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/caso_espejo.nc)
+set_tests_properties(simetria_hemisferica PROPERTIES FIXTURES_REQUIRED recortes TIMEOUT 300)
 # ALG-305 (L4): parámetros en config/params.yaml. Las variantes de los tests se derivan del fichero real al configurar.
 set(PARAMS_DEFECTO ${CMAKE_CURRENT_SOURCE_DIR}/../config/params.yaml)
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${PARAMS_DEFECTO})
