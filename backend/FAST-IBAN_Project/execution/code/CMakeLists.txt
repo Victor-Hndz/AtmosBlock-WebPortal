@@ -46,7 +46,9 @@ add_subdirectory(tests)
 
 add_library(UTILS src/utils.c libraries/utils.h) 
 add_library(CALC src/calc.c libraries/calc.h)
-add_library(INIT src/init.c libraries/init.h)
+add_library(INIT src/init.c libraries/init.h src/yaml_plano.c libraries/yaml_plano.h)
+# ALG-305 (L4): ruta por defecto de los parámetros; se sustituye con la variable de entorno FAST_IBAN_PARAMS.
+target_compile_definitions(INIT PRIVATE FAST_IBAN_PARAMS_DEFECTO="${CMAKE_CURRENT_SOURCE_DIR}/config/params.yaml")
 add_library(LIB src/lib.c libraries/lib.h)
 
 

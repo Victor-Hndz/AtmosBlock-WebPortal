@@ -46,13 +46,24 @@ extern int FILA_LAT_MIN;
 
 #define g_0 9.80665 // Standard gravity in m/s^2
 #define R 6371 // Earth's radius in km
-#define STEP 5 // Number of neighbours to use in the res. change
-#define N_BEARINGS 32 // Number of bearings to use in the great circle method
-#define DIST 500 // Distance in km to use in the great circle method
-#define PASS_PERCENT 0.9 // Percentage of points to pass in the bearing method
-#define BEARING_STEP (360.0/(N_BEARINGS*2)) // Bearing step in degrees (5.625 for 64 rays; B2: was integer division = 5)
+// ALG-305 (L4): parámetros del detector, leídos de config/params.yaml por cargar_parametros (init.c) y volcados en la
+// cabecera de cada CSV. La unidad va en el nombre de cada campo.
+typedef struct {
+    double candidate_spacing_deg;  // espaciado de los puntos candidatos; múltiplo entero de RES
+    int n_rays;                    // rayos de círculo máximo por punto; múltiplo de 8
+    double ray_distance_km;        // longitud de cada rayo
+    double pass_fraction;          // fracción de rayos por debajo (MAX) o por encima (MIN) del punto
+    int contour_step_m;            // separación entre contornos, en altura geopotencial
+    double search_radius_km;       // radio de búsqueda de contornos y de emparejamiento máximo-mínimos
+    double cluster_lat_min_deg;    // el punto más al norte de un cluster debe quedar por encima (estricto)
+    double cluster_lat_max_deg;    // y por debajo (estricto) de estas latitudes
+    int min_cluster_points;        // puntos mínimos de un cluster; depende de la rejilla (ALG-306)
+    double rex_max_dlon_deg;       // separación máxima en longitud entre el máximo y el mínimo de un Rex
+} parametros;
+extern parametros PARAMS;
+
+#define BEARING_STEP (360.0 / PARAMS.n_rays) // Bearing step in degrees (5.625 for 64 rays; B2: was integer division = 5)
 #define BEARING_START (-180) // Bearing start in degrees to use in the great circle method
-#define CONTOUR_STEP 20
 #define INF (1.0E+30)
 
 #define EXTRA_STR_SIZE 25

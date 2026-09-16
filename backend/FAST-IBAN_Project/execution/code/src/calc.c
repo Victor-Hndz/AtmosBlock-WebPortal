@@ -127,27 +127,35 @@ void generateDirections(int *dx, int *dy, int n_dirs) {
 // en vez de malloc + generateDirections + free en cada llamada.
 // ponytail: inicialización perezosa sin cerrojo, válida porque la fase 2 es secuencial; si se
 // paraleliza, llamar a cargar_direcciones() antes de la región paralela.
-static int DIR_X[2 * N_BEARINGS], DIR_Y[2 * N_BEARINGS];
+static int *DIR_X, *DIR_Y;  // ALG-305: PARAMS.n_rays direcciones, reservadas una vez para todo el proceso
 static bool DIR_CARGADAS = false;
 
 static void cargar_direcciones(void) {
     if (!DIR_CARGADAS) {
-        generateDirections(DIR_X, DIR_Y, 2 * N_BEARINGS);
+        DIR_X = malloc(PARAMS.n_rays * sizeof(int));
+        DIR_Y = malloc(PARAMS.n_rays * sizeof(int));
+        if (DIR_X == NULL || DIR_Y == NULL) {
+            perror("Error: Couldn't allocate memory for data. ");
+            exit(EXIT_FAILURE);
+        }
+        generateDirections(DIR_X, DIR_Y, PARAMS.n_rays);
         DIR_CARGADAS = true;
     }
 }
 
 bool check_closed_contour(points_cluster cluster, int contour, short **z_in, float *lats, float *lons, double scale_factor, double offset) {
     int i, lat, lon, newX, newY, cont=0;
-    const int *dx = DIR_X, *dy = DIR_Y;
+    const int *dx, *dy;
     bool exit;
 
     lat = findIndex(lats, NLAT, cluster.center.lat);
     lon = findIndex(lons, NLON, cluster.center.lon);
 
     cargar_direcciones();
+    dx = DIR_X;
+    dy = DIR_Y;
 
-    for (i = 0; i < 2*N_BEARINGS; i++) {
+    for (i = 0; i < PARAMS.n_rays; i++) {
         newX = lat, newY = lon;
         exit = false;
 
@@ -157,7 +165,7 @@ bool check_closed_contour(points_cluster cluster, int contour, short **z_in, flo
 
             if (newX < 0 || newX >= FILA_LAT_MIN-1 || newY < 0 || newY >= NLON)
                 break;
-            if(point_distance(cluster.center, create_point(lats[newX], lons[newY])) > 3000)
+            if(point_distance(cluster.center, create_point(lats[newX], lons[newY])) > PARAMS.search_radius_km)
                 break;
 
             if ((cluster.type == MAX && (((z_in[newX][newY] * scale_factor) + offset) / g_0) < contour) || 
@@ -169,22 +177,24 @@ bool check_closed_contour(points_cluster cluster, int contour, short **z_in, flo
         }
     }
     
-    if(cont == 2*N_BEARINGS)
+    if(cont == PARAMS.n_rays)
         return true;
     return false;
 }
 
 bool check_contour_dir_rex(points_cluster cluster, int contour, int dir_lat, int dir_lon, short **z_in, float *lats, float *lons, double scale_factor, double offset) {
     int i, lat, lon, newX, newY;
-    const int *dx = DIR_X, *dy = DIR_Y;
+    const int *dx, *dy;
     bool exit, found, all_found = true;
 
     lat = findIndex(lats, NLAT, cluster.center.lat);
     lon = findIndex(lons, NLON, cluster.center.lon);
 
     cargar_direcciones();
+    dx = DIR_X;
+    dy = DIR_Y;
 
-    for(i = 0; i < 2 * N_BEARINGS; i++) {
+    for(i = 0; i < PARAMS.n_rays; i++) {
         newX = lat;
         newY = lon;
         found = false;
@@ -210,7 +220,7 @@ bool check_contour_dir_rex(points_cluster cluster, int contour, int dir_lat, int
 
             if (newX < 0 || newX >= FILA_LAT_MIN - 1 || newY < 0 || newY >= NLON)
                 break;
-            if (point_distance(cluster.center, create_point(lats[newX], lons[newY])) > 3000)
+            if (point_distance(cluster.center, create_point(lats[newX], lons[newY])) > PARAMS.search_radius_km)
                 break;
 
             // printf("Punto (%.2f, %.2f) --> %.2f\n", lats[newX], lons[newY], (((z_in[newX][newY] * scale_factor) + offset) / g_0));
@@ -233,15 +243,17 @@ bool check_contour_dir_rex(points_cluster cluster, int contour, int dir_lat, int
 
 bool check_contour_dir_omega(points_cluster cluster, int contour, int dir_lat, int dir_lon, short **z_in, float *lats, float *lons, double scale_factor, double offset) {
     int i, lat, lon, newX, newY, cont=0, cont2=0;
-    const int *dx = DIR_X, *dy = DIR_Y;
+    const int *dx, *dy;
     bool exit, found;
 
     lat = findIndex(lats, NLAT, cluster.center.lat);
     lon = findIndex(lons, NLON, cluster.center.lon);
 
     cargar_direcciones();
+    dx = DIR_X;
+    dy = DIR_Y;
 
-    for(i = 0; i < 2 * N_BEARINGS; i++) {
+    for(i = 0; i < PARAMS.n_rays; i++) {
         newX = lat;
         newY = lon;
         found = false;
@@ -267,7 +279,7 @@ bool check_contour_dir_omega(points_cluster cluster, int contour, int dir_lat, i
 
             if (newX < 0 || newX >= FILA_LAT_MIN - 1 || newY < 0 || newY >= NLON)
                 break;
-            if (point_distance(cluster.center, create_point(lats[newX], lons[newY])) > 3000)
+            if (point_distance(cluster.center, create_point(lats[newX], lons[newY])) > PARAMS.search_radius_km)
                 break;
 
             // printf("Punto (%.2f, %.2f) --> %.2f\n", lats[newX], lons[newY], (((z_in[newX][newY] * scale_factor) + offset) / g_0));
@@ -321,9 +333,9 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                     exit = true;
                     break;
                 }
-                if(point_distance(clusters[i].center, create_point(lats[index_lat], lons[index_lon])) > 3000)
+                if(point_distance(clusters[i].center, create_point(lats[index_lat], lons[index_lon])) > PARAMS.search_radius_km)
                     break;
-                contour_top = (((z_in[index_lat][index_lon]*scale_factor) + offset)/g_0) - ((int)(((z_in[index_lat][index_lon]*scale_factor) + offset)/g_0) % CONTOUR_STEP);
+                contour_top = (((z_in[index_lat][index_lon]*scale_factor) + offset)/g_0) - ((int)(((z_in[index_lat][index_lon]*scale_factor) + offset)/g_0) % PARAMS.contour_step_m);
                 index_lat--;
 
                 for(j=0;j<visited_conts_size;j++) {
@@ -354,7 +366,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                     contour_izq = false;
 
                     for(j=0; j<size; j++) {
-                        if(point_distance(clusters[j].center, clusters[i].center) > 3000)
+                        if(point_distance(clusters[j].center, clusters[i].center) > PARAMS.search_radius_km)
                                 continue;
                         
                         if(fabs(clusters[i].center.lon - clusters[j].center.lon) >= 180) {
@@ -416,13 +428,13 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                         contour_top_aux = false;
 
                         for(j=0; j<size; j++) {
-                            if(point_distance(clusters[j].center, clusters[i].center) > 3000)
+                            if(point_distance(clusters[j].center, clusters[i].center) > PARAMS.search_radius_km)
                                 continue;
 
                             if(check_closed_contour(clusters[j], contour_top, z_in, lats, lons, scale_factor, offset))
                                 continue;
 
-                            if(clusters[j].type == MIN && clusters[j].center.lat <= clusters[i].center.lat && fabs(clusters[i].center.lon - clusters[j].center.lon) <= 10) {
+                            if(clusters[j].type == MIN && clusters[j].center.lat <= clusters[i].center.lat && fabs(clusters[i].center.lon - clusters[j].center.lon) <= PARAMS.rex_max_dlon_deg) {
                                 contour_bot = check_contour_dir_rex(clusters[j], contour_top, 1, 0, z_in, lats, lons, scale_factor, offset);
                                 contour_izq = check_contour_dir_rex(clusters[j], contour_top, 0, -1, z_in, lats, lons, scale_factor, offset);
                                 contour_top_aux = check_contour_dir_omega(clusters[j], contour_top, -1, 0, z_in, lats, lons, scale_factor, offset);

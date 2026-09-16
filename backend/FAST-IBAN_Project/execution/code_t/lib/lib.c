@@ -1,9 +1,57 @@
 #include "lib.h"
+#include "../../code/libraries/yaml_plano.h"
 
 int NTIME, NLAT, NLON, LAT_LIM_MIN, LAT_LIM_MAX, LON_LIM_MIN, LON_LIM_MAX, N_THREADS;
 char* FILE_NAME, *OUT_DIR_NAME;
 double RES;  // ALG-301: la fija init_nc_variables a partir de la rejilla del NetCDF
 int FILA_LAT_MIN;  // ALG-302
+
+// ALG-305 (L4): parámetros. La ruta por defecto la fija CMake (config/params.yaml de code_t).
+#ifndef FAST_IBAN_PARAMS_DEFECTO
+#define FAST_IBAN_PARAMS_DEFECTO "config/params.yaml"
+#endif
+
+parametros PARAMS;
+
+static const clave_yaml CLAVES_PARAMS[] = {
+    {"candidate_spacing_deg", false, &PARAMS.candidate_spacing_deg},
+    {"temperature_threshold_c", false, &PARAMS.temperature_threshold_c},
+};
+#define N_CLAVES_PARAMS (sizeof(CLAVES_PARAMS) / sizeof(CLAVES_PARAMS[0]))
+
+// Con NULL se usa FAST_IBAN_PARAMS del entorno o, si no está, la ruta por defecto.
+void cargar_parametros(const char *ruta) {
+    if (ruta == NULL)
+        ruta = getenv("FAST_IBAN_PARAMS");
+    if (ruta == NULL || *ruta == '\0')  // una variable vacía cuenta como no definida
+        ruta = FAST_IBAN_PARAMS_DEFECTO;
+    leer_yaml_plano(ruta, CLAVES_PARAMS, N_CLAVES_PARAMS);
+    if (PARAMS.candidate_spacing_deg <= 0) {
+        fprintf(stderr, "Error en %s: candidate_spacing_deg debe ser positivo\n", ruta);
+        exit(EXIT_FAILURE);
+    }
+}
+
+// Espaciado de los puntos candidatos en celdas; candidate_spacing_deg debe ser múltiplo entero de RES.
+int paso_candidatos(void) {
+    int paso = (int)lround(PARAMS.candidate_spacing_deg / RES);
+    if (paso < 1 || fabs(paso * RES - PARAMS.candidate_spacing_deg) > TOL_PASO) {
+        fprintf(stderr, "Error: candidate_spacing_deg (%g) debe ser un múltiplo entero de la resolución del fichero (%g).\n",
+                PARAMS.candidate_spacing_deg, RES);
+        exit(EXIT_FAILURE);
+    }
+    return paso;
+}
+
+// Configuración completa al principio del CSV, en líneas de comentario.
+void escribir_cabecera(FILE *fp) {
+    const char *base = strrchr(FILE_NAME, '/');
+    fprintf(fp, "# input_file: %s\n", base != NULL ? base + 1 : FILE_NAME);
+    fprintf(fp, "# grid_resolution_deg: %g\n", RES);
+    fprintf(fp, "# lat_limits_deg: %d %d\n", LAT_LIM_MIN, LAT_LIM_MAX);
+    fprintf(fp, "# lon_limits_deg: %d %d\n", LON_LIM_MIN, LON_LIM_MAX);
+    escribir_claves_yaml(fp, CLAVES_PARAMS, N_CLAVES_PARAMS);
+}
 
 // ALG-301: paso de una coordenada si es uniforme (con la tolerancia de float32); -1 si no lo es.
 static double paso_uniforme(const float *v, int n) {
@@ -17,6 +65,9 @@ static double paso_uniforme(const float *v, int n) {
 }
 
 void process_entry(int argc, char **argv) {
+    // ALG-305: antes de cambiar de directorio, para que una ruta relativa en FAST_IBAN_PARAMS funcione.
+    cargar_parametros(NULL);
+
     char cwd[NC_MAX_CHAR];
     if (getcwd(cwd, sizeof(cwd)) == NULL) {
         perror("Error getting current directory");
@@ -287,6 +338,7 @@ void init_file(char* filename, char* long_name) {
         exit(EXIT_FAILURE);
     }
     
+    escribir_cabecera(fp);  // ALG-305
     fprintf(fp, "time,latitude,longitude,t,cluster,centroid_lat,centroid_lon\n");
     fclose(fp);
 }

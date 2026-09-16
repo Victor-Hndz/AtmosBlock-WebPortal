@@ -22,13 +22,13 @@ fi
 # CSV de puntos: los que tienen la latitud en la segunda columna (selected en code/, salida única en code_t/).
 filas=0
 for f in out/*.csv; do
-    case "$(head -1 "$f" | cut -d, -f2)" in lat*) ;; *) continue ;; esac
-    fuera=$(tail -n +2 "$f" | awk -F, -v min="$LAT_MIN" -v sup="$LAT_SUP" '$2 < min - 1e-4 || $2 > sup + 1e-4' | wc -l)
-    n=$(tail -n +2 "$f" | wc -l)
+    case "$(grep -v '^#' "$f" | head -1 | cut -d, -f2)" in lat*) ;; *) continue ;; esac
+    fuera=$(grep -v '^#' "$f" | tail -n +2 | awk -F, -v min="$LAT_MIN" -v sup="$LAT_SUP" '$2 < min - 1e-4 || $2 > sup + 1e-4' | wc -l)
+    n=$(grep -v '^#' "$f" | tail -n +2 | wc -l)
     filas=$((filas + n))
     if [ "$fuera" -ne 0 ]; then
         echo "ERROR: $fuera de $n puntos de $(basename "$f") fuera de [$LAT_MIN, $LAT_SUP]; ejemplos:"
-        tail -n +2 "$f" | awk -F, -v min="$LAT_MIN" -v sup="$LAT_SUP" '$2 < min - 1e-4 || $2 > sup + 1e-4' | head -3
+        grep -v '^#' "$f" | tail -n +2 | awk -F, -v min="$LAT_MIN" -v sup="$LAT_SUP" '$2 < min - 1e-4 || $2 > sup + 1e-4' | head -3
         exit 1
     fi
 done

@@ -18,7 +18,8 @@ if ! "$BIN" "$CASO" 25 85 -180 180 out/ 1 > ejecucion.log 2>&1; then
     exit 1
 fi
 
-echo "$(cat out/*.csv | sha256sum | cut -d' ' -f1)  temperatura.csv" > actual.sha256
+# ALG-305: sin las líneas "#" de cabecera (configuración), que no son detecciones.
+echo "$(grep -hv '^#' out/*.csv | sha256sum | cut -d' ' -f1)  temperatura.csv" > actual.sha256
 
 if [ "${2:-}" = "--actualizar" ]; then
     cp actual.sha256 "$BASE"

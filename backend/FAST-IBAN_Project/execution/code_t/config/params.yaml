@@ -1,0 +1,9 @@
+# FAST-IBAN (variante de temperatura): parámetros (ALG-305, L4). Se vuelcan completos en la cabecera del CSV de salida.
+# Formato: YAML plano, una clave por línea ("clave: valor"); "#" empieza un comentario.
+# Otra ruta: variable de entorno FAST_IBAN_PARAMS.
+
+# Espaciado entre puntos candidatos, en grados. Debe ser múltiplo entero de la resolución del fichero.
+candidate_spacing_deg: 0.75
+
+# Se seleccionan los puntos con temperatura estrictamente mayor que este umbral, en °C.
+temperature_threshold_c: 28

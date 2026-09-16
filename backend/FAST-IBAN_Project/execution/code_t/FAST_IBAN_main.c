@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
     // ALG-301: datos y coordenadas se leen antes de dimensionar la rejilla, porque RES sale de ellas.
     init_nc_variables(ncid, t_in, lats, lons, &scale_factor, &offset, long_name);
 
-    step = 3;
+    step = paso_candidatos();  // ALG-305
     size_x = FILA_LAT_MIN/step + 1;  // ALG-302
     size_y = (int)((NLON)/step);
     
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
             // printf("Processing time %d, lat %d\n", time, lat);
             for(lon=0;lon<size_y;lon++) {
                 filtered_points[lat][lon] = create_selected_point(create_point(-1, -1), -1, NOT_SELECTED);
-                if (t_in[time][lat*step][lon*step]*scale_factor+offset-K_TO_C > 28) {
+                if (t_in[time][lat*step][lon*step]*scale_factor+offset-K_TO_C > PARAMS.temperature_threshold_c) {
                     filtered_points[lat][lon] = create_selected_point(create_point(lats[lat*step], lons[lon*step]), t_in[time][lat*step][lon*step], -1);
                 }
             }

@@ -312,7 +312,7 @@ class MapGenerator:
         # print(f"File name: {self.file_name}")
         
         try:
-            data = pd.read_csv(obtain_csv_files(self.request_hash, "selected"))
+            data = pd.read_csv(obtain_csv_files(self.request_hash, "selected"), comment="#")
             dates_nc = date_from_nc(self.file_name)
             corrected_dates = [from_nc_to_date(str(date)) for date in dates_nc]
             actual_date = from_elements_to_date(self.year, self.month, self.day, self.hour)
@@ -389,7 +389,7 @@ class MapGenerator:
         
         try:
             cont_ds = get_dataset(self.file_name)
-            disp_data = pd.read_csv(obtain_csv_files(self.request_hash, "selected"))
+            disp_data = pd.read_csv(obtain_csv_files(self.request_hash, "selected"), comment="#")
             
             dates_nc = date_from_nc(self.file_name)
             corrected_dates = [from_nc_to_date(str(date)) for date in dates_nc]
@@ -527,8 +527,8 @@ class MapGenerator:
         # print(f"File name: {self.file_name}")
         
         try:
-            select_data = pd.read_csv(obtain_csv_files(self.request_hash, "selected"))
-            forms_data = pd.read_csv(obtain_csv_files(self.request_hash, "formations"))
+            select_data = pd.read_csv(obtain_csv_files(self.request_hash, "selected"), comment="#")
+            forms_data = pd.read_csv(obtain_csv_files(self.request_hash, "formations"), comment="#")
             dates_nc = date_from_nc(self.file_name)
             corrected_dates = [from_nc_to_date(str(date)) for date in dates_nc]
             actual_date = from_elements_to_date(self.year, self.month, self.day, self.hour)

@@ -1,8 +1,82 @@
 #include "../libraries/init.h"
+#include "../libraries/yaml_plano.h"
 
 int LAT_LIM_MIN, LAT_LIM_MAX, LON_LIM_MIN, LON_LIM_MAX, N_THREADS;
 int FILA_LAT_MIN;  // ALG-302
 char* FILE_NAME, *OUT_DIR_NAME;
+
+// ALG-305 (L4): parámetros del detector. La ruta por defecto la fija CMake (config/params.yaml del código fuente).
+#ifndef FAST_IBAN_PARAMS_DEFECTO
+#define FAST_IBAN_PARAMS_DEFECTO "config/params.yaml"
+#endif
+
+static const clave_yaml CLAVES_PARAMS[] = {
+    {"candidate_spacing_deg", false, &PARAMS.candidate_spacing_deg},
+    {"n_rays", true, &PARAMS.n_rays},
+    {"ray_distance_km", false, &PARAMS.ray_distance_km},
+    {"pass_fraction", false, &PARAMS.pass_fraction},
+    {"contour_step_m", true, &PARAMS.contour_step_m},
+    {"search_radius_km", false, &PARAMS.search_radius_km},
+    {"cluster_lat_min_deg", false, &PARAMS.cluster_lat_min_deg},
+    {"cluster_lat_max_deg", false, &PARAMS.cluster_lat_max_deg},
+    {"min_cluster_points", true, &PARAMS.min_cluster_points},
+    {"rex_max_dlon_deg", false, &PARAMS.rex_max_dlon_deg},
+};
+#define N_CLAVES_PARAMS (sizeof(CLAVES_PARAMS) / sizeof(CLAVES_PARAMS[0]))
+
+/**
+ * @brief Leer los parámetros del detector y comprobar sus rangos; un valor fuera de rango termina el proceso con un
+ * mensaje (los errores de formato los da leer_yaml_plano).
+ *
+ * @param ruta Fichero; con NULL se usa FAST_IBAN_PARAMS del entorno o, si no está, la ruta por defecto.
+ */
+void cargar_parametros(const char *ruta) {
+    if (ruta == NULL)
+        ruta = getenv("FAST_IBAN_PARAMS");
+    if (ruta == NULL || *ruta == '\0')  // una variable vacía cuenta como no definida
+        ruta = FAST_IBAN_PARAMS_DEFECTO;
+    leer_yaml_plano(ruta, CLAVES_PARAMS, N_CLAVES_PARAMS);
+
+    if (PARAMS.n_rays <= 0 || PARAMS.n_rays % 8 != 0) {
+        fprintf(stderr, "Error en %s: n_rays (%d) debe ser un múltiplo positivo de 8\n", ruta, PARAMS.n_rays);
+        exit(EXIT_FAILURE);
+    }
+    if (PARAMS.candidate_spacing_deg <= 0 || PARAMS.ray_distance_km <= 0 || PARAMS.pass_fraction <= 0 ||
+        PARAMS.pass_fraction > 1 || PARAMS.contour_step_m <= 0 || PARAMS.search_radius_km <= 0 ||
+        PARAMS.min_cluster_points < 1 || PARAMS.rex_max_dlon_deg < 0 ||
+        PARAMS.cluster_lat_min_deg >= PARAMS.cluster_lat_max_deg) {
+        fprintf(stderr, "Error en %s: hay valores fuera de rango (positivos, pass_fraction en (0, 1], "
+                        "cluster_lat_min_deg < cluster_lat_max_deg)\n", ruta);
+        exit(EXIT_FAILURE);
+    }
+}
+
+/**
+ * @brief Espaciado de los puntos candidatos en celdas de la rejilla; candidate_spacing_deg debe ser múltiplo entero de RES.
+ *
+ * ponytail: la retícula empieza en la primera fila y columna del fichero; queda anclada a 0° cuando la primera latitud
+ * y longitud son múltiplos del espaciado (rejillas globales y áreas enteras del portal con espaciado de 1°).
+ */
+int paso_candidatos(void) {
+    int paso = (int)lround(PARAMS.candidate_spacing_deg / RES);
+    if (paso < 1 || fabs(paso * RES - PARAMS.candidate_spacing_deg) > TOL_PASO) {
+        fprintf(stderr, "Error: candidate_spacing_deg (%g) debe ser un múltiplo entero de la resolución del fichero (%g).\n",
+                PARAMS.candidate_spacing_deg, RES);
+        exit(EXIT_FAILURE);
+    }
+    return paso;
+}
+
+// ALG-305 (L4): configuración completa al principio de cada CSV, en líneas de comentario. Sin el número de hilos ni de
+// procesos, para que la salida siga siendo idéntica con cualquiera de ellos.
+void escribir_cabecera(FILE *fp) {
+    const char *base = strrchr(FILE_NAME, '/');
+    fprintf(fp, "# input_file: %s\n", base != NULL ? base + 1 : FILE_NAME);
+    fprintf(fp, "# grid_resolution_deg: %g\n", RES);
+    fprintf(fp, "# lat_limits_deg: %d %d\n", LAT_LIM_MIN, LAT_LIM_MAX);
+    fprintf(fp, "# lon_limits_deg: %d %d\n", LON_LIM_MIN, LON_LIM_MAX);
+    escribir_claves_yaml(fp, CLAVES_PARAMS, N_CLAVES_PARAMS);
+}
 
 
 /**
@@ -12,6 +86,9 @@ char* FILE_NAME, *OUT_DIR_NAME;
  * @param argv Argumentos.
  */
 void process_entry(int argc, char **argv) {
+    // ALG-305: antes de cambiar de directorio, para que una ruta relativa en FAST_IBAN_PARAMS funcione.
+    cargar_parametros(NULL);
+
     char cwd[NC_MAX_CHAR];
     if (getcwd(cwd, sizeof(cwd)) == NULL) {
         perror("Error getting current directory");
@@ -147,6 +224,7 @@ void init_files(char* filename, char* filename2, char* log_file, char* speed_fil
         perror("Error opening file");
         exit(EXIT_FAILURE);
     }
+    escribir_cabecera(fp);  // ALG-305
     fprintf(fp, "time,latitude,longitude,z,type,cluster,centroid_lat,centroid_lon\n");
     fclose(fp);
     
@@ -157,6 +235,7 @@ void init_files(char* filename, char* filename2, char* log_file, char* speed_fil
         perror("Error opening file");
         exit(EXIT_FAILURE);
     }
+    escribir_cabecera(fp);  // ALG-305
     fprintf(fp, "time,max_id,min1_id,min2_id,type\n");
     fclose(fp);
 

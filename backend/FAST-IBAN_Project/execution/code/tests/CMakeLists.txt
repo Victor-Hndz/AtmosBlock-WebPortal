@@ -141,3 +141,39 @@ endif()
 # LAT_LIM_MIN por debajo de la última latitud del fichero (el caso fijo llega a 0°): error explicado.
 add_test(NAME init_latitud_fuera_del_fichero COMMAND FAST-IBAN ${CASO_FIJO} -10 85 -180 180 out/ 1)
 set_tests_properties(init_latitud_fuera_del_fichero PROPERTIES PASS_REGULAR_EXPRESSION "fuera de las latitudes del fichero")
+# ALG-305 (L4): parámetros en config/params.yaml. Las variantes de los tests se derivan del fichero real al configurar.
+set(PARAMS_DEFECTO ${CMAKE_CURRENT_SOURCE_DIR}/../config/params.yaml)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${PARAMS_DEFECTO})
+file(READ ${PARAMS_DEFECTO} PARAMS_TEXTO)
+function(variante_params nombre buscar reemplazar)
+    string(REPLACE "${buscar}" "${reemplazar}" texto "${PARAMS_TEXTO}")
+    if(texto STREQUAL PARAMS_TEXTO)
+        message(FATAL_ERROR "variante_params(${nombre}): no se encuentra '${buscar}' en ${PARAMS_DEFECTO}")
+    endif()
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/params_${nombre}.yaml "${texto}")
+endfunction()
+variante_params(pass_08 "pass_fraction: 0.9" "pass_fraction: 0.8")
+variante_params(espaciado_1grado "candidate_spacing_deg: 1.25" "candidate_spacing_deg: 1.0")
+variante_params(espaciado_no_multiplo "candidate_spacing_deg: 1.25" "candidate_spacing_deg: 1.1")
+variante_params(clave_desconocida "n_rays: 64" "n_rays: 64\nsearch_radius: 3000")
+variante_params(sin_clave "rex_max_dlon_deg: 10" "")
+variante_params(rayos_no_multiplo "n_rays: 64" "n_rays: 60")
+
+add_executable(TEST_parametros test_parametros.c)
+target_link_libraries(TEST_parametros INIT UTILS LIB m netcdf OpenMP::OpenMP_C)
+add_test(NAME test_parametros COMMAND TEST_parametros)
+foreach(caso clave_desconocida sin_clave rayos_no_multiplo)
+    add_test(NAME parametros_${caso} COMMAND TEST_parametros ${CMAKE_CURRENT_BINARY_DIR}/params_${caso}.yaml)
+endforeach()
+set_tests_properties(parametros_clave_desconocida PROPERTIES PASS_REGULAR_EXPRESSION "clave desconocida: search_radius")
+set_tests_properties(parametros_sin_clave PROPERTIES PASS_REGULAR_EXPRESSION "falta la clave rex_max_dlon_deg")
+set_tests_properties(parametros_rayos_no_multiplo PROPERTIES PASS_REGULAR_EXPRESSION "positivo de 8")
+add_test(NAME parametros_espaciado_no_multiplo COMMAND FAST-IBAN ${CASO_FIJO} 25 85 -180 180 out/ 1)
+set_tests_properties(parametros_espaciado_no_multiplo PROPERTIES PASS_REGULAR_EXPRESSION "entero de la resoluci"
+    ENVIRONMENT "FAST_IBAN_PARAMS=${CMAKE_CURRENT_BINARY_DIR}/params_espaciado_no_multiplo.yaml")
+add_test(NAME parametros_en_cabecera_y_en_uso COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/comprobar_parametros.sh
+    $<TARGET_FILE:FAST-IBAN> ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/params_pass_08.yaml "pass_fraction: 0.8"
+    ${CMAKE_CURRENT_SOURCE_DIR}/regression/baseline.sha256)
+# A 1°, el espaciado de 1,25° no es múltiplo de la resolución: el test de latitudes usa uno de 1,0°.
+set_property(TEST latitudes_rejilla_1grado APPEND PROPERTY ENVIRONMENT
+    "FAST_IBAN_PARAMS=${CMAKE_CURRENT_BINARY_DIR}/params_espaciado_1grado.yaml")

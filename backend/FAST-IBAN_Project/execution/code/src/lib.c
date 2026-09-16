@@ -2,6 +2,7 @@
 #include "../libraries/utils.h"
 
 double RES;  // ALG-301: la fija init_nc_variables a partir de la rejilla del NetCDF
+parametros PARAMS;  // ALG-305: los lee cargar_parametros (init.c); aquí porque LIB también los usa
 
 // Function to create a coord_point struct from a latitude and longitude.
 coord_point create_point(float lat, float lon) {
@@ -74,7 +75,7 @@ points_cluster *fill_clusters(selected_point **points, int size_x, int size_y, i
                 clusters[cluster_id].type = points[i][j].type;
 
                 //Actualizar el contorno del cluster
-                aux_cont = (((points[i][j].z * scale_factor) + offset)/g_0) - ((int)(((points[i][j].z * scale_factor) + offset)/g_0) % CONTOUR_STEP);
+                aux_cont = (((points[i][j].z * scale_factor) + offset)/g_0) - ((int)(((points[i][j].z * scale_factor) + offset)/g_0) % PARAMS.contour_step_m);
                 if(clusters[cluster_id].type == MAX) {
                     if(aux_cont < clusters[cluster_id].contour)
                         clusters[cluster_id].contour = aux_cont;
