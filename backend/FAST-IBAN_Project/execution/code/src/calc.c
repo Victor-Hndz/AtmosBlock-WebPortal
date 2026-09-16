@@ -228,7 +228,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
         if(clusters[i].type == MAX) {
             // ALG-311: más allá de la guarda polar los sectores de rayos no distinguen direcciones; el máximo se
             // exporta como alta polar (sin mínimos) y no se evalúa como Omega ni Rex.
-            if(hemisferio(clusters[i].center.lat) * clusters[i].center.lat > guarda_polar_deg()) {
+            if(fabs(clusters[i].center.lat) > guarda_polar_deg()) {
                 export_formation_to_csv(create_formation(clusters[i].id, -1, -1, POLAR_HIGH), filename, time);
                 continue;
             }
