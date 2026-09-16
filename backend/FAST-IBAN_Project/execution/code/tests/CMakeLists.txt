@@ -159,6 +159,12 @@ variante_params(clave_desconocida "n_rays: [0-9]+" "n_rays: 64\nsearch_radius: 3
 variante_params(sin_clave "rex_max_dlon_deg: [0-9.]+" "")
 variante_params(rayos_no_multiplo "n_rays: [0-9]+" "n_rays: 60")
 
+# ALG-360: comprobaciones de contorno con rayos geodésicos, independientes de la latitud, la resolución y ±180°.
+add_executable(TEST_rayos_geodesicos test_rayos_geodesicos.c)
+target_link_libraries(TEST_rayos_geodesicos CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
+add_test(NAME test_rayos_geodesicos COMMAND TEST_rayos_geodesicos)
+set_tests_properties(test_rayos_geodesicos PROPERTIES TIMEOUT 300)
+
 add_executable(TEST_parametros test_parametros.c)
 target_link_libraries(TEST_parametros INIT UTILS LIB m netcdf OpenMP::OpenMP_C)
 add_test(NAME test_parametros COMMAND TEST_parametros)

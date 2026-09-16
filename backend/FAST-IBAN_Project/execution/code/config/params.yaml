@@ -20,6 +20,10 @@ contour_step_m: 20
 # Radio máximo de búsqueda de contornos y de emparejamiento máximo-mínimos, en km.
 search_radius_km: 3000
 
+# Paso, en km, con el que se muestrea cada rayo geodésico al buscar contornos (ALG-360). No supera el de la rejilla más
+# fina admitida (0,25° ≈ 27,8 km) ni la malla nativa de ERA5 (≈ 31 km), así que no depende de la resolución del fichero.
+contour_ray_step_km: 25
+
 # Se descartan los clusters cuyo punto más al norte no queda estrictamente entre estas latitudes, en grados.
 cluster_lat_min_deg: 30
 cluster_lat_max_deg: 85
