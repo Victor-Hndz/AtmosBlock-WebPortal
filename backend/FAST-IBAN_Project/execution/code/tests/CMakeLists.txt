@@ -150,6 +150,17 @@ set_tests_properties(init_latitud_fuera_del_fichero PROPERTIES PASS_REGULAR_EXPR
 # detecciones que el original con la latitud cambiada de signo.
 add_test(NAME preparar_caso_espejo COMMAND RECORTAR_NC ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/caso_espejo.nc z -25 1 espejo)
 set_tests_properties(preparar_caso_espejo PROPERTIES FIXTURES_SETUP recortes)
+# ALG-308: promedio de área conservativo para degradar a 0,5° y 1° (docs/invariancia_resolucion.md).
+add_executable(TEST_degradar test_degradar.c)
+target_link_libraries(TEST_degradar m)
+add_test(NAME test_degradar COMMAND TEST_degradar)
+add_executable(DEGRADAR_NC degradar_nc.c)
+target_link_libraries(DEGRADAR_NC netcdf m)
+# El caso fijo promediado a 1° corre de principio a fin (la herramienta escribe un NetCDF que el núcleo acepta).
+add_test(NAME preparar_caso_promedio_1grado COMMAND DEGRADAR_NC ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/caso_promedio_1grado.nc z 4)
+set_tests_properties(preparar_caso_promedio_1grado PROPERTIES FIXTURES_SETUP promedios)
+add_test(NAME caso_promedio_1grado COMMAND FAST-IBAN ${CMAKE_CURRENT_BINARY_DIR}/caso_promedio_1grado.nc 25 90 -180 180 out_promedio/ 1)
+set_tests_properties(caso_promedio_1grado PROPERTIES FIXTURES_REQUIRED promedios PASS_REGULAR_EXPRESSION "Successful search for formations")
 add_test(NAME simetria_hemisferica COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/comprobar_simetria.sh
     $<TARGET_FILE:FAST-IBAN> ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/caso_espejo.nc)
 set_tests_properties(simetria_hemisferica PROPERTIES FIXTURES_REQUIRED recortes TIMEOUT 300)
