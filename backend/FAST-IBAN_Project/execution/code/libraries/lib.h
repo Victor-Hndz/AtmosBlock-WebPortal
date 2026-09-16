@@ -59,7 +59,7 @@ typedef struct {
     double cluster_lat_min_deg;    // el punto más al norte de un cluster debe quedar por encima (estricto)
     double cluster_lat_max_deg;    // y por debajo (estricto) de estas latitudes
     int min_cluster_points;        // puntos mínimos de un cluster; depende de la rejilla (ALG-306)
-    double rex_max_dlon_deg;       // separación máxima en longitud entre el máximo y el mínimo de un Rex
+    double rex_max_offset_km;      // distancia máxima del mínimo de un Rex al meridiano del máximo (ALG-364)
 } parametros;
 extern parametros PARAMS;
 

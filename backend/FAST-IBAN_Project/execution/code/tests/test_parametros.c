@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
     comprobar(PARAMS.cluster_lat_min_deg == 30, "cluster_lat_min_deg == 30");
     comprobar(PARAMS.cluster_lat_max_deg == 85, "cluster_lat_max_deg == 85");
     comprobar(PARAMS.min_cluster_points == 2, "min_cluster_points == 2");
-    comprobar(PARAMS.rex_max_dlon_deg == 10, "rex_max_dlon_deg == 10");
+    comprobar(PARAMS.rex_max_offset_km == 700, "rex_max_offset_km == 700");  // ALG-364
 
     if (fallos == 0)
         printf("OK: parámetros por defecto\n");

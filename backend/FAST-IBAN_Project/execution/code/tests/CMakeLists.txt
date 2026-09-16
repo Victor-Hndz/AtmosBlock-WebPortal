@@ -156,7 +156,7 @@ endfunction()
 variante_params(pass_08 "pass_fraction: [0-9.]+" "pass_fraction: 0.8")
 variante_params(espaciado_no_multiplo "candidate_spacing_deg: [0-9.]+" "candidate_spacing_deg: 1.1")
 variante_params(clave_desconocida "n_rays: [0-9]+" "n_rays: 64\nsearch_radius: 3000")
-variante_params(sin_clave "rex_max_dlon_deg: [0-9.]+" "")
+variante_params(sin_clave "rex_max_offset_km: [0-9.]+" "")
 variante_params(rayos_no_multiplo "n_rays: [0-9]+" "n_rays: 60")
 
 # ALG-360: comprobaciones de contorno con rayos geodésicos, independientes de la latitud, la resolución y ±180°.
@@ -176,7 +176,7 @@ foreach(caso clave_desconocida sin_clave rayos_no_multiplo)
     add_test(NAME parametros_${caso} COMMAND TEST_parametros ${CMAKE_CURRENT_BINARY_DIR}/params_${caso}.yaml)
 endforeach()
 set_tests_properties(parametros_clave_desconocida PROPERTIES PASS_REGULAR_EXPRESSION "clave desconocida: search_radius")
-set_tests_properties(parametros_sin_clave PROPERTIES PASS_REGULAR_EXPRESSION "falta la clave rex_max_dlon_deg")
+set_tests_properties(parametros_sin_clave PROPERTIES PASS_REGULAR_EXPRESSION "falta la clave rex_max_offset_km")
 set_tests_properties(parametros_rayos_no_multiplo PROPERTIES PASS_REGULAR_EXPRESSION "positivo de 8")
 add_test(NAME parametros_espaciado_no_multiplo COMMAND FAST-IBAN ${CASO_FIJO} 25 85 -180 180 out/ 1)
 set_tests_properties(parametros_espaciado_no_multiplo PROPERTIES PASS_REGULAR_EXPRESSION "entero de la resoluci"
