@@ -45,6 +45,17 @@ extern int FILA_LAT_MIN;
 // Cluster of a point that did not pass the temperature threshold: it belongs to no cluster (ALG-114).
 #define NOT_SELECTED -2
 
+// ALG-305 (L4): parámetros de la variante de temperatura, leídos de config/params.yaml por cargar_parametros y
+// volcados en la cabecera del CSV. La unidad va en el nombre de cada campo.
+typedef struct {
+    double candidate_spacing_deg;    // espaciado de los puntos candidatos; múltiplo entero de RES
+    double temperature_threshold_c;  // umbral estricto de selección
+} parametros;
+extern parametros PARAMS;
+void cargar_parametros(const char *ruta);
+int paso_candidatos(void);
+void escribir_cabecera(FILE *fp);
+
 
 extern int NTIME, NLAT, NLON, LAT_LIM_MIN, LAT_LIM_MAX, LON_LIM_MIN, LON_LIM_MAX, N_THREADS;
 extern char* FILE_NAME, *OUT_DIR_NAME;

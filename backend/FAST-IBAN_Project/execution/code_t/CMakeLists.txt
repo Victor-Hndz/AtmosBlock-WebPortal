@@ -24,7 +24,9 @@ if(FAST_IBAN_WERROR)
 endif()
 
 
-add_library(LIB lib/lib.c lib/lib.h)
+# ALG-305 (L4): el lector de params.yaml se comparte con code/; ruta por defecto sustituible con FAST_IBAN_PARAMS.
+add_library(LIB lib/lib.c lib/lib.h ../code/src/yaml_plano.c)
+target_compile_definitions(LIB PRIVATE FAST_IBAN_PARAMS_DEFECTO="${CMAKE_CURRENT_SOURCE_DIR}/config/params.yaml")
 add_executable(FAST-IBAN FAST_IBAN_main.c)
 
 
@@ -60,3 +62,16 @@ set_tests_properties(latitudes_desde_80N_t PROPERTIES FIXTURES_REQUIRED recortes
 
 # target_include_directories(FAST-IBAN PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # set_target_properties(FAST-IBAN PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../)
+
+# ALG-305 (L4): parámetros en config/params.yaml. Con otro umbral, la cabecera lo muestra y la salida cambia.
+set(PARAMS_T ${CMAKE_CURRENT_SOURCE_DIR}/config/params.yaml)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${PARAMS_T})
+file(READ ${PARAMS_T} PARAMS_TEXTO_T)
+string(REPLACE "temperature_threshold_c: 28" "temperature_threshold_c: 30" PARAMS_UMBRAL_30 "${PARAMS_TEXTO_T}")
+if(PARAMS_UMBRAL_30 STREQUAL PARAMS_TEXTO_T)
+    message(FATAL_ERROR "No se encuentra 'temperature_threshold_c: 28' en ${PARAMS_T}")
+endif()
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/params_umbral_30.yaml "${PARAMS_UMBRAL_30}")
+add_test(NAME parametros_en_cabecera_y_en_uso_t COMMAND sh ${CODE_TESTS}/regression/comprobar_parametros.sh
+    $<TARGET_FILE:FAST-IBAN> ${CODE_TESTS}/fixtures/temp_850hPa_2019-06-28_00-06-12-18UTC.nc
+    ${CMAKE_CURRENT_BINARY_DIR}/params_umbral_30.yaml "temperature_threshold_c: 30" ${CMAKE_CURRENT_SOURCE_DIR}/tests/baseline_t.sha256)
