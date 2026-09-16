@@ -96,8 +96,11 @@ bool bilinear_interpolation(coord_point p, short **z_mat, float *lats, float *lo
  * queda por debajo (MAX) o por encima (MIN) de L, así que cada nivel se decide después con n_rays comparaciones.
  *
  * El rayo se detiene sin cruzar al bajar de LAT_LIM_MIN, al salir de las latitudes del fichero o de sus longitudes (si
- * no es global), al entrar en el casquete polar de radio contour_ray_step_km o si la interpolación falla.
- * ponytail: los rayos no atraviesan el polo; hacerlo es ALG-363, con su propio delta.
+ * no es global) o si la interpolación falla. Atraviesa el polo (ALG-363): al otro lado sigue el mismo círculo máximo.
+ * cluster->extremo_polo es el extremo del rayo 0 (el meridiano del centro) solo hasta el polo: delimita los
+ * niveles de contorno (niveles_hacia_el_polo), porque al otro lado "hacia el polo" pasa a ser hacia el sur.
+ * ponytail: "hacia el polo" es el rayo 0 (norte); el hemisferio sur llega con ALG-303. Una muestra exactamente en ±90°
+ * no se puede interpolar y termina el rayo.
  *
  * Reserva cluster->extremos (n_rays valores); lo libera search_formation.
  */
@@ -106,7 +109,6 @@ void calcular_extremos_rayos(points_cluster *cluster, short **z_in, float *lats,
     bool global = fabs(NLON * RES - 360.0) <= TOL_PASO;
     double lat_sup = fmax(lats[0], lats[NLAT - 1]), lat_inf = fmin(lats[0], lats[NLAT - 1]);
     double lon_min = fmin(lons[0], lons[NLON - 1]), lon_max = fmax(lons[0], lons[NLON - 1]);
-    double casquete_deg = PARAMS.contour_ray_step_km / R * 180 / M_PI;
     int pasos = (int)floor(PARAMS.search_radius_km / PARAMS.contour_ray_step_km + 1e-9);
 
     cluster->extremos = malloc(n * sizeof(double));
@@ -115,12 +117,15 @@ void calcular_extremos_rayos(points_cluster *cluster, short **z_in, float *lats,
         exit(EXIT_FAILURE);
     }
 
+    // El rayo 0 es el meridiano del centro: llega al polo a (90 - latitud) grados de arco.
+    double hasta_el_polo_km = (90.0 - cluster->center.lat) * M_PI / 180 * R;
+    cluster->extremo_polo = cluster->type == MAX ? INF : -INF;
     for (int k = 0; k < n; k++) {
         double extremo = cluster->type == MAX ? INF : -INF;
         for (int paso = 1; paso <= pasos; paso++) {
             coord_point p = coord_from_great_circle(cluster->center, paso * PARAMS.contour_ray_step_km, k * 360.0 / n);
             p.lon = (float)(fmod(p.lon + 540.0, 360.0) - 180.0);
-            if (p.lat < LAT_LIM_MIN || p.lat < lat_inf || p.lat > lat_sup || 90 - fabs(p.lat) < casquete_deg)
+            if (p.lat < LAT_LIM_MIN || p.lat < lat_inf || p.lat > lat_sup)
                 break;
             if (!global && (p.lon < lon_min || p.lon > lon_max))
                 break;
@@ -129,6 +134,8 @@ void calcular_extremos_rayos(points_cluster *cluster, short **z_in, float *lats,
                 break;
             double h = ((z * scale_factor) + offset) / g_0;
             extremo = cluster->type == MAX ? fmin(extremo, h) : fmax(extremo, h);
+            if (k == 0 && paso * PARAMS.contour_ray_step_km <= hasta_el_polo_km)
+                cluster->extremo_polo = cluster->type == MAX ? fmin(cluster->extremo_polo, h) : fmax(cluster->extremo_polo, h);
         }
         cluster->extremos[k] = extremo;
     }
@@ -178,16 +185,16 @@ bool check_contour_dir_omega(points_cluster cluster, int contour, int dir_lat, i
 /**
  * @brief ALG-360: niveles de contorno que se prueban para un máximo, de mayor a menor: todos los múltiplos de
  * contour_step_m con mín_polo < L <= altura del centro. mín_polo es el mínimo de la altura a lo largo del rayo hacia el
- * polo (rayo 0, hasta el casquete polar o search_radius_km). Son exactamente las isohipsas que cruza ese rayo, sin los
+ * polo (rayo 0, hasta el polo o search_radius_km: cluster->extremo_polo). Son exactamente las isohipsas que cruza ese rayo, sin los
  * saltos que daba recorrer las celdas del camino (a 1°, un nivel de cada dos con 40 m por celda).
  *
  * @return Número de niveles escritos en `niveles` (como mucho max_niveles).
  */
 int niveles_hacia_el_polo(const points_cluster *cluster, double altura_centro, int *niveles, int max_niveles) {
     int paso = PARAMS.contour_step_m, n = 0;
-    if (altura_centro <= cluster->extremos[0])
+    if (altura_centro <= cluster->extremo_polo)
         return 0;
-    for (int nivel = (int)altura_centro - ((int)altura_centro % paso); nivel > cluster->extremos[0] && n < max_niveles; nivel -= paso)
+    for (int nivel = (int)altura_centro - ((int)altura_centro % paso); nivel > cluster->extremo_polo && n < max_niveles; nivel -= paso)
         niveles[n++] = nivel;
     return n;
 }
@@ -225,7 +232,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
 
             // ALG-360: niveles explícitos, sin saltos (niveles_hacia_el_polo).
             double altura_centro = (index_lat >= 0 && index_lon >= 0) ? ((z_in[index_lat][index_lon]*scale_factor) + offset)/g_0 : -INF;
-            int max_niveles = clusters[i].extremos[0] < altura_centro ? (int)((altura_centro - clusters[i].extremos[0]) / PARAMS.contour_step_m) + 2 : 1;
+            int max_niveles = clusters[i].extremo_polo < altura_centro ? (int)((altura_centro - clusters[i].extremo_polo) / PARAMS.contour_step_m) + 2 : 1;
             int niveles[max_niveles];
             int n_niveles = niveles_hacia_el_polo(&clusters[i], altura_centro, niveles, max_niveles);
 
