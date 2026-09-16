@@ -55,6 +55,10 @@ add_test(NAME test_bilinear COMMAND TEST_bilinear)
 add_executable(TEST_expandcluster test_expandcluster.c)
 target_link_libraries(TEST_expandcluster CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
 add_test(NAME test_expandcluster COMMAND TEST_expandcluster)
+# ALG-309 (F3.9): vecindad con vuelta en ±180° y la fila del polo como un único punto
+add_executable(TEST_vecindad test_vecindad.c)
+target_link_libraries(TEST_vecindad CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
+add_test(NAME test_vecindad COMMAND TEST_vecindad)
 
 # ALG-204 (R2): lectura de un paso temporal y corrección de longitudes [0, 360) -> [-180, 180)
 add_executable(TEST_lectura_nc test_lectura_nc.c)

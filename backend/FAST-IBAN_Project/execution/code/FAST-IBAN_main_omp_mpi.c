@@ -180,7 +180,7 @@ int main(int argc, char **argv) {
             for(j=0; j< size_y;j++) {
                 if(filtered_points[i][j].cluster == -1 && filtered_points[i][j].type != NO_TYPE) {
                     filtered_points[i][j].cluster = id;
-                    expandCluster(filtered_points, size_x, size_y, i, j, id, RES*step);
+                    expandCluster(filtered_points, size_x, size_y, i, j, id);
                     id++;
                 }
             }

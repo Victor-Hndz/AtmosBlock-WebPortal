@@ -31,6 +31,7 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 | Espaciado de candidatos de 1,25° a 1,0° *(decisión de diseño, no bug)* | ALG-359 | puntos en clusters 1373 → 2118; misma OMEGA | **104 / 16** | **Esperado:** +57 % de puntos candidatos (1,25² = 1,56), clusters +3,1 %; 106 de 116 formaciones se conservan a ≤1°. Ver sección ALG-359 |
 
 | Recorridos de contorno geodésicos *(decisión de diseño, no bug)* | ALG-360 | 1 OMEGA → 4 OMEGA + 2 REX, las nuevas junto a ±180°; la original se conserva | **107 / 15** | **Objetivo:** el acuerdo entre 0,25° y 1° pasa de 97 a 105 formaciones emparejadas. Puntos y clusters idénticos. Ver sección ALG-360 |
+| Vecindad de clusters con vuelta en ±180° y fila del polo como un punto | ALG-309 | 4 / 1 → 4 / 0 | 97 / 13 (=) | **Pequeño:** clusters partidos en ±180° pasan a ser uno; 108 de 110 formaciones iguales. Ver sección ALG-309 |
 | Filtro de tamaño por área de celda, 22 000 km² *(decisión de diseño)* | ALG-306 | 4 / 2 → 4 / 1 | **97 / 13** | Se pierden sobre todo formaciones apoyadas en clusters pequeños; acuerdo 0,25°/1° 85 % → 88 %. Ver sección ALG-306 |
 
 B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2, B1, B10 y ALG-359 sí, porque cambian el muestreo. B7 cambia un solo punto. ALG-360 solo cambia las formaciones.
@@ -92,6 +93,19 @@ Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. E
 **Coste:** el caso largo con 12 hilos sigue en unos 6 s.
 
 Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
+
+## ALG-309: vecindad con vuelta en ±180° y paso por el polo
+
+`expandCluster` agrupaba candidatos vecinos (vecindad 8) comparando `|Δlat| ≤ eps` y `|Δlon| ≤ eps` en grados: ese eps no descartaba ningún vecino (C10), y los objetos se partían en ±180° y en el polo. Ahora la vecindad es topológica: los 8 vecinos del mismo tipo, con vuelta en longitud si la retícula es global, y la fila de un polo como un único punto (todos sus candidatos son vecinos entre sí). Se elimina eps: un umbral geodésico √2·R·Δ también aceptaría siempre a los 8 vecinos.
+
+**Coste (ALG-312):** `point_distance` cuesta 43 ns por vecino frente a 2,7 ns de la comparación anterior; con ~420 000 comprobaciones en el caso largo serían ~18 ms (0,1 %). Al no hacer falta ningún umbral, no se usa.
+
+**Test** `test_vecindad`: rojo con la vecindad anterior (máximos en −180° y 179° separados; 89°N en −90° y 90° separados) → verde; control en una rejilla regional, que no da la vuelta. `test_expandcluster` (1 millón de puntos) sigue en verde.
+
+**Delta:**
+- **Caso fijo:** 4 / 1 → 4 / 0. El Rex del paso 0 en 65,5°N −178,5° desaparece y una Omega del paso 1 cambia de mínimo: los clusters partidos en ±180° pasan a ser uno solo y su centroide se mueve.
+- **Caso largo:** 97 / 13 sin cambios; 108 de 110 formaciones iguales. Las otras dos son Omega de los pasos 34 y 35 cuyo mínimo junto a ±180° se une y pasa de −180° a 177–180°.
+- Bandas de latitud y acuerdo entre 0,25° y 1°: sin cambios.
 
 ## ALG-306: área mínima de cluster en km²
 

@@ -413,50 +413,75 @@ double point_distance(coord_point p1, coord_point p2) {
     return d;
 }
 
-// B8 (ALG-403): recorrido iterativo con pila explícita. El DFS recursivo anterior desbordaba la pila con
-// clusters grandes. Marca la misma componente: vecindad 8, mismo tipo que el punto actual y dentro de eps.
-void expandCluster(selected_point **filtered_points, int size_x, int size_y, int i, int j, int id, double eps) {
-    int capacidad = 64, n = 0;
-    int *pila = malloc(2 * capacidad * sizeof(int));
-    if (pila == NULL) {
+// Pila de índices (fila, columna) de expandCluster.
+typedef struct {
+    int *datos, n, capacidad;
+} pila_indices;
+
+// Marca (x, y) con `id` y lo apila si es un candidato del mismo tipo aún sin cluster.
+static void visitar(selected_point **puntos, int x, int y, enum Tipo_form tipo, int id, pila_indices *pila) {
+    if (puntos[x][y].cluster != -1 || puntos[x][y].type != tipo)
+        return;
+    puntos[x][y].cluster = id;
+    if (pila->n == pila->capacidad) {
+        pila->capacidad *= 2;
+        int *mayor = realloc(pila->datos, 2 * pila->capacidad * sizeof(int));
+        if (mayor == NULL) {
+            free(pila->datos);
+            perror("expandCluster: sin memoria");
+            exit(EXIT_FAILURE);
+        }
+        pila->datos = mayor;
+    }
+    pila->datos[2 * pila->n] = x;
+    pila->datos[2 * pila->n + 1] = y;
+    pila->n++;
+}
+
+/**
+ * @brief B8 (ALG-403): recorrido iterativo con pila explícita (el DFS recursivo desbordaba la pila con clusters grandes).
+ * Marca la componente conexa del punto semilla entre candidatos del mismo tipo.
+ *
+ * ALG-309 (F3.9): la vecindad es topológica sobre la retícula de candidatos: los 8 vecinos, con vuelta en longitud si la
+ * retícula es global, y la fila de un polo como un único punto (todos sus candidatos son vecinos entre sí). El antiguo
+ * eps en grados no descartaba ningún vecino (C10), y un umbral geodésico √2·R·Δ también los aceptaría siempre, así que
+ * se elimina (el coste de point_distance se midió en ALG-312).
+ */
+void expandCluster(selected_point **filtered_points, int size_x, int size_y, int i, int j, int id) {
+    double paso_lon = size_y > 1 ? filtered_points[0][1].point.lon - filtered_points[0][0].point.lon : 0;
+    bool global = size_y > 1 && fabs(size_y * paso_lon - 360.0) <= TOL_PASO * size_y;
+    pila_indices pila = {malloc(2 * 64 * sizeof(int)), 0, 64};
+    if (pila.datos == NULL) {
         perror("expandCluster: sin memoria");
         exit(EXIT_FAILURE);
     }
-    pila[0] = i;
-    pila[1] = j;
-    n = 1;
+    pila.datos[0] = i;
+    pila.datos[1] = j;
+    pila.n = 1;
 
-    while (n > 0) {
-        n--;
-        int ci = pila[2 * n], cj = pila[2 * n + 1];
+    while (pila.n > 0) {
+        pila.n--;
+        int ci = pila.datos[2 * pila.n], cj = pila.datos[2 * pila.n + 1];
+        enum Tipo_form tipo = filtered_points[ci][cj].type;
 
         for (int x = ci - 1; x <= ci + 1; x++) {
             if (x < 0 || x > size_x - 1)
                 continue;
             for (int y = cj - 1; y <= cj + 1; y++) {
-                if (y < 0 || y > size_y - 1 || (x == ci && y == cj))
+                if (x == ci && y == cj)
                     continue;
-                if (filtered_points[x][y].cluster != -1 || filtered_points[x][y].type != filtered_points[ci][cj].type)
-                    continue;
-                if (fabs(filtered_points[x][y].point.lat - filtered_points[ci][cj].point.lat) <= eps &&
-                    fabs(filtered_points[x][y].point.lon - filtered_points[ci][cj].point.lon) <= eps) {
-                    filtered_points[x][y].cluster = id;
-                    if (n == capacidad) {
-                        capacidad *= 2;
-                        int *mayor = realloc(pila, 2 * capacidad * sizeof(int));
-                        if (mayor == NULL) {
-                            free(pila);
-                            perror("expandCluster: sin memoria");
-                            exit(EXIT_FAILURE);
-                        }
-                        pila = mayor;
-                    }
-                    pila[2 * n] = x;
-                    pila[2 * n + 1] = y;
-                    n++;
+                int yy = y;
+                if (yy < 0 || yy > size_y - 1) {
+                    if (!global)
+                        continue;
+                    yy = (yy + size_y) % size_y;
                 }
+                visitar(filtered_points, x, yy, tipo, id, &pila);
             }
         }
+        if (fabs(fabs(filtered_points[ci][cj].point.lat) - 90.0) <= TOL_PASO)
+            for (int y = 0; y < size_y; y++)
+                visitar(filtered_points, ci, y, tipo, id, &pila);
     }
-    free(pila);
+    free(pila.datos);
 }

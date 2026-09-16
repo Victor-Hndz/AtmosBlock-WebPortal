@@ -1,4 +1,4 @@
-f86eaf213810dea0012074a3f245a5b6d476ab1baeb588d60faf45b8032f3fa3  selected.csv
+cce60ef01a0172a72e73a3b2243e0a90076d48bebb389bc4528e4faeb4c7cae6  selected.csv
 7114f82ced8a03cbf9e0ae081fd283a54ceb147d994af4824b3514982483f37f  formations.csv
-findIndex: 0 fallos (-1) de 28297574 llamadas (0.00 %)
-bilinear_interpolation: 0 fallos (-1) de 3537190 llamadas (0.00 %)
+findIndex: 0 fallos (-1) de 28247700 llamadas (0.00 %)
+bilinear_interpolation: 0 fallos (-1) de 3530956 llamadas (0.00 %)
