@@ -1,6 +1,7 @@
 #include "../libraries/init.h"
 
 int LAT_LIM_MIN, LAT_LIM_MAX, LON_LIM_MIN, LON_LIM_MAX, N_THREADS;
+int FILA_LAT_MIN;  // ALG-302
 char* FILE_NAME, *OUT_DIR_NAME;
 
 
@@ -284,6 +285,16 @@ int init_nc_variables(int ncid, float lats[NLAT], float lons[NLON], double *scal
         exit(EXIT_FAILURE);
     }
     RES = paso_lat;
+
+    // ALG-302: índice de la fila de LAT_LIM_MIN en las latitudes del fichero. Sustituye a FILT_LAT, que suponía
+    // una rejilla que empieza en 90°N con paso de 0,25°.
+    float lat_sup = lats[0] > lats[NLAT - 1] ? lats[0] : lats[NLAT - 1];
+    float lat_inf = lats[0] > lats[NLAT - 1] ? lats[NLAT - 1] : lats[0];
+    if (LAT_LIM_MIN > lat_sup + TOL_PASO || LAT_LIM_MIN < lat_inf - TOL_PASO) {
+        fprintf(stderr, "Error: el límite inferior de latitud (%d) está fuera de las latitudes del fichero (%g a %g).\n", LAT_LIM_MIN, lat_inf, lat_sup);
+        exit(EXIT_FAILURE);
+    }
+    FILA_LAT_MIN = (int)floor(fabs(lats[0] - LAT_LIM_MIN) / RES + TOL_PASO);
 
     // Read the scale factor, offset and long_name of z.
     if ((retval = nc_get_att_double(ncid, z_varid, SCALE_FACTOR, scale_factor)))
