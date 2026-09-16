@@ -3,7 +3,9 @@
 # Otra ruta: variable de entorno FAST_IBAN_PARAMS.
 
 # Espaciado entre puntos candidatos, en grados. Debe ser múltiplo entero de la resolución del fichero.
-candidate_spacing_deg: 1.25
+# 1° (ALG-359): múltiplo de 0,25°, 0,5° y 1°, así que los candidatos caen en las mismas coordenadas a cualquiera de esas
+# resoluciones (necesario para ALG-308); y ≤ ray_distance_km/4 ≈ 125 km. Antes, 1,25° (5 celdas a 0,25°).
+candidate_spacing_deg: 1.0
 
 # Rayos de círculo máximo por punto (múltiplo de 8) y su longitud, en km.
 n_rays: 64

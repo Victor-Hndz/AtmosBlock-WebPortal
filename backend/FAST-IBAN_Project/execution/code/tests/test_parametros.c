@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    comprobar(PARAMS.candidate_spacing_deg == 1.25, "candidate_spacing_deg == 1.25");
+    comprobar(PARAMS.candidate_spacing_deg == 1.0, "candidate_spacing_deg == 1.0");  // ALG-359
     comprobar(PARAMS.n_rays == 64, "n_rays == 64");
     comprobar(PARAMS.ray_distance_km == 500, "ray_distance_km == 500");
     comprobar(PARAMS.pass_fraction == 0.9, "pass_fraction == 0.9");

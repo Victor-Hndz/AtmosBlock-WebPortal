@@ -39,7 +39,7 @@ diagnoses the forecast; it does not make predictions itself.
 
 For each time step of a Z500 field (ERA5, 0.25°):
 
-1. **Candidate points.** The grid is sub-sampled every 5 points (1.25° effective spacing).
+1. **Candidate points.** Candidates are evaluated every 1° (`candidate_spacing_deg`, a multiple of the grid resolution), so they fall on the same coordinates at 0.25°, 0.5° and 1°.
 2. **Great-circle ray sampling.** From each candidate, 64 rays (every 5.625°) of 500 km are traced
    along great circles, and Z500 is bilinearly interpolated at their end points. A point is a
    high (low) candidate when at least 90 % of the end points are lower (higher).

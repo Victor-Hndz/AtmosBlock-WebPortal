@@ -146,18 +146,18 @@ set(PARAMS_DEFECTO ${CMAKE_CURRENT_SOURCE_DIR}/../config/params.yaml)
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${PARAMS_DEFECTO})
 file(READ ${PARAMS_DEFECTO} PARAMS_TEXTO)
 function(variante_params nombre buscar reemplazar)
-    string(REPLACE "${buscar}" "${reemplazar}" texto "${PARAMS_TEXTO}")
+    # Expresión regular sobre el valor, para no depender del valor por defecto de cada clave.
+    string(REGEX REPLACE "${buscar}" "${reemplazar}" texto "${PARAMS_TEXTO}")
     if(texto STREQUAL PARAMS_TEXTO)
         message(FATAL_ERROR "variante_params(${nombre}): no se encuentra '${buscar}' en ${PARAMS_DEFECTO}")
     endif()
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/params_${nombre}.yaml "${texto}")
 endfunction()
-variante_params(pass_08 "pass_fraction: 0.9" "pass_fraction: 0.8")
-variante_params(espaciado_1grado "candidate_spacing_deg: 1.25" "candidate_spacing_deg: 1.0")
-variante_params(espaciado_no_multiplo "candidate_spacing_deg: 1.25" "candidate_spacing_deg: 1.1")
-variante_params(clave_desconocida "n_rays: 64" "n_rays: 64\nsearch_radius: 3000")
-variante_params(sin_clave "rex_max_dlon_deg: 10" "")
-variante_params(rayos_no_multiplo "n_rays: 64" "n_rays: 60")
+variante_params(pass_08 "pass_fraction: [0-9.]+" "pass_fraction: 0.8")
+variante_params(espaciado_no_multiplo "candidate_spacing_deg: [0-9.]+" "candidate_spacing_deg: 1.1")
+variante_params(clave_desconocida "n_rays: [0-9]+" "n_rays: 64\nsearch_radius: 3000")
+variante_params(sin_clave "rex_max_dlon_deg: [0-9.]+" "")
+variante_params(rayos_no_multiplo "n_rays: [0-9]+" "n_rays: 60")
 
 add_executable(TEST_parametros test_parametros.c)
 target_link_libraries(TEST_parametros INIT UTILS LIB m netcdf OpenMP::OpenMP_C)
@@ -174,6 +174,3 @@ set_tests_properties(parametros_espaciado_no_multiplo PROPERTIES PASS_REGULAR_EX
 add_test(NAME parametros_en_cabecera_y_en_uso COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/comprobar_parametros.sh
     $<TARGET_FILE:FAST-IBAN> ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/params_pass_08.yaml "pass_fraction: 0.8"
     ${CMAKE_CURRENT_SOURCE_DIR}/regression/baseline.sha256)
-# A 1°, el espaciado de 1,25° no es múltiplo de la resolución: el test de latitudes usa uno de 1,0°.
-set_property(TEST latitudes_rejilla_1grado APPEND PROPERTY ENVIRONMENT
-    "FAST_IBAN_PARAMS=${CMAKE_CURRENT_BINARY_DIR}/params_espaciado_1grado.yaml")
