@@ -117,6 +117,7 @@ typedef struct cluster {
     selected_point point_izq, point_der, point_sup, point_inf;
     enum Tipo_form type;
     double *extremos;  // ALG-360: extremo de altura de cada rayo geodésico (calcular_extremos_rayos); NULL fuera de search_formation
+    double extremo_polo;  // ALG-363: extremo del rayo hacia el polo solo hasta el polo; delimita los niveles de contorno
 } points_cluster;
 
 

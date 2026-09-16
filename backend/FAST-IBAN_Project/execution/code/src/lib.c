@@ -23,7 +23,7 @@ formation create_formation(int max, int min1, int min2, enum Tipo_block type) {
 }
 
 points_cluster create_cluster(int id, int n_points, int contour, coord_point center, selected_point *points, selected_point point_izq, selected_point point_der, selected_point point_sup, selected_point point_inf, enum Tipo_form type) {
-    points_cluster new_cluster = {id, n_points, contour, center, points, point_izq, point_der, point_sup, point_inf, type, NULL};  // ALG-360: extremos
+    points_cluster new_cluster = {id, n_points, contour, center, points, point_izq, point_der, point_sup, point_inf, type, NULL, 0};  // ALG-360/363: extremos
     return new_cluster;
 
 }

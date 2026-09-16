@@ -92,6 +92,16 @@ Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. E
 
 Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
 
+## ALG-363: rayos de contorno que atraviesan el polo
+
+Con ALG-360 cada rayo se detenía, sin cruzar, a 25 km del polo, igual que antes lo hacía la fila del polo. Ahora sigue el mismo círculo máximo al otro lado. Los niveles de contorno se siguen contando solo hasta el polo, con el extremo del rayo 0 (el meridiano del centro) hasta 90°: más allá, "hacia el polo" pasaría a ser hacia el sur.
+
+**Tests** (`test_rayos_geodesicos`):
+- Un alto en 84°N, que supera el nivel hasta ~734 km del centro con el polo a ~667 km, salía abierto; ahora sale cerrado.
+- El mismo alto sigue dando 9 niveles (hasta el polo), no 15.
+
+**Delta: 0 formaciones** en el caso fijo, en el largo y en el largo a 1°, también por bandas. Cambian solo los contadores de interpolaciones de las líneas base, por las muestras al otro lado del polo. El cambio de semántica afecta a centros por encima de ~63°N, a menos de 3000 km del polo, y en estos casos no altera ninguna formación.
+
 ## ALG-359: espaciado de candidatos de 1,25° a 1,0°
 
 No corrige un bug: es una decisión de diseño tomada con la asesoría del agente físico. Con 1,25° (`STEP` = 5 celdas a 0,25°), los candidatos no caen en las mismas coordenadas a 0,5° ni a 1°, así que el test de invariancia a la resolución (ALG-308) no podría comparar sobre los mismos puntos. 1° es múltiplo de 0,25°, 0,5° y 1°, y queda por debajo de `ray_distance_km`/4 ≈ 125 km.

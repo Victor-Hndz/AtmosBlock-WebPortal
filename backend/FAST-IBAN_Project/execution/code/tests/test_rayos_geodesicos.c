@@ -104,6 +104,17 @@ int main(void) {
         comprobar(caso, check_contour_dir_rex(maximo(centro), NIVEL, 0, 1), true);
     }
 
+    // ALG-363: cerca del polo los rayos lo atraviesan. El alto en 84°N supera NIVEL hasta ~734 km y el polo está a
+    // ~667 km: el rayo hacia el norte debe seguir al otro lado del polo hasta cruzar el contorno.
+    centro = create_point(84, 0);
+    preparar(0.25, centro, SIN_DORSAL);
+    comprobar("alto en (84, 0): contorno cerrado (rayos por el polo)", check_closed_contour(maximo(centro), NIVEL), true);
+    // Los niveles se cuentan solo hasta el polo: al otro lado, "hacia el polo" pasa a ser hacia el sur. Mínimo hasta el
+    // polo ≈ 5627-5635 m → niveles de 5800 a 5640 (9); sin cortar en el polo serían 15 (hasta 5520).
+    int niveles[64];
+    points_cluster alto_polar = maximo(centro);
+    comprobar("alto en (84, 0): 9 niveles, hasta el polo", niveles_hacia_el_polo(&alto_polar, 5800, niveles, 64) == 9, true);
+
     // Δlon del Rex con vuelta en ±180°: un mínimo a -179,5° está a 1° de un máximo a 179,5°, no a 359°.
     comprobar("diferencia de longitud entre 179,5° y -179,5° = 1°", fabs(diferencia_longitud(179.5, -179.5) - 1) < 1e-9, true);
     comprobar("diferencia de longitud entre -10° y 10° = 20°", fabs(diferencia_longitud(-10, 10) - 20) < 1e-9, true);
