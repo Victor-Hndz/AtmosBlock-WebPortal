@@ -199,10 +199,16 @@ int niveles_hacia_el_polo(const points_cluster *cluster, double altura_centro, i
     return n;
 }
 
-// ALG-360: separación en longitud entre dos puntos, en grados, en [0, 180]: con vuelta en ±180°.
-double diferencia_longitud(double lon1, double lon2) {
-    double d = fmod(fabs(lon1 - lon2), 360.0);
-    return d > 180 ? 360 - d : d;
+/**
+ * @brief ALG-364: distancia, en km, del punto `p` al círculo máximo del meridiano de `referencia`: R·asin(cos φ·|sin Δλ|).
+ * Si `p` queda en el otro medio globo en longitud (cos Δλ <= 0, al otro lado del polo) devuelve INF. Es periódica en
+ * longitud, así que la vuelta en ±180° sale sola.
+ */
+double distancia_al_meridiano(coord_point p, coord_point referencia) {
+    double dl = (p.lon - referencia.lon) * M_PI / 180;
+    if (cos(dl) < 1e-9)  // Δλ >= 90°, con margen para el redondeo de cos(π/2)
+        return INF;
+    return R * asin(cos(p.lat * M_PI / 180) * fabs(sin(dl)));
 }
 
 void search_formation(points_cluster *clusters, int size, short **z_in, float *lats, float *lons, double scale_factor, double offset, char* filename, int time) {
@@ -320,7 +326,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                             if(check_closed_contour(clusters[j], contour_top))
                                 continue;
 
-                            if(clusters[j].type == MIN && clusters[j].center.lat <= clusters[i].center.lat && diferencia_longitud(clusters[i].center.lon, clusters[j].center.lon) <= PARAMS.rex_max_dlon_deg) {
+                            if(clusters[j].type == MIN && clusters[j].center.lat <= clusters[i].center.lat && distancia_al_meridiano(clusters[j].center, clusters[i].center) <= PARAMS.rex_max_offset_km) {
                                 contour_bot = check_contour_dir_rex(clusters[j], contour_top, 1, 0);
                                 contour_izq = check_contour_dir_rex(clusters[j], contour_top, 0, -1);
                                 contour_top_aux = check_contour_dir_omega(clusters[j], contour_top, -1, 0);

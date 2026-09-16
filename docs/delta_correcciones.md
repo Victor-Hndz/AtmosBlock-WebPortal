@@ -92,6 +92,40 @@ Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. E
 
 Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
 
+## ALG-364: separación del Rex en km, no en grados
+
+La regla del Rex exigía que el mínimo quedara a ≤10° de longitud del máximo. Pero 10° de longitud son ~950 km a 30°N, 556 km a 60°N y 193 km a 80°N: la tolerancia dependía de la latitud. Ahora se mide la distancia del mínimo al círculo máximo del meridiano del máximo, `d = R·asin(cos φ_min·|sin Δλ|)`, solo con cos Δλ > 0 (si no, el mínimo está al otro lado del polo). Es periódica en longitud, así que la vuelta en ±180° sale sola.
+
+**Tests** (`test_rayos_geodesicos`): (50°, Δλ 10°) ≈ 712,6 km; simetría este/oeste; vuelta en ±180°; Δλ de 90° y 180° no cuentan; hemisferio sur; (84°, Δλ 60°) ≈ 578 km.
+
+### Valor: 700 km
+
+**Literatura** (revisión del agente físico, fuentes leídas en texto completo). Ningún trabajo publica una distancia en km entre la alta y la baja de un Rex. Pero sí fija en qué latitud evaluar los 10° anteriores, porque la fórmula usa la latitud de la **baja**:
+- Sousa et al. 2021 (doi:10.1175/JCLI-D-20-0658.1): extensión latitudinal típica de 15° entre la alta y la baja.
+- Hirt et al. 2018 (doi:10.1080/16000870.2018.1458565): distancia alta–baja de los *high-over-low* con pico en ~2000–2200 km; criterio |Δlon| < 10° con dos bajas.
+- Barriopedro et al. 2006 (doi:10.1175/JCLI3678.1): centros de bloqueo en 60–70°N, con φ_S = 40°N.
+
+Combinado, la baja típica queda en ~40–50°N; 60°N es la latitud de la alta. Los criterios publicados de alta sobre baja equivalen a 710–1060 km a la latitud de la baja; ninguno es tan estricto como 550 km. La física (radio de deformación ~1000 km, cuarto de onda de Rossby estacionaria) fija el orden de magnitud, pero no separa 550 de 700.
+
+**Medición interna:** con la regla en grados, la latitud de la baja de nuestros 20 Rex tiene mediana **52°N** (Q1 49,75°, Q3 57°); la de la alta, 63,5°N.
+
+**Prueba empírica.** Regla en grados frente a 440, 550, 560, 660, 700 y 840 km en seis casos: fijo, 2003, largo, febrero de 2004, junio de 2024 y largo a 1°.
+
+| | Grados | 550 km | 700 km |
+|---|---|---|---|
+| Rex (largo / jun-2024 / largo a 1°) | 15 / 3 / 15 | 14 / 1 / 14 | 15 / 3 / 15 |
+| Persistencia en el caso largo (Rex con continuidad a ≤500 km en t±1) | 9/15 | 8/14 | 9/15 |
+| Robustez: Rex a 0,25° con pareja a 1° | 12/15 | 10/14 | 12/15 |
+| Fragilidad: Rex a ±20 % del umbral | — | 2/14 | 1/15 |
+
+- **700 km** (y 660) da resultados idénticos a la regla en grados en los seis casos.
+- **550 km** (y 560) quita cuatro Rex, todos coherentes con la predicción geométrica. Pero el del caso largo era persistente, y los dos de junio de 2024 son el mismo sistema en pasos consecutivos: estructuras coherentes, no ruido.
+- 440 km quita más y 840 km añade cuatro.
+
+**Límite:** con ~20 Rex, casi todos de un episodio, la prueba es un indicio. Pendiente ampliarla con casos documentados (ALG-366).
+
+**Delta con 700 km: 0 formaciones** en todos los casos; líneas base sin cambios.
+
 ## ALG-363: rayos de contorno que atraviesan el polo
 
 Con ALG-360 cada rayo se detenía, sin cruzar, a 25 km del polo, igual que antes lo hacía la fila del polo. Ahora sigue el mismo círculo máximo al otro lado. Los niveles de contorno se siguen contando solo hasta el polo, con el extremo del rayo 0 (el meridiano del centro) hasta 90°: más allá, "hacia el polo" pasaría a ser hacia el sur.

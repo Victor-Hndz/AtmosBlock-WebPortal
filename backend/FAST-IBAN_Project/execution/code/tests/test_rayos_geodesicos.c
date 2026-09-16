@@ -115,9 +115,17 @@ int main(void) {
     points_cluster alto_polar = maximo(centro);
     comprobar("alto en (84, 0): 9 niveles, hasta el polo", niveles_hacia_el_polo(&alto_polar, 5800, niveles, 64) == 9, true);
 
-    // Δlon del Rex con vuelta en ±180°: un mínimo a -179,5° está a 1° de un máximo a 179,5°, no a 359°.
-    comprobar("diferencia de longitud entre 179,5° y -179,5° = 1°", fabs(diferencia_longitud(179.5, -179.5) - 1) < 1e-9, true);
-    comprobar("diferencia de longitud entre -10° y 10° = 20°", fabs(diferencia_longitud(-10, 10) - 20) < 1e-9, true);
+    // ALG-364: distancia del mínimo al meridiano del máximo, R·asin(cos φ_min·|sin Δλ|), solo con cos Δλ > 0.
+    coord_point alto = create_point(60, 0);
+    double d_50_10 = distancia_al_meridiano(create_point(50, 10), alto);
+    comprobar("al meridiano: (50°, Δλ 10°) ≈ 712,6 km", fabs(d_50_10 - 712.6) < 0.5, true);
+    comprobar("al meridiano: simétrica al este y al oeste", fabs(distancia_al_meridiano(create_point(50, -10), alto) - d_50_10) < 1e-9, true);
+    comprobar("al meridiano: vuelta en ±180° (179,5° y -179,5° = Δλ 1°)",
+              fabs(distancia_al_meridiano(create_point(50, -179.5), create_point(60, 179.5)) - distancia_al_meridiano(create_point(50, 1), alto)) < 1e-6, true);
+    comprobar("al meridiano: Δλ 90° y 180° (otro lado) no cuentan",
+              distancia_al_meridiano(create_point(50, 90), alto) >= INF && distancia_al_meridiano(create_point(50, 180), alto) >= INF, true);
+    comprobar("al meridiano: hemisferio sur (-50°, Δλ 10°) ≈ 712,6 km", fabs(distancia_al_meridiano(create_point(-50, 10), create_point(-60, 0)) - 712.6) < 0.5, true);
+    comprobar("al meridiano: cerca del polo (84°, Δλ 60°) ≈ 578 km", fabs(distancia_al_meridiano(create_point(84, 60), create_point(88, 0)) - 578) < 1, true);
 
     return fallos != 0;
 }

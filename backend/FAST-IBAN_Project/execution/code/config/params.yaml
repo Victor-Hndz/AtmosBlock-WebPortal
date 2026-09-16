@@ -31,5 +31,9 @@ cluster_lat_max_deg: 85
 # Número mínimo de puntos de un cluster. Depende de la rejilla: pasará a área mínima en km² (ALG-306).
 min_cluster_points: 2
 
-# Separación máxima en longitud entre el máximo y el mínimo de un Rex, en grados.
-rex_max_dlon_deg: 10
+# Distancia máxima, en km, del mínimo de un Rex al meridiano del máximo: R·asin(cos φ_min·|sin Δλ|), con cos Δλ > 0
+# (ALG-364). Son los 10° de la regla anterior evaluados en la latitud típica de la baja, φ_min = 50°N (712,6 km,
+# redondeado): la baja de un Rex del HN queda 15-20° al sur de una alta a 60-65°N (Sousa et al. 2021; Hirt et al. 2018;
+# Barriopedro et al. 2006), y la mediana de φ_min de nuestros Rex es 52°N. La alternativa de 60°N (550 km) es la
+# latitud de la alta, no la de la baja. Detalle y prueba empírica en docs/delta_correcciones.md.
+rex_max_offset_km: 700
