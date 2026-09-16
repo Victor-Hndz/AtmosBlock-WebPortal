@@ -69,3 +69,21 @@ Una fase cumple si cumple los dos. Se informa de cada combinación de resolució
 ## 7. Comparación con DAV (ALG-308b, aparte)
 
 El mismo test, con los mismos ficheros degradados, se aplicará a DAV (Davini et al., 2012, doi:10.1175/JCLI-D-12-00032.1) con la función `DAV()` de blocktrack (Filippucci et al., 2024, doi:10.5194/wcd-5-1207-2024), en su variante instantánea (GHGS > 0 y GHGN < −10 m/°), sin extensión en longitud, persistencia ni seguimiento. Con decimación, DAV da IoU 1 por construcción (es puntual), así que solo informa el promedio de área. Cada método se compara consigo mismo, nunca uno contra otro.
+
+## 8. Adenda: controles y variante GHGS2 (añadida antes de calcularlos)
+
+**Motivo.** Con el IoU de §5 ya medido, DAV sale casi insensible al promedio de área (≥ 0,99) y FAST-IBAN algo menos (0,85–0,96). Un IoU alto también puede deberse solo a la geometría: si lo que cambia es el borde, 1 − IoU ≈ (P/A)·δ, así que máscaras grandes y compactas dan IoU alto con el mismo desplazamiento. Antes de leer las dos cifras juntas se fijan estos controles. Se añaden después de ver el IoU de §5, pero **antes de calcularlos**, y no cambian nada de lo anterior.
+
+**Dominio común.** Además de las bandas de §5, se da el total en **30–75°, con 75° incluido**, para los dos métodos. DAV solo es computable con φ₀ entre 30° y 75°. En DAV la banda 75–90° de §5 contiene únicamente la fila de 75° y se informa como **no computable**.
+
+**Controles**, por fase, degradación y dominio (30–75° y total por encima de 30°):
+1. **Cociente de persistencia**, solo en los casos a 6 h: `R = (1 − IoU_resolución) / (1 − IoU_6h)`. En primera aproximación el factor P/A se cancela, así que R compara el desplazamiento por resolución con el de 6 h de evolución.
+2. **Desplazamiento equivalente del borde:** `δ_eff = Σ_pasos área(A △ B) / Σ_pasos (P_A + P_B)/2`, en km, que se compara con el paso de la retícula (≈ 111 km).
+   - **Perímetro de una máscara:** suma de las aristas de celda de 1° entre un punto marcado y un vecino no marcado (4 vecinos) con los dos dentro del dominio. Así el recorte del dominio no cuenta como borde.
+   - **Longitud de cada arista:** `R·1°` entre vecinos de la misma fila y `R·1°·cos(φ ± ½°)` entre filas. La fila polar, que es un único punto, tiene por vecinos las 360 celdas de ±89°.
+3. **Fracción de área marcada** a 0,25°, `f` (media por paso del área marcada entre el área del dominio en los hemisferios presentes), y el **IoU esperado por azar** entre dos máscaras independientes con esa fracción, `f / (2 − f)`.
+4. **Coste del promedio:** `IoU_decimado − IoU_promedio`. Es el único término comparable directamente entre métodos: con decimación, DAV da 1 por construcción.
+
+**Variante declarada de DAV, con GHGS2.** Se repite todo con `mer_gradient_filter=True` de blocktrack, que añade GHGS2 < −5 m/°. Se da junto a la variante de §7, sin sustituirla.
+
+**Qué no se hará.** No se ajusta ningún umbral ni se suaviza la entrada para acercar las cifras. Las dos mediciones no ordenan los métodos por calidad: cada una mide la sensibilidad a la rejilla de un diagnóstico distinto.
