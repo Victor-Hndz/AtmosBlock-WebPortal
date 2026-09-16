@@ -110,5 +110,57 @@ class TestIoU(unittest.TestCase):
         self.assertEqual(r, iou.comparar(a, a, pasos_bloque=4))  # determinista
 
 
+class TestControles(unittest.TestCase):
+    """Adenda §8: dominio 30-75° con 75 incluido, perímetro, δ_eff, fracción marcada e IoU por azar."""
+
+    R1 = iou.R * iou.math.radians(1)
+
+    def cos(self, grados):
+        return iou.math.cos(iou.math.radians(grados))
+
+    def setUp(self):
+        self.dir = tempfile.TemporaryDirectory()
+        self.raiz = self.dir.name
+
+    def tearDown(self):
+        self.dir.cleanup()
+
+    def test_dominio_30_75_incluye_75(self):
+        a = ejecucion(self.raiz, "a", [(0, 75, 0, "MAX", 0), (0, 45, 0, "MAX", 0)])
+        b = ejecucion(self.raiz, "b", [(0, 45, 0, "MAX", 0)])
+        r = iou.comparar(a, b)["clusters"]["MAX"]
+        self.assertAlmostEqual(r["30-75"]["iou"], iou.peso(45) / (iou.peso(45) + iou.peso(75)))
+        self.assertIsNone(r["50-75"]["iou"])  # la partición de §5 no cambia: 75° va a 75-90
+
+    def test_perimetro(self):
+        total = iou.DOMINIOS["total"]
+        lados = self.cos(44.5) + self.cos(45.5)
+        self.assertAlmostEqual(iou.perimetro({(45, 0)}, total), self.R1 * (2 + lados))
+        self.assertAlmostEqual(iou.perimetro({(45, 0), (45, 1)}, total), self.R1 * (2 + 2 * lados))
+        self.assertAlmostEqual(iou.perimetro({(90, 0)}, total), 360 * self.R1 * self.cos(89.5))
+        self.assertAlmostEqual(iou.perimetro({(89, 5), (90, 0)}, total), self.R1 * (2 + self.cos(88.5)) + 359 * self.R1 * self.cos(89.5))
+        # El recorte del dominio no es borde: a 30° no cuenta la arista con 29°.
+        self.assertAlmostEqual(iou.perimetro({(30, 0)}, total), self.R1 * (2 + self.cos(30.5)))
+
+    def test_vuelta_en_longitud(self):
+        total = iou.DOMINIOS["total"]
+        lados = self.cos(44.5) + self.cos(45.5)
+        self.assertAlmostEqual(iou.perimetro({(45, -180), (45, 179)}, total), self.R1 * (2 + 2 * lados))
+
+    def test_delta_fraccion_azar(self):
+        a = ejecucion(self.raiz, "a", [(0, 45, 0, "MAX", 0)])
+        b = ejecucion(self.raiz, "b", [(0, 45, 1, "MAX", 0)])
+        m = iou.comparar(a, b)["clusters"]["MAX"]["total"]
+        p = self.R1 * (2 + self.cos(44.5) + self.cos(45.5))
+        self.assertAlmostEqual(m["delta_eff_km"], 2 * iou.peso(45) / p)
+        dominio = sum(360 * iou.peso(lat) for lat in range(30, 90)) + iou.peso(90)
+        self.assertAlmostEqual(m["fraccion"], iou.peso(45) / dominio)
+        self.assertAlmostEqual(m["azar"], m["fraccion"] / (2 - m["fraccion"]))
+
+    def test_sin_diferencias_delta_cero(self):
+        a = ejecucion(self.raiz, "a", [(0, 45, 0, "MAX", 0)])
+        self.assertEqual(iou.comparar(a, a)["clusters"]["MAX"]["total"]["delta_eff_km"], 0.0)
+
+
 if __name__ == "__main__":
     unittest.main()
