@@ -30,7 +30,67 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 
 | Espaciado de candidatos de 1,25° a 1,0° *(decisión de diseño, no bug)* | ALG-359 | puntos en clusters 1373 → 2118; misma OMEGA | **104 / 16** | **Esperado:** +57 % de puntos candidatos (1,25² = 1,56), clusters +3,1 %; 106 de 116 formaciones se conservan a ≤1°. Ver sección ALG-359 |
 
-B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2, B1, B10 y ALG-359 sí, porque cambian el muestreo. B7 cambia un solo punto.
+| Recorridos de contorno geodésicos *(decisión de diseño, no bug)* | ALG-360 | 1 OMEGA → 4 OMEGA + 2 REX, las nuevas junto a ±180°; la original se conserva | **107 / 15** | **Objetivo:** el acuerdo entre 0,25° y 1° pasa de 97 a 105 formaciones emparejadas. Puntos y clusters idénticos. Ver sección ALG-360 |
+
+B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2, B1, B10 y ALG-359 sí, porque cambian el muestreo. B7 cambia un solo punto. ALG-360 solo cambia las formaciones.
+
+## ALG-360: recorridos de contorno geodésicos
+
+No corrige un bug: es una decisión de diseño con la asesoría del agente físico. Las comprobaciones de contorno recorrían la rejilla por índices: 64 direcciones enteras con zancadas de hasta 8 celdas, sin vuelta en ±180° y con ángulos físicos que cambian con cos φ. El sector "sur" medía ±41° a 30°N y ±15° a 75°N. Además, los niveles de contorno eran los de las celdas que pisaba el camino hacia el norte, así que en rejillas gruesas se saltaban niveles.
+
+**Medición previa** (caso largo, parche local que cuenta los niveles probados por máximo):
+
+| | 0,25° | 1° (decimación ×4) |
+|---|---|---|
+| Niveles de 20 m saltados | 2,0 % | 15,6 % |
+| Máximos con algún nivel saltado | 1,1 % | 53,7 % |
+
+**Cambio, en tres commits con su delta:**
+
+1. **Rayos geodésicos.** Para cada cluster y cada uno de los `n_rays` acimuts, se muestrea el círculo máximo cada `contour_ray_step_km` = 25 km con la interpolación bilineal, hasta `search_radius_km`. Se guarda el extremo de la altura (mínimo para un máximo, máximo para un mínimo). Un rayo cruza el nivel L antes de su límite si y solo si su extremo queda por debajo de L (MAX) o por encima (MIN), así que cada nivel se decide con 64 comparaciones.
+   - **Dónde para un rayo:** en `LAT_LIM_MIN`, en el borde de latitudes o de longitudes del fichero (si no es global), en el casquete polar de 25 km o si la interpolación falla.
+   - **Sectores:** ±45° con los límites incluidos (17 rayos) y pertenencia decidida por índice de rayo.
+2. **Niveles explícitos.** Todos los múltiplos de 20 m con mín_polo < L ≤ altura del centro. mín_polo es el extremo del rayo hacia el polo.
+3. **Δlon del Rex con vuelta en ±180°.** Sigue en grados; pasarlo a km es ALG-364.
+
+**Tests:**
+- `test_rayos_geodesicos` usa campos sintéticos definidos en km. En rojo con el recorrido por índices estaban dos casos: un alto junto a ±180° salía abierto, y la misma dorsal (141°–175°) daba respuestas distintas en el sector este a 30°N y a 75°N. Los controles se mantienen en verde: un alto aislado sale cerrado a 0,25° y a 1°.
+- `test_niveles_contorno`: un máximo con 40 m por grado, a 1°, debe dar los 54 niveles de 5800 a 4740 m.
+
+**Delta por commit:**
+
+| | Caso fijo | Caso largo (60 pasos) | Caso largo a 1° |
+|---|---|---|---|
+| Antes (ALG-359) | 1 / 0 | 104 / 16 | 118 / 15 |
+| 1. Rayos geodésicos | 4 / 2 | 107 / 15 (95 de 120 emparejadas a ≤1°; 25 salen, 27 entran) | 107 / 14 |
+| 2. Niveles explícitos | 4 / 2 (sin cambios) | 107 / 15 (sin cambios) | 108 / 15 |
+| 3. Δlon del Rex con vuelta | sin cambios | sin cambios | sin cambios |
+
+Valores en OMEGA / REX.
+
+**Caso fijo:** la OMEGA original se conserva. Las cinco formaciones nuevas están junto a ±180° (64–66°N, entre 170°E y 170°O), donde antes los recorridos se cortaban.
+
+**Caso largo por bandas** (latitud del máximo; la franja ±180° es |lon| ≥ 170°), en OMEGA / REX:
+
+| | 30–50° | 50–63° | >63° | ±180° |
+|---|---|---|---|---|
+| Antes | 9 / 0 | 50 / 7 | 45 / 9 | 0 / 0 |
+| Después | 9 / 0 | 50 / 9 | 48 / 6 | 2 / 0 |
+
+Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. Encaja con lo esperado: sectores que ya no dependen de cos φ y recorridos que dan la vuelta en ±180°.
+
+**Invariancia a la resolución** (caso largo a 0,25° frente al mismo caso decimado a 1°; formaciones emparejadas a ≤1°):
+
+| | Formaciones a 0,25° / a 1° | Emparejadas | Solo en una de las dos |
+|---|---|---|---|
+| Antes | 120 / 133 | 97 | 23 + 36 = 59 |
+| Después | 122 / 123 | **105** | 17 + 18 = **35** (−41 %) |
+
+**Sensibilidad al paso de los rayos** (caso largo): con 12,5 km, 121 de 122 formaciones emparejadas; con 50 km, 122 de 122. El resultado apenas depende del paso.
+
+**Coste:** el caso largo con 12 hilos sigue en unos 6 s.
+
+Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
 
 ## ALG-359: espaciado de candidatos de 1,25° a 1,0°
 

@@ -26,6 +26,7 @@ int main(int argc, char **argv) {
     comprobar(PARAMS.pass_fraction == 0.9, "pass_fraction == 0.9");
     comprobar(PARAMS.contour_step_m == 20, "contour_step_m == 20");
     comprobar(PARAMS.search_radius_km == 3000, "search_radius_km == 3000");
+    comprobar(PARAMS.contour_ray_step_km == 25, "contour_ray_step_km == 25");  // ALG-360
     comprobar(PARAMS.cluster_lat_min_deg == 30, "cluster_lat_min_deg == 30");
     comprobar(PARAMS.cluster_lat_max_deg == 85, "cluster_lat_max_deg == 85");
     comprobar(PARAMS.min_cluster_points == 2, "min_cluster_points == 2");

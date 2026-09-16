@@ -55,6 +55,7 @@ typedef struct {
     double pass_fraction;          // fracción de rayos por debajo (MAX) o por encima (MIN) del punto
     int contour_step_m;            // separación entre contornos, en altura geopotencial
     double search_radius_km;       // radio de búsqueda de contornos y de emparejamiento máximo-mínimos
+    double contour_ray_step_km;    // paso de muestreo de los rayos geodésicos de contorno (ALG-360)
     double cluster_lat_min_deg;    // el punto más al norte de un cluster debe quedar por encima (estricto)
     double cluster_lat_max_deg;    // y por debajo (estricto) de estas latitudes
     int min_cluster_points;        // puntos mínimos de un cluster; depende de la rejilla (ALG-306)
@@ -115,6 +116,7 @@ typedef struct cluster {
     selected_point *points;
     selected_point point_izq, point_der, point_sup, point_inf;
     enum Tipo_form type;
+    double *extremos;  // ALG-360: extremo de altura de cada rayo geodésico (calcular_extremos_rayos); NULL fuera de search_formation
 } points_cluster;
 
 
