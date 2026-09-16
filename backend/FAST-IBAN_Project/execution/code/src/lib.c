@@ -23,9 +23,19 @@ formation create_formation(int max, int min1, int min2, enum Tipo_block type) {
 }
 
 points_cluster create_cluster(int id, int n_points, int contour, coord_point center, selected_point *points, selected_point point_izq, selected_point point_der, selected_point point_sup, selected_point point_inf, enum Tipo_form type) {
-    points_cluster new_cluster = {id, n_points, contour, center, points, point_izq, point_der, point_sup, point_inf, type, NULL, 0};  // ALG-360/363: extremos
+    points_cluster new_cluster = {id, n_points, contour, center, points, point_izq, point_der, point_sup, point_inf, type, NULL, 0, 0};  // ALG-360/363: extremos; ALG-306: área
     return new_cluster;
 
+}
+
+/**
+ * @brief ALG-306: área, en km², de la celda de la retícula de candidatos centrada en `lat_deg` con lado `paso_deg`:
+ * R²·Δλ·Δφ·cos φ. Con ella los filtros de tamaño no dependen de la latitud ni de la resolución.
+ * ponytail: aproximación de celda pequeña; en la fila del polo (cos φ = 0) da 0 en vez del casquete π(R·Δ/2)².
+ */
+double area_celda_km2(double lat_deg, double paso_deg) {
+    double paso = paso_deg * M_PI / 180;
+    return (double)R * R * paso * paso * cos(lat_deg * M_PI / 180);
 }
 
 points_cluster *fill_clusters(selected_point **points, int size_x, int size_y, int n_clusters, double offset, double scale_factor) {
@@ -45,6 +55,7 @@ points_cluster *fill_clusters(selected_point **points, int size_x, int size_y, i
     for(i=0; i<n_clusters; i++) {
         clusters[i].id = i;
         clusters[i].n_points = cluster_sizes[i];
+        clusters[i].area_km2 = 0;  // ALG-306
         clusters[i].points = malloc(cluster_sizes[i] * sizeof(selected_point));
         clusters[i].contour = NC_MAX_INT;
         clusters[i].type = NO_TYPE;
@@ -60,6 +71,7 @@ points_cluster *fill_clusters(selected_point **points, int size_x, int size_y, i
             cluster_id = points[i][j].cluster;
             if(cluster_id != -1 && points[i][j].type != NO_TYPE) {
                 clusters[cluster_id].points[cluster_indices[cluster_id]++] = points[i][j];
+                clusters[cluster_id].area_km2 += area_celda_km2(points[i][j].point.lat, PARAMS.candidate_spacing_deg);  // ALG-306
 
                 //Actualizar los puntos de referencia
                 if(points[i][j].point.lon < clusters[points[i][j].cluster].point_izq.point.lon)

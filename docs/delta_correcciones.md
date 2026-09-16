@@ -31,6 +31,7 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 | Espaciado de candidatos de 1,25° a 1,0° *(decisión de diseño, no bug)* | ALG-359 | puntos en clusters 1373 → 2118; misma OMEGA | **104 / 16** | **Esperado:** +57 % de puntos candidatos (1,25² = 1,56), clusters +3,1 %; 106 de 116 formaciones se conservan a ≤1°. Ver sección ALG-359 |
 
 | Recorridos de contorno geodésicos *(decisión de diseño, no bug)* | ALG-360 | 1 OMEGA → 4 OMEGA + 2 REX, las nuevas junto a ±180°; la original se conserva | **107 / 15** | **Objetivo:** el acuerdo entre 0,25° y 1° pasa de 97 a 105 formaciones emparejadas. Puntos y clusters idénticos. Ver sección ALG-360 |
+| Filtro de tamaño por área de celda, 22 000 km² *(decisión de diseño)* | ALG-306 | 4 / 2 → 4 / 1 | **97 / 13** | Se pierden sobre todo formaciones apoyadas en clusters pequeños; acuerdo 0,25°/1° 85 % → 88 %. Ver sección ALG-306 |
 
 B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2, B1, B10 y ALG-359 sí, porque cambian el muestreo. B7 cambia un solo punto. ALG-360 solo cambia las formaciones.
 
@@ -91,6 +92,29 @@ Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. E
 **Coste:** el caso largo con 12 hilos sigue en unos 6 s.
 
 Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
+
+## ALG-306: área mínima de cluster en km²
+
+El filtro de tamaño exigía al menos 2 puntos por cluster. Con candidatos cada 1°, un punto representa ~10 700 km² a 30° y ~1 100 km² a 85°, así que el filtro dependía de la latitud y de la resolución. Ahora cada cluster suma el área de sus celdas, `R²·Δλ·Δφ·cos φ` (`area_celda_km2`), y se descartan los de menos de `min_cluster_area_km2`.
+
+**Valor: 22 000 km²**, con un argumento previo a medir (agente físico). Un candidato tolera 7 de 64 rayos fallidos (sector de ±19,7°); una dorsal recta sin pendiente a lo largo del eje deja una franja de candidatos de ~170 km, y su círculo inscrito, π·(250·sin 19,69°)² ≈ 22 300 km², es el caso límite entre un extremo cerrado y uno abierto a la escala de `ray_distance_km`. Es un filtro de robustez de la semilla, no de tamaño físico. 10 000 km² reproducía casi exactamente la regla anterior, pero deja pasar celdas sueltas entre 30° y 36°.
+
+**Curva de estabilidad** (medida antes de fijar el valor; sin meseta, así que no se usa para elegir):
+
+| Área mínima | Caso largo OMEGA / REX | 1983 | 2019 | Acuerdo 0,25°/1° (largo · 1983) |
+|---|---|---|---|---|
+| ≥ 2 puntos (antes) | 107 / 15 | 150 / 15 | 84 / 27 | 85 % · 80 % |
+| 10 000 km² | 106 / 16 | 145 / 15 | 85 / 27 | 86 % · 82 % |
+| 20 000 km² | 99 / 13 | 135 / 15 | 80 / 27 | 88 % · 84 % |
+| 50 000 km² | 79 / 12 | 120 / 13 | 77 / 25 | 89 % · 84 % |
+| 100 000 km² | 54 / 9 | 91 / 8 | 68 / 23 | 89 % · 84 % |
+
+**Delta con 22 000 km²:**
+- **Caso fijo:** 4 / 2 → 4 / 1. Desaparece el Rex del paso 1 junto a ±180°, y una Omega cambia de mínimo derecho.
+- **Caso largo:** 107 / 15 → 97 / 13; 107 de 122 formaciones se conservan a ≤1°, 15 desaparecen y aparecen 3 (mínimos que cambian).
+- **Acuerdo entre 0,25° y 1°** en el caso largo: 105 de 123 → 99 de 112; formaciones que solo están en una resolución, 35 → 24 (−31 %).
+
+Test `test_area_celda`: 1° en el ecuador ≈ 12 364 km², la mitad a 60°, igual en el HS, y 16 celdas de 0,25° = 1 de 1°.
 
 ## ALG-364: separación del Rex en km, no en grados
 

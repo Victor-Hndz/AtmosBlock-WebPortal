@@ -177,6 +177,11 @@ add_executable(TEST_niveles_contorno test_niveles_contorno.c)
 target_link_libraries(TEST_niveles_contorno CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
 add_test(NAME test_niveles_contorno COMMAND TEST_niveles_contorno)
 
+# ALG-306: área de las celdas de candidatos, R²·Δλ·Δφ·cos φ
+add_executable(TEST_area_celda test_area_celda.c)
+target_link_libraries(TEST_area_celda LIB m)
+add_test(NAME test_area_celda COMMAND TEST_area_celda)
+
 add_executable(TEST_parametros test_parametros.c)
 target_link_libraries(TEST_parametros INIT UTILS LIB m netcdf OpenMP::OpenMP_C)
 add_test(NAME test_parametros COMMAND TEST_parametros)

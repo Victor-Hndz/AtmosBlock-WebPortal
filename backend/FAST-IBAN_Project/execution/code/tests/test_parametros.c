@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
     comprobar(PARAMS.contour_ray_step_km == 25, "contour_ray_step_km == 25");  // ALG-360
     comprobar(PARAMS.cluster_lat_min_deg == 30, "cluster_lat_min_deg == 30");
     comprobar(PARAMS.cluster_lat_max_deg == 85, "cluster_lat_max_deg == 85");
-    comprobar(PARAMS.min_cluster_points == 2, "min_cluster_points == 2");
+    comprobar(PARAMS.min_cluster_area_km2 == 22000, "min_cluster_area_km2 == 22000");  // ALG-306
     comprobar(PARAMS.rex_max_offset_km == 700, "rex_max_offset_km == 700");  // ALG-364
 
     if (fallos == 0)

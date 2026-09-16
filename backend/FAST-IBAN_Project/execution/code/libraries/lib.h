@@ -58,7 +58,7 @@ typedef struct {
     double contour_ray_step_km;    // paso de muestreo de los rayos geodésicos de contorno (ALG-360)
     double cluster_lat_min_deg;    // el punto más al norte de un cluster debe quedar por encima (estricto)
     double cluster_lat_max_deg;    // y por debajo (estricto) de estas latitudes
-    int min_cluster_points;        // puntos mínimos de un cluster; depende de la rejilla (ALG-306)
+    double min_cluster_area_km2;   // área mínima de un cluster, suma de R²·Δλ·Δφ·cos φ de sus celdas (ALG-306)
     double rex_max_offset_km;      // distancia máxima del mínimo de un Rex al meridiano del máximo (ALG-364)
 } parametros;
 extern parametros PARAMS;
@@ -118,6 +118,7 @@ typedef struct cluster {
     enum Tipo_form type;
     double *extremos;  // ALG-360: extremo de altura de cada rayo geodésico (calcular_extremos_rayos); NULL fuera de search_formation
     double extremo_polo;  // ALG-363: extremo del rayo hacia el polo solo hasta el polo; delimita los niveles de contorno
+    double area_km2;      // ALG-306: área del cluster, suma de las áreas de sus celdas de candidatos (fill_clusters)
 } points_cluster;
 
 // ALG-303 (L2): hemisferio de una latitud (+1 norte, -1 sur). Las comparaciones de latitud usan hemi·lat, nunca el HN.
@@ -136,6 +137,7 @@ coord_point create_point(float lat, float lon);
 selected_point create_selected_point(coord_point point, short z, enum Tipo_form type, int cluster);
 formation create_formation(int max_id, int min1_id, int min2_id, enum Tipo_block type);
 points_cluster create_cluster(int id, int n_points, int contour, coord_point center, selected_point *points, selected_point point_izq, selected_point point_der, selected_point point_sup, selected_point point_inf, enum Tipo_form type);
+double area_celda_km2(double lat_deg, double paso_deg);
 points_cluster *fill_clusters(selected_point **points, int size_x, int size_y, int n_clusters, double offset, double scale_factor);
 int compare_selected_points_lat(const void *a, const void *b);
 int compare_selected_points_lon(const void *a, const void *b);

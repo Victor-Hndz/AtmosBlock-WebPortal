@@ -20,7 +20,7 @@ static const clave_yaml CLAVES_PARAMS[] = {
     {"contour_ray_step_km", false, &PARAMS.contour_ray_step_km},
     {"cluster_lat_min_deg", false, &PARAMS.cluster_lat_min_deg},
     {"cluster_lat_max_deg", false, &PARAMS.cluster_lat_max_deg},
-    {"min_cluster_points", true, &PARAMS.min_cluster_points},
+    {"min_cluster_area_km2", false, &PARAMS.min_cluster_area_km2},
     {"rex_max_offset_km", false, &PARAMS.rex_max_offset_km},
 };
 #define N_CLAVES_PARAMS (sizeof(CLAVES_PARAMS) / sizeof(CLAVES_PARAMS[0]))
@@ -44,7 +44,7 @@ void cargar_parametros(const char *ruta) {
     }
     if (PARAMS.candidate_spacing_deg <= 0 || PARAMS.ray_distance_km <= 0 || PARAMS.pass_fraction <= 0 ||
         PARAMS.pass_fraction > 1 || PARAMS.contour_step_m <= 0 || PARAMS.search_radius_km <= 0 ||
-        PARAMS.contour_ray_step_km <= 0 || PARAMS.min_cluster_points < 1 || PARAMS.rex_max_offset_km < 0 ||
+        PARAMS.contour_ray_step_km <= 0 || PARAMS.min_cluster_area_km2 < 0 || PARAMS.rex_max_offset_km < 0 ||
         PARAMS.cluster_lat_min_deg >= PARAMS.cluster_lat_max_deg || PARAMS.cluster_lat_max_deg >= 90) {
         // ALG-360: con el centro en el polo los rayos geodésicos degeneran (todos siguen el mismo meridiano).
         fprintf(stderr, "Error en %s: hay valores fuera de rango (positivos, pass_fraction en (0, 1], "
