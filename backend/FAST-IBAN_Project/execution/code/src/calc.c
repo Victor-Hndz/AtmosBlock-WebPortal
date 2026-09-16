@@ -192,6 +192,12 @@ int niveles_hacia_el_polo(const points_cluster *cluster, double altura_centro, i
     return n;
 }
 
+// ALG-360: separación en longitud entre dos puntos, en grados, en [0, 180]: con vuelta en ±180°.
+double diferencia_longitud(double lon1, double lon2) {
+    double d = fmod(fabs(lon1 - lon2), 360.0);
+    return d > 180 ? 360 - d : d;
+}
+
 void search_formation(points_cluster *clusters, int size, short **z_in, float *lats, float *lons, double scale_factor, double offset, char* filename, int time) {
     int i, j, index_lat, index_lon, contour_top, lon_aux_max, lon_aux_min;
     double mean_dist, pair_score, best_score;
@@ -307,7 +313,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                             if(check_closed_contour(clusters[j], contour_top))
                                 continue;
 
-                            if(clusters[j].type == MIN && clusters[j].center.lat <= clusters[i].center.lat && fabs(clusters[i].center.lon - clusters[j].center.lon) <= PARAMS.rex_max_dlon_deg) {
+                            if(clusters[j].type == MIN && clusters[j].center.lat <= clusters[i].center.lat && diferencia_longitud(clusters[i].center.lon, clusters[j].center.lon) <= PARAMS.rex_max_dlon_deg) {
                                 contour_bot = check_contour_dir_rex(clusters[j], contour_top, 1, 0);
                                 contour_izq = check_contour_dir_rex(clusters[j], contour_top, 0, -1);
                                 contour_top_aux = check_contour_dir_omega(clusters[j], contour_top, -1, 0);

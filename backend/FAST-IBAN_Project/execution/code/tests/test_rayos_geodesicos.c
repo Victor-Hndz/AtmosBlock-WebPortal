@@ -104,5 +104,9 @@ int main(void) {
         comprobar(caso, check_contour_dir_rex(maximo(centro), NIVEL, 0, 1), true);
     }
 
+    // Δlon del Rex con vuelta en ±180°: un mínimo a -179,5° está a 1° de un máximo a 179,5°, no a 359°.
+    comprobar("diferencia de longitud entre 179,5° y -179,5° = 1°", fabs(diferencia_longitud(179.5, -179.5) - 1) < 1e-9, true);
+    comprobar("diferencia de longitud entre -10° y 10° = 20°", fabs(diferencia_longitud(-10, 10) - 20) < 1e-9, true);
+
     return fallos != 0;
 }
