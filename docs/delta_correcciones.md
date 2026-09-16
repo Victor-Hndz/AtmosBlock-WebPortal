@@ -35,6 +35,7 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 | Vecindad de clusters con vuelta en ±180° y fila del polo como un punto | ALG-309 | 4 / 1 → 4 / 0 | 97 / 13 (=) | **Pequeño:** clusters partidos en ±180° pasan a ser uno; 108 de 110 formaciones iguales. Ver sección ALG-309 |
 | Límite polar del filtro de latitud desactivado (90) *(decisión de diseño)* | ALG-304 | sin cambios | 97 / 13 (=) | **0 formaciones**; puntos en clusters del caso largo +29 % (clusters polares que antes se descartaban). Ver sección ALG-304 |
 | Guarda polar derivada de `ray_distance_km` y categoría `POLAR_HIGH` | ALG-310, ALG-311 | sin cambios | 97 / 13 (=) | **2003: 0 formaciones.** Invierno de 1983: una Omega a 86,5°N pasa a `POLAR_HIGH`; 3 `POLAR_HIGH` en total (85,75–86,5°N); acuerdo 0,25°/1° 123 → 126. Ver sección ALG-310/311 |
+| El mínimo del Rex debe estar abierto hacia el este (`contour_der` no se recalculaba) | ALG-361 | sin cambios | 97 / 13 → 97 / 12 | **Solo desaparecen Rex:** 2003 −1, 1983 −1, 2019 −3 (26 → 23); ninguno nuevo ni sustituido. Ver sección ALG-361 |
 
 B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2, B1, B10 y ALG-359 sí, porque cambian el muestreo. B7 cambia un solo punto. ALG-360 solo cambia las formaciones.
 
@@ -95,6 +96,19 @@ Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. E
 **Coste:** el caso largo con 12 hilos sigue en unos 6 s.
 
 Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
+
+## ALG-361: el mínimo del Rex debe estar abierto hacia el este
+
+En la búsqueda del mínimo de un Rex, `contour_der` se ponía a `false` antes del bucle y no se recalculaba para cada mínimo, así que la condición `!contour_der` se cumplía siempre: se aceptaban mínimos con el contorno cerrado también hacia el este. La forma exigida al mínimo pasa a una función, `minimo_rex_valido`: contorno hacia el ecuador y hacia el oeste en todo el sector, hacia el polo en la mayoría, y **abierto hacia el este** (no todos los rayos del sector cruzan el nivel). Es la simetría de la condición del máximo (cerrado hacia el ecuador y el este, abierto hacia el oeste).
+
+**Test** `test_minimo_rex`, con los extremos de los rayos fijados a mano: un mínimo sin contorno cerrado que cruza por el ecuador, el oeste, el polo (en mayoría) y el este se aceptaba (rojo) y ya no; controles con el este abierto (sí) y con el oeste abierto (no). La extracción a la función se comprobó antes, sin cambiar ningún hash.
+
+**Delta** (casos largos con techo de latitud 90): solo desaparecen Rex, ninguno aparece ni cambia de mínimo.
+- **Caso fijo y caso de 2003 de CTest:** sin cambios; líneas base intactas.
+- **2003-08-01…15:** 97 / 13 → 97 / 12. Se pierde el Rex del paso 6 (máximo 68°N −39,75°, mínimo 60,25°N −42,25°).
+- **1983-01-31…02-21:** 128 / 13 → 128 / 12. Se pierde el del paso 78 (máximo 59,75°N 35,75°E, mínimo 40,5°N 28°E), fuera del sector del episodio documentado.
+- **2019-06-24…07-01:** 80 / 26 → 80 / 23. Se pierden los de los pasos 13 (Siberia occidental), 14 (Pacífico nororiental) y 19 (Canadá).
+- **Acuerdo 0,25°/1°:** 2003 99 → 98, 1983 126 → 125, 2019 96 → 95 emparejadas (las pérdidas coinciden en las dos resoluciones); desacuerdo de 2019 22 → 20.
 
 ## ALG-310/311: guarda polar y altas polares
 
