@@ -21,3 +21,50 @@
 - **Hemisferio sur (puerta G3, solo comprobación de funcionamiento, no decide el umbral):** JJA de 2015 (1 de junio a 31 de agosto), 90–0°S, a las mismas horas.
 
 Nadie abre mapas ni campos de estos periodos antes de ejecutar el protocolo completo.
+
+## 2. Protocolo y regla de decisión (congelados antes de medir)
+
+**Código.** `main` después de corregir la forma del mínimo del Rex (ALG-361). Su hash se anota en §3 antes de la primera ejecución. Se usa `config/params.yaml` sin tocar, salvo `rex_max_offset_km`, con los límites `25 90 -180 180`.
+
+**Ejecuciones** (sobre cada semestre):
+- a 0,25°, con `rex_max_offset_km` = 700, 780 y 1060;
+- a 1° (decimado ×4 con `recortar_nc`, como en ALG-366), con 1060.
+
+1060 km es el techo de los criterios publicados. **No es candidato**: solo sirve para buscar parejas, de modo que un Rex cerca del borde de 780 no salga penalizado. No se informa de cuántos Rex da.
+
+**Definiciones:**
+- **Rex:** formación `REX` con su máximo y su mínimo, identificados por el centroide de cada cluster. `d` = distancia del centroide del mínimo al meridiano del centroide del máximo (la misma función del núcleo).
+- **C (núcleo):** Rex de la ejecución de 780 con `d ≤ 700` km.
+- **M (marginales):** Rex de la ejecución de 780 con `700 < d ≤ 780` km, sin un Rex con el mismo máximo y el mismo mínimo en la ejecución de 700 (mismo paso y mismos identificadores de cluster; las dos ejecuciones tienen los mismos clusters).
+- Las sustituciones de mínimo y las Omega que pasan a Rex entre 700 y 780 se cuentan y se describen, pero **no deciden**.
+- **Continuidad de un Rex** (1/0): hay un Rex de la ejecución de 1060 en el paso anterior o en el siguiente con el máximo **y** el mínimo a ≤ 500 km de los suyos.
+- **Robustez de un Rex** (1/0): hay un Rex de la ejecución de 1060 a 1°, en el mismo paso, con el máximo y el mínimo a ≤ 1° de latitud y de longitud (con vuelta en ±180°).
+- **P y R:** medias de continuidad y robustez en M (`P_M`, `R_M`) y en C (`P_C`, `R_C`). `Δ_P = P_M − P_C` y `Δ_R = R_M − R_C`.
+- **Episodio:** componente conexa de los Rex de la ejecución de 780 unidos entre pasos consecutivos por la misma relación de continuidad (máximo y mínimo a ≤ 500 km).
+- **Intervalo:** IC del 90 % (percentiles 5 y 95) de `Δ_P` y `Δ_R` por bootstrap de episodios: 2000 réplicas con semilla 368; en cada una se remuestrean episodios con reemplazo y se recalculan P y R con sus Rex.
+
+**Regla de parada** (solo mira el tamaño de la muestra): si en el primer semestre `n_M < 30` o M ocupa menos de 10 episodios, se añade el segundo y se analizan juntos. No se añade un tercer periodo sin un nuevo preregistro.
+
+**Regla de decisión:**
+- **Adoptar 780 km** si se cumplen las cuatro: `n_M ≥ 30` en ≥ 10 episodios; límite inferior del IC de `Δ_P` ≥ −0,15; límite inferior del IC de `Δ_R` ≥ −0,15; menos del 25 % de M con el mínimo por debajo de 35°N.
+- **Mantener 700 km** si el límite superior del IC de `Δ_P` o de `Δ_R` es < −0,15.
+- **Abierta** en cualquier otro caso, o si la muestra no llega tras los dos semestres. Se mantiene 700 km y se documenta como indeterminado.
+
+El margen de 0,15 es un juicio declarado, no un valor de la literatura. **Predicción de coherencia** (no decide): la mediana de φ_min de M será menor que la de C, porque `d` crece al bajar φ_min.
+
+**Qué no se hace:**
+- No se prueba ningún otro valor (840 ya se midió como fragilidad en ALG-364).
+- No se miran mapas ni campos de los periodos sorteados antes de terminar.
+- Si aparece un bug, se corrige con su propio delta sobre los casos ya usados y se repite todo el análisis, informando de las dos versiones.
+- 1983 queda como ilustración, fuera de la decisión.
+- El resultado vale para DJFMAM del hemisferio norte.
+
+## 4. Hemisferio sur: comprobación de funcionamiento (JJA 2015)
+
+No decide el umbral: se usa el mismo que en el hemisferio norte, porque la distancia en km ya es simétrica.
+
+- **Que corre:** a 0,25° y a 1° (decimado), con los límites `-90 -25 -180 180`.
+- **Espejo real:** el campo reflejado al hemisferio norte (`recortar_nc ... espejo`) debe dar las mismas formaciones con la latitud cambiada de signo. Cualquier diferencia es un bug.
+- **Rex:** el mínimo queda siempre hacia el ecuador del máximo.
+- **Plausibilidad, solo descriptiva:** distribución de la latitud de los máximos de Omega y Rex, que se espera concentrada en 40–70°S.
+- **POLAR_HIGH** sobre la meseta antártica se informa sin interpretarlo: allí 500 hPa queda cerca de la superficie.
