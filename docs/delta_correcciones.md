@@ -28,7 +28,25 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 
 | B10 `bilinear_interpolation` intercambiaba los pesos de las esquinas `p12` y `p21` | ALG-357 | puntos en clusters 1367 → 1373; sigue 1 OMEGA, desplazada una celda | **101 / 15** | **Moderado:** ~2 % de los puntos cambian de clasificación; 111 de 113 formaciones se conservan a ≤1°, 2 desaparecen y 5 aparecen. Ver sección B10 |
 
-B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2, B1 y B10 sí, porque cambian el muestreo. B7 cambia un solo punto.
+| Espaciado de candidatos de 1,25° a 1,0° *(decisión de diseño, no bug)* | ALG-359 | puntos en clusters 1373 → 2118; misma OMEGA | **104 / 16** | **Esperado:** +57 % de puntos candidatos (1,25² = 1,56), clusters +3,1 %; 106 de 116 formaciones se conservan a ≤1°. Ver sección ALG-359 |
+
+B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2, B1, B10 y ALG-359 sí, porque cambian el muestreo. B7 cambia un solo punto.
+
+## ALG-359: espaciado de candidatos de 1,25° a 1,0°
+
+No corrige un bug: es una decisión de diseño tomada con la asesoría del agente físico. Con 1,25° (`STEP` = 5 celdas a 0,25°), los candidatos no caen en las mismas coordenadas a 0,5° ni a 1°, así que el test de invariancia a la resolución (ALG-308) no podría comparar sobre los mismos puntos. 1° es múltiplo de 0,25°, 0,5° y 1°, y queda por debajo de `ray_distance_km`/4 ≈ 125 km.
+
+| Medida | Caso fijo | Caso largo (60 pasos) |
+|---|---|---|
+| Puntos en clusters | 1373 → 2118 | 33 060 → 51 898 |
+| MAX / MIN | 291 / 1082 → 450 / 1668 | 13 305 / 19 755 → 20 905 / 30 993 |
+| Clusters | 78 → 80 | 1918 → 1978 |
+| Formaciones (OMEGA / REX) | 1 / 0 → 1 / 0 | 101 / 15 → 104 / 16 |
+| Tiempo con 12 hilos | — | 5 s → 7 s |
+
+**Formaciones del caso largo**, emparejadas por paso, tipo y centroides a ≤1°: se conservan 106 de 116; 10 desaparecen y 14 aparecen. Varias de ellas son la misma formación desplazada algo más de 1° (por ejemplo, en el paso 48 el máximo pasa de 56,25° / 132,00° a 56,00° / 133,00°). La OMEGA del caso fijo es la misma, con los mismos identificadores de cluster.
+
+Se mantienen la invariancia a hilos, procesos y orden. Líneas base de `regresion_hash` y `regresion_hash_2003` actualizadas.
 
 ## B10: pesos de la interpolación bilineal
 

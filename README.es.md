@@ -39,7 +39,7 @@ diagnostica la previsión; el algoritmo no hace predicciones.
 
 Para cada paso temporal de un campo Z500 (ERA5, 0,25°):
 
-1. **Puntos candidatos.** La rejilla se submuestrea cada 5 puntos (espaciado efectivo de 1,25°).
+1. **Puntos candidatos.** Los candidatos se evalúan cada 1° (`candidate_spacing_deg`, múltiplo de la resolución de la rejilla), así que caen en las mismas coordenadas a 0,25°, 0,5° y 1°.
 2. **Muestreo por rayos de círculo máximo.** Desde cada candidato se trazan 64 rayos (cada 5,625°)
    de 500 km sobre círculos máximos, y se interpola Z500 de forma bilineal en sus extremos. Un punto
    es candidato a alta (baja) si al menos el 90 % de los extremos están por debajo (por encima).
