@@ -18,7 +18,14 @@ import statistics
 from collections import Counter, defaultdict
 
 R = 6371.0
-BANDAS = ("30-50", "50-75", "75-90")
+# Bandas de §5 (partición por |lat|) y dominios de la adenda §8 (30-75° con 75 incluido; total por encima de 30°).
+DOMINIOS = {
+    "30-50": lambda a: 30 <= a < 50,
+    "50-75": lambda a: 50 <= a < 75,
+    "75-90": lambda a: a >= 75,
+    "30-75": lambda a: 30 <= a <= 75,
+    "total": lambda a: a >= 30,
+}
 REPLICAS = 1000
 SEMILLA = 308
 
@@ -38,9 +45,26 @@ def peso(lat):
     return R**2 * math.radians(1) * (math.sin(math.radians(lat + 0.5)) - math.sin(math.radians(lat - 0.5)))
 
 
-def banda(lat):
-    a = abs(lat)
-    return None if a < 30 else "30-50" if a < 50 else "50-75" if a < 75 else "75-90"
+def _vecinos(k):
+    """Vecinos (4) de un punto de la retícula de 1° con la longitud de la arista común en km; el polo linda con su fila."""
+    lat, lon = k
+    arista = R * math.radians(1)
+    if abs(lat) == 90:
+        s = 1 if lat > 0 else -1
+        return [((s * 89, l), arista * math.cos(math.radians(89.5))) for l in range(-180, 180)]
+    return [(clave(lat, lon + 1), arista), (clave(lat, lon - 1), arista),
+            (clave(lat + 1, lon), arista * math.cos(math.radians(lat + 0.5))),
+            (clave(lat - 1, lon), arista * math.cos(math.radians(lat - 0.5)))]
+
+
+def perimetro(puntos, dominio):
+    """Longitud en km del borde de una máscara dentro de un dominio (§8): el recorte del dominio no es borde."""
+    return sum(largo for k in puntos if dominio(abs(k[0]))
+               for v, largo in _vecinos(k) if v not in puntos and dominio(abs(v[0])))
+
+
+def area_dominio(dominio, hemisferios):
+    return hemisferios * (sum(360 * peso(lat) for lat in range(0, 90) if dominio(lat)) + (peso(90) if dominio(90) else 0))
 
 
 def _filas(patron):
@@ -76,17 +100,17 @@ def leer_ejecucion(base):
 
 
 def _areas(a, b):
-    """Intersección y unión por banda (y total por encima de 30°) de dos conjuntos de puntos."""
-    r = {x: [0.0, 0.0] for x in BANDAS + ("total",)}
-    for k in a | b:
-        bd = banda(k[0])
-        if bd is None:
-            continue
-        w = peso(k[0])
-        dentro = k in a and k in b
-        for x in (bd, "total"):
-            r[x][0] += w * dentro
-            r[x][1] += w
+    """Por dominio: intersección, unión, área de a y perímetros de a y b."""
+    r = {}
+    for x, dominio in DOMINIOS.items():
+        inter = union = area_a = 0.0
+        for k in a | b:
+            if dominio(abs(k[0])):
+                w = peso(k[0])
+                union += w
+                inter += w * (k in a and k in b)
+                area_a += w * (k in a)
+        r[x] = (inter, union, area_a, perimetro(a, dominio), perimetro(b, dominio))
     return r
 
 
@@ -100,8 +124,9 @@ def _metricas_conjuntos(ref, deg, pasos, desfase, pasos_bloque):
     bloques = [range(i, min(i + pasos_bloque, len(pasos))) for i in range(0, len(pasos), pasos_bloque)]
     rng = random.Random(SEMILLA)
     muestras = [[rng.randrange(len(bloques)) for _ in bloques] for _ in range(REPLICAS)] if bloques else []
+    hemisferios = len({k[0] > 0 for d in (ref, deg) for t in d for k in d[t]}) or 1
     salida = {}
-    for x in BANDAS + ("total",):
+    for x, dominio in DOMINIOS.items():
         inter = sum(p[x][0] for p in por_paso)
         union = sum(p[x][1] for p in por_paso)
         ious = [p[x][0] / p[x][1] for p in por_paso if p[x][1] > 0]
@@ -118,6 +143,14 @@ def _metricas_conjuntos(ref, deg, pasos, desfase, pasos_bloque):
             "pasos": len(ious),
             "ic95": (_percentil(replicas, 2.5), _percentil(replicas, 97.5)) if replicas else None,
         }
+        # Controles de la adenda §8.
+        perimetros = sum((p[x][3] + p[x][4]) / 2 for p in por_paso)
+        f = sum(p[x][2] for p in por_paso) / (len(por_paso) * area_dominio(dominio, hemisferios)) if por_paso else None
+        salida[x].update({
+            "delta_eff_km": (union - inter) / perimetros if perimetros > 0 else None,
+            "fraccion": f,
+            "azar": f / (2 - f) if f is not None else None,
+        })
     return salida
 
 
