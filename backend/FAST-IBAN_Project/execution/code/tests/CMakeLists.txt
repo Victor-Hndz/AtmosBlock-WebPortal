@@ -170,6 +170,7 @@ variante_params(espaciado_no_multiplo "candidate_spacing_deg: [0-9.]+" "candidat
 variante_params(clave_desconocida "n_rays: [0-9]+" "n_rays: 64\nsearch_radius: 3000")
 variante_params(sin_clave "rex_max_offset_km: [0-9.]+" "")
 variante_params(rayos_no_multiplo "n_rays: [0-9]+" "n_rays: 60")
+variante_params(rayos_400 "ray_distance_km: [0-9.]+" "ray_distance_km: 400")
 
 # ALG-360: comprobaciones de contorno con rayos geodésicos, independientes de la latitud, la resolución y ±180°.
 add_executable(TEST_rayos_geodesicos test_rayos_geodesicos.c)
@@ -180,6 +181,12 @@ set_tests_properties(test_rayos_geodesicos PROPERTIES TIMEOUT 300)
 add_executable(TEST_niveles_contorno test_niveles_contorno.c)
 target_link_libraries(TEST_niveles_contorno CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
 add_test(NAME test_niveles_contorno COMMAND TEST_niveles_contorno)
+
+# ALG-310/311: un máximo más allá de la guarda polar (derivada de ray_distance_km) se clasifica POLAR_HIGH.
+add_executable(TEST_polar_high test_polar_high.c)
+target_link_libraries(TEST_polar_high CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
+add_test(NAME test_polar_high COMMAND TEST_polar_high)
+set_tests_properties(test_polar_high PROPERTIES TIMEOUT 300)
 
 # ALG-306: área de las celdas de candidatos, R²·Δλ·Δφ·cos φ
 add_executable(TEST_area_celda test_area_celda.c)
@@ -200,4 +207,8 @@ set_tests_properties(parametros_espaciado_no_multiplo PROPERTIES PASS_REGULAR_EX
     ENVIRONMENT "FAST_IBAN_PARAMS=${CMAKE_CURRENT_BINARY_DIR}/params_espaciado_no_multiplo.yaml")
 add_test(NAME parametros_en_cabecera_y_en_uso COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/comprobar_parametros.sh
     $<TARGET_FILE:FAST-IBAN> ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/params_pass_08.yaml "pass_fraction: 0.8"
+    ${CMAKE_CURRENT_SOURCE_DIR}/regression/baseline.sha256)
+# ALG-310: la guarda polar se deriva de ray_distance_km y se vuelca en la cabecera.
+add_test(NAME guarda_polar_en_cabecera COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/comprobar_parametros.sh
+    $<TARGET_FILE:FAST-IBAN> ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/params_rayos_400.yaml "polar_guard_deg: 86.403"
     ${CMAKE_CURRENT_SOURCE_DIR}/regression/baseline.sha256)

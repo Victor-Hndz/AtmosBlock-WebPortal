@@ -34,6 +34,7 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 | Filtro de tamaño por área de celda, 22 000 km² *(decisión de diseño)* | ALG-306 | 4 / 2 → 4 / 1 | **97 / 13** | Se pierden sobre todo formaciones apoyadas en clusters pequeños; acuerdo 0,25°/1° 85 % → 88 %. Ver sección ALG-306 |
 | Vecindad de clusters con vuelta en ±180° y fila del polo como un punto | ALG-309 | 4 / 1 → 4 / 0 | 97 / 13 (=) | **Pequeño:** clusters partidos en ±180° pasan a ser uno; 108 de 110 formaciones iguales. Ver sección ALG-309 |
 | Límite polar del filtro de latitud desactivado (90) *(decisión de diseño)* | ALG-304 | sin cambios | 97 / 13 (=) | **0 formaciones**; puntos en clusters del caso largo +29 % (clusters polares que antes se descartaban). Ver sección ALG-304 |
+| Guarda polar derivada de `ray_distance_km` y categoría `POLAR_HIGH` | ALG-310, ALG-311 | sin cambios | 97 / 13 (=) | **2003: 0 formaciones.** Invierno de 1983: una Omega a 86,5°N pasa a `POLAR_HIGH`; 3 `POLAR_HIGH` en total (85,75–86,5°N); acuerdo 0,25°/1° 123 → 126. Ver sección ALG-310/311 |
 
 B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2, B1, B10 y ALG-359 sí, porque cambian el muestreo. B7 cambia un solo punto. ALG-360 solo cambia las formaciones.
 
@@ -94,6 +95,23 @@ Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. E
 **Coste:** el caso largo con 12 hilos sigue en unos 6 s.
 
 Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
+
+## ALG-310/311: guarda polar y altas polares
+
+A menos de `ray_distance_km` del polo, la circunferencia de rayos de un máximo envuelve el polo: todos los destinos quedan hacia el ecuador y los sectores de dirección (ecuador, polo, este, oeste) dejan de distinguir nada. Una Omega o un Rex clasificados ahí no tienen sentido geométrico.
+
+- **ALG-310.** La guarda se deriva del parámetro, no es un literal: `90 − (ray_distance_km/R)·180/π`, 85,503° con 500 km. Se escribe en la cabecera de los CSV (`polar_guard_deg`), aunque no se lee de `params.yaml`.
+- **ALG-311.** Un máximo cuyo centroide queda más allá de la guarda (`hemi·lat`, ambos hemisferios) se exporta como `POLAR_HIGH`, sin mínimos (`min1_id` = `min2_id` = −1), antes del bucle de niveles, y no se evalúa como Omega ni Rex. Es una estructura anticiclónica instantánea sobre el casquete polar, **no un bloqueo**: la persistencia llega con el seguimiento (fase 4). Es un cambio de clase, no un filtro: el cluster sigue en `*_selected_*.csv`.
+
+Los mapas no cambian: con `min1_id` = −1 no hay puntos de mínimo que dibujar y la etiqueta muestra el tipo tal cual.
+
+**Tests:**
+- `test_polar_high`: rejilla global de 0,25° con un alto gaussiano. A 88°N y a 88°S sale `POLAR_HIGH`; a 80°N no. Rojo antes del cambio (los dos casos polares), verde después.
+- `guarda_polar_en_cabecera`: con `ray_distance_km: 400`, la cabecera lleva `polar_guard_deg: 86.403`.
+
+**Delta** (techo de latitud 85 y 90, mismo resultado):
+- **Caso fijo y caso largo de 2003:** 0 formaciones; tampoco cambian las bandas ni el acuerdo 0,25°/1°. Líneas base intactas.
+- **Invierno de 1983** (1983-01-31 a 02-21, 88 pasos): 129 / 13 → 128 Omega / 13 Rex / 3 `POLAR_HIGH`. La Omega del paso 57 con el máximo en 86,5°N pasa a `POLAR_HIGH`; las otras dos (85,75° y 86,25°N) no formaban nada antes. El acuerdo entre 0,25° y 1° pasa de 123 a 126 emparejadas (las 3 altas polares coinciden en ambas resoluciones).
 
 ## ALG-304: filtro de latitud sin límite polar
 

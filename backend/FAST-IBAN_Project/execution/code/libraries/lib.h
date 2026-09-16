@@ -89,7 +89,7 @@ contadores_hilo contadores_totales(void);
 
 /*STRUCTS*/
 enum Tipo_form{MAX, MIN, NO_TYPE};
-enum Tipo_block{OMEGA, REX, NO_BLOCK};
+enum Tipo_block{OMEGA, REX, POLAR_HIGH, NO_BLOCK};
 
 //Struct that holds a point (lat, lon).
 typedef struct point{
@@ -137,6 +137,10 @@ static inline bool fuera_de_latitudes(const points_cluster *c) {
     double lat = lat_polar_cluster(c);
     return lat <= PARAMS.cluster_lat_min_deg || (PARAMS.cluster_lat_max_deg < 90 && lat >= PARAMS.cluster_lat_max_deg);
 }
+
+// ALG-310: latitud a partir de la cual la circunferencia de rayos (radio ray_distance_km) envuelve el polo y la
+// lógica direccional degenera: 90 − (ray_distance_km/R)·180/π, unos 85,50° con 500 km.
+static inline double guarda_polar_deg(void) { return 90 - PARAMS.ray_distance_km / R * 180 / M_PI; }
 
 
 // Functions
