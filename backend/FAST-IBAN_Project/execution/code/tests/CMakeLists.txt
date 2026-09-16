@@ -164,6 +164,10 @@ add_executable(TEST_rayos_geodesicos test_rayos_geodesicos.c)
 target_link_libraries(TEST_rayos_geodesicos CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
 add_test(NAME test_rayos_geodesicos COMMAND TEST_rayos_geodesicos)
 set_tests_properties(test_rayos_geodesicos PROPERTIES TIMEOUT 300)
+# ALG-360: niveles de contorno explícitos, sin saltos en rejillas gruesas.
+add_executable(TEST_niveles_contorno test_niveles_contorno.c)
+target_link_libraries(TEST_niveles_contorno CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
+add_test(NAME test_niveles_contorno COMMAND TEST_niveles_contorno)
 
 add_executable(TEST_parametros test_parametros.c)
 target_link_libraries(TEST_parametros INIT UTILS LIB m netcdf OpenMP::OpenMP_C)

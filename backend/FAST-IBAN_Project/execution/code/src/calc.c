@@ -175,11 +175,27 @@ bool check_contour_dir_omega(points_cluster cluster, int contour, int dir_lat, i
     return cruzan > (n / 4 + 1) - cruzan;
 }
 
+/**
+ * @brief ALG-360: niveles de contorno que se prueban para un máximo, de mayor a menor: todos los múltiplos de
+ * contour_step_m con mín_polo < L <= altura del centro. mín_polo es el mínimo de la altura a lo largo del rayo hacia el
+ * polo (rayo 0, hasta el casquete polar o search_radius_km). Son exactamente las isohipsas que cruza ese rayo, sin los
+ * saltos que daba recorrer las celdas del camino (a 1°, un nivel de cada dos con 40 m por celda).
+ *
+ * @return Número de niveles escritos en `niveles` (como mucho max_niveles).
+ */
+int niveles_hacia_el_polo(const points_cluster *cluster, double altura_centro, int *niveles, int max_niveles) {
+    int paso = PARAMS.contour_step_m, n = 0;
+    if (altura_centro <= cluster->extremos[0])
+        return 0;
+    for (int nivel = (int)altura_centro - ((int)altura_centro % paso); nivel > cluster->extremos[0] && n < max_niveles; nivel -= paso)
+        niveles[n++] = nivel;
+    return n;
+}
+
 void search_formation(points_cluster *clusters, int size, short **z_in, float *lats, float *lons, double scale_factor, double offset, char* filename, int time) {
-    int i, j, index_lat, index_lon, contour_top, visited_conts_size, lon_aux_max, lon_aux_min;
+    int i, j, index_lat, index_lon, contour_top, lon_aux_max, lon_aux_min;
     double mean_dist, pair_score, best_score;
-    int *visited_conts;
-    bool exit, visited, contour_top_aux, contour_bot, contour_izq, contour_der;
+    bool contour_top_aux, contour_bot, contour_izq, contour_der;
     points_cluster selected_izq, selected_der, selected_rex;
     formation formation;
 
@@ -191,12 +207,9 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
         if(clusters[i].type == MAX) {
             index_lat = findIndex(lats, NLAT, clusters[i].center.lat);
             index_lon = findIndex(lons, NLON, clusters[i].center.lon);
-            exit = false, visited = false;
             mean_dist = INF;
             // B5: candidatos válidos de cada lado (índices en clusters); la pareja se elige tras recorrer los contornos.
             int cand_izq[size], cand_der[size], n_izq = 0, n_der = 0;
-            visited_conts = malloc(sizeof(int));
-            visited_conts_size = 0;
             selected_izq.center = create_point(INF, INF);
             selected_izq.id = -1;
             selected_der.center = create_point(INF, INF);
@@ -204,31 +217,15 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
             selected_rex.center = create_point(INF, INF);
             selected_rex.id = -1;
 
-            while(!exit) {
-                if(index_lon < 0 || index_lat < 0 || index_lat > FILA_LAT_MIN-1 || index_lon > NLON-1){
-                    exit = true;
-                    break;
-                }
-                if(point_distance(clusters[i].center, create_point(lats[index_lat], lons[index_lon])) > PARAMS.search_radius_km)
-                    break;
-                contour_top = (((z_in[index_lat][index_lon]*scale_factor) + offset)/g_0) - ((int)(((z_in[index_lat][index_lon]*scale_factor) + offset)/g_0) % PARAMS.contour_step_m);
-                index_lat--;
+            // ALG-360: niveles explícitos, sin saltos (niveles_hacia_el_polo).
+            double altura_centro = (index_lat >= 0 && index_lon >= 0) ? ((z_in[index_lat][index_lon]*scale_factor) + offset)/g_0 : -INF;
+            int max_niveles = clusters[i].extremos[0] < altura_centro ? (int)((altura_centro - clusters[i].extremos[0]) / PARAMS.contour_step_m) + 2 : 1;
+            int niveles[max_niveles];
+            int n_niveles = niveles_hacia_el_polo(&clusters[i], altura_centro, niveles, max_niveles);
 
-                for(j=0;j<visited_conts_size;j++) {
-                    if(visited_conts[j] == contour_top) {
-                        visited = true;
-                        break;
-                    }
-                }
-                if(visited) {
-                    visited = false;
-                    continue;
-                }
+            for(int nivel = 0; nivel < n_niveles; nivel++) {
+                contour_top = niveles[nivel];
 
-                visited_conts[visited_conts_size] = contour_top;
-                visited_conts_size++;
-                visited_conts = realloc(visited_conts, (visited_conts_size+1)*sizeof(int));
-                
                 if(check_closed_contour(clusters[i], contour_top))
                     continue;
 
@@ -323,7 +320,6 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                     }  
                 }
             }
-            free(visited_conts);
 
             // B5: pareja (izquierdo, derecho) con menor distancia media del triángulo máximo-izq-der, sin
             // depender del orden de los clusters. Empates: menor id izquierdo y, después, menor id derecho.

@@ -11,6 +11,7 @@ void calcular_extremos_rayos(points_cluster *cluster, short **z_in, float *lats,
 bool check_closed_contour(points_cluster cluster, int contour);
 bool check_contour_dir_rex(points_cluster cluster, int contour, int dir_lat, int dir_lon);
 bool check_contour_dir_omega(points_cluster cluster, int contour, int dir_lat, int dir_lon);
+int niveles_hacia_el_polo(const points_cluster *cluster, double altura_centro, int *niveles, int max_niveles);
 void search_formation(points_cluster *clusters, int size, short **z_in, float *lats, float *lons, double scale_factor, double offset, char* filename, int time);
 double point_distance(coord_point a, coord_point b);
 void expandCluster(selected_point **filtered_points, int size_x, int size_y, int i, int j, int id, double eps);
