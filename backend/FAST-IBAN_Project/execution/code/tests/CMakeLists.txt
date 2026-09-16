@@ -55,6 +55,10 @@ add_test(NAME test_bilinear COMMAND TEST_bilinear)
 add_executable(TEST_expandcluster test_expandcluster.c)
 target_link_libraries(TEST_expandcluster CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
 add_test(NAME test_expandcluster COMMAND TEST_expandcluster)
+# ALG-309 (F3.9): vecindad con vuelta en ±180° y la fila del polo como un único punto
+add_executable(TEST_vecindad test_vecindad.c)
+target_link_libraries(TEST_vecindad CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
+add_test(NAME test_vecindad COMMAND TEST_vecindad)
 
 # ALG-204 (R2): lectura de un paso temporal y corrección de longitudes [0, 360) -> [-180, 180)
 add_executable(TEST_lectura_nc test_lectura_nc.c)
@@ -176,6 +180,11 @@ set_tests_properties(test_rayos_geodesicos PROPERTIES TIMEOUT 300)
 add_executable(TEST_niveles_contorno test_niveles_contorno.c)
 target_link_libraries(TEST_niveles_contorno CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
 add_test(NAME test_niveles_contorno COMMAND TEST_niveles_contorno)
+
+# ALG-306: área de las celdas de candidatos, R²·Δλ·Δφ·cos φ
+add_executable(TEST_area_celda test_area_celda.c)
+target_link_libraries(TEST_area_celda LIB m)
+add_test(NAME test_area_celda COMMAND TEST_area_celda)
 
 add_executable(TEST_parametros test_parametros.c)
 target_link_libraries(TEST_parametros INIT UTILS LIB m netcdf OpenMP::OpenMP_C)

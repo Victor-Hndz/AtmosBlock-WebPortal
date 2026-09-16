@@ -28,8 +28,12 @@ contour_ray_step_km: 25
 cluster_lat_min_deg: 30
 cluster_lat_max_deg: 85
 
-# Número mínimo de puntos de un cluster. Depende de la rejilla: pasará a área mínima en km² (ALG-306).
-min_cluster_points: 2
+# Área mínima de un cluster, en km²: suma de R²·Δλ·Δφ·cos φ de sus celdas de candidatos (ALG-306). Sustituye al número
+# mínimo de puntos, que dependía de la latitud y de la resolución. Es un filtro de robustez de la semilla, no de tamaño
+# físico: un candidato tolera 7 de 64 rayos fallidos (sector de ±19,7°), así que una dorsal recta sin pendiente a lo
+# largo del eje deja una franja de candidatos de ~170 km; su círculo inscrito, π·(250·sin 19,69°)² ≈ 22 300 km², es el
+# caso límite entre un extremo cerrado y uno abierto a la escala de ray_distance_km. Escala con ray_distance_km.
+min_cluster_area_km2: 22000
 
 # Distancia máxima, en km, del mínimo de un Rex al meridiano del máximo: R·asin(cos φ_min·|sin Δλ|), con cos Δλ > 0
 # (ALG-364). Son los 10° de la regla anterior evaluados en la latitud típica de la baja, φ_min = 50°N (712,6 km,

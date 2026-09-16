@@ -15,5 +15,5 @@ int niveles_hacia_el_polo(const points_cluster *cluster, double altura_centro, i
 double distancia_al_meridiano(coord_point p, coord_point referencia);
 void search_formation(points_cluster *clusters, int size, short **z_in, float *lats, float *lons, double scale_factor, double offset, char* filename, int time);
 double point_distance(coord_point a, coord_point b);
-void expandCluster(selected_point **filtered_points, int size_x, int size_y, int i, int j, int id, double eps);
+void expandCluster(selected_point **filtered_points, int size_x, int size_y, int i, int j, int id);
 #endif // CALC

@@ -1,5 +1,5 @@
 // ALG-403 (B8): expandCluster no debe desbordar la pila con clusters grandes, y debe marcar
-// exactamente la componente conexa del punto semilla (mismo tipo, vecindad 8, dentro de eps).
+// exactamente la componente conexa del punto semilla (mismo tipo, vecindad 8).
 #include "../libraries/calc.h"
 
 #define FILAS 1000
@@ -26,7 +26,7 @@ int main(void) {
     puntos[FILAS - 1][0].type = MIN;
 
     puntos[0][0].cluster = 7;
-    expandCluster(puntos, FILAS, COLUMNAS, 0, 0, 7, PASO);
+    expandCluster(puntos, FILAS, COLUMNAS, 0, 0, 7);
 
     long marcados = 0, fuera = 0;
     for (int i = 0; i < FILAS; i++)
