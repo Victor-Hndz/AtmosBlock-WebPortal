@@ -101,3 +101,39 @@ Emparejamiento uno a uno con IoU ≥ 0,5, a 1° promediado:
   - una estación de verano completa, porque la banda de 30–50° de 2003 es la más débil.
 
   En la fila del polo, el promedio de área difiere del remapeo conservativo de CDO por diseño (media de toda la fila).
+
+## DAV y controles geométricos (ALG-308b)
+
+Aplica §7 y la adenda §8 del diseño; la adenda se congeló antes de calcular los controles. DAV es `DAV()` de blocktrack v1.1 en variante instantánea (GHGS > 0 y GHGN < −10 m/°) y, como variante declarada, con GHGS2 < −5 m/°. Comparte ficheros degradados, retícula de 1° y métricas con FAST-IBAN. DAV solo es computable entre 30° y 75°, así que la comparación conjunta usa ese dominio (75° incluido).
+
+**Lectura.** Con las mismas degradaciones, DAV mantiene un IoU ≥ 0,99, y con decimación exactamente 1. Es lo esperable por construcción: usa diferencias de Z500 a 15° en puntos que las dos rejillas conservan, mientras que FAST-IBAN decide con estructura local a 500 km. Por eso las dos cifras **no ordenan los métodos por calidad**: cada una mide la sensibilidad a la rejilla de un diagnóstico distinto. FAST-IBAN cumple el criterio fijado de antemano en todas las fases, también entre 75° y 90°, donde DAV no es computable.
+
+**Controles a 1° promediado** (30–75°):
+
+| | 2020 | 2003 | 1983 | 2019 |
+|---|---|---|---|---|
+| **IoU** FAST-IBAN formaciones / candidatos MAX / MIN | 0,88 / 0,92 / 0,96 | 0,87 / 0,91 / 0,95 | 0,86 / 0,95 / 0,96 | 0,87 / 0,93 / 0,96 |
+| **IoU** DAV / con GHGS2 | 0,992 / 0,991 | 0,991 / 0,992 | 0,996 / 0,995 | 0,992 / 0,993 |
+| **R** = (1 − IoU₁°) / (1 − IoU₆ₕ), FAST-IBAN formaciones / cand. MAX / MIN | — (24 h) | 0,20 / 0,18 / 0,09 | 0,22 / 0,10 / 0,07 | 0,26 / 0,14 / 0,07 |
+| **R** DAV / con GHGS2 | — | 0,04 / 0,04 | 0,02 / 0,02 | 0,03 / 0,03 |
+| **δ_eff** a 1° (km), FAST-IBAN formaciones / cand. MAX / MIN | 12 / 8 / 4 | 13 / 9 / 4 | 15 / 5 / 4 | 14 / 7 / 3 |
+| **δ_eff** a 1° (km), DAV | 2 | 2 | 1 | 2 |
+| **Coste del promedio** (IoU decimado − promediado), FAST-IBAN formaciones / cand. MAX | 0,012 / 0,027 | 0,031 / 0,036 | 0,034 / 0,009 | −0,005 / 0,019 |
+| **Coste del promedio**, DAV | 0,008 | 0,009 | 0,004 | 0,008 |
+| **Fracción marcada f**, FAST-IBAN formaciones / DAV / DAV con GHGS2 | 0,3 % / 7,3 % / 2,9 % | 0,3 % / 13,1 % / 4,0 % | 0,3 % / 5,3 % / 4,4 % | 0,6 % / 7,3 % / 3,1 % |
+
+- **La geometría no lo explica todo.** Con el factor perímetro/área cancelado (R), el cambio por pasar a 1° equivale al 20–26 % del de 6 h de evolución en las formaciones de FAST-IBAN y al 2–4 % en DAV: de 5 a 11 veces más.
+- **Aun así, el desplazamiento es pequeño.** El borde equivalente de las formaciones se mueve 12–15 km, una décima parte del paso de la retícula (≈ 111 km). En 6 h de evolución se mueve 66–94 km (156 km en 24 h, en 2020).
+- **La pérdida viene sobre todo de la decimación, no del promedio.** El coste del promedio de FAST-IBAN (−0,005 a 0,036) es del mismo orden que el de DAV (0,004 a 0,009). La mayor parte de la pérdida ya aparece con la decimación, es decir, al muestrear rayos y contornos sobre una rejilla más gruesa. Para DAV la decimación vale 1 por construcción.
+- **Las máscaras de DAV son mucho mayores** (f del 3 al 13 %, frente al 0,3–0,6 % de nuestras formaciones), así que su IoU se beneficia del efecto geométrico. El IoU por azar es despreciable en los dos métodos (≤ 0,07).
+- **GHGS2** reduce la fracción marcada de DAV pero no cambia su sensibilidad a la resolución.
+
+**No es defendible** decir que un método es más o menos robusto que el otro, llamar "invariante" a FAST-IBAN sin matices (esto es degradar desde 0,25°, no ejecutar a resolución nativa), dar cifras de DAV por encima de 75°, ni extrapolar al hemisferio sur o a otros años.
+
+**Reproducir:**
+
+```bash
+# en python:3.11-slim con numpy, xarray, scipy, tqdm, netCDF4, matplotlib y cartopy; blocktoolbox.py de blocktrack v1.1
+python3 backend/FAST-IBAN_Project/execution/code/tests/resolucion/dav_resolucion.py --blocktrack <dir> --pasos-dia N [--ghgs2] <ref.nc> <dec2.nc> <avg2.nc> <dec4.nc> <avg4.nc> > <dav>/<caso>[_ghgs2].json
+python3 backend/FAST-IBAN_Project/execution/code/tests/resolucion/tabla_controles.py <salida de medir_invariancia.sh> <dav> <caso>:<pasos por día>...
+```
