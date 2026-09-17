@@ -29,6 +29,9 @@ extern double RES;
 // #define LAT_LIM 25
 // ALG-302: índice de la fila de LAT_LIM_MIN en las latitudes del fichero; lo fija init_nc_variables.
 extern int FILA_LAT_MIN;
+// ALG-374: dominio de análisis en latitud. El límite hacia el ecuador es el de menor |lat| y hacia el polo no se
+// recorta (el filtro polar de clusters es cluster_lat_max_deg); si el dominio cruza el ecuador, limitan los dos.
+extern int DOM_LAT_MIN, DOM_LAT_MAX, FILA_LAT_INICIO;
 #define REC_NAME "time"
 #define LAT_NAME "latitude"
 #define LON_NAME "longitude"

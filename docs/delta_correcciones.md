@@ -35,6 +35,7 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 | Vecindad de clusters con vuelta en ±180° y fila del polo como un punto | ALG-309 | 4 / 1 → 4 / 0 | 97 / 13 (=) | **Pequeño:** clusters partidos en ±180° pasan a ser uno; 108 de 110 formaciones iguales. Ver sección ALG-309 |
 | Límite polar del filtro de latitud desactivado (90) *(decisión de diseño)* | ALG-304 | sin cambios | 97 / 13 (=) | **0 formaciones**; puntos en clusters del caso largo +29 % (clusters polares que antes se descartaban). Ver sección ALG-304 |
 | Guarda polar derivada de `ray_distance_km` y categoría `POLAR_HIGH` | ALG-310, ALG-311 | sin cambios | 97 / 13 (=) | **2003: 0 formaciones.** Invierno de 1983: una Omega a 86,5°N pasa a `POLAR_HIGH`; 3 `POLAR_HIGH` en total (85,75–86,5°N); acuerdo 0,25°/1° 123 → 126. Ver sección ALG-310/311 |
+| El dominio de análisis llega del límite hacia el ecuador al polo de su hemisferio | ALG-374 | sin cambios | sin cambios (norte) | **Hemisferio norte: 0 cambios** (las líneas base no se mueven). En el sur ya no se analiza la franja entre el ecuador y el límite pedido. Ver sección ALG-374 |
 | El mínimo del Rex debe estar abierto hacia el este (`contour_der` no se recalculaba) | ALG-361 | sin cambios | 97 / 13 → 97 / 12 | **Solo desaparecen Rex:** 2003 −1, 1983 −1, 2019 −3 (26 → 23); ninguno nuevo ni sustituido. Ver sección ALG-361 |
 
 B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2, B1, B10 y ALG-359 sí, porque cambian el muestreo. B7 cambia un solo punto. ALG-360 solo cambia las formaciones.
@@ -97,6 +98,21 @@ Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. E
 
 Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
 
+## ALG-374: el dominio de análisis depende del hemisferio
+
+`FILA_LAT_MIN` (ALG-302) y la parada de los rayos usaban siempre `LAT_LIM_MIN` como límite hacia el ecuador. En el hemisferio sur ese límite es el **polar**: con `-90 -25` se recorrían las filas desde la primera del fichero (0°) y ningún rayo paraba antes de −90°, así que se analizaba la franja de 0° a −25° que en el norte queda fuera.
+
+Ahora `calcular_dominio_latitudes()` da el dominio `[DOM_LAT_MIN, DOM_LAT_MAX]`: el límite hacia el ecuador es el de menor |latitud| y hacia el polo se llega a ±90°, porque el límite polar no recorta el análisis (ALG-304). Un dominio que cruza el ecuador queda limitado por los dos. Las filas empiezan en `FILA_LAT_INICIO` (la primera del fichero en el norte) y los rayos paran al salir del dominio.
+
+**Tests:**
+- `test_dominio_latitudes`: (25, 90) y (25, 85) → [25, 90]; (−90, −25) y (−85, −25) → [−90, −25]; (−30, 30) → [−30, 30].
+- `latitudes_hemisferio_sur`: el caso fijo reflejado **sin recortar** (0° a −90°), con los filtros de cluster quitados y límites `-90 -25`. Rojo antes del cambio: 2570 de 4796 puntos fuera de [−90, −25]; verde después.
+- `simetria_hemisferica_completa`: el mismo espejo sin recortar frente al original. Pasaba ya antes, porque en las 4 pasadas del caso fijo ningún cluster llega a esa franja: por eso hizo falta el test anterior.
+
+**Delta:**
+- **Hemisferio norte: 0.** Las líneas base del caso fijo y de 2003 no cambian; CTest 52/52 con valgrind.
+- **Hemisferio sur (JJA 2015, 368 pasos, datos reales):** 320 638 → 320 595 puntos (−43) y 289 / 49 / 66 → **291 / 40 / 66** OMEGA / REX / POLAR_HIGH. Los 9 Rex que desaparecen tenían el mínimo en la franja equatorward del límite, que ya no se analiza; dos Omega más aparecen al quedar libres esos máximos.
+- **Espejo real de JJA 2015** (el campo del sur reflejado al norte): de 43 puntos y 11 formaciones distintas a **0 y 0**. Era el criterio de la puerta G3 que faltaba.
 ## ALG-361: el mínimo del Rex debe estar abierto hacia el este
 
 En la búsqueda del mínimo de un Rex, `contour_der` se ponía a `false` antes del bucle y no se recalculaba para cada mínimo, así que la condición `!contour_der` se cumplía siempre: se aceptaban mínimos con el contorno cerrado también hacia el este. La forma exigida al mínimo pasa a una función, `minimo_rex_valido`: contorno hacia el ecuador y hacia el oeste en todo el sector, hacia el polo en la mayoría, y **abierto hacia el este** (no todos los rayos del sector cruzan el nivel). Es la simetría de la condición del máximo (cerrado hacia el ecuador y el este, abierto hacia el oeste).

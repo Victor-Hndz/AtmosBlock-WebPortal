@@ -7,6 +7,7 @@
 #include <sys/utsname.h>
 
 void cargar_parametros(const char *ruta);
+void calcular_dominio_latitudes(void);
 int paso_candidatos(void);
 void escribir_cabecera(FILE *fp);
 void process_entry(int argc, char **argv);

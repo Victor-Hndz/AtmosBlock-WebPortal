@@ -3,6 +3,7 @@
 
 int LAT_LIM_MIN, LAT_LIM_MAX, LON_LIM_MIN, LON_LIM_MAX, N_THREADS;
 int FILA_LAT_MIN;  // ALG-302
+int DOM_LAT_MIN, DOM_LAT_MAX, FILA_LAT_INICIO;  // ALG-374
 char* FILE_NAME, *OUT_DIR_NAME;
 
 // ALG-305 (L4): parámetros del detector. La ruta por defecto la fija CMake (config/params.yaml del código fuente).
@@ -51,6 +52,16 @@ void cargar_parametros(const char *ruta) {
                         "cluster_lat_min_deg < cluster_lat_max_deg <= 90)\n", ruta);
         exit(EXIT_FAILURE);
     }
+}
+
+/**
+ * @brief ALG-374: dominio de análisis en latitud a partir de los límites pedidos. El límite hacia el ecuador es el de
+ * menor |lat| y hacia el polo se llega hasta ±90°, porque el límite polar no recorta el análisis (ALG-304). Un dominio
+ * que cruza el ecuador queda limitado por los dos.
+ */
+void calcular_dominio_latitudes(void) {
+    DOM_LAT_MIN = LAT_LIM_MIN >= 0 || LAT_LIM_MAX > 0 ? LAT_LIM_MIN : -90;
+    DOM_LAT_MAX = LAT_LIM_MAX <= 0 || LAT_LIM_MIN < 0 ? LAT_LIM_MAX : 90;
 }
 
 /**
@@ -377,6 +388,11 @@ int init_nc_variables(int ncid, float lats[NLAT], float lons[NLON], double *scal
         exit(EXIT_FAILURE);
     }
     FILA_LAT_MIN = (int)floor(fabs(lats[0] - LAT_LIM_MIN) / RES + TOL_PASO);
+
+    // ALG-374: primera fila del dominio (el extremo polar), que en el hemisferio sur no es la primera del fichero.
+    calcular_dominio_latitudes();
+    // El techo del dominio puede quedar por encima del fichero (el portal pide 90): entonces se empieza en su primera fila.
+    FILA_LAT_INICIO = DOM_LAT_MAX >= lat_sup - TOL_PASO ? 0 : (int)ceil(fabs(lats[0] - DOM_LAT_MAX) / RES - TOL_PASO);
 
     // Read the scale factor, offset and long_name of z.
     if ((retval = nc_get_att_double(ncid, z_varid, SCALE_FACTOR, scale_factor)))

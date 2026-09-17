@@ -19,6 +19,8 @@ static void preparar(coord_point centro) {
     NLAT = N_LAT;
     NLON = N_LON;
     LAT_LIM_MIN = -90;
+    LAT_LIM_MAX = 90;
+    calcular_dominio_latitudes();  // ALG-374
     FILA_LAT_MIN = N_LAT - 1;
     for (int i = 0; i < N_LAT; i++) {
         lats[i] = (float)(90 - i * 0.25);
