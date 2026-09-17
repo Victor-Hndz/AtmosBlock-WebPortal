@@ -126,6 +126,10 @@ cp frontend/.env.example frontend/.env
 cd frontend && npm ci && npm run dev    # http://localhost:5173
 ```
 
+A step-by-step explanation of the detection algorithm, in plain language and in technical terms, is in
+[`docs/algoritmo_paso_a_paso.md`](docs/algoritmo_paso_a_paso.md) (in Spanish), with a diagram in
+[`docs/algoritmo_paso_a_paso.svg`](docs/algoritmo_paso_a_paso.svg).
+
 The [testing guide](docs/TESTING.md) covers every step in detail: running the detector on the sample
 case, checking determinism, running the automated tests and walking through the portal end to end.
 
@@ -141,7 +145,7 @@ backend/
     utils/              shared Python utilities (RabbitMQ, MinIO, NetCDF)
   nestjs/               REST API
 frontend/               web client
-docs/                   benchmark and testing guide
+docs/                   algorithm explainer, benchmark and testing guide
 docker-compose.yml      full stack
 ```
 
