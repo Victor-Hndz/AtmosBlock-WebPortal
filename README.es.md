@@ -127,6 +127,10 @@ cp frontend/.env.example frontend/.env
 cd frontend && npm ci && npm run dev    # http://localhost:5173
 ```
 
+La explicación del algoritmo paso a paso, en lenguaje llano y en términos técnicos, está en
+[`docs/algoritmo_paso_a_paso.md`](docs/algoritmo_paso_a_paso.md), con su diagrama en
+[`docs/algoritmo_paso_a_paso.svg`](docs/algoritmo_paso_a_paso.svg).
+
 La [guía de pruebas](docs/TESTING.es.md) detalla cada paso: ejecutar el detector sobre el caso de
 ejemplo, comprobar el determinismo, lanzar los tests automáticos y recorrer el portal de principio a fin.
 
@@ -142,7 +146,7 @@ backend/
     utils/              utilidades comunes de Python (RabbitMQ, MinIO, NetCDF)
   nestjs/               API REST
 frontend/               cliente web
-docs/                   benchmark y guía de pruebas
+docs/                   explicación del algoritmo, benchmark y guía de pruebas
 docker-compose.yml      pila completa
 ```
 
