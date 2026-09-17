@@ -87,6 +87,7 @@
   },
   "requests": {
     "allMapTypes": "Todos los Tipos de Mapa",
+    "allMapTypesDescription": "Lista de todos los tipos de mapa de esta solicitud",
     "details": "Detalles de la Solicitud",
     "variableName": "Nombre de la Variable",
     "date": "Fecha",
@@ -220,7 +221,7 @@
     "save": "Guardar",
     "saving": "Guardando...",
     "delete": "Eliminar",
-    "deleteing": "Eliminando...",
+    "deleting": "Eliminando...",
     "edit": "Editar",
     "back": "Atrás",
     "close": "Cerrar",

@@ -87,6 +87,7 @@
   },
   "requests": {
     "allMapTypes": "All Map Types",
+    "allMapTypesDescription": "List of all map types for this request",
     "details": "Request Details",
     "variableName": "Variable Name",
     "date": "Date",
