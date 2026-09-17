@@ -72,3 +72,40 @@ No decide el umbral: se usa el mismo que en el hemisferio norte, porque la dista
 - **Rex:** el mínimo queda siempre hacia el ecuador del máximo.
 - **Plausibilidad, solo descriptiva:** distribución de la latitud de los máximos de Omega y Rex, que se espera concentrada en 40–70°S.
 - **POLAR_HIGH** sobre la meseta antártica se informa sin interpretarlo: allí 500 hPa queda cerca de la superficie.
+
+## 5. Resultados
+
+Ejecutado el árbol `8e27893d` (§3) sobre los dos semestres sorteados. El primero dio 10 Rex marginales, por debajo del mínimo de 30, así que la regla de parada de §2 pidió el segundo; los dos se analizan juntos, como estaba previsto.
+
+| | DJFMAM 2014-15 | DJFMAM 2006-07 | Juntos |
+|---|---|---|---|
+| Rex con 700 km | 186 | 221 | 407 |
+| Rex con 780 km | 192 | 240 | 432 |
+| Marginales (M), 700 < d ≤ 780 | 10 | 21 | **31**, en 27 episodios |
+| Núcleo (C), d ≤ 700 | 182 | — | 401, en 194 episodios |
+
+**Muestra suficiente:** sí (31 ≥ 30 en 27 ≥ 10 episodios). Ningún marginal tiene el mínimo por debajo de 35°N.
+
+| Métrica | Marginales (M) | Núcleo (C) | Diferencia M − C, IC 90 % |
+|---|---|---|---|
+| Continuidad a ±1 paso (6 h) | 0,68 | 0,71 | [−0,20; +0,11] |
+| Robustez a 1° | 0,81 | 0,88 | [−0,21; +0,03] |
+
+**Decisión: abierta. Se mantiene `rex_max_offset_km` = 700 km.**
+
+Los dos intervalos incluyen el cero, así que no hay indicio de que los Rex marginales sean peores; pero su límite inferior (−0,20 y −0,21) pasa del margen de −0,15 fijado, así que tampoco se puede descartar que lo sean. Es el resultado que el diseño ya preveía como más probable: con 31 marginales, el intervalo de una proporción mide unos ±0,2. No se añade un tercer periodo sin un preregistro nuevo.
+
+**Otros datos, descriptivos:**
+- Pasar de 700 a 780 km cambia el mínimo elegido en 6 Rex y convierte 6 Omega en Rex.
+- La **predicción de coherencia falla**: la mediana de φ_min es 53°N en los marginales y 52°N en los núcleo, prácticamente igual, cuando se esperaba menor en los marginales. En el primer semestre por separado era incluso mayor (64°N frente a 51°N). La distancia al meridiano depende tanto de Δλ como de φ_min, así que los marginales no son solo Rex de latitudes bajas.
+
+## 6. Hemisferio sur (JJA 2015): comprobación de funcionamiento
+
+| | 0,25° | 1° |
+|---|---|---|
+| OMEGA / REX / POLAR_HIGH | 289 / 49 / 66 | 296 / 47 / 68 |
+
+- **Corre** en las dos resoluciones con los límites `-90 -25`, sin recompilar.
+- **Rex:** en los 49, el mínimo queda hacia el ecuador del máximo.
+- **Espejo real: falla.** El campo reflejado al hemisferio norte no da las mismas detecciones: 43 puntos de 320 595 y 11 formaciones de 397 son distintas, todas entre 22° y 39°. La causa es que el límite hacia el ecuador se toma siempre de `LAT_LIM_MIN`, que en el hemisferio sur es el límite polar: con `-90 -25` se recorren filas y rayos entre 0° y −25°, que en el norte quedan fuera. El test `simetria_hemisferica` no lo detecta porque su fichero del sur ya está recortado en −25°. Queda como tarea aparte (ALG-374) y **bloquea la puerta G3**.
+- **Descriptivo, sin interpretar:** 197 de las 338 formaciones Omega y Rex tienen el máximo al sur de 70°S (mediana de las Omega, 73°S), lejos de la franja de 40–70°S de la climatología de bloqueo del hemisferio sur. Allí 500 hPa queda cerca de la superficie de la meseta antártica. Pendiente de consultar (INV-003).
