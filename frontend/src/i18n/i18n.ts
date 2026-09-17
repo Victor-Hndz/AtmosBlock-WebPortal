@@ -18,6 +18,7 @@ i18n
     fallbackLng: "es",
     supportedLngs: ["en", "es"],
     debug: import.meta.env.DEV,
+    ns: ["common"],
     defaultNS: "common",
     interpolation: {
       escapeValue: false,
@@ -33,11 +34,5 @@ i18n
       useSuspense: true,
     },
   });
-
-const currentLanguage = i18n.language || "es";
-
-i18n.changeLanguage(currentLanguage).then(() => {
-  i18n.loadNamespaces("common");
-});
 
 export default i18n;
