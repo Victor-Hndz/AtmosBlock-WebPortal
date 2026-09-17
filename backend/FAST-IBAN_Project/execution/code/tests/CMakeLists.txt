@@ -199,6 +199,11 @@ target_link_libraries(TEST_polar_high CALC UTILS INIT LIB m netcdf OpenMP::OpenM
 add_test(NAME test_polar_high COMMAND TEST_polar_high)
 set_tests_properties(test_polar_high PROPERTIES TIMEOUT 300)
 
+# ALG-361: el mínimo de un Rex tiene el contorno abierto hacia el este.
+add_executable(TEST_minimo_rex test_minimo_rex.c)
+target_link_libraries(TEST_minimo_rex CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
+add_test(NAME test_minimo_rex COMMAND TEST_minimo_rex)
+
 # ALG-306: área de las celdas de candidatos, R²·Δλ·Δφ·cos φ
 add_executable(TEST_area_celda test_area_celda.c)
 target_link_libraries(TEST_area_celda LIB m)
