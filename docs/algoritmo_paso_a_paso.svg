@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 1580" width="1240" height="1580" role="img" aria-label="Cómo funciona FAST-IBAN paso a paso">
-<rect width="1240" height="1580" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 1662" width="1240" height="1662" role="img" aria-label="Cómo funciona FAST-IBAN paso a paso">
+<rect width="1240" height="1662" fill="#ffffff"/>
 <text x="40" y="58" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="30" fill="#1d2733" font-weight="700" text-anchor="start">Cómo detecta FAST-IBAN un bloqueo atmosférico</text>
 <text x="40" y="88" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" fill="#5b6b7c" font-weight="400" text-anchor="start">De una foto del aire en altura a una lista de bloqueos clasificados por su forma. Cada paso, en dos idiomas: llano y técnico.</text>
 <line x1="40" y1="108" x2="1200" y2="108" stroke="#c7d0d9" stroke-width="2"/>
@@ -152,7 +152,7 @@
 <circle cx="250" cy="842" r="7" fill="#c0392b"/>
 <text x="250" y="812" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#1d2733" font-weight="600" text-anchor="middle">punto de prueba</text>
 <line x1="250" y1="842" x2="400" y2="842" stroke="#1d2733" stroke-width="2"/>
-<text x="325.0" y="862" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#1d2733" font-weight="600" text-anchor="middle">500 km</text>
+<text x="325.0" y="834" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#1d2733" font-weight="600" text-anchor="middle">500 km</text>
 <text x="250" y="1016" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="middle">hacia el ecuador</text>
 <text x="250" y="680" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="middle">hacia el polo</text>
 <text x="410" y="846" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start">este</text>
@@ -170,55 +170,55 @@
 <text x="470" y="945" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">ecuador, hacia el polo, al este y al oeste. Ahí está la diferencia entre una</text>
 <text x="470" y="964" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Omega y un Rex.</text>
 <text x="40" y="1072" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="22" fill="#1d2733" font-weight="700" text-anchor="start">Las tres cosas que puede encontrar</text>
-<rect x="40" y="1092" width="372" height="250" rx="12" fill="#ffffff" stroke="#c7d0d9"/>
+<rect x="40" y="1092" width="372" height="330" rx="12" fill="#ffffff" stroke="#c7d0d9"/>
 <text x="60" y="1124" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#c0392b" font-weight="700" text-anchor="start">Omega (Ω)</text>
-<circle cx="226.0" cy="1192" r="46" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.25"/>
-<circle cx="226.0" cy="1192" r="32" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.45"/>
-<circle cx="226.0" cy="1192" r="18" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.7"/>
-<text x="226.0" y="1198" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#c0392b" font-weight="700" text-anchor="middle">A</text>
-<circle cx="140.0" cy="1226" r="20" fill="none" stroke="#2a5fa8" stroke-width="2" opacity="0.6"/>
-<text x="140.0" y="1232" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" fill="#2a5fa8" font-weight="700" text-anchor="middle">B</text>
-<circle cx="312.0" cy="1226" r="20" fill="none" stroke="#2a5fa8" stroke-width="2" opacity="0.6"/>
-<text x="312.0" y="1232" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" fill="#2a5fa8" font-weight="700" text-anchor="middle">B</text>
-<text x="60" y="1260" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Una zona de aire alto con una zona baja a</text>
-<text x="60" y="1279" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">cada lado. El aire rodea la alta como una</text>
-<text x="60" y="1298" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">letra omega y la circulación se queda</text>
-<text x="60" y="1317" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">parada.</text>
-<text x="60" y="1308" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Alta cerrada al este y al oeste, abierta hacia el</text>
-<text x="60" y="1324" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">ecuador, con dos bajas flanqueantes no más al polo</text>
-<text x="60" y="1340" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">que ella.</text>
-<rect x="432" y="1092" width="372" height="250" rx="12" fill="#ffffff" stroke="#c7d0d9"/>
+<circle cx="226.0" cy="1200" r="46" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.25"/>
+<circle cx="226.0" cy="1200" r="32" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.45"/>
+<circle cx="226.0" cy="1200" r="18" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.7"/>
+<text x="226.0" y="1206" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#c0392b" font-weight="700" text-anchor="middle">A</text>
+<circle cx="140.0" cy="1234" r="20" fill="none" stroke="#2a5fa8" stroke-width="2" opacity="0.6"/>
+<text x="140.0" y="1240" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" fill="#2a5fa8" font-weight="700" text-anchor="middle">B</text>
+<circle cx="312.0" cy="1234" r="20" fill="none" stroke="#2a5fa8" stroke-width="2" opacity="0.6"/>
+<text x="312.0" y="1240" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" fill="#2a5fa8" font-weight="700" text-anchor="middle">B</text>
+<text x="60" y="1290" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Una zona de aire alto con una zona baja a</text>
+<text x="60" y="1309" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">cada lado. El aire rodea la alta como una</text>
+<text x="60" y="1328" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">letra omega y la circulación se queda</text>
+<text x="60" y="1347" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">parada.</text>
+<text x="60" y="1372" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Alta cerrada al este y al oeste, abierta hacia el</text>
+<text x="60" y="1388" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">ecuador, con dos bajas flanqueantes no más al polo</text>
+<text x="60" y="1404" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">que ella.</text>
+<rect x="432" y="1092" width="372" height="330" rx="12" fill="#ffffff" stroke="#c7d0d9"/>
 <text x="452" y="1124" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#c0392b" font-weight="700" text-anchor="start">Rex</text>
-<circle cx="618.0" cy="1176" r="44" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.25"/>
-<circle cx="618.0" cy="1176" r="30" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.45"/>
-<circle cx="618.0" cy="1176" r="16" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.7"/>
-<text x="618.0" y="1182" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#c0392b" font-weight="700" text-anchor="middle">A</text>
-<circle cx="618.0" cy="1248" r="30" fill="none" stroke="#2a5fa8" stroke-width="2" opacity="0.35"/>
-<circle cx="618.0" cy="1248" r="16" fill="none" stroke="#2a5fa8" stroke-width="2" opacity="0.6"/>
-<text x="618.0" y="1254" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" fill="#2a5fa8" font-weight="700" text-anchor="middle">B</text>
-<text x="452" y="1260" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Una zona alta con una sola zona baja justo</text>
-<text x="452" y="1279" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">debajo, hacia el ecuador. Es el dipolo</text>
-<text x="452" y="1298" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">clásico de Rex (1950).</text>
-<text x="452" y="1308" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Dipolo alta–baja alineado en longitud: la baja a ≤</text>
-<text x="452" y="1324" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">700 km del meridiano de la alta y abierta hacia el</text>
-<text x="452" y="1340" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">este.</text>
-<rect x="824" y="1092" width="372" height="250" rx="12" fill="#ffffff" stroke="#c7d0d9"/>
+<circle cx="618.0" cy="1178" r="44" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.25"/>
+<circle cx="618.0" cy="1178" r="30" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.45"/>
+<circle cx="618.0" cy="1178" r="16" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.7"/>
+<text x="618.0" y="1184" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#c0392b" font-weight="700" text-anchor="middle">A</text>
+<circle cx="618.0" cy="1244" r="28" fill="none" stroke="#2a5fa8" stroke-width="2" opacity="0.35"/>
+<circle cx="618.0" cy="1244" r="14" fill="none" stroke="#2a5fa8" stroke-width="2" opacity="0.6"/>
+<text x="618.0" y="1250" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" fill="#2a5fa8" font-weight="700" text-anchor="middle">B</text>
+<text x="452" y="1290" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Una zona alta con una sola zona baja justo</text>
+<text x="452" y="1309" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">debajo, hacia el ecuador. Es el dipolo</text>
+<text x="452" y="1328" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">clásico de Rex (1950).</text>
+<text x="452" y="1372" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Dipolo alta–baja alineado en longitud: la baja a ≤</text>
+<text x="452" y="1388" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">700 km del meridiano de la alta y abierta hacia el</text>
+<text x="452" y="1404" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">este.</text>
+<rect x="824" y="1092" width="372" height="330" rx="12" fill="#ffffff" stroke="#c7d0d9"/>
 <text x="844" y="1124" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#6b7a8c" font-weight="700" text-anchor="start">Alta polar</text>
-<circle cx="1010.0" cy="1206" r="52" fill="none" stroke="#5b6b7c" stroke-width="1.2" stroke-dasharray="4 4"/>
-<circle cx="1010.0" cy="1170" r="3.5" fill="#1d2733"/>
-<text x="1020.0" y="1170" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start">polo</text>
-<circle cx="1010.0" cy="1206" r="30" fill="none" stroke="#6b7a8c" stroke-width="2" opacity="0.35"/>
-<circle cx="1010.0" cy="1206" r="16" fill="none" stroke="#6b7a8c" stroke-width="2" opacity="0.6"/>
-<text x="1010.0" y="1212" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" fill="#6b7a8c" font-weight="700" text-anchor="middle">A</text>
-<text x="844" y="1260" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Una zona alta tan cerca del polo que ya no</text>
-<text x="844" y="1279" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">tiene sentido hablar de “norte” o “sur”. Se</text>
-<text x="844" y="1298" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">marca aparte.</text>
-<text x="844" y="1308" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Máximo a menos de 500 km del polo (guarda 85,5°):</text>
-<text x="844" y="1324" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">categoría de exclusión, no es un bloqueo.</text>
-<rect x="40" y="1372" width="1160" height="112" rx="12" fill="#fff8e8" stroke="#e5c77a"/>
-<text x="64" y="1402" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#8a5a00" font-weight="700" text-anchor="start">Qué NO dice este método</text>
-<text x="64" y="1428" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" fill="#1d2733" font-weight="400" text-anchor="start">• No predice: diagnostica un campo que ya ha ocurrido. Si el campo es una previsión, diagnostica la previsión.</text>
-<text x="64" y="1447" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" fill="#1d2733" font-weight="400" text-anchor="start">• Es instantáneo: todavía no exige que el bloqueo dure varios días, como pide la definición al uso. El seguimiento en el tiempo llega después.</text>
-<text x="64" y="1466" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" fill="#1d2733" font-weight="400" text-anchor="start">• La “alta polar” no cuenta como bloqueo: es la etiqueta para los casos donde la geometría de direcciones deja de tener sentido.</text>
-<text x="40" y="1552" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start">FAST-IBAN · AtmosBlock — diagrama del algoritmo. Se actualiza con cada cambio del algoritmo; detalle y fuentes en docs/algoritmo_paso_a_paso.md</text>
+<circle cx="1010.0" cy="1214" r="52" fill="none" stroke="#5b6b7c" stroke-width="1.2" stroke-dasharray="4 4"/>
+<circle cx="1010.0" cy="1178" r="3.5" fill="#1d2733"/>
+<text x="1020.0" y="1178" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start">polo</text>
+<circle cx="1010.0" cy="1214" r="30" fill="none" stroke="#6b7a8c" stroke-width="2" opacity="0.35"/>
+<circle cx="1010.0" cy="1214" r="16" fill="none" stroke="#6b7a8c" stroke-width="2" opacity="0.6"/>
+<text x="1010.0" y="1220" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" fill="#6b7a8c" font-weight="700" text-anchor="middle">A</text>
+<text x="844" y="1290" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Una zona alta tan cerca del polo que ya no</text>
+<text x="844" y="1309" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">tiene sentido hablar de “norte” o “sur”. Se</text>
+<text x="844" y="1328" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">marca aparte.</text>
+<text x="844" y="1372" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Máximo a menos de 500 km del polo (guarda 85,5°):</text>
+<text x="844" y="1388" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">categoría de exclusión, no es un bloqueo.</text>
+<rect x="40" y="1454" width="1160" height="112" rx="12" fill="#fff8e8" stroke="#e5c77a"/>
+<text x="64" y="1484" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#8a5a00" font-weight="700" text-anchor="start">Qué NO dice este método</text>
+<text x="64" y="1510" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" fill="#1d2733" font-weight="400" text-anchor="start">• No predice: diagnostica un campo que ya ha ocurrido. Si el campo es una previsión, diagnostica la previsión.</text>
+<text x="64" y="1529" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" fill="#1d2733" font-weight="400" text-anchor="start">• Es instantáneo: todavía no exige que el bloqueo dure varios días, como pide la definición al uso. El seguimiento en el tiempo llega después.</text>
+<text x="64" y="1548" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" fill="#1d2733" font-weight="400" text-anchor="start">• La “alta polar” no cuenta como bloqueo: es la etiqueta para los casos donde la geometría de direcciones deja de tener sentido.</text>
+<text x="40" y="1634" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start">FAST-IBAN · AtmosBlock — diagrama del algoritmo. Se actualiza con cada cambio del algoritmo; detalle y fuentes en docs/algoritmo_paso_a_paso.md</text>
 </svg>
