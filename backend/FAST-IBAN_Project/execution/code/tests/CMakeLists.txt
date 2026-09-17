@@ -163,6 +163,17 @@ add_test(NAME caso_promedio_1grado COMMAND FAST-IBAN ${CMAKE_CURRENT_BINARY_DIR}
 set_tests_properties(caso_promedio_1grado PROPERTIES FIXTURES_REQUIRED promedios PASS_REGULAR_EXPRESSION "Successful search for formations")
 add_test(NAME simetria_hemisferica COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/comprobar_simetria.sh
     $<TARGET_FILE:FAST-IBAN> ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/caso_espejo.nc)
+# ALG-374: dominio de análisis por hemisferio.
+add_executable(TEST_dominio_latitudes test_dominio_latitudes.c)
+target_link_libraries(TEST_dominio_latitudes INIT UTILS LIB CALC m netcdf OpenMP::OpenMP_C)
+add_test(NAME test_dominio_latitudes COMMAND TEST_dominio_latitudes)
+# ALG-374: el mismo espejo SIN recortar en 25°S. Con el fichero completo (0° a -90°) el límite hacia el ecuador del
+# hemisferio sur es LAT_LIM_MAX, no LAT_LIM_MIN: si se toma mal, se procesa la franja de 0° a -25° que el norte no ve.
+add_test(NAME preparar_caso_espejo_completo COMMAND RECORTAR_NC ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/caso_espejo_completo.nc z 90 1 espejo)
+set_tests_properties(preparar_caso_espejo_completo PROPERTIES FIXTURES_SETUP recortes)
+add_test(NAME simetria_hemisferica_completa COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/comprobar_simetria.sh
+    $<TARGET_FILE:FAST-IBAN> ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/caso_espejo_completo.nc)
+set_tests_properties(simetria_hemisferica_completa PROPERTIES FIXTURES_REQUIRED recortes)
 set_tests_properties(simetria_hemisferica PROPERTIES FIXTURES_REQUIRED recortes TIMEOUT 300)
 # ALG-305 (L4): parámetros en config/params.yaml. Las variantes de los tests se derivan del fichero real al configurar.
 set(PARAMS_DEFECTO ${CMAKE_CURRENT_SOURCE_DIR}/../config/params.yaml)
@@ -182,6 +193,17 @@ variante_params(clave_desconocida "n_rays: [0-9]+" "n_rays: 64\nsearch_radius: 3
 variante_params(sin_clave "rex_max_offset_km: [0-9.]+" "")
 variante_params(rayos_no_multiplo "n_rays: [0-9]+" "n_rays: 60")
 variante_params(rayos_400 "ray_distance_km: [0-9.]+" "ray_distance_km: 400")
+
+# ALG-374: sin los filtros de cluster, en el hemisferio sur no puede quedar ningún candidato del lado del ecuador del
+# límite pedido (-25°). Antes se recorría hasta 0°, porque el límite hacia el ecuador se tomaba de LAT_LIM_MIN.
+string(REGEX REPLACE "min_cluster_area_km2: [0-9.]+" "min_cluster_area_km2: 0" SIN_FILTROS "${PARAMS_TEXTO}")
+string(REGEX REPLACE "cluster_lat_min_deg: [0-9.]+" "cluster_lat_min_deg: 0" SIN_FILTROS "${SIN_FILTROS}")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/params_sin_filtros.yaml "${SIN_FILTROS}")
+add_test(NAME latitudes_hemisferio_sur COMMAND sh ${COMPROBAR_LATITUDES}
+    $<TARGET_FILE:FAST-IBAN> ${CMAKE_CURRENT_BINARY_DIR}/caso_espejo_completo.nc -90 -25 0 -25)
+set_tests_properties(latitudes_hemisferio_sur PROPERTIES FIXTURES_REQUIRED recortes TIMEOUT 600
+    ENVIRONMENT "FAST_IBAN_PARAMS=${CMAKE_CURRENT_BINARY_DIR}/params_sin_filtros.yaml")
+
 
 # ALG-360: comprobaciones de contorno con rayos geodésicos, independientes de la latitud, la resolución y ±180°.
 add_executable(TEST_rayos_geodesicos test_rayos_geodesicos.c)

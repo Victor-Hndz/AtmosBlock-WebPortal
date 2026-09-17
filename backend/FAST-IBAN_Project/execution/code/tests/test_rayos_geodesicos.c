@@ -32,6 +32,8 @@ static void preparar(double res, coord_point centro, double dorsal) {
     NLAT = (int)lround(180 / res) + 1;
     NLON = (int)lround(360 / res);
     LAT_LIM_MIN = -80;
+    LAT_LIM_MAX = 90;
+    calcular_dominio_latitudes();  // ALG-374
     FILA_LAT_MIN = (int)lround((90 - LAT_LIM_MIN) / res);
     for (int i = 0; i < NLAT; i++) {
         lats[i] = (float)(90 - i * res);

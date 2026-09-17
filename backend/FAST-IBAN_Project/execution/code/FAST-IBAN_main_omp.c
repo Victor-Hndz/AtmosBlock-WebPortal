@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
         z[i] = z[0] + i * NLON;
 
     step = paso_candidatos();  // ALG-305
-    size_x = FILA_LAT_MIN/step + 1;  // ALG-302
+    size_x = (FILA_LAT_MIN - FILA_LAT_INICIO)/step + 1;  // ALG-302, ALG-374
     size_y = (int)((NLON)/step);
 
     selected_points = malloc((size_x)*sizeof(selected_point*));
@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
     for (time=0; time<NTIME; time++) {
         read_time_step(ncid, z_varid, time, swap_lon, z);  // ALG-204
         t_ini = omp_get_wtime();
-        #pragma omp parallel num_threads(N_THREADS) shared(z, lats, lons, size_x, size_y, time, selected_points, filtered_points, step, scale_factor, offset, PARAMS) default(none)
+        #pragma omp parallel num_threads(N_THREADS) shared(z, lats, lons, size_x, size_y, time, selected_points, filtered_points, step, scale_factor, offset, PARAMS, FILA_LAT_INICIO) default(none)
         {
             int lat, lon, it, bearing_count, bearing_count2;
             short z_aux_selected; bool interp_ok;
@@ -103,10 +103,10 @@ int main(int argc, char **argv) {
                 printf("Processing time %d, lat %d\n", time, lat);
                 for(lon=0;lon<size_y;lon++) {
                     bearing_count = 0, bearing_count2 = 0;
-                    selected_points[lat][lon] = create_selected_point(create_point(lats[lat*step], lons[lon*step]), z[lat*step][lon*step], NO_TYPE, -1);
+                    selected_points[lat][lon] = create_selected_point(create_point(lats[FILA_LAT_INICIO + lat*step], lons[lon*step]), z[FILA_LAT_INICIO + lat*step][lon*step], NO_TYPE, -1);
 
                     for(it=0; it<PARAMS.n_rays;it++) {
-                        interp_ok = bilinear_interpolation(coord_from_great_circle(create_point(lats[lat*step], lons[lon*step]), PARAMS.ray_distance_km, BEARING_START + it*BEARING_STEP), z, lats, lons, &z_aux_selected);
+                        interp_ok = bilinear_interpolation(coord_from_great_circle(create_point(lats[FILA_LAT_INICIO + lat*step], lons[lon*step]), PARAMS.ray_distance_km, BEARING_START + it*BEARING_STEP), z, lats, lons, &z_aux_selected);
                         
                         //Si se sale de la zona delimitada por los límites de latitud y longitud , no se tiene en cuenta.
                         if(!interp_ok) {
@@ -114,9 +114,9 @@ int main(int argc, char **argv) {
                             continue;
                         }
 
-                        if((((z[lat*step][lon*step] * scale_factor) + offset)/g_0) >= (((z_aux_selected * scale_factor) + offset)/g_0))
+                        if((((z[FILA_LAT_INICIO + lat*step][lon*step] * scale_factor) + offset)/g_0) >= (((z_aux_selected * scale_factor) + offset)/g_0))
                             bearing_count++;
-                        if((((z[lat*step][lon*step] * scale_factor) + offset)/g_0) <= (((z_aux_selected * scale_factor) + offset)/g_0))
+                        if((((z[FILA_LAT_INICIO + lat*step][lon*step] * scale_factor) + offset)/g_0) <= (((z_aux_selected * scale_factor) + offset)/g_0))
                             bearing_count2++;                 
                     }
                     if(bearing_count >= (int)(PARAMS.n_rays*PARAMS.pass_fraction)) 

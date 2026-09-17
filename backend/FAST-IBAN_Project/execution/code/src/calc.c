@@ -95,7 +95,7 @@ bool bilinear_interpolation(coord_point p, short **z_mat, float *lats, float *lo
  * interpolación bilineal hasta search_radius_km. Un rayo cruza un contorno L antes de su límite si y solo si su extremo
  * queda por debajo (MAX) o por encima (MIN) de L, así que cada nivel se decide después con n_rays comparaciones.
  *
- * El rayo se detiene sin cruzar al bajar de LAT_LIM_MIN, al salir de las latitudes del fichero o de sus longitudes (si
+ * El rayo se detiene sin cruzar al salir del dominio de latitudes (ALG-374), al salir de las latitudes del fichero o de sus longitudes (si
  * no es global) o si la interpolación falla. Atraviesa el polo (ALG-363): al otro lado sigue el mismo círculo máximo.
  * cluster->extremo_polo es el extremo del rayo hacia el polo del hemisferio del centro (el meridiano del centro: rayo
  * 0 en el HN, rayo n_rays/2 en el HS; ALG-303) solo hasta el polo: delimita los niveles de contorno
@@ -126,7 +126,7 @@ void calcular_extremos_rayos(points_cluster *cluster, short **z_in, float *lats,
         for (int paso = 1; paso <= pasos; paso++) {
             coord_point p = coord_from_great_circle(cluster->center, paso * PARAMS.contour_ray_step_km, k * 360.0 / n);
             p.lon = (float)(fmod(p.lon + 540.0, 360.0) - 180.0);
-            if (p.lat < LAT_LIM_MIN || p.lat < lat_inf || p.lat > lat_sup)
+            if (p.lat < DOM_LAT_MIN || p.lat > DOM_LAT_MAX || p.lat < lat_inf || p.lat > lat_sup)
                 break;
             if (!global && (p.lon < lon_min || p.lon > lon_max))
                 break;

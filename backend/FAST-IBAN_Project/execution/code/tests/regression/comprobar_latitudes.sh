@@ -1,12 +1,13 @@
 #!/bin/sh
 # ALG-302: ejecuta un binario FAST-IBAN (code/ o code_t/) y comprueba que termina bien y que todas las latitudes
 # de los CSV de puntos quedan entre el límite inferior pedido y la primera latitud del fichero.
-# Uso: comprobar_latitudes.sh <binario> <caso.nc> <lat_min> <lat_max> <lat_superior_del_fichero>
+# Uso: comprobar_latitudes.sh <binario> <caso.nc> <lat_min> <lat_max> <lat_superior_del_fichero> [techo]
+# Con <techo> se comprueba ese límite superior en vez de la primera latitud del fichero (ALG-374, hemisferio sur).
 set -eu
 
 BIN=$(realpath "$1")
 CASO=$(realpath "$2")
-LAT_MIN=$3; LAT_MAX=$4; LAT_SUP=$5
+LAT_MIN=$3; LAT_MAX=$4; LAT_SUP=${6:-$5}
 
 TMP=$(mktemp -d)
 cd "$TMP"
