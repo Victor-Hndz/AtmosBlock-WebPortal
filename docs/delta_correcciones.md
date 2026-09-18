@@ -111,6 +111,10 @@ En la búsqueda de la Omega, un mínimo es flanco izquierdo (oeste) o derecho (e
 - DJFMAM 2014-15: 14 Omega cambian de mínimo y aparecen 4 (1213 → 1217 formaciones); acuerdo 0,25°/1° 1081 → 1088 emparejadas.
 - **Patrón:** los mínimos que entran están casi en el meridiano del máximo (Δλ de 0,25° a 0,75°) y hacia el ecuador. Antes el truncamiento los excluía por accidente. Una baja justo bajo la alta es la configuración de un Rex, no un flanco de Omega: la separación mínima de los flancos queda como cambio físico aparte, con su propia decisión y su delta.
 
+**Separación mínima de los flancos (commit aparte, decidido por el usuario el 2026-09-18 con asesoría física).** Un mínimo solo es flanco de una Omega si está a **más de `rex_max_offset_km` (700 km) del meridiano del máximo**: el complemento exacto de la franja del Rex, sin hueco ni solape y sin parámetros nuevos (Hirt et al. 2018 separan *high-over-low* de Omega por |Δλ|). **Predicción escrita antes de medir:** solo pueden perderse flancos con d ≤ 700 km, así que el cambio solo puede quitar Omegas o cambiarles un mínimo por otro más lejano; ninguna Omega nueva puede aparecer salvo que un máximo antes emparejado como Omega quede libre y pase a Rex; los Rex no pierden nada.
+
+DELTA_SEPARACION
+
 ## ALG-374: el dominio de análisis depende del hemisferio
 
 `FILA_LAT_MIN` (ALG-302) y la parada de los rayos usaban siempre `LAT_LIM_MIN` como límite hacia el ecuador. En el hemisferio sur ese límite es el **polar**: con `-90 -25` se recorrían las filas desde la primera del fichero (0°) y ningún rayo paraba antes de −90°, así que se analizaba la franja de 0° a −25° que en el norte queda fuera.
