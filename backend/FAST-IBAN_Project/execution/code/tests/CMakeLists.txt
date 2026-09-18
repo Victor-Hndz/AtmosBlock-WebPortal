@@ -221,6 +221,10 @@ target_link_libraries(TEST_polar_high CALC UTILS INIT LIB m netcdf OpenMP::OpenM
 add_test(NAME test_polar_high COMMAND TEST_polar_high)
 set_tests_properties(test_polar_high PROPERTIES TIMEOUT 300)
 
+# ALG-362: lado del mínimo respecto al meridiano del máximo, sin truncar la longitud.
+add_executable(TEST_lado_minimo test_lado_minimo.c)
+target_link_libraries(TEST_lado_minimo CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
+add_test(NAME test_lado_minimo COMMAND TEST_lado_minimo)
 # ALG-361: el mínimo de un Rex tiene el contorno abierto hacia el este.
 add_executable(TEST_minimo_rex test_minimo_rex.c)
 target_link_libraries(TEST_minimo_rex CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)

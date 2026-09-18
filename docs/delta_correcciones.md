@@ -35,6 +35,7 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 | Vecindad de clusters con vuelta en ±180° y fila del polo como un punto | ALG-309 | 4 / 1 → 4 / 0 | 97 / 13 (=) | **Pequeño:** clusters partidos en ±180° pasan a ser uno; 108 de 110 formaciones iguales. Ver sección ALG-309 |
 | Límite polar del filtro de latitud desactivado (90) *(decisión de diseño)* | ALG-304 | sin cambios | 97 / 13 (=) | **0 formaciones**; puntos en clusters del caso largo +29 % (clusters polares que antes se descartaban). Ver sección ALG-304 |
 | Guarda polar derivada de `ray_distance_km` y categoría `POLAR_HIGH` | ALG-310, ALG-311 | sin cambios | 97 / 13 (=) | **2003: 0 formaciones.** Invierno de 1983: una Omega a 86,5°N pasa a `POLAR_HIGH`; 3 `POLAR_HIGH` en total (85,75–86,5°N); acuerdo 0,25°/1° 123 → 126. Ver sección ALG-310/311 |
+| El lado del mínimo en la Omega se decide sin truncar la longitud | ALG-362 | sin cambios | 97 / 12 (=) | 2003 y 2019: 1 Omega cambia de mínimo cada uno; 1983: 0; DJFMAM 2014-15: 14 Omega cambian de mínimo y aparecen 4 (1213 → 1217). Ver sección ALG-362 |
 | El dominio de análisis llega del límite hacia el ecuador al polo de su hemisferio | ALG-374 | sin cambios | sin cambios (norte) | **Hemisferio norte: 0 cambios** (las líneas base no se mueven). En el sur ya no se analiza la franja entre el ecuador y el límite pedido. Ver sección ALG-374 |
 | El mínimo del Rex debe estar abierto hacia el este (`contour_der` no se recalculaba) | ALG-361 | sin cambios | 97 / 13 → 97 / 12 | **Solo desaparecen Rex:** 2003 −1, 1983 −1, 2019 −3 (26 → 23); ninguno nuevo ni sustituido. Ver sección ALG-361 |
 
@@ -97,6 +98,18 @@ Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. E
 **Coste:** el caso largo con 12 hilos sigue en unos 6 s.
 
 Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
+
+## ALG-362: el lado del mínimo en la Omega sin truncar la longitud
+
+En la búsqueda de la Omega, un mínimo es flanco izquierdo (oeste) o derecho (este) según su longitud respecto a la del máximo, con vuelta en ±180°. Esas longitudes se guardaban en `int`, que trunca: un mínimo con la misma parte entera que el máximo (10,5° frente a 10,9°) no quedaba en ningún lado, y 10,9° frente a 11,1° sí contaba. La decisión pasa a `lado_del_minimo()` con `double`.
+
+**Test** `test_lado_minimo`: rojo con el `int` (10,9/10,5, 10,5/10,9 y −10,5/−10,9 daban 0), verde con `double`; los casos con vuelta en ±180° y el mismo meridiano no cambian. La extracción a la función se comprobó antes sin cambiar ningún hash.
+
+**Delta:**
+- Caso fijo: sin cambios. Caso de 2003 de CTest: cambia el hash de formaciones (los puntos no); línea base actualizada.
+- 2003-08-01…15: una Omega (paso 55) cambia de mínimo derecho. 1983: sin cambios. 2019: una Omega (paso 24) cambia de mínimo.
+- DJFMAM 2014-15: 14 Omega cambian de mínimo y aparecen 4 (1213 → 1217 formaciones); acuerdo 0,25°/1° 1081 → 1088 emparejadas.
+- **Patrón:** los mínimos que entran están casi en el meridiano del máximo (Δλ de 0,25° a 0,75°) y hacia el ecuador. Antes el truncamiento los excluía por accidente. Una baja justo bajo la alta es la configuración de un Rex, no un flanco de Omega: la separación mínima de los flancos queda como cambio físico aparte, con su propia decisión y su delta.
 
 ## ALG-374: el dominio de análisis depende del hemisferio
 

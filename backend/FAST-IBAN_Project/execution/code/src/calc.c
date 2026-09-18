@@ -214,6 +214,27 @@ double distancia_al_meridiano(coord_point p, coord_point referencia) {
 }
 
 /**
+ * @brief Lado del meridiano del máximo en el que queda el mínimo: -1 al oeste, 1 al este y 0 en el mismo meridiano.
+ * La diferencia de longitud se toma con vuelta en ±180°.
+ */
+int lado_del_minimo(coord_point maximo, coord_point minimo) {
+    double lon_max, lon_min;  // ALG-362: antes int, que truncaba la longitud
+    if (fabs(maximo.lon - minimo.lon) >= 180) {
+        if (maximo.lon > minimo.lon) {
+            lon_max = maximo.lon - 360;
+            lon_min = minimo.lon;
+        } else {
+            lon_min = minimo.lon - 360;
+            lon_max = maximo.lon;
+        }
+    } else {
+        lon_max = maximo.lon;
+        lon_min = minimo.lon;
+    }
+    return lon_min < lon_max ? -1 : lon_min > lon_max ? 1 : 0;
+}
+
+/**
  * @brief Forma del mínimo de un Rex al nivel `contour`: contorno hacia el ecuador y hacia el oeste en todo el sector,
  * hacia el polo en la mayoría, y abierto hacia el este.
  */
@@ -223,7 +244,7 @@ bool minimo_rex_valido(points_cluster minimo, int contour) {
 }
 
 void search_formation(points_cluster *clusters, int size, short **z_in, float *lats, float *lons, double scale_factor, double offset, char* filename, int time) {
-    int i, j, index_lat, index_lon, contour_top, lon_aux_max, lon_aux_min;
+    int i, j, index_lat, index_lon, contour_top;
     double mean_dist, pair_score, best_score;
     bool contour_bot, contour_izq, contour_der;
     points_cluster selected_izq, selected_der, selected_rex;
@@ -278,20 +299,9 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                         if(point_distance(clusters[j].center, clusters[i].center) > PARAMS.search_radius_km)
                                 continue;
                         
-                        if(fabs(clusters[i].center.lon - clusters[j].center.lon) >= 180) {
-                            if(clusters[i].center.lon > clusters[j].center.lon) {
-                                lon_aux_max = clusters[i].center.lon - 360;
-                                lon_aux_min = clusters[j].center.lon;
-                            } else {
-                                lon_aux_min = clusters[j].center.lon - 360;
-                                lon_aux_max = clusters[i].center.lon;
-                            }
-                        } else {
-                            lon_aux_max = clusters[i].center.lon;
-                            lon_aux_min = clusters[j].center.lon;
-                        }
+                        int lado = lado_del_minimo(clusters[i].center, clusters[j].center);
 
-                        if(clusters[j].type == MIN && hemisferio(clusters[i].center.lat) * clusters[j].center.lat <= hemisferio(clusters[i].center.lat) * clusters[i].center.lat && lon_aux_min < lon_aux_max) {
+                        if(clusters[j].type == MIN && hemisferio(clusters[i].center.lat) * clusters[j].center.lat <= hemisferio(clusters[i].center.lat) * clusters[i].center.lat && lado < 0) {
                             if(check_closed_contour(clusters[j], contour_top))
                                 continue;
                             
@@ -307,7 +317,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                                 while(k < n_izq && cand_izq[k] != j) k++;
                                 if(k == n_izq) cand_izq[n_izq++] = j;
                             }
-                        } else if(clusters[j].type == MIN && hemisferio(clusters[i].center.lat) * clusters[j].center.lat <= hemisferio(clusters[i].center.lat) * clusters[i].center.lat && lon_aux_min > lon_aux_max) {
+                        } else if(clusters[j].type == MIN && hemisferio(clusters[i].center.lat) * clusters[j].center.lat <= hemisferio(clusters[i].center.lat) * clusters[i].center.lat && lado > 0) {
                             if(check_closed_contour(clusters[j], contour_top))
                                 continue;
 
