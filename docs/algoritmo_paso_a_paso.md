@@ -32,7 +32,7 @@ Revisado con el agente físico del proyecto y contrastado con el código (2026-0
 | | En llano | En técnico |
 |---|---|---|
 | **Omega (Ω)** | Una zona de aire alto con una zona baja a cada lado; el aire la rodea dibujando una omega y la circulación se queda parada. | Alta cerrada al este y al oeste y abierta hacia el ecuador, con dos mínimos flanqueantes, uno a cada lado en longitud, no más cerca del polo que ella, a menos de 3000 km (`search_radius_km`) y **a más de 700 km de su meridiano** (`rex_max_offset_km`): un mínimo más cerca del meridiano está bajo la alta, en la franja del Rex, y no cuenta como flanco (ALG-362). |
-| **Rex** | Una zona alta con una sola zona baja justo debajo, hacia el ecuador: el dipolo clásico descrito por Rex en 1950. | Alta cerrada hacia el ecuador y al este y abierta al oeste; mínimo hacia el ecuador, a ≤ 700 km del meridiano de la alta (`rex_max_offset_km`) y abierto hacia el este. |
+| **Rex** | Una zona alta con una sola zona baja justo debajo, hacia el ecuador: el dipolo clásico descrito por Rex en 1950. | Alta cerrada hacia el ecuador y abierta por un lado en longitud; mínimo hacia el ecuador, a ≤ 700 km del meridiano de la alta (`rex_max_offset_km`) y abierto por el lado contrario al de la alta. Valen las dos orientaciones: alta abierta al oeste y baja al este, o al revés (ALG-377). |
 | **Alta polar** | Una zona alta tan cerca del polo que ya no tiene sentido hablar de “hacia el norte” o “hacia el sur”. Se marca aparte. | Máximo con el centroide a menos de `ray_distance_km` del polo (guarda de 85,5°): categoría de exclusión, exportada sin mínimos. |
 
 Si un mismo máximo admite las dos configuraciones, gana la más compacta (la de menor distancia media entre sus centros).
