@@ -15,6 +15,7 @@ int niveles_hacia_el_polo(const points_cluster *cluster, double altura_centro, i
 double distancia_al_meridiano(coord_point p, coord_point referencia);
 bool minimo_rex_valido(points_cluster minimo, int contour);
 int lado_del_minimo(coord_point maximo, coord_point minimo);
+enum Tipo_form clasificar_candidato(coord_point p, short z0, short **z, float *lats, float *lons);
 int lado_flanco_omega(coord_point maximo, coord_point minimo);
 void search_formation(points_cluster *clusters, int size, short **z_in, float *lats, float *lons, double scale_factor, double offset, char* filename, int time);
 double point_distance(coord_point a, coord_point b);

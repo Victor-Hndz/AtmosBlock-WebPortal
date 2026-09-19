@@ -161,8 +161,12 @@ add_test(NAME preparar_caso_promedio_1grado COMMAND DEGRADAR_NC ${CASO_FIJO} ${C
 set_tests_properties(preparar_caso_promedio_1grado PROPERTIES FIXTURES_SETUP promedios)
 add_test(NAME caso_promedio_1grado COMMAND FAST-IBAN ${CMAKE_CURRENT_BINARY_DIR}/caso_promedio_1grado.nc 25 90 -180 180 out_promedio/ 1)
 set_tests_properties(caso_promedio_1grado PROPERTIES FIXTURES_REQUIRED promedios PASS_REGULAR_EXPRESSION "Successful search for formations")
+# ALG-369: los dos lados con la misma cobertura de datos. El norte es el espejo del sur recortado (90°N a 25°N): con el
+# fichero del norte completo, sus rayos tendrían datos al sur de 25°N que al sur de -25° no hay, y ya no votan.
+add_test(NAME preparar_caso_norte_recortado COMMAND RECORTAR_NC ${CMAKE_CURRENT_BINARY_DIR}/caso_espejo.nc ${CMAKE_CURRENT_BINARY_DIR}/caso_norte_recortado.nc z 90 1 espejo)
+set_tests_properties(preparar_caso_norte_recortado PROPERTIES FIXTURES_SETUP recortes DEPENDS preparar_caso_espejo)
 add_test(NAME simetria_hemisferica COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/comprobar_simetria.sh
-    $<TARGET_FILE:FAST-IBAN> ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/caso_espejo.nc)
+    $<TARGET_FILE:FAST-IBAN> ${CMAKE_CURRENT_BINARY_DIR}/caso_norte_recortado.nc ${CMAKE_CURRENT_BINARY_DIR}/caso_espejo.nc)
 # ALG-374: dominio de análisis por hemisferio.
 add_executable(TEST_dominio_latitudes test_dominio_latitudes.c)
 target_link_libraries(TEST_dominio_latitudes INIT UTILS LIB CALC m netcdf OpenMP::OpenMP_C)
@@ -221,6 +225,10 @@ target_link_libraries(TEST_polar_high CALC UTILS INIT LIB m netcdf OpenMP::OpenM
 add_test(NAME test_polar_high COMMAND TEST_polar_high)
 set_tests_properties(test_polar_high PROPERTIES TIMEOUT 300)
 
+# ALG-369: un rayo que no se puede interpolar no vota en la clasificación del candidato.
+add_executable(TEST_clasificar_candidato test_clasificar_candidato.c)
+target_link_libraries(TEST_clasificar_candidato CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
+add_test(NAME test_clasificar_candidato COMMAND TEST_clasificar_candidato)
 # ALG-362: lado del mínimo respecto al meridiano del máximo, sin truncar la longitud.
 add_executable(TEST_lado_minimo test_lado_minimo.c)
 target_link_libraries(TEST_lado_minimo CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)

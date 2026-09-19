@@ -7,9 +7,8 @@
 
 
 int main(int argc, char **argv) {
-    int ncid, retval, i, j, k, time, lat, lon, size_x, size_y, step, bearing_count, bearing_count2, id;
+    int ncid, retval, i, j, k, time, lat, lon, size_x, size_y, step, id;
     double scale_factor, offset, t_ini, t_fin, t_total = 0.0;
-    short z_aux_selected; bool interp_ok;
     short **z = NULL;
     int z_varid;
     bool swap_lon;
@@ -116,27 +115,10 @@ int main(int argc, char **argv) {
         for(lat=0;lat<size_x;lat++) {
             // printf("Processing time %d, lat %d\n", time, lat);
             for(lon=0;lon<size_y;lon++) {
-                bearing_count = 0, bearing_count2 = 0;
-                selected_points[lat][lon] = create_selected_point(create_point(lats[FILA_LAT_INICIO + lat*step], lons[lon*step]), z[FILA_LAT_INICIO + lat*step][lon*step], NO_TYPE, -1);
-
-                for(i=0; i<PARAMS.n_rays;i++) {
-                    interp_ok = bilinear_interpolation(coord_from_great_circle(create_point(lats[FILA_LAT_INICIO + lat*step], lons[lon*step]), PARAMS.ray_distance_km, BEARING_START + i*BEARING_STEP), z, lats, lons, &z_aux_selected);
-                    
-                    //Si se sale de la zona delimitada por los límites de latitud y longitud , no se tiene en cuenta.
-                    if(!interp_ok) {
-                        bearing_count++;
-                        continue;
-                    }
-
-                    if((((z[FILA_LAT_INICIO + lat*step][lon*step] * scale_factor) + offset)/g_0) >= (((z_aux_selected * scale_factor) + offset)/g_0))
-                        bearing_count++;
-                    if((((z[FILA_LAT_INICIO + lat*step][lon*step] * scale_factor) + offset)/g_0) <= (((z_aux_selected * scale_factor) + offset)/g_0))
-                        bearing_count2++;                 
-                }
-                if(bearing_count >= (int)(PARAMS.n_rays*PARAMS.pass_fraction)) 
-                    selected_points[lat][lon].type = MAX;
-                else if(bearing_count2 >= (int)(PARAMS.n_rays*PARAMS.pass_fraction)) 
-                    selected_points[lat][lon].type = MIN;
+                // ALG-369: clasificación local del candidato con los rayos de círculo máximo (calc.c).
+                coord_point candidato = create_point(lats[FILA_LAT_INICIO + lat*step], lons[lon*step]);
+                short z_candidato = z[FILA_LAT_INICIO + lat*step][lon*step];
+                selected_points[lat][lon] = create_selected_point(candidato, z_candidato, clasificar_candidato(candidato, z_candidato, z, lats, lons), -1);
                 filtered_points[lat][lon] = selected_points[lat][lon];
             }
         }

@@ -214,6 +214,26 @@ double distancia_al_meridiano(coord_point p, coord_point referencia) {
 }
 
 /**
+ * @brief Clasificación local de un candidato: MAX si al menos pass_fraction de los n_rays rayos de círculo máximo a
+ * ray_distance_km tienen su extremo a igual o menor altura que el candidato, MIN si a igual o mayor, NO_TYPE si no.
+ * El umbral se cuenta sobre los n_rays rayos, no sobre los que se pueden interpolar.
+ * La altura se compara en valores empaquetados: la conversión (z·escala + desplazamiento)/g₀ es creciente.
+ */
+enum Tipo_form clasificar_candidato(coord_point p, short z0, short **z, float *lats, float *lons) {
+    int debajo = 0, encima = 0, umbral = (int)(PARAMS.n_rays * PARAMS.pass_fraction);
+    for (int k = 0; k < PARAMS.n_rays; k++) {
+        short z_rayo;
+        // ALG-369: un rayo que cae fuera del fichero no vota (antes votaba a MAX). Con el umbral fijo sobre n_rays, un
+        // candidato con más de n_rays - umbral rayos fuera no se clasifica.
+        if (!bilinear_interpolation(coord_from_great_circle(p, PARAMS.ray_distance_km, BEARING_START + k * BEARING_STEP), z, lats, lons, &z_rayo))
+            continue;
+        debajo += z0 >= z_rayo;
+        encima += z0 <= z_rayo;
+    }
+    return debajo >= umbral ? MAX : encima >= umbral ? MIN : NO_TYPE;
+}
+
+/**
  * @brief Lado del meridiano del máximo en el que queda el mínimo: -1 al oeste, 1 al este y 0 en el mismo meridiano.
  * La diferencia de longitud se toma con vuelta en ±180°.
  */
