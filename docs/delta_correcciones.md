@@ -40,6 +40,7 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 | Los flancos de la Omega deben estar a más de 700 km del meridiano del máximo *(decisión física)* | ALG-362 | 4 / 0: una Omega cambia de mínimo | 97 / 12 → 89 / 12 | **Solo se pierden Omegas o cambian de mínimo:** 2003 −8, 1983 −12, 2019 −7, DJFMAM 2014-15 −176 (−18 %, 5 pasan a Rex). Ver sección ALG-362 |
 | El dominio de análisis llega del límite hacia el ecuador al polo de su hemisferio | ALG-374 | sin cambios | sin cambios (norte) | **Hemisferio norte: 0 cambios** (las líneas base no se mueven). En el sur ya no se analiza la franja entre el ecuador y el límite pedido. Ver sección ALG-374 |
 | El mínimo del Rex debe estar abierto hacia el este (`contour_der` no se recalculaba) | ALG-361 | sin cambios | 97 / 13 → 97 / 12 | **Solo desaparecen Rex:** 2003 −1, 1983 −1, 2019 −3 (26 → 23); ninguno nuevo ni sustituido. Ver sección ALG-361 |
+| Área de celda de banda exacta, con el casquete en la fila del polo (antes 0 km² por cos 90°) | ALG-373 | sin cambios | sin cambios | **0 en los cuatro casos** (2003, 1983, 2019 y DJFMAM 2014-15): ningún cluster estaba cerca del filtro de 22 000 km² por su celda polar. Ver sección ALG-373 |
 
 B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2, B1, B10 y ALG-359 sí, porque cambian el muestreo. B7 cambia un solo punto. ALG-360 solo cambia las formaciones.
 
@@ -129,6 +130,14 @@ Predicciones: B tiene un exceso de MAX en las franjas junto a los bordes; C no t
 - **Con el margen del configurador los candidatos son idénticos a los del fichero completo, bit a bit**, en los cuatro casos.
 - **Formación truncada:** en el dominio regional de 2003, D pierde 1 de las 4 formaciones de A. Sus rayos de contorno (hasta 3000 km) llegan al borde del fichero, que en A no existe. Es la limitación prevista; marcarlas queda como deuda.
 - Con los límites de las pruebas de CTest (`25 85`), el caso fijo da las mismas detecciones (solo bajan los contadores de llamadas) y el de 2003 deja de informar 45 puntos por encima de 85°; líneas base actualizadas.
+
+## ALG-373: área de la celda del polo
+
+`area_celda_km2` usaba R²·Δλ·Δφ·cos φ, que da 0 en la fila de ±90°: un cluster polar se quedaba sin el área de su celda del polo (≈ 9 700 km² a 1°, casi la mitad del filtro de 22 000 km²). Pasa a la banda exacta R²·Δλ·(sin(φ+Δ/2) − sin(φ−Δ/2)), recortada a ±90°: es aditiva, y en la fila del polo cada candidato se lleva su parte del casquete (las 360/Δ celdas suman 2πR²(1 − cos Δ/2)).
+
+**Test** `test_area_celda`: rojo antes (fila del polo 0 km²; 4×4 celdas de 0,25° no sumaban la de 1° que cubren), verde después.
+
+**Delta:** 0 en CTest (líneas base intactas) y en los cuatro casos largos, en puntos y formaciones (2003, 1983, 2019 y DJFMAM 2014-15; en este último, 683 102 puntos y 819 OMEGA / 191 REX / 36 POLAR_HIGH antes y después). Fuera del polo la banda y la fórmula con cos φ difieren menos de 10⁻⁴ en relativo, y ningún cluster polar de estos casos estaba en el filo del filtro.
 
 ## ALG-362: el lado del mínimo en la Omega sin truncar la longitud
 
