@@ -205,6 +205,11 @@ string(REGEX REPLACE "cluster_lat_min_deg: [0-9.]+" "cluster_lat_min_deg: 0" SIN
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/params_sin_filtros.yaml "${SIN_FILTROS}")
 add_test(NAME latitudes_hemisferio_sur COMMAND sh ${COMPROBAR_LATITUDES}
     $<TARGET_FILE:FAST-IBAN> ${CMAKE_CURRENT_BINARY_DIR}/caso_espejo_completo.nc -90 -25 0 -25)
+# ALG-369 (ALG-358): solo se informa de candidatos dentro del área pedida, también en longitud y hacia el polo. El
+# portal descarga un margen alrededor del área para que los rayos de los bordes tengan datos.
+add_test(NAME area_pedida COMMAND sh ${COMPROBAR_LATITUDES}
+    $<TARGET_FILE:FAST-IBAN> ${CASO_FIJO} 30 70 90 70 -30 40)
+set_tests_properties(area_pedida PROPERTIES TIMEOUT 600)
 set_tests_properties(latitudes_hemisferio_sur PROPERTIES FIXTURES_REQUIRED recortes TIMEOUT 600
     ENVIRONMENT "FAST_IBAN_PARAMS=${CMAKE_CURRENT_BINARY_DIR}/params_sin_filtros.yaml")
 

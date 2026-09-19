@@ -4,6 +4,7 @@
 int LAT_LIM_MIN, LAT_LIM_MAX, LON_LIM_MIN, LON_LIM_MAX, N_THREADS;
 int FILA_LAT_MIN;  // ALG-302
 int DOM_LAT_MIN, DOM_LAT_MAX, FILA_LAT_INICIO;  // ALG-374
+int COL_LON_INICIO;  // ALG-369
 char* FILE_NAME, *OUT_DIR_NAME;
 
 // ALG-305 (L4): parámetros del detector. La ruta por defecto la fija CMake (config/params.yaml del código fuente).
@@ -62,6 +63,27 @@ void cargar_parametros(const char *ruta) {
 void calcular_dominio_latitudes(void) {
     DOM_LAT_MIN = LAT_LIM_MIN >= 0 || LAT_LIM_MAX > 0 ? LAT_LIM_MIN : -90;
     DOM_LAT_MAX = LAT_LIM_MAX <= 0 || LAT_LIM_MIN < 0 ? LAT_LIM_MAX : 90;
+}
+
+/**
+ * @brief ALG-369 (ALG-358): columnas de candidatos dentro de [LON_LIM_MIN, LON_LIM_MAX], con la retícula anclada a la
+ * primera columna del fichero. Deja la primera en COL_LON_INICIO y devuelve cuántas hay. Con un fichero global y el
+ * círculo completo pedido son todas; el portal descarga un margen alrededor del área y solo se informa dentro de ella.
+ * Se llama con las longitudes ya en -180…180 (check_coords).
+ */
+int columnas_candidatas(const float *lons, int paso) {
+    int inicio = 0;
+    while (inicio < NLON && lons[inicio] < LON_LIM_MIN - TOL_PASO)
+        inicio += paso;
+    int n = 0;
+    while (inicio + n * paso < NLON && lons[inicio + n * paso] <= LON_LIM_MAX + TOL_PASO)
+        n++;
+    if (inicio >= NLON || n == 0) {
+        fprintf(stderr, "Error: ninguna longitud de candidatos entre %d y %d en el fichero.\n", LON_LIM_MIN, LON_LIM_MAX);
+        exit(EXIT_FAILURE);
+    }
+    COL_LON_INICIO = inicio;
+    return n;
 }
 
 /**
@@ -389,10 +411,11 @@ int init_nc_variables(int ncid, float lats[NLAT], float lons[NLON], double *scal
     }
     FILA_LAT_MIN = (int)floor(fabs(lats[0] - LAT_LIM_MIN) / RES + TOL_PASO);
 
-    // ALG-374: primera fila del dominio (el extremo polar), que en el hemisferio sur no es la primera del fichero.
+    // ALG-374, ALG-369: primera fila de candidatos, la de LAT_LIM_MAX (el área pedida), que no tiene por qué ser la
+    // primera del fichero: en el hemisferio sur, o cuando el portal descarga un margen alrededor del área.
     calcular_dominio_latitudes();
-    // El techo del dominio puede quedar por encima del fichero (el portal pide 90): entonces se empieza en su primera fila.
-    FILA_LAT_INICIO = DOM_LAT_MAX >= lat_sup - TOL_PASO ? 0 : (int)ceil(fabs(lats[0] - DOM_LAT_MAX) / RES - TOL_PASO);
+    // El techo pedido puede quedar por encima del fichero (el portal pide 90): entonces se empieza en su primera fila.
+    FILA_LAT_INICIO = LAT_LIM_MAX >= lat_sup - TOL_PASO ? 0 : (int)ceil(fabs(lats[0] - LAT_LIM_MAX) / RES - TOL_PASO);
 
     // Read the scale factor, offset and long_name of z.
     if ((retval = nc_get_att_double(ncid, z_varid, SCALE_FACTOR, scale_factor)))

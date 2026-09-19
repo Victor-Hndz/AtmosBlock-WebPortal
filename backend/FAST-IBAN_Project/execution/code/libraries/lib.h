@@ -31,7 +31,7 @@ extern double RES;
 extern int FILA_LAT_MIN;
 // ALG-374: dominio de análisis en latitud. El límite hacia el ecuador es el de menor |lat| y hacia el polo no se
 // recorta (el filtro polar de clusters es cluster_lat_max_deg); si el dominio cruza el ecuador, limitan los dos.
-extern int DOM_LAT_MIN, DOM_LAT_MAX, FILA_LAT_INICIO;
+extern int DOM_LAT_MIN, DOM_LAT_MAX, FILA_LAT_INICIO, COL_LON_INICIO;
 #define REC_NAME "time"
 #define LAT_NAME "latitude"
 #define LON_NAME "longitude"

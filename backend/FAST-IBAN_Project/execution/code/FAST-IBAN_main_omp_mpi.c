@@ -59,7 +59,8 @@ int main(int argc, char **argv) {
 
     step = paso_candidatos();  // ALG-305
     size_x = (FILA_LAT_MIN - FILA_LAT_INICIO)/step + 1;  // ALG-302, ALG-374
-    size_y = (int)((NLON)/step);
+    swap_lon = check_coords(lons);  // ALG-369: antes de elegir las columnas de candidatos
+    size_y = columnas_candidatas(lons, step);
 
     //Chumk paralelo
     chunk_size = (size_x + N_THREADS - 1) / N_THREADS; // Redondea hacia arriba
@@ -82,8 +83,6 @@ int main(int argc, char **argv) {
     }
 
 
-    //Check the coordinates and correct them if necessary.
-    swap_lon = check_coords(lons);
 
     //Initialize the output files.
     // ALG-206: solo el proceso 0 crea el directorio de salida y los CSV finales con su cabecera; el resto
@@ -132,7 +131,7 @@ int main(int argc, char **argv) {
         read_time_step(ncid, z_varid, time, swap_lon, z);  // ALG-204
         t_ini = omp_get_wtime();
 
-        #pragma omp parallel num_threads(N_THREADS) shared(z, lats, lons, size_x, size_y, time, selected_points, filtered_points, step, scale_factor, offset, chunk_size, PARAMS, FILA_LAT_INICIO) default(none)
+        #pragma omp parallel num_threads(N_THREADS) shared(z, lats, lons, size_x, size_y, time, selected_points, filtered_points, step, scale_factor, offset, chunk_size, PARAMS, FILA_LAT_INICIO, COL_LON_INICIO) default(none)
         {
             int lat, lon;
 
@@ -141,8 +140,8 @@ int main(int argc, char **argv) {
                 // printf("Processing time %d, lat %d\n", time, lat);
                 for(lon=0;lon<size_y;lon++) {
                     // ALG-369: clasificación local del candidato con los rayos de círculo máximo (calc.c).
-                    coord_point candidato = create_point(lats[FILA_LAT_INICIO + lat*step], lons[lon*step]);
-                    short z_candidato = z[FILA_LAT_INICIO + lat*step][lon*step];
+                    coord_point candidato = create_point(lats[FILA_LAT_INICIO + lat*step], lons[COL_LON_INICIO + lon*step]);
+                    short z_candidato = z[FILA_LAT_INICIO + lat*step][COL_LON_INICIO + lon*step];
                     selected_points[lat][lon] = create_selected_point(candidato, z_candidato, clasificar_candidato(candidato, z_candidato, z, lats, lons), -1);
                     filtered_points[lat][lon] = selected_points[lat][lon];
                 }

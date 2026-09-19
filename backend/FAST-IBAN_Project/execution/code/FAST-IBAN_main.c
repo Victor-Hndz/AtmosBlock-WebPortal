@@ -57,7 +57,8 @@ int main(int argc, char **argv) {
 
     step = paso_candidatos();  // ALG-305
     size_x = (FILA_LAT_MIN - FILA_LAT_INICIO)/step + 1;  // ALG-302, ALG-374
-    size_y = (int)((NLON)/step);
+    swap_lon = check_coords(lons);  // ALG-369: antes de elegir las columnas de candidatos
+    size_y = columnas_candidatas(lons, step);
 
     selected_points = malloc((size_x)*sizeof(selected_point*));
     selected_points[0] = malloc(sizeof(selected_point)*size_x*size_y);
@@ -78,8 +79,6 @@ int main(int argc, char **argv) {
 
 
 
-    //Check the coordinates and correct them if necessary.
-    swap_lon = check_coords(lons);
 
     //Initialize the output files.
     init_files(filename, filename2, log_file, speed_file, long_name);
@@ -116,8 +115,8 @@ int main(int argc, char **argv) {
             // printf("Processing time %d, lat %d\n", time, lat);
             for(lon=0;lon<size_y;lon++) {
                 // ALG-369: clasificación local del candidato con los rayos de círculo máximo (calc.c).
-                coord_point candidato = create_point(lats[FILA_LAT_INICIO + lat*step], lons[lon*step]);
-                short z_candidato = z[FILA_LAT_INICIO + lat*step][lon*step];
+                coord_point candidato = create_point(lats[FILA_LAT_INICIO + lat*step], lons[COL_LON_INICIO + lon*step]);
+                short z_candidato = z[FILA_LAT_INICIO + lat*step][COL_LON_INICIO + lon*step];
                 selected_points[lat][lon] = create_selected_point(candidato, z_candidato, clasificar_candidato(candidato, z_candidato, z, lats, lons), -1);
                 filtered_points[lat][lon] = selected_points[lat][lon];
             }
