@@ -187,6 +187,12 @@ void process_entry(int argc, char **argv) {
             printf("Error: El número de hilos no puede ser menor de 1.\n");
             exit(1);
         }
+
+        // ALG-354: una entrada de contadores de diagnóstico por hilo; con más hilos, dos compartirían entrada.
+        if(N_THREADS > MAX_HILOS_CONTADORES) {
+            printf("Error: se admiten como mucho %d hilos (se pidieron %d).\n", MAX_HILOS_CONTADORES, N_THREADS);
+            exit(1);
+        }
     }
 }
 
