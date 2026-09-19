@@ -199,9 +199,9 @@
 <text x="452" y="1290" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Una zona alta con una sola zona baja justo</text>
 <text x="452" y="1309" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">debajo, hacia el ecuador. Es el dipolo</text>
 <text x="452" y="1328" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">clásico de Rex (1950).</text>
-<text x="452" y="1372" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Dipolo alta–baja alineado en longitud: la baja a ≤</text>
-<text x="452" y="1388" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">700 km del meridiano de la alta y abierta hacia el</text>
-<text x="452" y="1404" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">este.</text>
+<text x="452" y="1372" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Dipolo alta–baja: la baja a ≤ 700 km del meridiano</text>
+<text x="452" y="1388" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">de la alta. Vale en los dos sentidos: abierta al este</text>
+<text x="452" y="1404" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">con la alta abierta al oeste, o al revés.</text>
 <rect x="824" y="1092" width="372" height="330" rx="12" fill="#ffffff" stroke="#c7d0d9"/>
 <text x="844" y="1124" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#6b7a8c" font-weight="700" text-anchor="start">Alta polar</text>
 <circle cx="1010.0" cy="1214" r="52" fill="none" stroke="#5b6b7c" stroke-width="1.2" stroke-dasharray="4 4"/>
