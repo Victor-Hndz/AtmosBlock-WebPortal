@@ -112,6 +112,10 @@ set_tests_properties(init_nombre_demasiado_largo PROPERTIES PASS_REGULAR_EXPRESS
 set_tests_properties(init_latitud_incorrecta PROPERTIES PASS_REGULAR_EXPRESSION "de latitud son incorrectos")
 set_tests_properties(init_longitud_incorrecta PROPERTIES PASS_REGULAR_EXPRESSION "de longitud son incorrectos")
 set_tests_properties(init_hilos_incorrectos PROPERTIES PASS_REGULAR_EXPRESSION "hilos no puede")
+# ALG-354: los contadores de diagnóstico tienen una entrada por hilo (MAX_HILOS_CONTADORES); con más hilos dos
+# compartirían entrada, así que se rechazan con un error claro en vez de corromper los contadores.
+add_test(NAME init_demasiados_hilos COMMAND FAST-IBAN ${CASO_FIJO} 25 85 -180 180 out/ 257)
+set_tests_properties(init_demasiados_hilos PROPERTIES PASS_REGULAR_EXPRESSION "como mucho 256 hilos")
 # Sin argumentos usa el caso por defecto config/data/…, que no existe fuera del portal: nc_open falla.
 set_tests_properties(init_sin_argumentos PROPERTIES PASS_REGULAR_EXPRESSION "No such file")
 set_tests_properties(init_directorio_salida_imposible PROPERTIES PASS_REGULAR_EXPRESSION "Error creating directory")

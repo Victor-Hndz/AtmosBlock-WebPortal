@@ -78,8 +78,8 @@ extern char* FILE_NAME, *OUT_DIR_NAME;
 // ALG-208: un contador por hilo, sin "omp atomic" en el camino caliente (frenaba el escalado de
 // la fase 1). Cada entrada ocupa su propia línea de caché para que los hilos no se estorben;
 // contadores_totales() los suma al terminar, con el mismo resultado exacto.
-// ponytail: tabla fija; con más de MAX_HILOS_CONTADORES hilos dos comparten entrada y el total
-// podría perder incrementos (solo el diagnóstico, nunca las detecciones).
+// Tabla fija, una entrada por hilo: process_entry rechaza más de MAX_HILOS_CONTADORES hilos (ALG-354), así que dos hilos
+// nunca comparten entrada.
 #include <omp.h>
 #define MAX_HILOS_CONTADORES 256
 typedef struct {
