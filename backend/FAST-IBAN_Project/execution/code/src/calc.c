@@ -235,6 +235,15 @@ int lado_del_minimo(coord_point maximo, coord_point minimo) {
 }
 
 /**
+ * @brief Lado en el que un mínimo flanquea una Omega: el de lado_del_minimo si está a más de rex_max_offset_km del
+ * meridiano del máximo, y 0 si no. Es el complemento exacto de la franja del Rex: un mínimo casi bajo la alta es un
+ * dipolo alta-baja, no el flanco de una Omega (ALG-362; Hirt et al. 2018 separan ambos tipos por |Δλ|).
+ */
+int lado_flanco_omega(coord_point maximo, coord_point minimo) {
+    return distancia_al_meridiano(minimo, maximo) > PARAMS.rex_max_offset_km ? lado_del_minimo(maximo, minimo) : 0;
+}
+
+/**
  * @brief Forma del mínimo de un Rex al nivel `contour`: contorno hacia el ecuador y hacia el oeste en todo el sector,
  * hacia el polo en la mayoría, y abierto hacia el este.
  */
@@ -299,7 +308,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                         if(point_distance(clusters[j].center, clusters[i].center) > PARAMS.search_radius_km)
                                 continue;
                         
-                        int lado = lado_del_minimo(clusters[i].center, clusters[j].center);
+                        int lado = lado_flanco_omega(clusters[i].center, clusters[j].center);
 
                         if(clusters[j].type == MIN && hemisferio(clusters[i].center.lat) * clusters[j].center.lat <= hemisferio(clusters[i].center.lat) * clusters[i].center.lat && lado < 0) {
                             if(check_closed_contour(clusters[j], contour_top))
