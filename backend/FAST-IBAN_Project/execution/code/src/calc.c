@@ -264,12 +264,13 @@ int lado_flanco_omega(coord_point maximo, coord_point minimo) {
 }
 
 /**
- * @brief Forma del mínimo de un Rex al nivel `contour`: contorno hacia el ecuador y hacia el oeste en todo el sector,
- * hacia el polo en la mayoría, y abierto hacia el este.
+ * @brief Forma del mínimo de un Rex al nivel `contour`: contorno hacia el ecuador en todo el sector, hacia el polo en la
+ * mayoría, y los lados acoplados con los de la alta: cerrado en todo el sector por el lado en que la alta está abierta
+ * (`abierto_alta`: -1 oeste, 1 este) y abierto por el contrario. ALG-377: las dos orientaciones del dipolo.
  */
-bool minimo_rex_valido(points_cluster minimo, int contour) {
-    return check_contour_dir_rex(minimo, contour, 1, 0) && check_contour_dir_rex(minimo, contour, 0, -1) &&
-           check_contour_dir_omega(minimo, contour, -1, 0) && !check_contour_dir_rex(minimo, contour, 0, 1);
+bool minimo_rex_valido(points_cluster minimo, int contour, int abierto_alta) {
+    return check_contour_dir_rex(minimo, contour, 1, 0) && check_contour_dir_rex(minimo, contour, 0, abierto_alta) &&
+           check_contour_dir_omega(minimo, contour, -1, 0) && !check_contour_dir_rex(minimo, contour, 0, -abierto_alta);
 }
 
 void search_formation(points_cluster *clusters, int size, short **z_in, float *lats, float *lons, double scale_factor, double offset, char* filename, int time) {
@@ -369,7 +370,9 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                     contour_izq = check_contour_dir_rex(clusters[i], contour_top, 0, -1);
                     contour_der = check_contour_dir_rex(clusters[i], contour_top, 0, 1);
                     
-                    if(contour_bot && contour_der && !contour_izq) {
+                    // ALG-377: alta cerrada hacia el ecuador y por un lado, abierta por el otro (-1 oeste, 1 este).
+                    int abierto_alta = contour_bot && contour_der && !contour_izq ? -1 : contour_bot && contour_izq && !contour_der ? 1 : 0;
+                    if(abierto_alta != 0) {
                         for(j=0; j<size; j++) {
                             if(point_distance(clusters[j].center, clusters[i].center) > PARAMS.search_radius_km)
                                 continue;
@@ -378,7 +381,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                                 continue;
 
                             if(clusters[j].type == MIN && hemisferio(clusters[i].center.lat) * clusters[j].center.lat <= hemisferio(clusters[i].center.lat) * clusters[i].center.lat && distancia_al_meridiano(clusters[j].center, clusters[i].center) <= PARAMS.rex_max_offset_km) {
-                                if(minimo_rex_valido(clusters[j], contour_top))
+                                if(minimo_rex_valido(clusters[j], contour_top, abierto_alta))
                                     if(point_distance(clusters[j].center, clusters[i].center) < point_distance(selected_rex.center, clusters[i].center)) 
                                         selected_rex = clusters[j];
                             }
