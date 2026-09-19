@@ -35,6 +35,8 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 | Vecindad de clusters con vuelta en ±180° y fila del polo como un punto | ALG-309 | 4 / 1 → 4 / 0 | 97 / 13 (=) | **Pequeño:** clusters partidos en ±180° pasan a ser uno; 108 de 110 formaciones iguales. Ver sección ALG-309 |
 | Límite polar del filtro de latitud desactivado (90) *(decisión de diseño)* | ALG-304 | sin cambios | 97 / 13 (=) | **0 formaciones**; puntos en clusters del caso largo +29 % (clusters polares que antes se descartaban). Ver sección ALG-304 |
 | Guarda polar derivada de `ray_distance_km` y categoría `POLAR_HIGH` | ALG-310, ALG-311 | sin cambios | 97 / 13 (=) | **2003: 0 formaciones.** Invierno de 1983: una Omega a 86,5°N pasa a `POLAR_HIGH`; 3 `POLAR_HIGH` en total (85,75–86,5°N); acuerdo 0,25°/1° 123 → 126. Ver sección ALG-310/311 |
+| El lado del mínimo en la Omega se decide sin truncar la longitud | ALG-362 | sin cambios | 97 / 12 (=) | 2003 y 2019: 1 Omega cambia de mínimo cada uno; 1983: 0; DJFMAM 2014-15: 14 Omega cambian de mínimo y aparecen 4 (1213 → 1217). Ver sección ALG-362 |
+| Los flancos de la Omega deben estar a más de 700 km del meridiano del máximo *(decisión física)* | ALG-362 | 4 / 0: una Omega cambia de mínimo | 97 / 12 → 89 / 12 | **Solo se pierden Omegas o cambian de mínimo:** 2003 −8, 1983 −12, 2019 −7, DJFMAM 2014-15 −176 (−18 %, 5 pasan a Rex). Ver sección ALG-362 |
 | El dominio de análisis llega del límite hacia el ecuador al polo de su hemisferio | ALG-374 | sin cambios | sin cambios (norte) | **Hemisferio norte: 0 cambios** (las líneas base no se mueven). En el sur ya no se analiza la franja entre el ecuador y el límite pedido. Ver sección ALG-374 |
 | El mínimo del Rex debe estar abierto hacia el este (`contour_der` no se recalculaba) | ALG-361 | sin cambios | 97 / 13 → 97 / 12 | **Solo desaparecen Rex:** 2003 −1, 1983 −1, 2019 −3 (26 → 23); ninguno nuevo ni sustituido. Ver sección ALG-361 |
 
@@ -97,6 +99,38 @@ Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. E
 **Coste:** el caso largo con 12 hilos sigue en unos 6 s.
 
 Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
+
+## ALG-362: el lado del mínimo en la Omega sin truncar la longitud
+
+En la búsqueda de la Omega, un mínimo es flanco izquierdo (oeste) o derecho (este) según su longitud respecto a la del máximo, con vuelta en ±180°. Esas longitudes se guardaban en `int`, que trunca: un mínimo con la misma parte entera que el máximo (10,5° frente a 10,9°) no quedaba en ningún lado, y 10,9° frente a 11,1° sí contaba. La decisión pasa a `lado_del_minimo()` con `double`.
+
+**Test** `test_lado_minimo`: rojo con el `int` (10,9/10,5, 10,5/10,9 y −10,5/−10,9 daban 0), verde con `double`; los casos con vuelta en ±180° y el mismo meridiano no cambian. La extracción a la función se comprobó antes sin cambiar ningún hash.
+
+**Delta:**
+- Caso fijo: sin cambios. Caso de 2003 de CTest: cambia el hash de formaciones (los puntos no); línea base actualizada.
+- 2003-08-01…15: una Omega (paso 55) cambia de mínimo derecho. 1983: sin cambios. 2019: una Omega (paso 24) cambia de mínimo.
+- DJFMAM 2014-15: 14 Omega cambian de mínimo y aparecen 4 (1213 → 1217 formaciones); acuerdo 0,25°/1° 1081 → 1088 emparejadas.
+- **Patrón:** los mínimos que entran están casi en el meridiano del máximo (Δλ de 0,25° a 0,75°) y hacia el ecuador. Antes el truncamiento los excluía por accidente. Una baja justo bajo la alta es la configuración de un Rex, no un flanco de Omega: la separación mínima de los flancos queda como cambio físico aparte, con su propia decisión y su delta.
+
+**Separación mínima de los flancos (commit aparte, decidido por el usuario el 2026-09-18 con asesoría física).** Un mínimo solo es flanco de una Omega si está a **más de `rex_max_offset_km` (700 km) del meridiano del máximo**: el complemento exacto de la franja del Rex, sin hueco ni solape y sin parámetros nuevos (Hirt et al. 2018 separan *high-over-low* de Omega por |Δλ|). **Predicción escrita antes de medir:** solo pueden perderse flancos con d ≤ 700 km, así que el cambio solo puede quitar Omegas o cambiarles un mínimo por otro más lejano; ninguna Omega nueva puede aparecer salvo que un máximo antes emparejado como Omega quede libre y pase a Rex; los Rex no pierden nada.
+
+**Test** (`test_lado_minimo`, casos de flanco): mínimo a 358 km del meridiano o casi en él → no es flanco; a 854 km al este o al oeste → sí. Rojo antes (la función no existía), verde después.
+
+**Delta** (frente al commit anterior; se cumple la predicción: solo se pierden Omegas o cambian de mínimo, ninguna aparece, los Rex no pierden nada):
+
+| Caso | Omega | Perdidas | Cambian de mínimo | Omega → Rex |
+|---|---|---|---|---|
+| Caso fijo (4 pasos) | 4 → 4 | 0 | 1 | 0 |
+| 2003-08-01…15 | 97 → 89 | 8 | 14 | 0 |
+| 1983-01-31…02-21 | 128 → 116 | 12 | 30 | 0 |
+| 2019-06-24…07-01 | 80 → 73 | 7 | 29 | 0 |
+| DJFMAM 2014-15 | 995 → 819 | 171 | 286 | 5 |
+
+- **El efecto es grande en el semestre invernal (−18 % de Omegas) y moderado en los casos cortos (−8 a −9 %).** Se reparte por todas las bandas de latitud.
+- **Qué se pierde:** Omegas cuyo flanco más cercano estaba a 59–679 km del meridiano del máximo. De las 176 perdidas o convertidas en 2014-15, solo 16 tenían los dos flancos en los sectores laterales (este/oeste, ±45°) vistos desde el máximo; en los casos cortos, 1 de 27. El resto tenía al menos un flanco hacia el ecuador, en la franja del Rex.
+- **Alternativa descartada con datos:** exigir que los flancos estén en los sectores laterales de ±45° sería mucho más estricto (solo el 35–56 % de las Omegas actuales lo cumplen), porque los flancos típicos quedan al suroeste y al sureste del máximo.
+- **Acuerdo 0,25°/1° en 2014-15:** 1088 → 926 emparejadas sobre 1217 → 1046 formaciones (89 % → 89 %).
+- Líneas base del caso fijo y de 2003 actualizadas.
 
 ## ALG-374: el dominio de análisis depende del hemisferio
 

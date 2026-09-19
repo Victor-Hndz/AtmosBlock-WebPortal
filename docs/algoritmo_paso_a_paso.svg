@@ -184,9 +184,9 @@
 <text x="60" y="1309" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">cada lado. El aire rodea la alta como una</text>
 <text x="60" y="1328" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">letra omega y la circulación se queda</text>
 <text x="60" y="1347" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">parada.</text>
-<text x="60" y="1372" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Alta cerrada al este y al oeste, abierta hacia el</text>
-<text x="60" y="1388" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">ecuador, con dos bajas flanqueantes no más al polo</text>
-<text x="60" y="1404" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">que ella.</text>
+<text x="60" y="1372" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Alta cerrada al este y al oeste y abierta hacia el</text>
+<text x="60" y="1388" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">ecuador; dos bajas flanqueantes no más al polo que</text>
+<text x="60" y="1404" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">ella y a más de 700 km de su meridiano.</text>
 <rect x="432" y="1092" width="372" height="330" rx="12" fill="#ffffff" stroke="#c7d0d9"/>
 <text x="452" y="1124" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#c0392b" font-weight="700" text-anchor="start">Rex</text>
 <circle cx="618.0" cy="1178" r="44" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.25"/>
