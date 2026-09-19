@@ -102,6 +102,14 @@ Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. E
 
 Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
 
+## ALG-377: el Rex en las dos orientaciones este-oeste
+
+La regla del Rex solo aceptaba una orientación del dipolo: la alta cerrada hacia el ecuador y al este y abierta al oeste, con la baja cerrada al oeste y abierta al este. No hay base en la literatura para exigir ese sentido (Rex 1950; Hirt et al. 2018; Detring et al. 2021, doi:10.5194/wcd-2-927-2021; Masato et al. 2012, doi:10.1002/qj.990, muestran que las dos roturas de onda son físicas): era una asimetría heredada. Decidido por el usuario con asesoría física: se acepta también la configuración espejo (alta abierta al este y baja abierta al oeste), con los lados abiertos acoplados, sin parámetros nuevos. Una alta y una baja abiertas por el mismo lado siguen sin ser Rex.
+
+**Predicción escrita antes de medir:** solo pueden aparecer Rex (donde no había formación, o donde una Omega pierde frente a una baja espejo más cercana y pasa a Rex); un Rex existente solo puede cambiar de baja si hay una baja espejo válida más cerca; ningún Rex desaparece y no aparece ninguna Omega; los puntos de los clusters no cambian. Orden de magnitud: entre +30 % y +100 % de Rex. **Control positivo:** en el caso de 2019, paso 13, sale REX con la alta 57°N 20,75°W y la baja 43,25°N 16,25°W (ALG-367). La simetría entre hemisferios con datos reales (JJA 2015) se mantiene.
+
+DELTA_377
+
 ## ALG-369: rayos fuera del fichero y margen de descarga del portal
 
 Un rayo de clasificación cuya interpolación fallaba (el punto caía fuera del fichero) sumaba un voto a MAX y ninguno a MIN, aunque el comentario del código decía que no se tenía en cuenta. En el portal el fichero llega recortado al área pedida, así que los candidatos de los bordes sufrían ese sesgo. Decidido por el usuario con asesoría física (opciones b + e):
