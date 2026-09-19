@@ -1,0 +1,224 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 1662" width="1240" height="1662" role="img" aria-label="Cómo funciona FAST-IBAN paso a paso">
+<rect width="1240" height="1662" fill="#ffffff"/>
+<text x="40" y="58" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="30" fill="#1d2733" font-weight="700" text-anchor="start">Cómo detecta FAST-IBAN un bloqueo atmosférico</text>
+<text x="40" y="88" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" fill="#5b6b7c" font-weight="400" text-anchor="start">De una foto del aire en altura a una lista de bloqueos clasificados por su forma. Cada paso, en dos idiomas: llano y técnico.</text>
+<line x1="40" y1="108" x2="1200" y2="108" stroke="#c7d0d9" stroke-width="2"/>
+<rect x="40" y="132" width="372" height="132" rx="12" fill="#f4f7fa" stroke="#c7d0d9"/>
+<circle cx="70" cy="162" r="16" fill="#1d2733"/>
+<text x="70" y="168" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#ffffff" font-weight="700" text-anchor="middle">1</text>
+<text x="98" y="168" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#1d2733" font-weight="600" text-anchor="start">Datos</text>
+<text x="60" y="196" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Una “foto” del aire a unos 5,5 km de altura,</text>
+<text x="60" y="215" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">cada 6 horas</text>
+<text x="60" y="238" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">ERA5: geopotencial en 500 hPa → altura</text>
+<text x="60" y="255" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">geopotencial</text>
+<path d="M416 198.0 l12 0 m-5 -5 l5 5 l-5 5" stroke="#5b6b7c" stroke-width="2" fill="none"/>
+<rect x="432" y="132" width="372" height="132" rx="12" fill="#f4f7fa" stroke="#c7d0d9"/>
+<circle cx="462" cy="162" r="16" fill="#1d2733"/>
+<text x="462" y="168" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#ffffff" font-weight="700" text-anchor="middle">2</text>
+<text x="490" y="168" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#1d2733" font-weight="600" text-anchor="start">Zona</text>
+<text x="452" y="196" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Se elige qué parte del mundo se mira; hacia</text>
+<text x="452" y="215" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">el polo se llega al final</text>
+<text x="452" y="238" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Dominio en latitud hasta ±90°, sin truncar el</text>
+<text x="452" y="255" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">casquete</text>
+<path d="M808 198.0 l12 0 m-5 -5 l5 5 l-5 5" stroke="#5b6b7c" stroke-width="2" fill="none"/>
+<rect x="824" y="132" width="372" height="132" rx="12" fill="#f4f7fa" stroke="#c7d0d9"/>
+<circle cx="854" cy="162" r="16" fill="#1d2733"/>
+<text x="854" y="168" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#ffffff" font-weight="700" text-anchor="middle">3</text>
+<text x="882" y="168" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#1d2733" font-weight="600" text-anchor="start">Puntos de prueba</text>
+<text x="844" y="196" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Una cuadrícula de puntos, uno cada 100 km</text>
+<text x="844" y="215" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">aprox.</text>
+<text x="844" y="238" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Retícula de candidatos de 1°, múltiplo de la</text>
+<text x="844" y="255" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">resolución</text>
+<rect x="40" y="284" width="372" height="132" rx="12" fill="#f4f7fa" stroke="#c7d0d9"/>
+<circle cx="70" cy="314" r="16" fill="#1d2733"/>
+<text x="70" y="320" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#ffffff" font-weight="700" text-anchor="middle">4</text>
+<text x="98" y="320" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#1d2733" font-weight="600" text-anchor="start">¿Cima o valle?</text>
+<text x="60" y="348" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Desde cada punto se mira en 64 direcciones a</text>
+<text x="60" y="367" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">500 km</text>
+<text x="60" y="390" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">57 de 64 rayos geodésicos por debajo → MAX; por</text>
+<text x="60" y="407" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">encima → MIN</text>
+<path d="M416 350.0 l12 0 m-5 -5 l5 5 l-5 5" stroke="#5b6b7c" stroke-width="2" fill="none"/>
+<rect x="432" y="284" width="372" height="132" rx="12" fill="#f4f7fa" stroke="#c7d0d9"/>
+<circle cx="462" cy="314" r="16" fill="#1d2733"/>
+<text x="462" y="320" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#ffffff" font-weight="700" text-anchor="middle">5</text>
+<text x="490" y="320" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#1d2733" font-weight="600" text-anchor="start">Agrupar</text>
+<text x="452" y="348" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Las cimas pegadas forman una sola montaña</text>
+<text x="452" y="390" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Componente conexa con vuelta en ±180° y polo</text>
+<text x="452" y="407" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">colapsado</text>
+<path d="M808 350.0 l12 0 m-5 -5 l5 5 l-5 5" stroke="#5b6b7c" stroke-width="2" fill="none"/>
+<rect x="824" y="284" width="372" height="132" rx="12" fill="#f4f7fa" stroke="#c7d0d9"/>
+<circle cx="854" cy="314" r="16" fill="#1d2733"/>
+<text x="854" y="320" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#ffffff" font-weight="700" text-anchor="middle">6</text>
+<text x="882" y="320" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#1d2733" font-weight="600" text-anchor="start">Descartar</text>
+<text x="844" y="348" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Fuera lo muy pequeño y lo muy tropical</text>
+<text x="844" y="390" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Área ≥ 22 000 km² y punto polar del cluster > 30°</text>
+<rect x="40" y="436" width="372" height="132" rx="12" fill="#f4f7fa" stroke="#c7d0d9"/>
+<circle cx="70" cy="466" r="16" fill="#1d2733"/>
+<text x="70" y="472" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#ffffff" font-weight="700" text-anchor="middle">7</text>
+<text x="98" y="472" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#1d2733" font-weight="600" text-anchor="start">¿Qué forma tiene?</text>
+<text x="60" y="500" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Se miran sus curvas de nivel: ¿dos valles al</text>
+<text x="60" y="519" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">lado o uno debajo?</text>
+<text x="60" y="542" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Isohipsas cada 20 m; sectores de ±45° por rayos</text>
+<path d="M416 502.0 l12 0 m-5 -5 l5 5 l-5 5" stroke="#5b6b7c" stroke-width="2" fill="none"/>
+<rect x="432" y="436" width="372" height="132" rx="12" fill="#f4f7fa" stroke="#c7d0d9"/>
+<circle cx="462" cy="466" r="16" fill="#1d2733"/>
+<text x="462" y="472" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#ffffff" font-weight="700" text-anchor="middle">8</text>
+<text x="490" y="472" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#1d2733" font-weight="600" text-anchor="start">Resultado</text>
+<text x="452" y="500" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Una tabla con lo detectado y la receta</text>
+<text x="452" y="519" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">exacta usada</text>
+<text x="452" y="542" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">CSV de puntos y formaciones con la configuración</text>
+<text x="452" y="559" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">en cabecera</text>
+<path d="M808 502.0 l12 0 m-5 -5 l5 5 l-5 5" stroke="#5b6b7c" stroke-width="2" fill="none"/>
+<rect x="824" y="436" width="372" height="132" rx="12" fill="#f4f7fa" stroke="#c7d0d9"/>
+<circle cx="854" cy="466" r="16" fill="#1d2733"/>
+<text x="854" y="472" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#ffffff" font-weight="700" text-anchor="middle">9</text>
+<text x="882" y="472" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#1d2733" font-weight="600" text-anchor="start">Siempre igual</text>
+<text x="844" y="500" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Los mismos datos dan siempre el mismo</text>
+<text x="844" y="519" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">resultado</text>
+<text x="844" y="542" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Determinista e invariante al número de hilos y</text>
+<text x="844" y="559" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">procesos</text>
+<text x="40" y="612" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="22" fill="#1d2733" font-weight="700" text-anchor="start">El paso 4 y el 7, de cerca</text>
+<text x="40" y="638" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14.5" fill="#5b6b7c" font-weight="400" text-anchor="start">La misma idea sirve para decidir si un punto es cima o valle (paso 4) y para leer la forma de sus curvas de nivel (paso 7).</text>
+<rect x="40" y="656" width="1160" height="380" rx="12" fill="#ffffff" stroke="#c7d0d9"/>
+<path d="M250 842 L143.9 948.1 A150 150 0 0 1 143.9 735.9 Z" fill="#e8eef5" stroke="none"/>
+<path d="M250 842 L356.1 735.9 A150 150 0 0 1 356.1 948.1 Z" fill="#e8eef5" stroke="none"/>
+<path d="M250 842 L356.1 948.1 A150 150 0 0 1 143.9 948.1 Z" fill="#eef2e8" stroke="none"/>
+<path d="M250 842 L143.9 735.9 A150 150 0 0 1 356.1 735.9 Z" fill="#eef2e8" stroke="none"/>
+<line x1="250" y1="842" x2="250.0" y2="692.0" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="264.7" y2="692.7" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="279.3" y2="694.9" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="293.5" y2="698.5" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="307.4" y2="703.4" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="320.7" y2="709.7" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="333.3" y2="717.3" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="345.2" y2="726.0" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="356.1" y2="735.9" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="366.0" y2="746.8" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="374.7" y2="758.7" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="382.3" y2="771.3" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="388.6" y2="784.6" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="393.5" y2="798.5" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="397.1" y2="812.7" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="399.3" y2="827.3" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="400.0" y2="842.0" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="399.3" y2="856.7" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="397.1" y2="871.3" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="393.5" y2="885.5" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="388.6" y2="899.4" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="382.3" y2="912.7" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="374.7" y2="925.3" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="366.0" y2="937.2" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="356.1" y2="948.1" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="345.2" y2="958.0" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="333.3" y2="966.7" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="320.7" y2="974.3" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="307.4" y2="980.6" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="293.5" y2="985.5" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="279.3" y2="989.1" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="264.7" y2="991.3" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="250.0" y2="992.0" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="235.3" y2="991.3" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="220.7" y2="989.1" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="206.5" y2="985.5" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="192.6" y2="980.6" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="179.3" y2="974.3" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="166.7" y2="966.7" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="154.8" y2="958.0" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="143.9" y2="948.1" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="134.0" y2="937.2" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="125.3" y2="925.3" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="117.7" y2="912.7" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="111.4" y2="899.4" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="106.5" y2="885.5" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="102.9" y2="871.3" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="100.7" y2="856.7" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="100.0" y2="842.0" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="100.7" y2="827.3" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="102.9" y2="812.7" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="106.5" y2="798.5" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="111.4" y2="784.6" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="117.7" y2="771.3" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="125.3" y2="758.7" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="134.0" y2="746.8" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="143.9" y2="735.9" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="154.8" y2="726.0" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="166.7" y2="717.3" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="179.3" y2="709.7" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="192.6" y2="703.4" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="206.5" y2="698.5" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="220.7" y2="694.9" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<line x1="250" y1="842" x2="235.3" y2="692.7" stroke="#5b6b7c" stroke-width="0.8" opacity="0.75"/>
+<circle cx="250" cy="842" r="150" fill="none" stroke="#1d2733" stroke-width="1.5"/>
+<circle cx="250" cy="842" r="7" fill="#c0392b"/>
+<text x="250" y="812" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#1d2733" font-weight="600" text-anchor="middle">punto de prueba</text>
+<line x1="250" y1="842" x2="400" y2="842" stroke="#1d2733" stroke-width="2"/>
+<text x="325.0" y="834" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#1d2733" font-weight="600" text-anchor="middle">500 km</text>
+<text x="250" y="1016" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="middle">hacia el ecuador</text>
+<text x="250" y="680" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="middle">hacia el polo</text>
+<text x="410" y="846" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start">este</text>
+<text x="90" y="846" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="end">oeste</text>
+<text x="470" y="696" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" fill="#1d2733" font-weight="600" text-anchor="start">Rayos, no celdas de la rejilla.</text>
+<text x="470" y="720" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Cada rayo avanza 500 km sobre la esfera, así que mide lo mismo a 40° que a</text>
+<text x="470" y="739" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">85°. Por eso el método no se deforma cerca del polo y funciona donde otros</text>
+<text x="470" y="758" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">índices ya no se pueden calcular.</text>
+<text x="470" y="799" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" fill="#1d2733" font-weight="600" text-anchor="start">57 de 64 para decidir.</text>
+<text x="470" y="823" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Si al menos 57 de los 64 destinos están más bajos que el punto, es una cima</text>
+<text x="470" y="842" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">(MAX); si están más altos, un valle (MIN). Los 7 que sobran dan margen a que</text>
+<text x="470" y="861" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">el aire no sea perfectamente simétrico.</text>
+<text x="470" y="902" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" fill="#1d2733" font-weight="600" text-anchor="start">Cuatro sectores de ±45°.</text>
+<text x="470" y="926" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Para leer la forma se mira por dónde cruza cada curva de nivel: hacia el</text>
+<text x="470" y="945" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">ecuador, hacia el polo, al este y al oeste. Ahí está la diferencia entre una</text>
+<text x="470" y="964" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Omega y un Rex.</text>
+<text x="40" y="1072" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="22" fill="#1d2733" font-weight="700" text-anchor="start">Las tres cosas que puede encontrar</text>
+<rect x="40" y="1092" width="372" height="330" rx="12" fill="#ffffff" stroke="#c7d0d9"/>
+<text x="60" y="1124" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#c0392b" font-weight="700" text-anchor="start">Omega (Ω)</text>
+<circle cx="226.0" cy="1200" r="46" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.25"/>
+<circle cx="226.0" cy="1200" r="32" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.45"/>
+<circle cx="226.0" cy="1200" r="18" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.7"/>
+<text x="226.0" y="1206" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#c0392b" font-weight="700" text-anchor="middle">A</text>
+<circle cx="140.0" cy="1234" r="20" fill="none" stroke="#2a5fa8" stroke-width="2" opacity="0.6"/>
+<text x="140.0" y="1240" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" fill="#2a5fa8" font-weight="700" text-anchor="middle">B</text>
+<circle cx="312.0" cy="1234" r="20" fill="none" stroke="#2a5fa8" stroke-width="2" opacity="0.6"/>
+<text x="312.0" y="1240" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" fill="#2a5fa8" font-weight="700" text-anchor="middle">B</text>
+<text x="60" y="1290" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Una zona de aire alto con una zona baja a</text>
+<text x="60" y="1309" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">cada lado. El aire rodea la alta como una</text>
+<text x="60" y="1328" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">letra omega y la circulación se queda</text>
+<text x="60" y="1347" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">parada.</text>
+<text x="60" y="1372" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Alta cerrada al este y al oeste, abierta hacia el</text>
+<text x="60" y="1388" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">ecuador, con dos bajas flanqueantes no más al polo</text>
+<text x="60" y="1404" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">que ella.</text>
+<rect x="432" y="1092" width="372" height="330" rx="12" fill="#ffffff" stroke="#c7d0d9"/>
+<text x="452" y="1124" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#c0392b" font-weight="700" text-anchor="start">Rex</text>
+<circle cx="618.0" cy="1178" r="44" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.25"/>
+<circle cx="618.0" cy="1178" r="30" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.45"/>
+<circle cx="618.0" cy="1178" r="16" fill="none" stroke="#c0392b" stroke-width="2" opacity="0.7"/>
+<text x="618.0" y="1184" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#c0392b" font-weight="700" text-anchor="middle">A</text>
+<circle cx="618.0" cy="1244" r="28" fill="none" stroke="#2a5fa8" stroke-width="2" opacity="0.35"/>
+<circle cx="618.0" cy="1244" r="14" fill="none" stroke="#2a5fa8" stroke-width="2" opacity="0.6"/>
+<text x="618.0" y="1250" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" fill="#2a5fa8" font-weight="700" text-anchor="middle">B</text>
+<text x="452" y="1290" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Una zona alta con una sola zona baja justo</text>
+<text x="452" y="1309" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">debajo, hacia el ecuador. Es el dipolo</text>
+<text x="452" y="1328" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">clásico de Rex (1950).</text>
+<text x="452" y="1372" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Dipolo alta–baja alineado en longitud: la baja a ≤</text>
+<text x="452" y="1388" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">700 km del meridiano de la alta y abierta hacia el</text>
+<text x="452" y="1404" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">este.</text>
+<rect x="824" y="1092" width="372" height="330" rx="12" fill="#ffffff" stroke="#c7d0d9"/>
+<text x="844" y="1124" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#6b7a8c" font-weight="700" text-anchor="start">Alta polar</text>
+<circle cx="1010.0" cy="1214" r="52" fill="none" stroke="#5b6b7c" stroke-width="1.2" stroke-dasharray="4 4"/>
+<circle cx="1010.0" cy="1178" r="3.5" fill="#1d2733"/>
+<text x="1020.0" y="1178" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start">polo</text>
+<circle cx="1010.0" cy="1214" r="30" fill="none" stroke="#6b7a8c" stroke-width="2" opacity="0.35"/>
+<circle cx="1010.0" cy="1214" r="16" fill="none" stroke="#6b7a8c" stroke-width="2" opacity="0.6"/>
+<text x="1010.0" y="1220" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" fill="#6b7a8c" font-weight="700" text-anchor="middle">A</text>
+<text x="844" y="1290" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Una zona alta tan cerca del polo que ya no</text>
+<text x="844" y="1309" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">tiene sentido hablar de “norte” o “sur”. Se</text>
+<text x="844" y="1328" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">marca aparte.</text>
+<text x="844" y="1372" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Máximo a menos de 500 km del polo (guarda 85,5°):</text>
+<text x="844" y="1388" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">categoría de exclusión, no es un bloqueo.</text>
+<rect x="40" y="1454" width="1160" height="112" rx="12" fill="#fff8e8" stroke="#e5c77a"/>
+<text x="64" y="1484" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#8a5a00" font-weight="700" text-anchor="start">Qué NO dice este método</text>
+<text x="64" y="1510" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" fill="#1d2733" font-weight="400" text-anchor="start">• No predice: diagnostica un campo que ya ha ocurrido. Si el campo es una previsión, diagnostica la previsión.</text>
+<text x="64" y="1529" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" fill="#1d2733" font-weight="400" text-anchor="start">• Es instantáneo: todavía no exige que el bloqueo dure varios días, como pide la definición al uso. El seguimiento en el tiempo llega después.</text>
+<text x="64" y="1548" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" fill="#1d2733" font-weight="400" text-anchor="start">• La “alta polar” no cuenta como bloqueo: es la etiqueta para los casos donde la geometría de direcciones deja de tener sentido.</text>
+<text x="40" y="1634" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start">FAST-IBAN · AtmosBlock — diagrama del algoritmo. Se actualiza con cada cambio del algoritmo; detalle y fuentes en docs/algoritmo_paso_a_paso.md</text>
+</svg>
