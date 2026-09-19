@@ -13,7 +13,7 @@ bool check_contour_dir_rex(points_cluster cluster, int contour, int dir_lat, int
 bool check_contour_dir_omega(points_cluster cluster, int contour, int dir_lat, int dir_lon);
 int niveles_hacia_el_polo(const points_cluster *cluster, double altura_centro, int *niveles, int max_niveles);
 double distancia_al_meridiano(coord_point p, coord_point referencia);
-bool minimo_rex_valido(points_cluster minimo, int contour);
+bool minimo_rex_valido(points_cluster minimo, int contour, int abierto_alta);
 int lado_del_minimo(coord_point maximo, coord_point minimo);
 enum Tipo_form clasificar_candidato(coord_point p, short z0, short **z, float *lats, float *lons);
 int lado_flanco_omega(coord_point maximo, coord_point minimo);
