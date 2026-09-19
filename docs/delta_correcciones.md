@@ -100,6 +100,23 @@ Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. E
 
 Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
 
+## ALG-369: rayos fuera del fichero y margen de descarga del portal
+
+Un rayo de clasificación cuya interpolación fallaba (el punto caía fuera del fichero) sumaba un voto a MAX y ninguno a MIN, aunque el comentario del código decía que no se tenía en cuenta. En el portal el fichero llega recortado al área pedida, así que los candidatos de los bordes sufrían ese sesgo. Decidido por el usuario con asesoría física (opciones b + e):
+
+- **(b)** El rayo fallido no vota; el umbral sigue en 57 de 64 rayos, así que un candidato con más de 7 rayos fuera no se clasifica.
+- **(e)** El configurador descarga un margen de `ray_distance_km` + una celda alrededor del área (5° en latitud; 4,5°/cos φ + una celda en longitud) y el C solo informa de candidatos dentro del área pedida (antes ignoraba `LAT_LIM_MAX` y los límites de longitud: ALG-358).
+
+**Protocolo y predicciones, escritos antes de medir.** Casos 2003-08-01…15 y 1983-01-31…02-21, en dos dominios: hemisférico 25–90°N y regional 35–75°N × 30°O–40°E. Cuatro ejecuciones por dominio:
+- **A:** fichero completo (90–0°N, todas las longitudes) con el código nuevo, informando solo dentro del área: la referencia.
+- **B:** fichero recortado exactamente al área, código anterior.
+- **C:** fichero recortado exactamente al área, código nuevo.
+- **D:** fichero con el margen del configurador, código nuevo.
+
+Predicciones: B tiene un exceso de MAX en las franjas junto a los bordes; C no tiene candidatos en esas franjas donde fallan más de 7 rayos; **D coincide con A en los candidatos**, bit a bit en el dominio hemisférico. En el regional, los rayos de contorno de D paran en el borde del fichero y en A no, así que alguna formación cuyo contorno llegue más allá del margen puede diferir (formaciones truncadas: deuda aparte).
+
+DELTA_369
+
 ## ALG-362: el lado del mínimo en la Omega sin truncar la longitud
 
 En la búsqueda de la Omega, un mínimo es flanco izquierdo (oeste) o derecho (este) según su longitud respecto a la del máximo, con vuelta en ±180°. Esas longitudes se guardaban en `int`, que trunca: un mínimo con la misma parte entera que el máximo (10,5° frente a 10,9°) no quedaba en ningún lado, y 10,9° frente a 11,1° sí contaba. La decisión pasa a `lado_del_minimo()` con `double`.
