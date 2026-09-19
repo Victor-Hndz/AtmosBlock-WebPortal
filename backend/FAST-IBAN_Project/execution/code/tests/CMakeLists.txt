@@ -142,6 +142,13 @@ add_test(NAME latitudes_rejilla_1grado COMMAND sh ${COMPROBAR_LATITUDES} $<TARGE
 set_tests_properties(latitudes_desde_80N latitudes_rejilla_1grado PROPERTIES FIXTURES_REQUIRED recortes TIMEOUT 600)
 # Leer filas de más no siempre rompe el proceso; con valgrind (instalado en el CI) cualquier lectura fuera falla.
 find_program(VALGRIND valgrind)
+# ALG-355: las variantes MPI también bajo valgrind (2 procesos; MPICH no da falsos positivos), con la misma línea base.
+if(VALGRIND)
+    add_test(NAME valgrind_mpi_2 COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN_mpi>)
+    add_test(NAME valgrind_omp_mpi_2x2 COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN_omp_mpi> 2)
+    set_tests_properties(valgrind_mpi_2 valgrind_omp_mpi_2x2 PROPERTIES TIMEOUT 1800 ENVIRONMENT
+        "LANZADOR=${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} 2 ${VALGRIND} -q --error-exitcode=3")
+endif()
 if(VALGRIND)
     set_tests_properties(latitudes_desde_80N latitudes_rejilla_1grado PROPERTIES ENVIRONMENT
         "LANZADOR=${VALGRIND} -q --error-exitcode=3")
