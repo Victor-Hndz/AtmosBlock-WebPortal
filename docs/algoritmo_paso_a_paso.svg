@@ -16,10 +16,10 @@
 <circle cx="462" cy="162" r="16" fill="#1d2733"/>
 <text x="462" y="168" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#ffffff" font-weight="700" text-anchor="middle">2</text>
 <text x="490" y="168" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#1d2733" font-weight="600" text-anchor="start">Zona</text>
-<text x="452" y="196" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Se elige qué parte del mundo se mira; hacia</text>
-<text x="452" y="215" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">el polo se llega al final</text>
-<text x="452" y="238" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Dominio en latitud hasta ±90°, sin truncar el</text>
-<text x="452" y="255" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">casquete</text>
+<text x="452" y="196" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Se elige qué parte del mundo se mira y se</text>
+<text x="452" y="215" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">descarga un margen alrededor</text>
+<text x="452" y="238" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">Candidatos solo en el área pedida; rayos con</text>
+<text x="452" y="255" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">margen de 500 km y hasta ±90°</text>
 <path d="M808 198.0 l12 0 m-5 -5 l5 5 l-5 5" stroke="#5b6b7c" stroke-width="2" fill="none"/>
 <rect x="824" y="132" width="372" height="132" rx="12" fill="#f4f7fa" stroke="#c7d0d9"/>
 <circle cx="854" cy="162" r="16" fill="#1d2733"/>
