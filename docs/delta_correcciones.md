@@ -42,6 +42,7 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 | El mínimo del Rex debe estar abierto hacia el este (`contour_der` no se recalculaba) | ALG-361 | sin cambios | 97 / 13 → 97 / 12 | **Solo desaparecen Rex:** 2003 −1, 1983 −1, 2019 −3 (26 → 23); ninguno nuevo ni sustituido. Ver sección ALG-361 |
 | Área de celda de banda exacta, con el casquete en la fila del polo (antes 0 km² por cos 90°) | ALG-373 | sin cambios | sin cambios | **0 en los cuatro casos** (2003, 1983, 2019 y DJFMAM 2014-15): ningún cluster estaba cerca del filtro de 22 000 km² por su celda polar. Ver sección ALG-373 |
 | El Rex se acepta en las dos orientaciones este-oeste *(decisión física)* | ALG-377 | sin cambios | 89 / 12 → 89 / 24 | **Solo aparecen Rex:** 2003 +12, 1983 +44, 2019 +4, DJFMAM 2014-15 +198 (191 → 389); 14 Omegas pasan a Rex con la misma alta; ningún Rex se pierde. Por encima del rango previsto en 1983. Ver sección ALG-377 |
+| Un paso temporal común a las cuatro variantes (`procesar_paso` en `calc.c`) en lugar de cuatro copias | ALG-351 | sin cambios | sin cambios | **0**: refactor; líneas base idénticas en serie y OpenMP, invariancia con hilos y procesos, valgrind limpio en MPI |
 
 B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2, B1, B10 y ALG-359 sí, porque cambian el muestreo. B7 cambia un solo punto. ALG-360 solo cambia las formaciones.
 
