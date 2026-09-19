@@ -29,13 +29,14 @@ points_cluster create_cluster(int id, int n_points, int contour, coord_point cen
 }
 
 /**
- * @brief ALG-306: área, en km², de la celda de la retícula de candidatos centrada en `lat_deg` con lado `paso_deg`:
- * R²·Δλ·Δφ·cos φ. Con ella los filtros de tamaño no dependen de la latitud ni de la resolución.
- * ponytail: aproximación de celda pequeña; en la fila del polo (cos φ = 0) da 0 en vez del casquete π(R·Δ/2)².
+ * @brief ALG-306, ALG-373: área, en km², de la celda de la retícula de candidatos centrada en `lat_deg` con lado
+ * `paso_deg`: la de su banda de latitud, R²·Δλ·(sin(φ+Δ/2) − sin(φ−Δ/2)), recortada a ±90°. Es exacta y aditiva, y en
+ * la fila del polo cada candidato se lleva su parte del casquete: las 360/Δ celdas de la fila suman 2πR²(1 − cos Δ/2).
+ * Antes era R²·Δλ·Δφ·cos φ, que da 0 en el polo.
  */
 double area_celda_km2(double lat_deg, double paso_deg) {
-    double paso = paso_deg * M_PI / 180;
-    return (double)R * R * paso * paso * cos(lat_deg * M_PI / 180);
+    double arriba = fmin(lat_deg + paso_deg / 2, 90), abajo = fmax(lat_deg - paso_deg / 2, -90);
+    return (double)R * R * (paso_deg * M_PI / 180) * (sin(arriba * M_PI / 180) - sin(abajo * M_PI / 180));
 }
 
 points_cluster *fill_clusters(selected_point **points, int size_x, int size_y, int n_clusters, double offset, double scale_factor) {
