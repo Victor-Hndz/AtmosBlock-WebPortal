@@ -121,18 +121,29 @@ void calcular_extremos_rayos(points_cluster *cluster, short **z_in, float *lats,
     int hemi = hemisferio(cluster->center.lat), rayo_polo = hemi > 0 ? 0 : n / 2;
     double hasta_el_polo_km = (90.0 - hemi * cluster->center.lat) * M_PI / 180 * R;
     cluster->extremo_polo = cluster->type == MAX ? INF : -INF;
+    cluster->truncado = false;
     for (int k = 0; k < n; k++) {
         double extremo = cluster->type == MAX ? INF : -INF;
         for (int paso = 1; paso <= pasos; paso++) {
             coord_point p = coord_from_great_circle(cluster->center, paso * PARAMS.contour_ray_step_km, k * 360.0 / n);
             p.lon = (float)(fmod(p.lon + 540.0, 360.0) - 180.0);
-            if (p.lat < DOM_LAT_MIN || p.lat > DOM_LAT_MAX || p.lat < lat_inf || p.lat > lat_sup)
+            if (p.lat < DOM_LAT_MIN || p.lat > DOM_LAT_MAX)
+                break;  // límite de análisis pedido: no es falta de datos
+            // ALG-376: a partir de aquí el rayo se corta porque el fichero se acaba, así que el contorno de este
+            // cluster puede estar incompleto y la formación se marca como truncada.
+            if (p.lat < lat_inf || p.lat > lat_sup) {
+                cluster->truncado = true;
                 break;
-            if (!global && (p.lon < lon_min || p.lon > lon_max))
+            }
+            if (!global && (p.lon < lon_min || p.lon > lon_max)) {
+                cluster->truncado = true;
                 break;
+            }
             short z;
-            if (!bilinear_interpolation(p, z_in, lats, lons, &z))
+            if (!bilinear_interpolation(p, z_in, lats, lons, &z)) {
+                cluster->truncado = true;
                 break;
+            }
             double h = ((z * scale_factor) + offset) / g_0;
             extremo = cluster->type == MAX ? fmin(extremo, h) : fmax(extremo, h);
             if (k == rayo_polo && paso * PARAMS.contour_ray_step_km <= hasta_el_polo_km)
@@ -277,7 +288,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
     int i, j, index_lat, index_lon, contour_top;
     double mean_dist, pair_score, best_score;
     bool contour_bot, contour_izq, contour_der;
-    points_cluster selected_izq, selected_der, selected_rex;
+    points_cluster selected_izq = {0}, selected_der = {0}, selected_rex = {0};
     formation formation;
 
     // ALG-360: extremos de los rayos geodésicos de todos los clusters, una vez por paso temporal.
@@ -289,7 +300,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
             // ALG-311: más allá de la guarda polar los sectores de rayos no distinguen direcciones; el máximo se
             // exporta como alta polar (sin mínimos) y no se evalúa como Omega ni Rex.
             if(fabs(clusters[i].center.lat) > guarda_polar_deg()) {
-                export_formation_to_csv(create_formation(clusters[i].id, -1, -1, POLAR_HIGH), filename, time);
+                export_formation_to_csv(create_formation(clusters[i].id, -1, -1, POLAR_HIGH, clusters[i].truncado), filename, time);
                 continue;
             }
             index_lat = findIndex(lats, NLAT, clusters[i].center.lat);
@@ -424,11 +435,12 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
             
             if(selected_rex.center.lat != INF && selected_rex.id != -1) {
                 printf("Formación REX encontrada: %d, %d\n", clusters[i].id, selected_rex.id);
-                formation = create_formation(clusters[i].id, selected_rex.id, -1, REX);
+                formation = create_formation(clusters[i].id, selected_rex.id, -1, REX, clusters[i].truncado || selected_rex.truncado);
                 export_formation_to_csv(formation, filename, time);
             } else if (selected_izq.center.lat != INF && selected_der.center.lat != INF && selected_izq.id != -1 && selected_der.id != -1) {
                 printf("Formación OMEGA encontrada: %d, %d, %d\n", clusters[i].id, selected_izq.id, selected_der.id);   
-                formation = create_formation(clusters[i].id, selected_izq.id, selected_der.id, OMEGA);
+                formation = create_formation(clusters[i].id, selected_izq.id, selected_der.id, OMEGA,
+                                            clusters[i].truncado || selected_izq.truncado || selected_der.truncado);
                 export_formation_to_csv(formation, filename, time);
             }
         }

@@ -67,7 +67,7 @@
 <text x="452" y="500" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">Una tabla con lo detectado y la receta</text>
 <text x="452" y="519" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#1d2733" font-weight="400" text-anchor="start">exacta usada</text>
 <text x="452" y="542" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">CSV de puntos y formaciones con la configuración</text>
-<text x="452" y="559" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">en cabecera</text>
+<text x="452" y="559" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b6b7c" font-weight="400" text-anchor="start" font-style="italic">en cabecera; `truncada` marca lo visto a medias</text>
 <path d="M808 502.0 l12 0 m-5 -5 l5 5 l-5 5" stroke="#5b6b7c" stroke-width="2" fill="none"/>
 <rect x="824" y="436" width="372" height="132" rx="12" fill="#f4f7fa" stroke="#c7d0d9"/>
 <circle cx="854" cy="466" r="16" fill="#1d2733"/>

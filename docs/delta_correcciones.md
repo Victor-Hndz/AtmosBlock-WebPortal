@@ -43,6 +43,7 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 | Área de celda de banda exacta, con el casquete en la fila del polo (antes 0 km² por cos 90°) | ALG-373 | sin cambios | sin cambios | **0 en los cuatro casos** (2003, 1983, 2019 y DJFMAM 2014-15): ningún cluster estaba cerca del filtro de 22 000 km² por su celda polar. Ver sección ALG-373 |
 | El Rex se acepta en las dos orientaciones este-oeste *(decisión física)* | ALG-377 | sin cambios | 89 / 12 → 89 / 24 | **Solo aparecen Rex:** 2003 +12, 1983 +44, 2019 +4, DJFMAM 2014-15 +198 (191 → 389); 14 Omegas pasan a Rex con la misma alta; ningún Rex se pierde. Por encima del rango previsto en 1983. Ver sección ALG-377 |
 | Un paso temporal común a las cuatro variantes (`procesar_paso` en `calc.c`) en lugar de cuatro copias | ALG-351 | sin cambios | sin cambios | **0**: refactor; líneas base idénticas en serie y OpenMP, invariancia con hilos y procesos, valgrind limpio en MPI |
+| Las formaciones con el contorno cortado por el borde del fichero se marcan `truncada` | ALG-376 | sin cambios | sin cambios | **0 detecciones:** solo se añade una columna al CSV de formaciones. Hemisférico (1983): 0 truncadas. Petición regional de 2003 (75/-30/35/40 con margen): **las 6 formaciones truncadas**, porque los rayos de contorno llegan a 3000 km. Ver sección ALG-376 |
 
 B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2, B1, B10 y ALG-359 sí, porque cambian el muestreo. B7 cambia un solo punto. ALG-360 solo cambia las formaciones.
 
@@ -103,6 +104,23 @@ Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. E
 **Coste:** el caso largo con 12 hilos sigue en unos 6 s.
 
 Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
+
+## ALG-376: formaciones truncadas
+
+Con un fichero regional (el que descarga el portal con el margen de ALG-369), los rayos de contorno —que llegan hasta `search_radius_km` = 3000 km— se quedan sin datos al salir del fichero, y la formación se evalúa con información incompleta: en 2003 regional salían 3 de 4 formaciones distintas de las del fichero completo. La propuesta del agente físico fue marcarlas, no ampliar el margen a 3000 km (que multiplicaría la descarga).
+
+`calcular_extremos_rayos` distingue ahora por qué se corta un rayo:
+
+- si para en `DOM_LAT_MIN`/`DOM_LAT_MAX`, es el límite de análisis que se ha pedido y no marca nada;
+- si para porque se acaba el fichero (latitud o longitud) o porque la interpolación no tiene datos, el cluster queda `truncado`.
+
+Una formación es `truncada` si lo es su máximo o alguno de sus mínimos. Se exporta como sexta columna del CSV de formaciones (`time,max_id,min1_id,min2_id,type,truncada`) y el generador de mapas dibuja esas formaciones con el contorno a trazos y un asterisco en la etiqueta; los CSV anteriores, sin la columna, siguen funcionando.
+
+**Test** `truncadas_fichero_completo` y `truncadas_fichero_recortado`: con el caso fijo (90°N a 25°N) y el dominio 25–90 no hay ninguna truncada; con el mismo caso recortado en 80°N y el mismo dominio, alguna. Rojo antes (la columna no existía, 0 truncadas), verde después.
+
+**Delta:** ninguna detección cambia; los CSV son idénticos salvo la columna nueva (comprobado en 1983 y en el caso regional de 2003). Líneas base actualizadas solo por la columna.
+
+**Qué se marca:** 0 de 171 formaciones en 1983 (fichero hemisférico) y **6 de 6 en la petición regional de 2003**. Con `search_radius_km` = 3000 km, cualquier petición regional más pequeña que ~60° de lado sale entera marcada: el aviso es correcto, pero dice sobre todo que las peticiones regionales pequeñas no son comparables con las hemisféricas.
 
 ## ALG-377: el Rex en las dos orientaciones este-oeste
 

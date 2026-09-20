@@ -50,7 +50,8 @@ static bool es_polar_high(coord_point centro) {
     char linea[128] = "";
     bool encontrado = false;
     while (fp != NULL && fgets(linea, sizeof(linea), fp) != NULL)
-        encontrado = encontrado || strcmp(linea, "0,0,-1,-1,POLAR_HIGH\n") == 0;
+        // ALG-376: la última columna (truncada) depende de si el fichero sintético llega al borde.
+        encontrado = encontrado || strncmp(linea, "0,0,-1,-1,POLAR_HIGH", 20) == 0;
     if (fp != NULL)
         fclose(fp);
     return encontrado;
