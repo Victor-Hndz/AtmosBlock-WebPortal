@@ -1,5 +1,5 @@
 #!/bin/sh
-# ALG-307: simetría hemisférica. El caso <norte.nc> (90°N-0°) se ejecuta con límites 25..85 y su reflejo en el ecuador,
+# ALG-307: simetría hemisférica. El caso <norte.nc> (90°N-0°) se ejecuta con límites 25..90 y su reflejo en el ecuador,
 # recortado a 25°S (<sur.nc>), con límites -90..-25. Los puntos seleccionados y las formaciones (por centroides) deben
 # ser los mismos con la latitud cambiada de signo.
 # Uso: comprobar_simetria.sh <binario FAST-IBAN> <norte.nc> <sur.nc>
@@ -32,7 +32,7 @@ normalizar() {  # normalizar <directorio> <signo>
         | LC_ALL=C sort > formaciones.txt
 }
 
-ejecutar "$NORTE" 25 85 norte
+ejecutar "$NORTE" 25 90 norte
 ejecutar "$SUR" -90 -25 sur
 normalizar norte 1
 normalizar sur -1

@@ -41,6 +41,7 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 | El dominio de análisis llega del límite hacia el ecuador al polo de su hemisferio | ALG-374 | sin cambios | sin cambios (norte) | **Hemisferio norte: 0 cambios** (las líneas base no se mueven). En el sur ya no se analiza la franja entre el ecuador y el límite pedido. Ver sección ALG-374 |
 | El mínimo del Rex debe estar abierto hacia el este (`contour_der` no se recalculaba) | ALG-361 | sin cambios | 97 / 13 → 97 / 12 | **Solo desaparecen Rex:** 2003 −1, 1983 −1, 2019 −3 (26 → 23); ninguno nuevo ni sustituido. Ver sección ALG-361 |
 | Área de celda de banda exacta, con el casquete en la fila del polo (antes 0 km² por cos 90°) | ALG-373 | sin cambios | sin cambios | **0 en los cuatro casos** (2003, 1983, 2019 y DJFMAM 2014-15): ningún cluster estaba cerca del filtro de 22 000 km² por su celda polar. Ver sección ALG-373 |
+| El Rex se acepta en las dos orientaciones este-oeste *(decisión física)* | ALG-377 | sin cambios | 89 / 12 → 89 / 24 | **Solo aparecen Rex:** 2003 +12, 1983 +44, 2019 +4, DJFMAM 2014-15 +198 (191 → 389); 14 Omegas pasan a Rex con la misma alta; ningún Rex se pierde. Por encima del rango previsto en 1983. Ver sección ALG-377 |
 
 B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2, B1, B10 y ALG-359 sí, porque cambian el muestreo. B7 cambia un solo punto. ALG-360 solo cambia las formaciones.
 
@@ -101,6 +102,30 @@ Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. E
 **Coste:** el caso largo con 12 hilos sigue en unos 6 s.
 
 Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
+
+## ALG-377: el Rex en las dos orientaciones este-oeste
+
+La regla del Rex solo aceptaba una orientación del dipolo: la alta cerrada hacia el ecuador y al este y abierta al oeste, con la baja cerrada al oeste y abierta al este. No hay base en la literatura para exigir ese sentido (Rex 1950; Hirt et al. 2018; Detring et al. 2021, doi:10.5194/wcd-2-927-2021; Masato et al. 2012, doi:10.1002/qj.990, muestran que las dos roturas de onda son físicas): era una asimetría heredada. Decidido por el usuario con asesoría física: se acepta también la configuración espejo (alta abierta al este y baja abierta al oeste), con los lados abiertos acoplados, sin parámetros nuevos. Una alta y una baja abiertas por el mismo lado siguen sin ser Rex.
+
+**Predicción escrita antes de medir:** solo pueden aparecer Rex (donde no había formación, o donde una Omega pierde frente a una baja espejo más cercana y pasa a Rex); un Rex existente solo puede cambiar de baja si hay una baja espejo válida más cerca; ningún Rex desaparece y no aparece ninguna Omega; los puntos de los clusters no cambian. Orden de magnitud: entre +30 % y +100 % de Rex. **Control positivo:** en el caso de 2019, paso 13, sale REX con la alta 57°N 20,75°W y la baja 43,25°N 16,25°W (ALG-367). La simetría entre hemisferios con datos reales (JJA 2015) se mantiene.
+
+**Delta** (frente al commit anterior; puntos idénticos en todos los casos):
+
+| Caso | Rex | Omega | Omega → Rex (misma alta) | Rex perdidos o con otra baja |
+|---|---|---|---|---|
+| Caso fijo (4 pasos) | 0 → 0 | 4 → 4 | 0 | 0 |
+| 2003-08-01…15 | 12 → 24 (+100 %) | 89 → 89 | 0 | 0 |
+| 1983-01-31…02-21 | 12 → 56 (+367 %) | 116 → 112 | 4 | 0 |
+| 2019-06-24…07-01 | 23 → 27 (+17 %) | 73 → 73 | 0 | 0 |
+| DJFMAM 2014-15 | 191 → 389 (+104 %) | 819 → 809 | 10 | 0 |
+
+- **Se cumple la parte cualitativa de la predicción:** solo aparecen Rex; las únicas Omegas que se pierden pasan a Rex con la misma alta; ningún Rex desaparece ni cambia de baja; ninguna Omega aparece.
+- **Control positivo:** en 2019, paso 13, sale REX con la alta en 57°N 20,75°W y la baja en 43,25°N 16,25°W.
+- **La magnitud se sale del rango previsto (+30 % a +100 %).** En conjunto, los Rex pasan de 238 a 496 (+108 %). 2003 y 2014-15 quedan en el borde superior; 2019 (+17 %) queda por debajo; 1983 (+367 %), muy por encima. Los Rex nuevos de 1983 no son sueltos: forman trayectorias de varios días (una alta sobre el golfo de Alaska, 55–63°N, de los pasos 43 a 69; otra sobre el mar de Bering, 67°N, de los pasos 51 a 60; y otra atlántica, 58–60°N, de los pasos 76 a 80), todas con la orientación espejo que antes se rechazaba. La predicción subestimó cuánto domina la orientación espejo en episodios concretos; no se ajusta nada para acercarse a ella.
+- Latitud de la alta de los Rex nuevos: mediana entre 63° y 69° según el caso (2014-15: de 39,5° a 85°).
+- **Acuerdo 0,25°/1° en 2014-15:** 926 de 1046 → 1096 de 1234 emparejadas (88,5 % → 88,8 %).
+- **Simetría entre hemisferios (espejo real de JJA 2015):** 0 puntos y 0 formaciones distintas, antes (359) y después (415). Se mide con el techo del norte en 90°, como el sur; `comprobar_simetria.sh` usaba 85° y comparaba de más las altas polares entre 85° y 90° (corregido en un commit aparte).
+- Líneas base intactas: ni el caso fijo ni el de 2003 de CTest tienen Rex en la orientación espejo.
 
 ## ALG-369: rayos fuera del fichero y margen de descarga del portal
 
