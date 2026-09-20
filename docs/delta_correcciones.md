@@ -40,6 +40,11 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 | Los flancos de la Omega deben estar a más de 700 km del meridiano del máximo *(decisión física)* | ALG-362 | 4 / 0: una Omega cambia de mínimo | 97 / 12 → 89 / 12 | **Solo se pierden Omegas o cambian de mínimo:** 2003 −8, 1983 −12, 2019 −7, DJFMAM 2014-15 −176 (−18 %, 5 pasan a Rex). Ver sección ALG-362 |
 | El dominio de análisis llega del límite hacia el ecuador al polo de su hemisferio | ALG-374 | sin cambios | sin cambios (norte) | **Hemisferio norte: 0 cambios** (las líneas base no se mueven). En el sur ya no se analiza la franja entre el ecuador y el límite pedido. Ver sección ALG-374 |
 | El mínimo del Rex debe estar abierto hacia el este (`contour_der` no se recalculaba) | ALG-361 | sin cambios | 97 / 13 → 97 / 12 | **Solo desaparecen Rex:** 2003 −1, 1983 −1, 2019 −3 (26 → 23); ninguno nuevo ni sustituido. Ver sección ALG-361 |
+| Área de celda de banda exacta, con el casquete en la fila del polo (antes 0 km² por cos 90°) | ALG-373 | sin cambios | sin cambios | **0 en los cuatro casos** (2003, 1983, 2019 y DJFMAM 2014-15): ningún cluster estaba cerca del filtro de 22 000 km² por su celda polar. Ver sección ALG-373 |
+| El Rex se acepta en las dos orientaciones este-oeste *(decisión física)* | ALG-377 | sin cambios | 89 / 12 → 89 / 24 | **Solo aparecen Rex:** 2003 +12, 1983 +44, 2019 +4, DJFMAM 2014-15 +198 (191 → 389); 14 Omegas pasan a Rex con la misma alta; ningún Rex se pierde. Por encima del rango previsto en 1983. Ver sección ALG-377 |
+| Un paso temporal común a las cuatro variantes (`procesar_paso` en `calc.c`) en lugar de cuatro copias | ALG-351 | sin cambios | sin cambios | **0**: refactor; líneas base idénticas en serie y OpenMP, invariancia con hilos y procesos, valgrind limpio en MPI |
+| Las formaciones con el contorno cortado por el borde del fichero se marcan `truncada` | ALG-376 | sin cambios | sin cambios | **0 detecciones:** solo se añade una columna al CSV de formaciones. Hemisférico (1983): 0 truncadas. Petición regional de 2003 (75/-30/35/40 con margen): **las 6 formaciones truncadas**, porque los rayos de contorno llegan a 3000 km. Ver sección ALG-376 |
+| La variante de temperatura (`code_t`) usa el núcleo de `code/` en vez de su propia librería | ALG-352 | sin cambios | sin cambios | **0 en geopotencial.** En temperatura sí cambia, porque la variante hereda las correcciones de las fases 1-3: caso fijo de temperatura 3309 → 3498 puntos y 45 → 52 clusters; 33 de los 45 clusters antiguos siguen ahí a ≤150 km. Ver sección ALG-352 |
 
 B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2, B1, B10 y ALG-359 sí, porque cambian el muestreo. B7 cambia un solo punto. ALG-360 solo cambia las formaciones.
 
@@ -101,6 +106,66 @@ Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. E
 
 Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
 
+## ALG-352: la variante de temperatura usa el núcleo
+
+`code_t` tenía su propia librería (471 líneas) copiada de una versión antigua de `code/`: sin ninguna corrección de las fases 1-3 (B1, B2, B7, B10, la vecindad con vuelta en ±180°, el dominio por hemisferio, el anclaje de la rejilla de candidatos…). Ahora comparte el núcleo y solo conserva su regla propia: un punto se selecciona si su temperatura supera `temperature_threshold_c`.
+
+Para eso el núcleo aprende qué variable trata (`VARIABLE`, ALG-352): el nombre en el NetCDF (`z` o `t`), las unidades de la salida (`valor_fisico`: metros de altura geopotencial o grados Celsius) y el juego de parámetros (la variante de temperatura añade su umbral). Con geopotencial no cambia nada: `valor_fisico` es la misma división por `g₀` y la cabecera es idéntica.
+
+**Qué se borra:** `code_t/lib/` entero y los tests de clusters, `expandCluster` y resolución, que duplicaban los del núcleo.
+
+**Delta (caso fijo de temperatura, 850 hPa, 2019-06-28):**
+
+| | Antes | Después |
+|---|---|---|
+| Puntos seleccionados | 3309 | 3498 |
+| Clusters | 45 | 52 |
+| Clusters comunes (centroides a ≤150 km) | — | 33 de 45 |
+| Latitudes | 25,5–46,5 | 25,0–46,75 |
+
+Los puntos no coinciden uno a uno porque la rejilla de candidatos pasa a anclarse como la del núcleo (ALG-302, ALG-369, ALG-374): las filas y columnas salen desplazadas medio grado. Los objetos son los mismos; cambian el muestreo y, con la vecindad corregida, cómo se agrupan. La salida gana la columna `type` del formato del núcleo (siempre `MAX` en esta variante) y el geopotencial no se toca.
+
+## ALG-376: formaciones truncadas
+
+Con un fichero regional (el que descarga el portal con el margen de ALG-369), los rayos de contorno —que llegan hasta `search_radius_km` = 3000 km— se quedan sin datos al salir del fichero, y la formación se evalúa con información incompleta: en 2003 regional salían 3 de 4 formaciones distintas de las del fichero completo. La propuesta del agente físico fue marcarlas, no ampliar el margen a 3000 km (que multiplicaría la descarga).
+
+`calcular_extremos_rayos` distingue ahora por qué se corta un rayo:
+
+- si para en `DOM_LAT_MIN`/`DOM_LAT_MAX`, es el límite de análisis que se ha pedido y no marca nada;
+- si para porque se acaba el fichero (latitud o longitud) o porque la interpolación no tiene datos, el cluster queda `truncado`.
+
+Una formación es `truncada` si lo es su máximo o alguno de sus mínimos. Se exporta como sexta columna del CSV de formaciones (`time,max_id,min1_id,min2_id,type,truncada`) y el generador de mapas dibuja esas formaciones con el contorno a trazos y un asterisco en la etiqueta; los CSV anteriores, sin la columna, siguen funcionando.
+
+**Test** `truncadas_fichero_completo` y `truncadas_fichero_recortado`: con el caso fijo (90°N a 25°N) y el dominio 25–90 no hay ninguna truncada; con el mismo caso recortado en 80°N y el mismo dominio, alguna. Rojo antes (la columna no existía, 0 truncadas), verde después.
+
+**Delta:** ninguna detección cambia; los CSV son idénticos salvo la columna nueva (comprobado en 1983 y en el caso regional de 2003). Líneas base actualizadas solo por la columna.
+
+**Qué se marca:** 0 de 171 formaciones en 1983 (fichero hemisférico) y **6 de 6 en la petición regional de 2003**. Con `search_radius_km` = 3000 km, cualquier petición regional más pequeña que ~60° de lado sale entera marcada: el aviso es correcto, pero dice sobre todo que las peticiones regionales pequeñas no son comparables con las hemisféricas.
+
+## ALG-377: el Rex en las dos orientaciones este-oeste
+
+La regla del Rex solo aceptaba una orientación del dipolo: la alta cerrada hacia el ecuador y al este y abierta al oeste, con la baja cerrada al oeste y abierta al este. No hay base en la literatura para exigir ese sentido (Rex 1950; Hirt et al. 2018; Detring et al. 2021, doi:10.5194/wcd-2-927-2021; Masato et al. 2012, doi:10.1002/qj.990, muestran que las dos roturas de onda son físicas): era una asimetría heredada. Decidido por el usuario con asesoría física: se acepta también la configuración espejo (alta abierta al este y baja abierta al oeste), con los lados abiertos acoplados, sin parámetros nuevos. Una alta y una baja abiertas por el mismo lado siguen sin ser Rex.
+
+**Predicción escrita antes de medir:** solo pueden aparecer Rex (donde no había formación, o donde una Omega pierde frente a una baja espejo más cercana y pasa a Rex); un Rex existente solo puede cambiar de baja si hay una baja espejo válida más cerca; ningún Rex desaparece y no aparece ninguna Omega; los puntos de los clusters no cambian. Orden de magnitud: entre +30 % y +100 % de Rex. **Control positivo:** en el caso de 2019, paso 13, sale REX con la alta 57°N 20,75°W y la baja 43,25°N 16,25°W (ALG-367). La simetría entre hemisferios con datos reales (JJA 2015) se mantiene.
+
+**Delta** (frente al commit anterior; puntos idénticos en todos los casos):
+
+| Caso | Rex | Omega | Omega → Rex (misma alta) | Rex perdidos o con otra baja |
+|---|---|---|---|---|
+| Caso fijo (4 pasos) | 0 → 0 | 4 → 4 | 0 | 0 |
+| 2003-08-01…15 | 12 → 24 (+100 %) | 89 → 89 | 0 | 0 |
+| 1983-01-31…02-21 | 12 → 56 (+367 %) | 116 → 112 | 4 | 0 |
+| 2019-06-24…07-01 | 23 → 27 (+17 %) | 73 → 73 | 0 | 0 |
+| DJFMAM 2014-15 | 191 → 389 (+104 %) | 819 → 809 | 10 | 0 |
+
+- **Se cumple la parte cualitativa de la predicción:** solo aparecen Rex; las únicas Omegas que se pierden pasan a Rex con la misma alta; ningún Rex desaparece ni cambia de baja; ninguna Omega aparece.
+- **Control positivo:** en 2019, paso 13, sale REX con la alta en 57°N 20,75°W y la baja en 43,25°N 16,25°W.
+- **La magnitud se sale del rango previsto (+30 % a +100 %).** En conjunto, los Rex pasan de 238 a 496 (+108 %). 2003 y 2014-15 quedan en el borde superior; 2019 (+17 %) queda por debajo; 1983 (+367 %), muy por encima. Los Rex nuevos de 1983 no son sueltos: forman trayectorias de varios días (una alta sobre el golfo de Alaska, 55–63°N, de los pasos 43 a 69; otra sobre el mar de Bering, 67°N, de los pasos 51 a 60; y otra atlántica, 58–60°N, de los pasos 76 a 80), todas con la orientación espejo que antes se rechazaba. La predicción subestimó cuánto domina la orientación espejo en episodios concretos; no se ajusta nada para acercarse a ella.
+- Latitud de la alta de los Rex nuevos: mediana entre 63° y 69° según el caso (2014-15: de 39,5° a 85°).
+- **Acuerdo 0,25°/1° en 2014-15:** 926 de 1046 → 1096 de 1234 emparejadas (88,5 % → 88,8 %).
+- **Simetría entre hemisferios (espejo real de JJA 2015):** 0 puntos y 0 formaciones distintas, antes (359) y después (415). Se mide con el techo del norte en 90°, como el sur; `comprobar_simetria.sh` usaba 85° y comparaba de más las altas polares entre 85° y 90° (corregido en un commit aparte).
+- Líneas base intactas: ni el caso fijo ni el de 2003 de CTest tienen Rex en la orientación espejo.
+
 ## ALG-369: rayos fuera del fichero y margen de descarga del portal
 
 Un rayo de clasificación cuya interpolación fallaba (el punto caía fuera del fichero) sumaba un voto a MAX y ninguno a MIN, aunque el comentario del código decía que no se tenía en cuenta. En el portal el fichero llega recortado al área pedida, así que los candidatos de los bordes sufrían ese sesgo. Decidido por el usuario con asesoría física (opciones b + e):
@@ -129,6 +194,14 @@ Predicciones: B tiene un exceso de MAX en las franjas junto a los bordes; C no t
 - **Con el margen del configurador los candidatos son idénticos a los del fichero completo, bit a bit**, en los cuatro casos.
 - **Formación truncada:** en el dominio regional de 2003, D pierde 1 de las 4 formaciones de A. Sus rayos de contorno (hasta 3000 km) llegan al borde del fichero, que en A no existe. Es la limitación prevista; marcarlas queda como deuda.
 - Con los límites de las pruebas de CTest (`25 85`), el caso fijo da las mismas detecciones (solo bajan los contadores de llamadas) y el de 2003 deja de informar 45 puntos por encima de 85°; líneas base actualizadas.
+
+## ALG-373: área de la celda del polo
+
+`area_celda_km2` usaba R²·Δλ·Δφ·cos φ, que da 0 en la fila de ±90°: un cluster polar se quedaba sin el área de su celda del polo (≈ 9 700 km² a 1°, casi la mitad del filtro de 22 000 km²). Pasa a la banda exacta R²·Δλ·(sin(φ+Δ/2) − sin(φ−Δ/2)), recortada a ±90°: es aditiva, y en la fila del polo cada candidato se lleva su parte del casquete (las 360/Δ celdas suman 2πR²(1 − cos Δ/2)).
+
+**Test** `test_area_celda`: rojo antes (fila del polo 0 km²; 4×4 celdas de 0,25° no sumaban la de 1° que cubren), verde después.
+
+**Delta:** 0 en CTest (líneas base intactas) y en los cuatro casos largos, en puntos y formaciones (2003, 1983, 2019 y DJFMAM 2014-15; en este último, 683 102 puntos y 819 OMEGA / 191 REX / 36 POLAR_HIGH antes y después). Fuera del polo la banda y la fórmula con cos φ difieren menos de 10⁻⁴ en relativo, y ningún cluster polar de estos casos estaba en el filo del filtro.
 
 ## ALG-362: el lado del mínimo en la Omega sin truncar la longitud
 
@@ -161,6 +234,18 @@ En la búsqueda de la Omega, un mínimo es flanco izquierdo (oeste) o derecho (e
 - **Alternativa descartada con datos:** exigir que los flancos estén en los sectores laterales de ±45° sería mucho más estricto (solo el 35–56 % de las Omegas actuales lo cumplen), porque los flancos típicos quedan al suroeste y al sureste del máximo.
 - **Acuerdo 0,25°/1° en 2014-15:** 1088 → 926 emparejadas sobre 1217 → 1046 formaciones (89 % → 89 %).
 - Líneas base del caso fijo y de 2003 actualizadas.
+
+**Revisión manual de las Omegas perdidas (2026-09-20).** Se revisaron las 12 Omegas que pierde 1983-01-31…02-21, con sus mapas de formaciones generados con el código del portal:
+
+| Caso | Flanco más cercano | Posición respecto a la alta | Veredicto |
+|---|---|---|---|
+| Pasos 10, 11, 14, 15 (Norteamérica occidental) | 404–569 km | 13–16° hacia el ecuador | Alta sobre baja: el rechazo es correcto |
+| Paso 35 (dos casos, golfo de Alaska y mar de Bering) | 59 y 443 km | 9,5 y 13° hacia el ecuador | Correcto |
+| Paso 66 (Atlántico oriental) | 245 km | 18° hacia el ecuador | Correcto |
+| Paso 80 (Asia central) | 290 km | 6° hacia el ecuador, justo debajo | Correcto |
+| **Pasos 50, 66, 67, 70 (Siberia central)** | **501–682 km** | **5–9° hacia el ecuador, casi al lado** | **Fronterizos:** el flanco está entre el 72 % y el 97 % del umbral y a la altura de la alta; en el mapa la configuración se lee como Omega |
+
+Ocho de las doce son rechazos claros. Las cuatro fronterizas son la misma alta siberiana en cuatro pasos consecutivos, con su flanco oeste justo por debajo de los 700 km: son el precio del umbral elegido, no un fallo de la regla. Queda anotado por si en la validación del umbral del Rex (ALG-368) se revisa el valor.
 
 ## ALG-374: el dominio de análisis depende del hemisferio
 
@@ -250,6 +335,14 @@ El filtro de tamaño exigía al menos 2 puntos por cluster. Con candidatos cada 
 - **Acuerdo entre 0,25° y 1°** en el caso largo: 105 de 123 → 99 de 112; formaciones que solo están en una resolución, 35 → 24 (−31 %).
 
 Test `test_area_celda`: 1° en el ecuador ≈ 12 364 km², la mitad a 60°, igual en el HS, y 16 celdas de 0,25° = 1 de 1°.
+
+**Validación del umbral (ALG-371, 2026-09-20).** La derivación de 22 000 km² era geometría plana con perfiles ideales, sin comprobar. Ahora hay predicción analítica y medida:
+
+- **Cúpula isótropa:** un candidato a distancia *r* del centro falla el rayo del acimut θ cuando cos θ > D/(2r), así que la huella MAX es un disco de radio D/(2 cos(π·fracción de rayos que pueden fallar)) = 265,5 km, es decir 2,21·10⁵ km², **sin depender del ancho de la cúpula, de la latitud ni de la resolución**. Medido con el código real (`test_area_cupula`): 224 806 km² a 30°, 233 971 a 55° y 244 720 (1°) / 231 843 (0,25°) a 80°; el ancho (600 y 1500 km) no cambia el resultado.
+- **Dorsal sin pendiente:** la franja mide D·sin(π·fracción que falla) = 169 km. Medido: 167,0 km a 30° y 194,6 km a 55° (la desviación es geométrica: un rayo hacia el este es un círculo máximo que se aparta del paralelo hacia el ecuador). Una dorsal necesita 131 km de longitud para llegar a 22 000 km².
+- **Distribución real** (1983, sin filtro, 2239 clusters; `tests/validacion/area_minima.py`): la mediana de un cluster MAX son 214 886 km², casi la huella teórica. El filtro quita el 13,6 % de los MAX y el 10,0 % de los MIN, todos por debajo de una huella.
+- **Sensibilidad:** subir el umbral de 22 000 a 28 800 km² solo quitaría un 1,8 % más de MAX y un 1,5 % más de MIN; entre 22 000 y 22 300 no cambia nada. La elección exacta no decide detecciones.
+- **Qué quita hoy:** en el caso fijo, nada (el Rex que desaparecía en ALG-306 ya no existe tras los cambios posteriores). En 1983 quita 46 de 217 formaciones y no añade ninguna: 25 Omega, 9 Rex y **12 de las 15 `POLAR_HIGH`**, casi todas por encima de 85°, donde las huellas son estrechas porque la lógica direccional degenera.
 
 ## ALG-364: separación del Rex en km, no en grados
 

@@ -1,9 +1,50 @@
-# FAST-IBAN (variante de temperatura): parámetros (ALG-305, L4). Se vuelcan completos en la cabecera del CSV de salida.
+# FAST-IBAN: parámetros del detector (ALG-305, L4). Se vuelcan completos en la cabecera de cada CSV de salida.
 # Formato: YAML plano, una clave por línea ("clave: valor"); "#" empieza un comentario.
 # Otra ruta: variable de entorno FAST_IBAN_PARAMS.
 
 # Espaciado entre puntos candidatos, en grados. Debe ser múltiplo entero de la resolución del fichero.
+# 1° (ALG-359): múltiplo de 0,25°, 0,5° y 1°, así que los candidatos caen en las mismas coordenadas a cualquiera de esas
+# resoluciones (necesario para ALG-308); y ≤ ray_distance_km/4 ≈ 125 km. Antes, 1,25° (5 celdas a 0,25°).
 candidate_spacing_deg: 0.75
 
-# Se seleccionan los puntos con temperatura estrictamente mayor que este umbral, en °C.
+# Rayos de círculo máximo por punto (múltiplo de 8) y su longitud, en km.
+n_rays: 64
+ray_distance_km: 500
+
+# Fracción de rayos que deben quedar por debajo (máximo) o por encima (mínimo) del punto.
+pass_fraction: 0.9
+
+# Separación entre contornos, en metros de altura geopotencial.
+contour_step_m: 20
+
+# Radio máximo de búsqueda de contornos y de emparejamiento máximo-mínimos, en km.
+search_radius_km: 3000
+
+# Paso, en km, con el que se muestrea cada rayo geodésico al buscar contornos (ALG-360). No supera el de la rejilla más
+# fina admitida (0,25° ≈ 27,8 km) ni la malla nativa de ERA5 (≈ 31 km), así que no depende de la resolución del fichero.
+contour_ray_step_km: 25
+
+# Se descartan los clusters cuyo punto más cercano a su polo no queda estrictamente entre estas latitudes absolutas, en
+# grados, en ambos hemisferios (ALG-303, ALG-304). 90 en el máximo significa sin límite polar: la franja de 75-90° es
+# la que da sentido al método (el antiguo 85 no tenía base física y dejaba fuera las altas polares). Los mismos valores
+# en el HS: su climatología de bloqueo está en 40-70°S, lejos de 30° (asesoría física, 2026-09-16).
+cluster_lat_min_deg: 30
+cluster_lat_max_deg: 90
+
+# Área mínima de un cluster, en km²: suma de R²·Δλ·Δφ·cos φ de sus celdas de candidatos (ALG-306). Sustituye al número
+# mínimo de puntos, que dependía de la latitud y de la resolución. Es un filtro de robustez de la semilla, no de tamaño
+# físico: un candidato tolera 7 de 64 rayos fallidos (sector de ±19,7°), así que una dorsal recta sin pendiente a lo
+# largo del eje deja una franja de candidatos de ~170 km; su círculo inscrito, π·(250·sin 19,69°)² ≈ 22 300 km², es el
+# caso límite entre un extremo cerrado y uno abierto a la escala de ray_distance_km. Escala con ray_distance_km.
+min_cluster_area_km2: 22000
+
+# Distancia máxima, en km, del mínimo de un Rex al meridiano del máximo: R·asin(cos φ_min·|sin Δλ|), con cos Δλ > 0
+# (ALG-364). Son los 10° de la regla anterior evaluados en la latitud típica de la baja, φ_min = 50°N (712,6 km,
+# redondeado): la baja de un Rex del HN queda 15-20° al sur de una alta a 60-65°N (Sousa et al. 2021; Hirt et al. 2018;
+# Barriopedro et al. 2006), y la mediana de φ_min de nuestros Rex es 52°N. La alternativa de 60°N (550 km) es la
+# latitud de la alta, no la de la baja. Detalle y prueba empírica en docs/delta_correcciones.md.
+rex_max_offset_km: 700
+
+# ALG-352: solo lo usa la variante de temperatura. Se seleccionan los puntos con temperatura estrictamente mayor que
+# este umbral, en °C.
 temperature_threshold_c: 28

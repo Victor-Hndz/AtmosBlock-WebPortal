@@ -7,14 +7,14 @@
 
 
 int main(int argc, char **argv) {
-    int ncid, retval, i, j, k, time, size_x, size_y, step, id, rank, size, time_start, time_end, chunk_size, base_chunk;
+    int ncid, retval, i, j, time, size_x, size_y, step, rank, size, time_start, time_end, base_chunk;
     double scale_factor, offset, t_ini, t_fin, t_total = 0.0;
     short **z = NULL;
     int z_varid;
     bool swap_lon;
     char long_name[NC_MAX_NAME+1] = "";
     FILE *fp;
-    selected_point **selected_points, **filtered_points;
+    selected_point **filtered_points;
     char *filename = malloc(sizeof(char)*(NC_MAX_NAME+1));
     char *filename2 = malloc(sizeof(char)*(NC_MAX_NAME+1));
     char *log_file = malloc(sizeof(char)*(NC_MAX_NAME+1));
@@ -62,22 +62,17 @@ int main(int argc, char **argv) {
     swap_lon = check_coords(lons);  // ALG-369: antes de elegir las columnas de candidatos
     size_y = columnas_candidatas(lons, step);
 
-    //Chumk paralelo
-    chunk_size = (size_x + N_THREADS - 1) / N_THREADS; // Redondea hacia arriba
 
-    selected_points = malloc((size_x)*sizeof(selected_point*));
-    selected_points[0] = malloc(sizeof(selected_point)*size_x*size_y);
     
     filtered_points = calloc(size_x, sizeof(selected_point*));
     filtered_points[0] = calloc((size_t)size_x*size_y, sizeof(selected_point));
 
     for(i = 0; i < size_x; i++) {
-        selected_points[i] = selected_points[0] + i * size_y;
         filtered_points[i] = filtered_points[0] + i * size_y;
     }
 
 
-    if (z == NULL || z[0] == NULL || selected_points == NULL || selected_points[0] == NULL || filtered_points == NULL || filtered_points[0] == NULL) {
+    if (z == NULL || z[0] == NULL || filtered_points == NULL || filtered_points[0] == NULL) {
         perror("Error: Couldn't allocate memory for data. ");
         return 2;
     }
@@ -129,95 +124,8 @@ int main(int argc, char **argv) {
     //Loop for every z value.
     for (time=time_start; time<time_end; time++) {
         read_time_step(ncid, z_varid, time, swap_lon, z);  // ALG-204
-        t_ini = omp_get_wtime();
-
-        #pragma omp parallel num_threads(N_THREADS) shared(z, lats, lons, size_x, size_y, time, selected_points, filtered_points, step, scale_factor, offset, chunk_size, PARAMS, FILA_LAT_INICIO, COL_LON_INICIO) default(none)
-        {
-            int lat, lon;
-
-            #pragma omp for schedule(dynamic, chunk_size)
-            for(lat=0;lat<size_x;lat++) {
-                // printf("Processing time %d, lat %d\n", time, lat);
-                for(lon=0;lon<size_y;lon++) {
-                    // ALG-369: clasificación local del candidato con los rayos de círculo máximo (calc.c).
-                    coord_point candidato = create_point(lats[FILA_LAT_INICIO + lat*step], lons[COL_LON_INICIO + lon*step]);
-                    short z_candidato = z[FILA_LAT_INICIO + lat*step][COL_LON_INICIO + lon*step];
-                    selected_points[lat][lon] = create_selected_point(candidato, z_candidato, clasificar_candidato(candidato, z_candidato, z, lats, lons), -1);
-                    filtered_points[lat][lon] = selected_points[lat][lon];
-                }
-            }
-        }
-
-        t_fin = omp_get_wtime();
-        printf("\n#2-%d. Filtrado y selección de máximos y mínimos realizada con éxito: %.6f s.\n", time, t_fin-t_ini);
-        fp = fopen(speed_file, "a");
-           fprintf(fp, "1,%d,%.3f\n", time, t_fin-t_ini);
-        fclose(fp);
-        t_total += (t_fin-t_ini);
-        t_ini = omp_get_wtime();
-        
-        id=0;
-        for(i=0; i<size_x;i++) {
-            for(j=0; j< size_y;j++) {
-                if(filtered_points[i][j].cluster == -1 && filtered_points[i][j].type != NO_TYPE) {
-                    filtered_points[i][j].cluster = id;
-                    expandCluster(filtered_points, size_x, size_y, i, j, id);
-                    id++;
-                }
-            }
-        }
-
-        points_cluster *clusters_aux = fill_clusters(filtered_points, size_x, size_y, id, offset, scale_factor);
-        int clusters_cont=0;
-        for(i=0;i<id;i++) 
-            if(fuera_de_latitudes(&clusters_aux[i]) || clusters_aux[i].area_km2 < PARAMS.min_cluster_area_km2)
-                clusters_cont++;
-
-        points_cluster *clusters = malloc((id-clusters_cont)*sizeof(points_cluster));
-        for(i=0, j=0;i<id;i++) {
-            if(!fuera_de_latitudes(&clusters_aux[i]) && clusters_aux[i].area_km2 >= PARAMS.min_cluster_area_km2) {
-                clusters[j] = clusters_aux[i];
-                clusters[j].id = j;
-                
-                for(k=0;k<clusters[j].n_points;k++) 
-                    clusters[j].points[k].cluster = j;
-                clusters[j].point_izq.cluster = j;
-                clusters[j].point_der.cluster = j;
-                clusters[j].point_sup.cluster = j;
-                clusters[j].point_inf.cluster = j;
-                j++;
-            } else {
-                free(clusters_aux[i].points);  // R5 (ALG-203): cluster descartado por el filtro
-            }
-        }
-        free(clusters_aux);
-
-        t_fin = omp_get_wtime();
-        t_total += (t_fin-t_ini);
-        t_ini = omp_get_wtime();
-
-
-        search_formation(clusters, j, z, lats, lons, scale_factor, offset, filename2, time);
-    
-        t_fin = omp_get_wtime();
-        printf("\n#4-%d. Búsqueda de formaciones realizada con éxito: %.6f s.\n", time, t_fin-t_ini);
-        fp = fopen(speed_file, "a");
-           fprintf(fp, "2,%d,%.3f\n", time, t_fin-t_ini);
-        fclose(fp);
-        t_total += (t_fin-t_ini);
-        
-        t_ini = omp_get_wtime();
-        
-        export_clusters_to_csv(clusters, j, filename, offset, scale_factor, time);
-        
-        t_fin = omp_get_wtime();
-        printf("\n#5-%d. Archivo escrito con éxito: %.6f s.\n", time, t_fin-t_ini);
-        t_total += (t_fin-t_ini);
-        
-        printf("Tiempo %d procesado.\n", time);
-        for(i=0; i<j; i++)
-            free(clusters[i].points);  // R5 (ALG-203)
-        free(clusters);
+        t_total += procesar_paso(time, z, lats, lons, filtered_points, size_x, size_y, step, scale_factor, offset,
+                                 filename, filename2, speed_file, N_THREADS);  // ALG-351
     }
 
     // ALG-206: tiempo total de este proceso en su parte; contadores sumados de todos los procesos; y unión
@@ -267,8 +175,6 @@ int main(int argc, char **argv) {
         ERR(retval)
 
     free(z[0]);
-    free(selected_points[0]);
-    free(selected_points);
     free(filtered_points[0]);
     free(filtered_points);
     free(z);

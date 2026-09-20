@@ -121,18 +121,29 @@ void calcular_extremos_rayos(points_cluster *cluster, short **z_in, float *lats,
     int hemi = hemisferio(cluster->center.lat), rayo_polo = hemi > 0 ? 0 : n / 2;
     double hasta_el_polo_km = (90.0 - hemi * cluster->center.lat) * M_PI / 180 * R;
     cluster->extremo_polo = cluster->type == MAX ? INF : -INF;
+    cluster->truncado = false;
     for (int k = 0; k < n; k++) {
         double extremo = cluster->type == MAX ? INF : -INF;
         for (int paso = 1; paso <= pasos; paso++) {
             coord_point p = coord_from_great_circle(cluster->center, paso * PARAMS.contour_ray_step_km, k * 360.0 / n);
             p.lon = (float)(fmod(p.lon + 540.0, 360.0) - 180.0);
-            if (p.lat < DOM_LAT_MIN || p.lat > DOM_LAT_MAX || p.lat < lat_inf || p.lat > lat_sup)
+            if (p.lat < DOM_LAT_MIN || p.lat > DOM_LAT_MAX)
+                break;  // límite de análisis pedido: no es falta de datos
+            // ALG-376: a partir de aquí el rayo se corta porque el fichero se acaba, así que el contorno de este
+            // cluster puede estar incompleto y la formación se marca como truncada.
+            if (p.lat < lat_inf || p.lat > lat_sup) {
+                cluster->truncado = true;
                 break;
-            if (!global && (p.lon < lon_min || p.lon > lon_max))
+            }
+            if (!global && (p.lon < lon_min || p.lon > lon_max)) {
+                cluster->truncado = true;
                 break;
+            }
             short z;
-            if (!bilinear_interpolation(p, z_in, lats, lons, &z))
+            if (!bilinear_interpolation(p, z_in, lats, lons, &z)) {
+                cluster->truncado = true;
                 break;
+            }
             double h = ((z * scale_factor) + offset) / g_0;
             extremo = cluster->type == MAX ? fmin(extremo, h) : fmax(extremo, h);
             if (k == rayo_polo && paso * PARAMS.contour_ray_step_km <= hasta_el_polo_km)
@@ -264,19 +275,20 @@ int lado_flanco_omega(coord_point maximo, coord_point minimo) {
 }
 
 /**
- * @brief Forma del mínimo de un Rex al nivel `contour`: contorno hacia el ecuador y hacia el oeste en todo el sector,
- * hacia el polo en la mayoría, y abierto hacia el este.
+ * @brief Forma del mínimo de un Rex al nivel `contour`: contorno hacia el ecuador en todo el sector, hacia el polo en la
+ * mayoría, y los lados acoplados con los de la alta: cerrado en todo el sector por el lado en que la alta está abierta
+ * (`abierto_alta`: -1 oeste, 1 este) y abierto por el contrario. ALG-377: las dos orientaciones del dipolo.
  */
-bool minimo_rex_valido(points_cluster minimo, int contour) {
-    return check_contour_dir_rex(minimo, contour, 1, 0) && check_contour_dir_rex(minimo, contour, 0, -1) &&
-           check_contour_dir_omega(minimo, contour, -1, 0) && !check_contour_dir_rex(minimo, contour, 0, 1);
+bool minimo_rex_valido(points_cluster minimo, int contour, int abierto_alta) {
+    return check_contour_dir_rex(minimo, contour, 1, 0) && check_contour_dir_rex(minimo, contour, 0, abierto_alta) &&
+           check_contour_dir_omega(minimo, contour, -1, 0) && !check_contour_dir_rex(minimo, contour, 0, -abierto_alta);
 }
 
 void search_formation(points_cluster *clusters, int size, short **z_in, float *lats, float *lons, double scale_factor, double offset, char* filename, int time) {
     int i, j, index_lat, index_lon, contour_top;
     double mean_dist, pair_score, best_score;
     bool contour_bot, contour_izq, contour_der;
-    points_cluster selected_izq, selected_der, selected_rex;
+    points_cluster selected_izq = {0}, selected_der = {0}, selected_rex = {0};
     formation formation;
 
     // ALG-360: extremos de los rayos geodésicos de todos los clusters, una vez por paso temporal.
@@ -288,7 +300,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
             // ALG-311: más allá de la guarda polar los sectores de rayos no distinguen direcciones; el máximo se
             // exporta como alta polar (sin mínimos) y no se evalúa como Omega ni Rex.
             if(fabs(clusters[i].center.lat) > guarda_polar_deg()) {
-                export_formation_to_csv(create_formation(clusters[i].id, -1, -1, POLAR_HIGH), filename, time);
+                export_formation_to_csv(create_formation(clusters[i].id, -1, -1, POLAR_HIGH, clusters[i].truncado), filename, time);
                 continue;
             }
             index_lat = findIndex(lats, NLAT, clusters[i].center.lat);
@@ -369,7 +381,9 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                     contour_izq = check_contour_dir_rex(clusters[i], contour_top, 0, -1);
                     contour_der = check_contour_dir_rex(clusters[i], contour_top, 0, 1);
                     
-                    if(contour_bot && contour_der && !contour_izq) {
+                    // ALG-377: alta cerrada hacia el ecuador y por un lado, abierta por el otro (-1 oeste, 1 este).
+                    int abierto_alta = contour_bot && contour_der && !contour_izq ? -1 : contour_bot && contour_izq && !contour_der ? 1 : 0;
+                    if(abierto_alta != 0) {
                         for(j=0; j<size; j++) {
                             if(point_distance(clusters[j].center, clusters[i].center) > PARAMS.search_radius_km)
                                 continue;
@@ -378,7 +392,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                                 continue;
 
                             if(clusters[j].type == MIN && hemisferio(clusters[i].center.lat) * clusters[j].center.lat <= hemisferio(clusters[i].center.lat) * clusters[i].center.lat && distancia_al_meridiano(clusters[j].center, clusters[i].center) <= PARAMS.rex_max_offset_km) {
-                                if(minimo_rex_valido(clusters[j], contour_top))
+                                if(minimo_rex_valido(clusters[j], contour_top, abierto_alta))
                                     if(point_distance(clusters[j].center, clusters[i].center) < point_distance(selected_rex.center, clusters[i].center)) 
                                         selected_rex = clusters[j];
                             }
@@ -421,11 +435,12 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
             
             if(selected_rex.center.lat != INF && selected_rex.id != -1) {
                 printf("Formación REX encontrada: %d, %d\n", clusters[i].id, selected_rex.id);
-                formation = create_formation(clusters[i].id, selected_rex.id, -1, REX);
+                formation = create_formation(clusters[i].id, selected_rex.id, -1, REX, clusters[i].truncado || selected_rex.truncado);
                 export_formation_to_csv(formation, filename, time);
             } else if (selected_izq.center.lat != INF && selected_der.center.lat != INF && selected_izq.id != -1 && selected_der.id != -1) {
                 printf("Formación OMEGA encontrada: %d, %d, %d\n", clusters[i].id, selected_izq.id, selected_der.id);   
-                formation = create_formation(clusters[i].id, selected_izq.id, selected_der.id, OMEGA);
+                formation = create_formation(clusters[i].id, selected_izq.id, selected_der.id, OMEGA,
+                                            clusters[i].truncado || selected_izq.truncado || selected_der.truncado);
                 export_formation_to_csv(formation, filename, time);
             }
         }
@@ -529,4 +544,99 @@ void expandCluster(selected_point **filtered_points, int size_x, int size_y, int
                 visitar(filtered_points, ci, y, tipo, id, &pila);
     }
     free(pila.datos);
+}
+
+// ALG-351: un paso temporal completo, común a las cuatro variantes (n_hilos = 1 en las que no usan OpenMP).
+// Clasifica los candidatos, agrupa y filtra los clusters, busca formaciones y exporta. Devuelve el tiempo del paso.
+double procesar_paso(int time, short **z, float *lats, float *lons, selected_point **puntos, int size_x, int size_y, int step,
+                     double scale_factor, double offset, char *filename, char *filename2, char *speed_file, int n_hilos) {
+    double t_ini = omp_get_wtime(), t_fin, t_paso = 0;
+    int i, j, k, id;
+    FILE *fp;
+
+    // Cada celda se escribe una sola vez y no hay acumulación: el reparto entre hilos no cambia la salida.
+    #pragma omp parallel for num_threads(n_hilos) schedule(dynamic, 2)
+    for(int lat=0;lat<size_x;lat++)
+        for(int lon=0;lon<size_y;lon++) {
+            // ALG-369: clasificación local del candidato con los rayos de círculo máximo.
+            coord_point candidato = create_point(lats[FILA_LAT_INICIO + lat*step], lons[COL_LON_INICIO + lon*step]);
+            short z_candidato = z[FILA_LAT_INICIO + lat*step][COL_LON_INICIO + lon*step];
+            puntos[lat][lon] = create_selected_point(candidato, z_candidato, clasificar_candidato(candidato, z_candidato, z, lats, lons), -1);
+        }
+
+    t_fin = omp_get_wtime();
+    printf("\n#2-%d. Filtrado y selección de máximos y mínimos realizada con éxito: %.6f s.\n", time, t_fin-t_ini);
+    fp = fopen(speed_file, "a");
+    fprintf(fp, "1,%d,%.3f\n", time, t_fin-t_ini);
+    fclose(fp);
+    t_paso += t_fin-t_ini;
+    t_ini = omp_get_wtime();
+
+    id=0;
+    for(i=0; i<size_x;i++)
+        for(j=0; j< size_y;j++)
+            if(puntos[i][j].cluster == -1 && puntos[i][j].type != NO_TYPE) {
+                puntos[i][j].cluster = id;
+                expandCluster(puntos, size_x, size_y, i, j, id);
+                id++;
+            }
+
+    points_cluster *clusters_aux = fill_clusters(puntos, size_x, size_y, id, offset, scale_factor);
+    int clusters_cont=0;
+    for(i=0;i<id;i++)
+        if(fuera_de_latitudes(&clusters_aux[i]) || clusters_aux[i].area_km2 < PARAMS.min_cluster_area_km2)
+            clusters_cont++;
+
+    points_cluster *clusters = malloc((id-clusters_cont)*sizeof(points_cluster));
+    for(i=0, j=0;i<id;i++) {
+        if(!fuera_de_latitudes(&clusters_aux[i]) && clusters_aux[i].area_km2 >= PARAMS.min_cluster_area_km2) {
+            clusters[j] = clusters_aux[i];
+            clusters[j].id = j;
+            for(k=0;k<clusters[j].n_points;k++)
+                clusters[j].points[k].cluster = j;
+            clusters[j].point_izq.cluster = j;
+            clusters[j].point_der.cluster = j;
+            clusters[j].point_sup.cluster = j;
+            clusters[j].point_inf.cluster = j;
+            j++;
+        } else {
+            free(clusters_aux[i].points);  // R5 (ALG-203): cluster descartado por el filtro
+        }
+    }
+    free(clusters_aux);
+
+    // ALG-108: invierte el orden de los clusters (conservando sus id) para comprobar
+    // que las formaciones no dependen del orden en que se recorren.
+    if(getenv("FAST_IBAN_INVERTIR_CLUSTERS") != NULL)
+        for(k=0; k<j/2; k++) {
+            points_cluster aux = clusters[k];
+            clusters[k] = clusters[j-1-k];
+            clusters[j-1-k] = aux;
+        }
+
+    t_fin = omp_get_wtime();
+    t_paso += t_fin-t_ini;
+    t_ini = omp_get_wtime();
+
+    search_formation(clusters, j, z, lats, lons, scale_factor, offset, filename2, time);
+
+    t_fin = omp_get_wtime();
+    printf("\n#4-%d. Búsqueda de formaciones realizada con éxito: %.6f s.\n", time, t_fin-t_ini);
+    fp = fopen(speed_file, "a");
+    fprintf(fp, "2,%d,%.3f\n", time, t_fin-t_ini);
+    fclose(fp);
+    t_paso += t_fin-t_ini;
+    t_ini = omp_get_wtime();
+
+    export_clusters_to_csv(clusters, j, filename, offset, scale_factor, time);
+
+    t_fin = omp_get_wtime();
+    printf("\n#5-%d. Archivo escrito con éxito: %.6f s.\n", time, t_fin-t_ini);
+    t_paso += t_fin-t_ini;
+
+    printf("Tiempo %d procesado.\n", time);
+    for(i=0; i<j; i++)
+        free(clusters[i].points);  // R5 (ALG-203)
+    free(clusters);
+    return t_paso;
 }

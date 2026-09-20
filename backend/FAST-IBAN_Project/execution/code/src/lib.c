@@ -17,25 +17,37 @@ selected_point create_selected_point(coord_point point, short z, enum Tipo_form 
 }
 
 // Function to create a formation struct.
-formation create_formation(int max, int min1, int min2, enum Tipo_block type) {
-    formation new_formation = {max, min1, min2, type};
+// ALG-352: variable tratada; por defecto, geopotencial.
+enum Variable VARIABLE = VAR_GEOPOTENCIAL;
+
+const char *nombre_variable(void) { return VARIABLE == VAR_TEMPERATURA ? T_NAME : Z_NAME; }
+
+// Valor empaquetado del NetCDF a unidades físicas: metros de altura geopotencial o grados Celsius.
+double valor_fisico(short empaquetado, double scale_factor, double offset) {
+    double valor = empaquetado * scale_factor + offset;
+    return VARIABLE == VAR_TEMPERATURA ? valor - K_TO_C : valor / g_0;
+}
+
+formation create_formation(int max, int min1, int min2, enum Tipo_block type, bool truncada) {
+    formation new_formation = {max, min1, min2, type, truncada};
     return new_formation;
 }
 
 points_cluster create_cluster(int id, int n_points, int contour, coord_point center, selected_point *points, selected_point point_izq, selected_point point_der, selected_point point_sup, selected_point point_inf, enum Tipo_form type) {
-    points_cluster new_cluster = {id, n_points, contour, center, points, point_izq, point_der, point_sup, point_inf, type, NULL, 0, 0};  // ALG-360/363: extremos; ALG-306: área
+    points_cluster new_cluster = {id, n_points, contour, center, points, point_izq, point_der, point_sup, point_inf, type, NULL, 0, 0, false};  // ALG-360/363: extremos; ALG-306: área
     return new_cluster;
 
 }
 
 /**
- * @brief ALG-306: área, en km², de la celda de la retícula de candidatos centrada en `lat_deg` con lado `paso_deg`:
- * R²·Δλ·Δφ·cos φ. Con ella los filtros de tamaño no dependen de la latitud ni de la resolución.
- * ponytail: aproximación de celda pequeña; en la fila del polo (cos φ = 0) da 0 en vez del casquete π(R·Δ/2)².
+ * @brief ALG-306, ALG-373: área, en km², de la celda de la retícula de candidatos centrada en `lat_deg` con lado
+ * `paso_deg`: la de su banda de latitud, R²·Δλ·(sin(φ+Δ/2) − sin(φ−Δ/2)), recortada a ±90°. Es exacta y aditiva, y en
+ * la fila del polo cada candidato se lleva su parte del casquete: las 360/Δ celdas de la fila suman 2πR²(1 − cos Δ/2).
+ * Antes era R²·Δλ·Δφ·cos φ, que da 0 en el polo.
  */
 double area_celda_km2(double lat_deg, double paso_deg) {
-    double paso = paso_deg * M_PI / 180;
-    return (double)R * R * paso * paso * cos(lat_deg * M_PI / 180);
+    double arriba = fmin(lat_deg + paso_deg / 2, 90), abajo = fmax(lat_deg - paso_deg / 2, -90);
+    return (double)R * R * (paso_deg * M_PI / 180) * (sin(arriba * M_PI / 180) - sin(abajo * M_PI / 180));
 }
 
 points_cluster *fill_clusters(selected_point **points, int size_x, int size_y, int n_clusters, double offset, double scale_factor) {

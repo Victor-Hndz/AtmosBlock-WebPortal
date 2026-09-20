@@ -112,6 +112,10 @@ set_tests_properties(init_nombre_demasiado_largo PROPERTIES PASS_REGULAR_EXPRESS
 set_tests_properties(init_latitud_incorrecta PROPERTIES PASS_REGULAR_EXPRESSION "de latitud son incorrectos")
 set_tests_properties(init_longitud_incorrecta PROPERTIES PASS_REGULAR_EXPRESSION "de longitud son incorrectos")
 set_tests_properties(init_hilos_incorrectos PROPERTIES PASS_REGULAR_EXPRESSION "hilos no puede")
+# ALG-354: los contadores de diagnóstico tienen una entrada por hilo (MAX_HILOS_CONTADORES); con más hilos dos
+# compartirían entrada, así que se rechazan con un error claro en vez de corromper los contadores.
+add_test(NAME init_demasiados_hilos COMMAND FAST-IBAN ${CASO_FIJO} 25 85 -180 180 out/ 257)
+set_tests_properties(init_demasiados_hilos PROPERTIES PASS_REGULAR_EXPRESSION "como mucho 256 hilos")
 # Sin argumentos usa el caso por defecto config/data/…, que no existe fuera del portal: nc_open falla.
 set_tests_properties(init_sin_argumentos PROPERTIES PASS_REGULAR_EXPRESSION "No such file")
 set_tests_properties(init_directorio_salida_imposible PROPERTIES PASS_REGULAR_EXPRESSION "Error creating directory")
@@ -131,6 +135,14 @@ target_link_libraries(RECORTAR_NC netcdf)
 add_test(NAME preparar_caso_80N COMMAND RECORTAR_NC ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/caso_80N.nc z 80 1)
 add_test(NAME preparar_caso_1grado COMMAND RECORTAR_NC ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/caso_1grado.nc z 90 4)
 set_tests_properties(preparar_caso_80N preparar_caso_1grado PROPERTIES FIXTURES_SETUP recortes)
+# ALG-376: formaciones truncadas. Con el caso fijo (90°N a 25°N) y el dominio pedido 25-90, los rayos paran en el
+# límite de análisis y ninguna formación se marca. Con el mismo caso recortado en 80°N y el dominio 25-90, el fichero
+# se acaba dentro del dominio y alguna formación tiene el contorno incompleto.
+set(COMPROBAR_TRUNCADAS ${CMAKE_CURRENT_SOURCE_DIR}/regression/comprobar_truncadas.sh)
+add_test(NAME truncadas_fichero_completo COMMAND sh ${COMPROBAR_TRUNCADAS} $<TARGET_FILE:FAST-IBAN> ${CASO_FIJO} 25 90 ninguna)
+add_test(NAME truncadas_fichero_recortado COMMAND sh ${COMPROBAR_TRUNCADAS} $<TARGET_FILE:FAST-IBAN> ${CMAKE_CURRENT_BINARY_DIR}/caso_80N.nc 25 90 alguna)
+set_tests_properties(truncadas_fichero_recortado PROPERTIES FIXTURES_REQUIRED recortes)
+
 set(COMPROBAR_LATITUDES ${CMAKE_CURRENT_SOURCE_DIR}/regression/comprobar_latitudes.sh)
 # Área de 80°N a 0°N, como la pide el portal: LAT_LIM_MIN = 0 (con 20, code/ descarta en la salida lo que lee de más).
 add_test(NAME latitudes_desde_80N COMMAND sh ${COMPROBAR_LATITUDES} $<TARGET_FILE:FAST-IBAN> ${CMAKE_CURRENT_BINARY_DIR}/caso_80N.nc 0 85 80)
@@ -138,6 +150,13 @@ add_test(NAME latitudes_rejilla_1grado COMMAND sh ${COMPROBAR_LATITUDES} $<TARGE
 set_tests_properties(latitudes_desde_80N latitudes_rejilla_1grado PROPERTIES FIXTURES_REQUIRED recortes TIMEOUT 600)
 # Leer filas de más no siempre rompe el proceso; con valgrind (instalado en el CI) cualquier lectura fuera falla.
 find_program(VALGRIND valgrind)
+# ALG-355: las variantes MPI también bajo valgrind (2 procesos; MPICH no da falsos positivos), con la misma línea base.
+if(VALGRIND)
+    add_test(NAME valgrind_mpi_2 COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN_mpi>)
+    add_test(NAME valgrind_omp_mpi_2x2 COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN_omp_mpi> 2)
+    set_tests_properties(valgrind_mpi_2 valgrind_omp_mpi_2x2 PROPERTIES TIMEOUT 1800 ENVIRONMENT
+        "LANZADOR=${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} 2 ${VALGRIND} -q --error-exitcode=3")
+endif()
 if(VALGRIND)
     set_tests_properties(latitudes_desde_80N latitudes_rejilla_1grado PROPERTIES ENVIRONMENT
         "LANZADOR=${VALGRIND} -q --error-exitcode=3")
@@ -160,7 +179,7 @@ target_link_libraries(DEGRADAR_NC netcdf m)
 add_test(NAME preparar_caso_promedio_1grado COMMAND DEGRADAR_NC ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/caso_promedio_1grado.nc z 4)
 set_tests_properties(preparar_caso_promedio_1grado PROPERTIES FIXTURES_SETUP promedios)
 add_test(NAME caso_promedio_1grado COMMAND FAST-IBAN ${CMAKE_CURRENT_BINARY_DIR}/caso_promedio_1grado.nc 25 90 -180 180 out_promedio/ 1)
-set_tests_properties(caso_promedio_1grado PROPERTIES FIXTURES_REQUIRED promedios PASS_REGULAR_EXPRESSION "Successful search for formations")
+set_tests_properties(caso_promedio_1grado PROPERTIES FIXTURES_REQUIRED promedios PASS_REGULAR_EXPRESSION "de formaciones realizada con")
 # ALG-369: los dos lados con la misma cobertura de datos. El norte es el espejo del sur recortado (90°N a 25°N): con el
 # fichero del norte completo, sus rayos tendrían datos al sur de 25°N que al sur de -25° no hay, y ya no votan.
 add_test(NAME preparar_caso_norte_recortado COMMAND RECORTAR_NC ${CMAKE_CURRENT_BINARY_DIR}/caso_espejo.nc ${CMAKE_CURRENT_BINARY_DIR}/caso_norte_recortado.nc z 90 1 espejo)
@@ -247,6 +266,11 @@ add_test(NAME test_minimo_rex COMMAND TEST_minimo_rex)
 add_executable(TEST_area_celda test_area_celda.c)
 target_link_libraries(TEST_area_celda LIB m)
 add_test(NAME test_area_celda COMMAND TEST_area_celda)
+
+# ALG-371: el área de la huella de una cúpula isótropa frente a la predicción analítica (valida el filtro de ALG-306).
+add_executable(TEST_area_cupula test_area_cupula.c)
+target_link_libraries(TEST_area_cupula CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
+add_test(NAME area_cupula_isotropa COMMAND TEST_area_cupula)
 
 add_executable(TEST_parametros test_parametros.c)
 target_link_libraries(TEST_parametros INIT UTILS LIB m netcdf OpenMP::OpenMP_C)

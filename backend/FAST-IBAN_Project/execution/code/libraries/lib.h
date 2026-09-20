@@ -36,6 +36,8 @@ extern int DOM_LAT_MIN, DOM_LAT_MAX, FILA_LAT_INICIO, COL_LON_INICIO;
 #define LAT_NAME "latitude"
 #define LON_NAME "longitude"
 #define Z_NAME "z"
+#define T_NAME "t"
+#define K_TO_C 273.15  // ALG-352
 
 #define SCALE_FACTOR "scale_factor"
 #define OFFSET "add_offset"
@@ -63,8 +65,16 @@ typedef struct {
     double cluster_lat_max_deg;    // y por debajo (estricto) de estas latitudes
     double min_cluster_area_km2;   // área mínima de un cluster, suma de R²·Δλ·Δφ·cos φ de sus celdas (ALG-306)
     double rex_max_offset_km;      // distancia máxima del mínimo de un Rex al meridiano del máximo (ALG-364)
+    double temperature_threshold_c;  // ALG-352: solo la variante de temperatura; umbral estricto de selección, en °C
 } parametros;
 extern parametros PARAMS;
+
+// ALG-352: la misma detección sirve para geopotencial y para temperatura; solo cambian el nombre de la variable en el
+// NetCDF, las unidades de la salida y la regla de selección. La variante de temperatura lo fija antes de leer nada.
+enum Variable { VAR_GEOPOTENCIAL, VAR_TEMPERATURA };
+extern enum Variable VARIABLE;
+const char *nombre_variable(void);
+double valor_fisico(short empaquetado, double scale_factor, double offset);
 
 #define BEARING_STEP (360.0 / PARAMS.n_rays) // Bearing step in degrees (5.625 for 64 rays; B2: was integer division = 5)
 #define BEARING_START (-180) // Bearing start in degrees to use in the great circle method
@@ -78,8 +88,8 @@ extern char* FILE_NAME, *OUT_DIR_NAME;
 // ALG-208: un contador por hilo, sin "omp atomic" en el camino caliente (frenaba el escalado de
 // la fase 1). Cada entrada ocupa su propia línea de caché para que los hilos no se estorben;
 // contadores_totales() los suma al terminar, con el mismo resultado exacto.
-// ponytail: tabla fija; con más de MAX_HILOS_CONTADORES hilos dos comparten entrada y el total
-// podría perder incrementos (solo el diagnóstico, nunca las detecciones).
+// Tabla fija, una entrada por hilo: process_entry rechaza más de MAX_HILOS_CONTADORES hilos (ALG-354), así que dos hilos
+// nunca comparten entrada.
 #include <omp.h>
 #define MAX_HILOS_CONTADORES 256
 typedef struct {
@@ -111,6 +121,7 @@ typedef struct selected_point_list {
 typedef struct formation_list {
     int max_id, min1_id, min2_id;
     enum Tipo_block type;
+    bool truncada;  // ALG-376: algún cluster de la formación tiene rayos de contorno cortados por el borde del fichero
 } formation;
 
 typedef struct cluster {
@@ -122,6 +133,7 @@ typedef struct cluster {
     double *extremos;  // ALG-360: extremo de altura de cada rayo geodésico (calcular_extremos_rayos); NULL fuera de search_formation
     double extremo_polo;  // ALG-363: extremo del rayo hacia el polo solo hasta el polo; delimita los niveles de contorno
     double area_km2;      // ALG-306: área del cluster, suma de las áreas de sus celdas de candidatos (fill_clusters)
+    bool truncado;        // ALG-376: algún rayo de contorno se quedó sin datos en el borde del fichero (calcular_extremos_rayos)
 } points_cluster;
 
 // ALG-303 (L2): hemisferio de una latitud (+1 norte, -1 sur). Las comparaciones de latitud usan hemi·lat, nunca el HN.
@@ -149,7 +161,7 @@ static inline double guarda_polar_deg(void) { return 90 - PARAMS.ray_distance_km
 // Functions
 coord_point create_point(float lat, float lon);
 selected_point create_selected_point(coord_point point, short z, enum Tipo_form type, int cluster);
-formation create_formation(int max_id, int min1_id, int min2_id, enum Tipo_block type);
+formation create_formation(int max_id, int min1_id, int min2_id, enum Tipo_block type, bool truncada);
 points_cluster create_cluster(int id, int n_points, int contour, coord_point center, selected_point *points, selected_point point_izq, selected_point point_der, selected_point point_sup, selected_point point_inf, enum Tipo_form type);
 double area_celda_km2(double lat_deg, double paso_deg);
 points_cluster *fill_clusters(selected_point **points, int size_x, int size_y, int n_clusters, double offset, double scale_factor);

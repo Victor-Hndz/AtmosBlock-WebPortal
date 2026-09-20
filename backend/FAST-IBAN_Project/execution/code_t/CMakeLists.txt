@@ -24,32 +24,21 @@ if(FAST_IBAN_WERROR)
 endif()
 
 
-# ALG-305 (L4): el lector de params.yaml se comparte con code/; ruta por defecto sustituible con FAST_IBAN_PARAMS.
-add_library(LIB lib/lib.c lib/lib.h ../code/src/yaml_plano.c)
-target_compile_definitions(LIB PRIVATE FAST_IBAN_PARAMS_DEFECTO="${CMAKE_CURRENT_SOURCE_DIR}/config/params.yaml")
+# ALG-352: la variante de temperatura usa el núcleo de code/ (lectura, rejilla, clusters y exportación). Lo único
+# propio es la regla de selección, en FAST_IBAN_main.c. Necesita OpenMP porque el núcleo mide tiempos con omp_get_wtime.
+find_package(OpenMP REQUIRED)
+set(NUCLEO ${CMAKE_CURRENT_SOURCE_DIR}/../code)
+add_library(LIB ${NUCLEO}/src/lib.c ${NUCLEO}/src/init.c ${NUCLEO}/src/utils.c ${NUCLEO}/src/calc.c ${NUCLEO}/src/yaml_plano.c)
+target_compile_definitions(LIB PUBLIC FAST_IBAN_PARAMS_DEFECTO="${CMAKE_CURRENT_SOURCE_DIR}/config/params.yaml")
+target_link_libraries(LIB PUBLIC m netcdf OpenMP::OpenMP_C)
+
 add_executable(FAST-IBAN FAST_IBAN_main.c)
-
-
-target_link_libraries(LIB PRIVATE m)
-target_link_libraries(FAST-IBAN PRIVATE netcdf)
-
 target_link_libraries(FAST-IBAN PRIVATE LIB)
 
-# ALG-112: pruebas de la variante de temperatura (ctest --test-dir build)
+# ALG-112: pruebas de la variante de temperatura (ctest --test-dir build). Las de clusters, expandCluster y
+# resolución ya no se duplican aquí: son las mismas del núcleo y corren en code/ (ALG-352).
 enable_testing()
-add_executable(TEST_expandcluster_t tests/test_expandcluster.c)
-target_link_libraries(TEST_expandcluster_t PRIVATE LIB m netcdf)
-add_test(NAME test_expandcluster_t COMMAND TEST_expandcluster_t)
-add_executable(TEST_clusters_t tests/test_clusters.c)
-target_link_libraries(TEST_clusters_t PRIVATE LIB m netcdf)
-add_test(NAME test_clusters_t COMMAND TEST_clusters_t)
 add_test(NAME regresion_hash_t COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/tests/run_baseline.sh $<TARGET_FILE:FAST-IBAN>)
-# ALG-301 (L1): la resolución se lee del NetCDF; una rejilla con paso no uniforme se rechaza.
-add_executable(TEST_resolucion_t tests/test_resolucion.c)
-target_link_libraries(TEST_resolucion_t PRIVATE LIB m netcdf)
-add_test(NAME test_resolucion_t COMMAND TEST_resolucion_t WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-add_test(NAME init_rejilla_irregular_t COMMAND TEST_resolucion_t irregular WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-set_tests_properties(init_rejilla_irregular_t PROPERTIES PASS_REGULAR_EXPRESSION "paso uniforme")
 # ALG-302: la rejilla se recorre desde la primera fila del fichero hasta LAT_LIM_MIN, sin suponer 90°N.
 set(CODE_TESTS ${CMAKE_CURRENT_SOURCE_DIR}/../code/tests)
 add_executable(RECORTAR_NC_t ${CODE_TESTS}/recortar_nc.c)
