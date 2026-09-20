@@ -36,6 +36,8 @@ extern int DOM_LAT_MIN, DOM_LAT_MAX, FILA_LAT_INICIO, COL_LON_INICIO;
 #define LAT_NAME "latitude"
 #define LON_NAME "longitude"
 #define Z_NAME "z"
+#define T_NAME "t"
+#define K_TO_C 273.15  // ALG-352
 
 #define SCALE_FACTOR "scale_factor"
 #define OFFSET "add_offset"
@@ -63,8 +65,16 @@ typedef struct {
     double cluster_lat_max_deg;    // y por debajo (estricto) de estas latitudes
     double min_cluster_area_km2;   // área mínima de un cluster, suma de R²·Δλ·Δφ·cos φ de sus celdas (ALG-306)
     double rex_max_offset_km;      // distancia máxima del mínimo de un Rex al meridiano del máximo (ALG-364)
+    double temperature_threshold_c;  // ALG-352: solo la variante de temperatura; umbral estricto de selección, en °C
 } parametros;
 extern parametros PARAMS;
+
+// ALG-352: la misma detección sirve para geopotencial y para temperatura; solo cambian el nombre de la variable en el
+// NetCDF, las unidades de la salida y la regla de selección. La variante de temperatura lo fija antes de leer nada.
+enum Variable { VAR_GEOPOTENCIAL, VAR_TEMPERATURA };
+extern enum Variable VARIABLE;
+const char *nombre_variable(void);
+double valor_fisico(short empaquetado, double scale_factor, double offset);
 
 #define BEARING_STEP (360.0 / PARAMS.n_rays) // Bearing step in degrees (5.625 for 64 rays; B2: was integer division = 5)
 #define BEARING_START (-180) // Bearing start in degrees to use in the great circle method

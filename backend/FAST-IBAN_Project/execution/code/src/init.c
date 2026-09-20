@@ -27,6 +27,21 @@ static const clave_yaml CLAVES_PARAMS[] = {
 };
 #define N_CLAVES_PARAMS (sizeof(CLAVES_PARAMS) / sizeof(CLAVES_PARAMS[0]))
 
+// ALG-352: la variante de temperatura usa los mismos parámetros más su umbral de selección.
+static clave_yaml CLAVES_TEMPERATURA[N_CLAVES_PARAMS + 1];
+
+static const clave_yaml *claves_de_la_variable(size_t *n) {
+    if (VARIABLE != VAR_TEMPERATURA) {
+        *n = N_CLAVES_PARAMS;
+        return CLAVES_PARAMS;
+    }
+    for (size_t i = 0; i < N_CLAVES_PARAMS; i++)
+        CLAVES_TEMPERATURA[i] = CLAVES_PARAMS[i];
+    CLAVES_TEMPERATURA[N_CLAVES_PARAMS] = (clave_yaml){"temperature_threshold_c", false, &PARAMS.temperature_threshold_c};
+    *n = N_CLAVES_PARAMS + 1;
+    return CLAVES_TEMPERATURA;
+}
+
 /**
  * @brief Leer los parámetros del detector y comprobar sus rangos; un valor fuera de rango termina el proceso con un
  * mensaje (los errores de formato los da leer_yaml_plano).
@@ -38,7 +53,9 @@ void cargar_parametros(const char *ruta) {
         ruta = getenv("FAST_IBAN_PARAMS");
     if (ruta == NULL || *ruta == '\0')  // una variable vacía cuenta como no definida
         ruta = FAST_IBAN_PARAMS_DEFECTO;
-    leer_yaml_plano(ruta, CLAVES_PARAMS, N_CLAVES_PARAMS);
+    size_t n_claves;
+    const clave_yaml *claves = claves_de_la_variable(&n_claves);
+    leer_yaml_plano(ruta, claves, n_claves);
 
     if (PARAMS.n_rays <= 0 || PARAMS.n_rays % 8 != 0) {
         fprintf(stderr, "Error en %s: n_rays (%d) debe ser un múltiplo positivo de 8\n", ruta, PARAMS.n_rays);
@@ -110,7 +127,9 @@ void escribir_cabecera(FILE *fp) {
     fprintf(fp, "# grid_resolution_deg: %g\n", RES);
     fprintf(fp, "# lat_limits_deg: %d %d\n", LAT_LIM_MIN, LAT_LIM_MAX);
     fprintf(fp, "# lon_limits_deg: %d %d\n", LON_LIM_MIN, LON_LIM_MAX);
-    escribir_claves_yaml(fp, CLAVES_PARAMS, N_CLAVES_PARAMS);
+    size_t n_claves;
+    const clave_yaml *claves = claves_de_la_variable(&n_claves);
+    escribir_claves_yaml(fp, claves, n_claves);
     fprintf(fp, "# polar_guard_deg: %.3f\n", guarda_polar_deg());  // ALG-310: derivada, no se lee
 }
 
@@ -267,7 +286,7 @@ void init_files(char* filename, char* filename2, char* log_file, char* speed_fil
         exit(EXIT_FAILURE);
     }
     escribir_cabecera(fp);  // ALG-305
-    fprintf(fp, "time,latitude,longitude,z,type,cluster,centroid_lat,centroid_lon\n");
+    fprintf(fp, "time,latitude,longitude,%s,type,cluster,centroid_lat,centroid_lon\n", nombre_variable());  // ALG-352
     fclose(fp);
     
     buffer_size = strlen(file_path) + strlen(long_name) + strlen(temp) + strlen(fecha) + EXTRA_STR_SIZE;
@@ -381,7 +400,7 @@ int init_nc_variables(int ncid, float lats[NLAT], float lons[NLON], double *scal
         ERR(retval)
 
     // Get the varid of z
-    if ((retval = nc_inq_varid(ncid, Z_NAME, &z_varid)))
+    if ((retval = nc_inq_varid(ncid, nombre_variable(), &z_varid)))
         ERR(retval)
 
     // z must be (time, latitude, longitude): read_time_step reads one time step at a time.

@@ -17,6 +17,17 @@ selected_point create_selected_point(coord_point point, short z, enum Tipo_form 
 }
 
 // Function to create a formation struct.
+// ALG-352: variable tratada; por defecto, geopotencial.
+enum Variable VARIABLE = VAR_GEOPOTENCIAL;
+
+const char *nombre_variable(void) { return VARIABLE == VAR_TEMPERATURA ? T_NAME : Z_NAME; }
+
+// Valor empaquetado del NetCDF a unidades físicas: metros de altura geopotencial o grados Celsius.
+double valor_fisico(short empaquetado, double scale_factor, double offset) {
+    double valor = empaquetado * scale_factor + offset;
+    return VARIABLE == VAR_TEMPERATURA ? valor - K_TO_C : valor / g_0;
+}
+
 formation create_formation(int max, int min1, int min2, enum Tipo_block type, bool truncada) {
     formation new_formation = {max, min1, min2, type, truncada};
     return new_formation;

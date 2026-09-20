@@ -58,7 +58,7 @@ void export_clusters_to_csv(points_cluster *clusters, int size, char *filename, 
 
     for(i=0; i<size; i++) 
         for(j=0; j<clusters[i].n_points; j++) 
-            fprintf(fp, "%d,%.2f,%.2f,%.1f,%s,%d,%.2f,%.2f\n", time, clusters[i].points[j].point.lat, clusters[i].points[j].point.lon, (((clusters[i].points[j].z* scale_factor) + offset)/g_0), clusters[i].points[j].type == MAX ? "MAX" : clusters[i].points[j].type == MIN ? "MIN" : "NO_TYPE", clusters[i].points[j].cluster, 
+            fprintf(fp, "%d,%.2f,%.2f,%.1f,%s,%d,%.2f,%.2f\n", time, clusters[i].points[j].point.lat, clusters[i].points[j].point.lon, valor_fisico(clusters[i].points[j].z, scale_factor, offset), clusters[i].points[j].type == MAX ? "MAX" : clusters[i].points[j].type == MIN ? "MIN" : "NO_TYPE", clusters[i].points[j].cluster, 
             clusters[i].center.lat, clusters[i].center.lon);
     fclose(fp);
 }

@@ -44,6 +44,7 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 | El Rex se acepta en las dos orientaciones este-oeste *(decisión física)* | ALG-377 | sin cambios | 89 / 12 → 89 / 24 | **Solo aparecen Rex:** 2003 +12, 1983 +44, 2019 +4, DJFMAM 2014-15 +198 (191 → 389); 14 Omegas pasan a Rex con la misma alta; ningún Rex se pierde. Por encima del rango previsto en 1983. Ver sección ALG-377 |
 | Un paso temporal común a las cuatro variantes (`procesar_paso` en `calc.c`) en lugar de cuatro copias | ALG-351 | sin cambios | sin cambios | **0**: refactor; líneas base idénticas en serie y OpenMP, invariancia con hilos y procesos, valgrind limpio en MPI |
 | Las formaciones con el contorno cortado por el borde del fichero se marcan `truncada` | ALG-376 | sin cambios | sin cambios | **0 detecciones:** solo se añade una columna al CSV de formaciones. Hemisférico (1983): 0 truncadas. Petición regional de 2003 (75/-30/35/40 con margen): **las 6 formaciones truncadas**, porque los rayos de contorno llegan a 3000 km. Ver sección ALG-376 |
+| La variante de temperatura (`code_t`) usa el núcleo de `code/` en vez de su propia librería | ALG-352 | sin cambios | sin cambios | **0 en geopotencial.** En temperatura sí cambia, porque la variante hereda las correcciones de las fases 1-3: caso fijo de temperatura 3309 → 3498 puntos y 45 → 52 clusters; 33 de los 45 clusters antiguos siguen ahí a ≤150 km. Ver sección ALG-352 |
 
 B6, B3, B4, B5 y B8 no cambian los puntos seleccionados ni los clusters (`*_selected_*.csv`). B2, B1, B10 y ALG-359 sí, porque cambian el muestreo. B7 cambia un solo punto. ALG-360 solo cambia las formaciones.
 
@@ -104,6 +105,25 @@ Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. E
 **Coste:** el caso largo con 12 hilos sigue en unos 6 s.
 
 Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
+
+## ALG-352: la variante de temperatura usa el núcleo
+
+`code_t` tenía su propia librería (471 líneas) copiada de una versión antigua de `code/`: sin ninguna corrección de las fases 1-3 (B1, B2, B7, B10, la vecindad con vuelta en ±180°, el dominio por hemisferio, el anclaje de la rejilla de candidatos…). Ahora comparte el núcleo y solo conserva su regla propia: un punto se selecciona si su temperatura supera `temperature_threshold_c`.
+
+Para eso el núcleo aprende qué variable trata (`VARIABLE`, ALG-352): el nombre en el NetCDF (`z` o `t`), las unidades de la salida (`valor_fisico`: metros de altura geopotencial o grados Celsius) y el juego de parámetros (la variante de temperatura añade su umbral). Con geopotencial no cambia nada: `valor_fisico` es la misma división por `g₀` y la cabecera es idéntica.
+
+**Qué se borra:** `code_t/lib/` entero y los tests de clusters, `expandCluster` y resolución, que duplicaban los del núcleo.
+
+**Delta (caso fijo de temperatura, 850 hPa, 2019-06-28):**
+
+| | Antes | Después |
+|---|---|---|
+| Puntos seleccionados | 3309 | 3498 |
+| Clusters | 45 | 52 |
+| Clusters comunes (centroides a ≤150 km) | — | 33 de 45 |
+| Latitudes | 25,5–46,5 | 25,0–46,75 |
+
+Los puntos no coinciden uno a uno porque la rejilla de candidatos pasa a anclarse como la del núcleo (ALG-302, ALG-369, ALG-374): las filas y columnas salen desplazadas medio grado. Los objetos son los mismos; cambian el muestreo y, con la vecindad corregida, cómo se agrupan. La salida gana la columna `type` del formato del núcleo (siempre `MAX` en esta variante) y el geopotencial no se toca.
 
 ## ALG-376: formaciones truncadas
 
