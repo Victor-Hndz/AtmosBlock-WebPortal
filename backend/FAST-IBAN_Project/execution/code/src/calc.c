@@ -533,3 +533,98 @@ void expandCluster(selected_point **filtered_points, int size_x, int size_y, int
     }
     free(pila.datos);
 }
+
+// ALG-351: un paso temporal completo, común a las cuatro variantes (n_hilos = 1 en las que no usan OpenMP).
+// Clasifica los candidatos, agrupa y filtra los clusters, busca formaciones y exporta. Devuelve el tiempo del paso.
+double procesar_paso(int time, short **z, float *lats, float *lons, selected_point **puntos, int size_x, int size_y, int step,
+                     double scale_factor, double offset, char *filename, char *filename2, char *speed_file, int n_hilos) {
+    double t_ini = omp_get_wtime(), t_fin, t_paso = 0;
+    int i, j, k, id;
+    FILE *fp;
+
+    // Cada celda se escribe una sola vez y no hay acumulación: el reparto entre hilos no cambia la salida.
+    #pragma omp parallel for num_threads(n_hilos) schedule(dynamic, 2)
+    for(int lat=0;lat<size_x;lat++)
+        for(int lon=0;lon<size_y;lon++) {
+            // ALG-369: clasificación local del candidato con los rayos de círculo máximo.
+            coord_point candidato = create_point(lats[FILA_LAT_INICIO + lat*step], lons[COL_LON_INICIO + lon*step]);
+            short z_candidato = z[FILA_LAT_INICIO + lat*step][COL_LON_INICIO + lon*step];
+            puntos[lat][lon] = create_selected_point(candidato, z_candidato, clasificar_candidato(candidato, z_candidato, z, lats, lons), -1);
+        }
+
+    t_fin = omp_get_wtime();
+    printf("\n#2-%d. Filtrado y selección de máximos y mínimos realizada con éxito: %.6f s.\n", time, t_fin-t_ini);
+    fp = fopen(speed_file, "a");
+    fprintf(fp, "1,%d,%.3f\n", time, t_fin-t_ini);
+    fclose(fp);
+    t_paso += t_fin-t_ini;
+    t_ini = omp_get_wtime();
+
+    id=0;
+    for(i=0; i<size_x;i++)
+        for(j=0; j< size_y;j++)
+            if(puntos[i][j].cluster == -1 && puntos[i][j].type != NO_TYPE) {
+                puntos[i][j].cluster = id;
+                expandCluster(puntos, size_x, size_y, i, j, id);
+                id++;
+            }
+
+    points_cluster *clusters_aux = fill_clusters(puntos, size_x, size_y, id, offset, scale_factor);
+    int clusters_cont=0;
+    for(i=0;i<id;i++)
+        if(fuera_de_latitudes(&clusters_aux[i]) || clusters_aux[i].area_km2 < PARAMS.min_cluster_area_km2)
+            clusters_cont++;
+
+    points_cluster *clusters = malloc((id-clusters_cont)*sizeof(points_cluster));
+    for(i=0, j=0;i<id;i++) {
+        if(!fuera_de_latitudes(&clusters_aux[i]) && clusters_aux[i].area_km2 >= PARAMS.min_cluster_area_km2) {
+            clusters[j] = clusters_aux[i];
+            clusters[j].id = j;
+            for(k=0;k<clusters[j].n_points;k++)
+                clusters[j].points[k].cluster = j;
+            clusters[j].point_izq.cluster = j;
+            clusters[j].point_der.cluster = j;
+            clusters[j].point_sup.cluster = j;
+            clusters[j].point_inf.cluster = j;
+            j++;
+        } else {
+            free(clusters_aux[i].points);  // R5 (ALG-203): cluster descartado por el filtro
+        }
+    }
+    free(clusters_aux);
+
+    // ALG-108: invierte el orden de los clusters (conservando sus id) para comprobar
+    // que las formaciones no dependen del orden en que se recorren.
+    if(getenv("FAST_IBAN_INVERTIR_CLUSTERS") != NULL)
+        for(k=0; k<j/2; k++) {
+            points_cluster aux = clusters[k];
+            clusters[k] = clusters[j-1-k];
+            clusters[j-1-k] = aux;
+        }
+
+    t_fin = omp_get_wtime();
+    t_paso += t_fin-t_ini;
+    t_ini = omp_get_wtime();
+
+    search_formation(clusters, j, z, lats, lons, scale_factor, offset, filename2, time);
+
+    t_fin = omp_get_wtime();
+    printf("\n#4-%d. Búsqueda de formaciones realizada con éxito: %.6f s.\n", time, t_fin-t_ini);
+    fp = fopen(speed_file, "a");
+    fprintf(fp, "2,%d,%.3f\n", time, t_fin-t_ini);
+    fclose(fp);
+    t_paso += t_fin-t_ini;
+    t_ini = omp_get_wtime();
+
+    export_clusters_to_csv(clusters, j, filename, offset, scale_factor, time);
+
+    t_fin = omp_get_wtime();
+    printf("\n#5-%d. Archivo escrito con éxito: %.6f s.\n", time, t_fin-t_ini);
+    t_paso += t_fin-t_ini;
+
+    printf("Tiempo %d procesado.\n", time);
+    for(i=0; i<j; i++)
+        free(clusters[i].points);  // R5 (ALG-203)
+    free(clusters);
+    return t_paso;
+}

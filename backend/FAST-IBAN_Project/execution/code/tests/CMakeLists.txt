@@ -171,7 +171,7 @@ target_link_libraries(DEGRADAR_NC netcdf m)
 add_test(NAME preparar_caso_promedio_1grado COMMAND DEGRADAR_NC ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/caso_promedio_1grado.nc z 4)
 set_tests_properties(preparar_caso_promedio_1grado PROPERTIES FIXTURES_SETUP promedios)
 add_test(NAME caso_promedio_1grado COMMAND FAST-IBAN ${CMAKE_CURRENT_BINARY_DIR}/caso_promedio_1grado.nc 25 90 -180 180 out_promedio/ 1)
-set_tests_properties(caso_promedio_1grado PROPERTIES FIXTURES_REQUIRED promedios PASS_REGULAR_EXPRESSION "Successful search for formations")
+set_tests_properties(caso_promedio_1grado PROPERTIES FIXTURES_REQUIRED promedios PASS_REGULAR_EXPRESSION "de formaciones realizada con")
 # ALG-369: los dos lados con la misma cobertura de datos. El norte es el espejo del sur recortado (90°N a 25°N): con el
 # fichero del norte completo, sus rayos tendrían datos al sur de 25°N que al sur de -25° no hay, y ya no votan.
 add_test(NAME preparar_caso_norte_recortado COMMAND RECORTAR_NC ${CMAKE_CURRENT_BINARY_DIR}/caso_espejo.nc ${CMAKE_CURRENT_BINARY_DIR}/caso_norte_recortado.nc z 90 1 espejo)

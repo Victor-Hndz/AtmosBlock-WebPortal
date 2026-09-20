@@ -20,4 +20,6 @@ int lado_flanco_omega(coord_point maximo, coord_point minimo);
 void search_formation(points_cluster *clusters, int size, short **z_in, float *lats, float *lons, double scale_factor, double offset, char* filename, int time);
 double point_distance(coord_point a, coord_point b);
 void expandCluster(selected_point **filtered_points, int size_x, int size_y, int i, int j, int id);
+double procesar_paso(int time, short **z, float *lats, float *lons, selected_point **puntos, int size_x, int size_y, int step,
+                     double scale_factor, double offset, char *filename, char *filename2, char *speed_file, int n_hilos);
 #endif // CALC
