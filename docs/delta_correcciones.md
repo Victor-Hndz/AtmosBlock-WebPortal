@@ -35,6 +35,7 @@ Ambos se ejecutan con `FAST-IBAN_omp <caso> 25 85 -180 180 out/ <hilos>`. La sal
 | Vecindad de clusters con vuelta en ±180° y fila del polo como un punto | ALG-309 | 4 / 1 → 4 / 0 | 97 / 13 (=) | **Pequeño:** clusters partidos en ±180° pasan a ser uno; 108 de 110 formaciones iguales. Ver sección ALG-309 |
 | Límite polar del filtro de latitud desactivado (90) *(decisión de diseño)* | ALG-304 | sin cambios | 97 / 13 (=) | **0 formaciones**; puntos en clusters del caso largo +29 % (clusters polares que antes se descartaban). Ver sección ALG-304 |
 | Guarda polar derivada de `ray_distance_km` y categoría `POLAR_HIGH` | ALG-310, ALG-311 | sin cambios | 97 / 13 (=) | **2003: 0 formaciones.** Invierno de 1983: una Omega a 86,5°N pasa a `POLAR_HIGH`; 3 `POLAR_HIGH` en total (85,75–86,5°N); acuerdo 0,25°/1° 123 → 126. Ver sección ALG-310/311 |
+| Un rayo fuera del fichero no vota; el portal descarga un margen y el C solo informa dentro del área | ALG-369 (y ALG-358) | mismas detecciones | 97 / 12 (=) en 25–90 | **Ficheros recortados del portal:** fin del exceso de MAX en los bordes (1983, 25–30°N: 57 611 MAX → 27). Con el margen, candidatos idénticos al fichero completo. Ver sección ALG-369 |
 | El lado del mínimo en la Omega se decide sin truncar la longitud | ALG-362 | sin cambios | 97 / 12 (=) | 2003 y 2019: 1 Omega cambia de mínimo cada uno; 1983: 0; DJFMAM 2014-15: 14 Omega cambian de mínimo y aparecen 4 (1213 → 1217). Ver sección ALG-362 |
 | Los flancos de la Omega deben estar a más de 700 km del meridiano del máximo *(decisión física)* | ALG-362 | 4 / 0: una Omega cambia de mínimo | 97 / 12 → 89 / 12 | **Solo se pierden Omegas o cambian de mínimo:** 2003 −8, 1983 −12, 2019 −7, DJFMAM 2014-15 −176 (−18 %, 5 pasan a Rex). Ver sección ALG-362 |
 | El dominio de análisis llega del límite hacia el ecuador al polo de su hemisferio | ALG-374 | sin cambios | sin cambios (norte) | **Hemisferio norte: 0 cambios** (las líneas base no se mueven). En el sur ya no se analiza la franja entre el ecuador y el límite pedido. Ver sección ALG-374 |
@@ -99,6 +100,35 @@ Casi todos los cambios se concentran al norte de 50°N y entre 130°E y 180°. E
 **Coste:** el caso largo con 12 hilos sigue en unos 6 s.
 
 Se mantienen la invariancia a hilos, procesos y orden. Líneas base actualizadas: cambia solo el hash de formaciones del caso fijo y del de 2003; el de puntos es idéntico.
+
+## ALG-369: rayos fuera del fichero y margen de descarga del portal
+
+Un rayo de clasificación cuya interpolación fallaba (el punto caía fuera del fichero) sumaba un voto a MAX y ninguno a MIN, aunque el comentario del código decía que no se tenía en cuenta. En el portal el fichero llega recortado al área pedida, así que los candidatos de los bordes sufrían ese sesgo. Decidido por el usuario con asesoría física (opciones b + e):
+
+- **(b)** El rayo fallido no vota; el umbral sigue en 57 de 64 rayos, así que un candidato con más de 7 rayos fuera no se clasifica.
+- **(e)** El configurador descarga un margen de `ray_distance_km` + una celda alrededor del área (5° en latitud; 4,5°/cos φ + una celda en longitud) y el C solo informa de candidatos dentro del área pedida (antes ignoraba `LAT_LIM_MAX` y los límites de longitud: ALG-358).
+
+**Protocolo y predicciones, escritos antes de medir.** Casos 2003-08-01…15 y 1983-01-31…02-21, en dos dominios: hemisférico 25–90°N y regional 35–75°N × 30°O–40°E. Cuatro ejecuciones por dominio:
+- **A:** fichero completo (90–0°N, todas las longitudes) con el código nuevo, informando solo dentro del área: la referencia.
+- **B:** fichero recortado exactamente al área, código anterior.
+- **C:** fichero recortado exactamente al área, código nuevo.
+- **D:** fichero con el margen del configurador, código nuevo.
+
+Predicciones: B tiene un exceso de MAX en las franjas junto a los bordes; C no tiene candidatos en esas franjas donde fallan más de 7 rayos; **D coincide con A en los candidatos**, bit a bit en el dominio hemisférico. En el regional, los rayos de contorno de D paran en el borde del fichero y en A no, así que alguna formación cuyo contorno llegue más allá del margen puede diferir (formaciones truncadas: deuda aparte).
+
+**Resultado: se cumplen las cuatro predicciones.** Candidatos sin filtros de cluster (MAX / MIN en la franja de borde: 25–30°N en el dominio hemisférico, 5° junto a cada borde en el regional) y formaciones de la ejecución normal:
+
+| Caso y dominio | A (referencia) | B (antes, recortado) | C (nuevo, recortado) | D (nuevo, con margen) |
+|---|---|---|---|---|
+| 2003, hemisférico | 5400 / 1423; 101 formaciones | **11 610 / 0**; 101 iguales | 0 / 0; 101 iguales | **idéntico a A**; 101 iguales |
+| 2003, regional | 823 / 2856; 4 formaciones | 8264 / 0; 0 formaciones | 0 / 0; 0 formaciones | **idéntico a A**; 3 de 4 |
+| 1983, hemisférico | 27 / 443; 131 formaciones | **57 611 / 0**; 129 de 131 | 0 / 0; 129 de 131 | **idéntico a A**; 131 iguales |
+| 1983, regional | 1430 / 2575; 9 formaciones | 12 698 / 0; 2 de 7 | 0 / 0; 2 de 7 | **idéntico a A**; 9 iguales |
+
+- **El sesgo era enorme en los bordes:** con el fichero recortado, casi todos los candidatos de la franja salían MAX y ninguno MIN. En el dominio hemisférico lo tapaba en parte el filtro de 30° de los clusters (las formaciones apenas cambian); en el regional, no: B da 0 formaciones en 2003 y 2 correctas de 7 en 1983.
+- **Con el margen del configurador los candidatos son idénticos a los del fichero completo, bit a bit**, en los cuatro casos.
+- **Formación truncada:** en el dominio regional de 2003, D pierde 1 de las 4 formaciones de A. Sus rayos de contorno (hasta 3000 km) llegan al borde del fichero, que en A no existe. Es la limitación prevista; marcarlas queda como deuda.
+- Con los límites de las pruebas de CTest (`25 85`), el caso fijo da las mismas detecciones (solo bajan los contadores de llamadas) y el de 2003 deja de informar 45 puntos por encima de 85°; líneas base actualizadas.
 
 ## ALG-362: el lado del mínimo en la Omega sin truncar la longitud
 

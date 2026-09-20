@@ -12,57 +12,8 @@ from utils.rabbitMQ.create_message import create_message
 from utils.rabbitMQ.notify_updates import notify_update
 from utils.rabbitMQ.notify_results import notify_result
 from utils.rabbitMQ.rabbit_consts import CONFIG_QUEUE, REQUESTS_EXCHANGE, HANDLER_START_KEY
-from utils.consts.consts import API_FOLDER, ARGUMENTS, STATUS_OK, STATUS_ERROR
-
-
-def format_range(values: list) -> str:
-    """Transform a list of values into a range if they are consecutive or list them."""
-
-    if not values:
-        return ""
-
-    values = sorted(map(int, values))
-    ranges = []
-    start = values[0]
-
-    for i in range(1, len(values)):
-        if values[i] != values[i - 1] + 1:
-            ranges.append((start, values[i - 1]))
-            start = values[i]
-
-    ranges.append((start, values[-1]))
-
-    return "-".join(f"{s:02d}" if s == e else f"{s:02d}-{e:02d}" for s, e in ranges)
-
-
-def format_list(values: list) -> list:
-    """Transform a list of values into a list of strings with leading zeros."""
-    return [f"{int(v):02d}" for v in values]
-
-
-def mount_file_name(args: dict) -> str:
-    """Generate the name of the file based on the parameters provided."""
-
-    # Asign default values
-    variable = args["variableName"] or ""
-    pressure_levels = args["pressureLevels"] or []
-    years = format_list(args["years"] or [])
-    months = format_list(args["months"] or [])
-    days = format_list(args["days"] or [])
-    hours = format_list(args["hours"] or [])
-
-    # Mount the new file name
-    pressure_part = (
-        "-".join(pressure_levels) + "hPa"
-        if len(pressure_levels) > 1
-        else pressure_levels[0] + "hPa"
-    )
-    year_part = "-".join(years)
-    month_part = "-".join(months)
-    day_part = f"({format_range(days)})"
-    hour_part = "-".join(hours) + "UTC"
-
-    return f"{API_FOLDER}/{variable}_{pressure_part}_{year_part}-{month_part}-{day_part}_{hour_part}.nc"
+from utils.consts.consts import ARGUMENTS, STATUS_OK, STATUS_ERROR
+from rutas import area_de_descarga, format_list, format_range, mount_file_name  # noqa: F401  (ALG-369, WEB-359)
 
 
 class Configurator:
@@ -105,9 +56,11 @@ class Configurator:
 
         await notify_update(self.rabbitmq, request_hash, 1, "CONFIG: argumentos recibidos con éxito.")
 
-        file_name = mount_file_name(args)
+        area = area_de_descarga(args["areaCovered"], args["variableName"] or "")
+        file_name = mount_file_name(args, area)
 
         if not os.path.exists(file_name):
+            os.makedirs(os.path.dirname(file_name), exist_ok=True)
             # call to API for dowload the file
             print(f"El archivo {file_name} no existe, se procederá a descargarlo.")
             request_data(
@@ -117,7 +70,7 @@ class Configurator:
                 args["days"],
                 args["hours"],
                 args["pressureLevels"],
-                args["areaCovered"],
+                area,
                 file_name,
             )
             print(f"\n✅ Archivo {file_name} descargado con éxito.")

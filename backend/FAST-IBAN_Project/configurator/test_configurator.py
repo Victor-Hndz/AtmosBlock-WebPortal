@@ -48,6 +48,11 @@ api_request = _cargar("api_request_real", RAIZ / "utils" / "api_request.py")
 llamadas_adapt = []
 _stub("utils.api_request", request_data=api_request.request_data)
 _stub("utils.netcdf_editor", adapt_netcdf=llamadas_adapt.append)
+# ALG-369 / WEB-359: las rutas de descarga viven aparte, sin dependencias, para que la prueba de extremo a extremo
+# pueda preguntarle al configurador dónde espera cada fichero.
+sys.path.insert(0, str(RAIZ / "configurator"))
+rutas = _cargar("rutas", RAIZ / "configurator" / "rutas.py")
+sys.modules["rutas"] = rutas
 configurator = _cargar("configurator_CLI", RAIZ / "configurator" / "configurator_CLI.py")
 
 from utils.consts.consts import STATUS_ERROR, STATUS_OK  # noqa: E402
@@ -87,7 +92,9 @@ class ConfiguratorErroresTest(unittest.TestCase):
         rabbit = RabbitFalso()
         llamadas_adapt.clear()
 
-        asyncio.run(configurator.Configurator(rabbit).process_message(peticion()))
+        # El directorio del área (ALG-369) no se crea de verdad: /app no existe fuera del contenedor.
+        with mock.patch.object(configurator.os, "makedirs"):
+            asyncio.run(configurator.Configurator(rabbit).process_message(peticion()))
 
         resultados = rabbit.con_clave(RESULTS_DONE_KEY)
         self.assertEqual(len(resultados), 1)
@@ -119,6 +126,39 @@ class ConfiguratorConcurrenciaTest(unittest.TestCase):
         self.assertTrue(enviados["b"].endswith("_06UTC.nc"), enviados["b"])
         progreso = [m["content"]["requestHash"] for m in rabbit.con_clave(PROGRESS_UPDATE_KEY)]
         self.assertEqual((progreso.count("a"), progreso.count("b")), (3, 3))
+
+
+class AreaDeDescargaTest(unittest.TestCase):
+    """ALG-369: el geopotencial se descarga con un margen de ray_distance_km alrededor del área pedida, en grados
+    enteros, para que los rayos de los candidatos de los bordes tengan datos; el C solo informa dentro del área."""
+
+    def test_hemisferio_norte_por_encima_de_25(self):
+        self.assertEqual(configurator.area_de_descarga(["90", "-180", "25", "180"], "geopotential"), ["90", "-180", "20", "180"])
+
+    def test_dominio_regional_margen_en_longitud_segun_la_latitud_mas_polar(self):
+        # 500 km son 4,5° de latitud; en longitud, 4,5°/cos 70° + una celda = 13,4° → 14°.
+        self.assertEqual(configurator.area_de_descarga(["70", "-30", "35", "40"], "Geopotential"), ["75", "-44", "30", "54"])
+
+    def test_cruza_el_antimeridiano_o_llega_cerca_del_polo_circulo_completo(self):
+        self.assertEqual(configurator.area_de_descarga(["60", "160", "40", "179"], "geopotential"), ["65", "-180", "35", "180"])
+        self.assertEqual(configurator.area_de_descarga(["85", "0", "60", "30"], "geopotential"), ["90", "-180", "55", "180"])
+
+    def test_hemisferio_sur_simetrico(self):
+        self.assertEqual(configurator.area_de_descarga(["-25", "-180", "-90", "180"], "geopotential"), ["-20", "-180", "-90", "180"])
+
+    def test_la_temperatura_no_lleva_margen(self):
+        self.assertEqual(configurator.area_de_descarga(["70", "-30", "35", "40"], "temperature"), ["70", "-30", "35", "40"])
+
+    def test_distancia_de_los_rayos_igual_que_en_params_yaml(self):
+        params = (RAIZ / "execution" / "code" / "config" / "params.yaml").read_text(encoding="utf-8")
+        valor = next(float(l.split(":")[1]) for l in params.splitlines() if l.startswith("ray_distance_km:"))
+        self.assertEqual(rutas.RAY_DISTANCE_KM, valor)
+
+    def test_el_fichero_va_en_un_directorio_por_area(self):
+        args = {"variableName": "geopotential", "pressureLevels": ["500"], "years": ["2022"], "months": ["03"],
+                "days": ["14"], "hours": ["12"]}
+        ruta = configurator.mount_file_name(args, ["90", "-180", "20", "180"])
+        self.assertTrue(ruta.endswith("/area_90_-180_20_180/geopotential_500hPa_2022-03-(14)_12UTC.nc"), ruta)
 
 
 if __name__ == "__main__":

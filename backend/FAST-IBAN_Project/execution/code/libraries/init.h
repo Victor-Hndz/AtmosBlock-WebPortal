@@ -9,6 +9,7 @@
 void cargar_parametros(const char *ruta);
 void calcular_dominio_latitudes(void);
 int paso_candidatos(void);
+int columnas_candidatas(const float *lons, int paso);
 void escribir_cabecera(FILE *fp);
 void process_entry(int argc, char **argv);
 void init_files(char* filename, char* filename2, char* log_file, char* speed_file, char* long_name);

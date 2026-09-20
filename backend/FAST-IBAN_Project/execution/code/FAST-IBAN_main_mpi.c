@@ -7,9 +7,8 @@
 
 
 int main(int argc, char **argv) {
-    int ncid, retval, i, j, k, time, lat, lon, size_x, size_y, step, bearing_count, bearing_count2, id, rank, size, time_start, time_end, base_chunk;
+    int ncid, retval, i, j, k, time, lat, lon, size_x, size_y, step, id, rank, size, time_start, time_end, base_chunk;
     double scale_factor, offset, t_ini, t_fin, t_total = 0.0;
-    short z_aux_selected; bool interp_ok;
     short **z = NULL;
     int z_varid;
     bool swap_lon;
@@ -60,7 +59,8 @@ int main(int argc, char **argv) {
 
     step = paso_candidatos();  // ALG-305
     size_x = (FILA_LAT_MIN - FILA_LAT_INICIO)/step + 1;  // ALG-302, ALG-374
-    size_y = (int)((NLON)/step);
+    swap_lon = check_coords(lons);  // ALG-369: antes de elegir las columnas de candidatos
+    size_y = columnas_candidatas(lons, step);
 
     selected_points = malloc((size_x)*sizeof(selected_point*));
     selected_points[0] = malloc(sizeof(selected_point)*size_x*size_y);
@@ -80,8 +80,6 @@ int main(int argc, char **argv) {
     }
 
 
-    //Check the coordinates and correct them if necessary.
-    swap_lon = check_coords(lons);
 
     //Initialize the output files.
     // ALG-206: solo el proceso 0 crea el directorio de salida y los CSV finales con su cabecera; el resto
@@ -131,27 +129,10 @@ int main(int argc, char **argv) {
         for(lat=0;lat<size_x;lat++) {
             printf("Processing time %d, lat %d\n", time, lat);
             for(lon=0;lon<size_y;lon++) {
-                bearing_count = 0, bearing_count2 = 0;
-                selected_points[lat][lon] = create_selected_point(create_point(lats[FILA_LAT_INICIO + lat*step], lons[lon*step]), z[FILA_LAT_INICIO + lat*step][lon*step], NO_TYPE, -1);
-
-                for(i=0; i<PARAMS.n_rays;i++) {
-                    interp_ok = bilinear_interpolation(coord_from_great_circle(create_point(lats[FILA_LAT_INICIO + lat*step], lons[lon*step]), PARAMS.ray_distance_km, BEARING_START + i*BEARING_STEP), z, lats, lons, &z_aux_selected);
-                    
-                    //Si se sale de la zona delimitada por los límites de latitud y longitud , no se tiene en cuenta.
-                    if(!interp_ok) {
-                        bearing_count++;
-                        continue;
-                    }
-
-                    if((((z[FILA_LAT_INICIO + lat*step][lon*step] * scale_factor) + offset)/g_0) >= (((z_aux_selected * scale_factor) + offset)/g_0))
-                        bearing_count++;
-                    if((((z[FILA_LAT_INICIO + lat*step][lon*step] * scale_factor) + offset)/g_0) <= (((z_aux_selected * scale_factor) + offset)/g_0))
-                        bearing_count2++;                 
-                }
-                if(bearing_count >= (int)(PARAMS.n_rays*PARAMS.pass_fraction)) 
-                    selected_points[lat][lon].type = MAX;
-                else if(bearing_count2 >= (int)(PARAMS.n_rays*PARAMS.pass_fraction)) 
-                    selected_points[lat][lon].type = MIN;
+                // ALG-369: clasificación local del candidato con los rayos de círculo máximo (calc.c).
+                coord_point candidato = create_point(lats[FILA_LAT_INICIO + lat*step], lons[COL_LON_INICIO + lon*step]);
+                short z_candidato = z[FILA_LAT_INICIO + lat*step][COL_LON_INICIO + lon*step];
+                selected_points[lat][lon] = create_selected_point(candidato, z_candidato, clasificar_candidato(candidato, z_candidato, z, lats, lons), -1);
                 filtered_points[lat][lon] = selected_points[lat][lon];
             }
         }
