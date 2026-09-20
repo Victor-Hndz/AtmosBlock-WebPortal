@@ -259,6 +259,11 @@ add_executable(TEST_area_celda test_area_celda.c)
 target_link_libraries(TEST_area_celda LIB m)
 add_test(NAME test_area_celda COMMAND TEST_area_celda)
 
+# ALG-371: el área de la huella de una cúpula isótropa frente a la predicción analítica (valida el filtro de ALG-306).
+add_executable(TEST_area_cupula test_area_cupula.c)
+target_link_libraries(TEST_area_cupula CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
+add_test(NAME area_cupula_isotropa COMMAND TEST_area_cupula)
+
 add_executable(TEST_parametros test_parametros.c)
 target_link_libraries(TEST_parametros INIT UTILS LIB m netcdf OpenMP::OpenMP_C)
 add_test(NAME test_parametros COMMAND TEST_parametros)
