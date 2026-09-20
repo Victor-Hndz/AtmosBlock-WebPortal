@@ -135,6 +135,14 @@ target_link_libraries(RECORTAR_NC netcdf)
 add_test(NAME preparar_caso_80N COMMAND RECORTAR_NC ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/caso_80N.nc z 80 1)
 add_test(NAME preparar_caso_1grado COMMAND RECORTAR_NC ${CASO_FIJO} ${CMAKE_CURRENT_BINARY_DIR}/caso_1grado.nc z 90 4)
 set_tests_properties(preparar_caso_80N preparar_caso_1grado PROPERTIES FIXTURES_SETUP recortes)
+# ALG-376: formaciones truncadas. Con el caso fijo (90°N a 25°N) y el dominio pedido 25-90, los rayos paran en el
+# límite de análisis y ninguna formación se marca. Con el mismo caso recortado en 80°N y el dominio 25-90, el fichero
+# se acaba dentro del dominio y alguna formación tiene el contorno incompleto.
+set(COMPROBAR_TRUNCADAS ${CMAKE_CURRENT_SOURCE_DIR}/regression/comprobar_truncadas.sh)
+add_test(NAME truncadas_fichero_completo COMMAND sh ${COMPROBAR_TRUNCADAS} $<TARGET_FILE:FAST-IBAN> ${CASO_FIJO} 25 90 ninguna)
+add_test(NAME truncadas_fichero_recortado COMMAND sh ${COMPROBAR_TRUNCADAS} $<TARGET_FILE:FAST-IBAN> ${CMAKE_CURRENT_BINARY_DIR}/caso_80N.nc 25 90 alguna)
+set_tests_properties(truncadas_fichero_recortado PROPERTIES FIXTURES_REQUIRED recortes)
+
 set(COMPROBAR_LATITUDES ${CMAKE_CURRENT_SOURCE_DIR}/regression/comprobar_latitudes.sh)
 # Área de 80°N a 0°N, como la pide el portal: LAT_LIM_MIN = 0 (con 20, code/ descarta en la salida lo que lee de más).
 add_test(NAME latitudes_desde_80N COMMAND sh ${COMPROBAR_LATITUDES} $<TARGET_FILE:FAST-IBAN> ${CMAKE_CURRENT_BINARY_DIR}/caso_80N.nc 0 85 80)

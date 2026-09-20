@@ -111,6 +111,7 @@ typedef struct selected_point_list {
 typedef struct formation_list {
     int max_id, min1_id, min2_id;
     enum Tipo_block type;
+    bool truncada;  // ALG-376: algún cluster de la formación tiene rayos de contorno cortados por el borde del fichero
 } formation;
 
 typedef struct cluster {
@@ -122,6 +123,7 @@ typedef struct cluster {
     double *extremos;  // ALG-360: extremo de altura de cada rayo geodésico (calcular_extremos_rayos); NULL fuera de search_formation
     double extremo_polo;  // ALG-363: extremo del rayo hacia el polo solo hasta el polo; delimita los niveles de contorno
     double area_km2;      // ALG-306: área del cluster, suma de las áreas de sus celdas de candidatos (fill_clusters)
+    bool truncado;        // ALG-376: algún rayo de contorno se quedó sin datos en el borde del fichero (calcular_extremos_rayos)
 } points_cluster;
 
 // ALG-303 (L2): hemisferio de una latitud (+1 norte, -1 sur). Las comparaciones de latitud usan hemi·lat, nunca el HN.
@@ -149,7 +151,7 @@ static inline double guarda_polar_deg(void) { return 90 - PARAMS.ray_distance_km
 // Functions
 coord_point create_point(float lat, float lon);
 selected_point create_selected_point(coord_point point, short z, enum Tipo_form type, int cluster);
-formation create_formation(int max_id, int min1_id, int min2_id, enum Tipo_block type);
+formation create_formation(int max_id, int min1_id, int min2_id, enum Tipo_block type, bool truncada);
 points_cluster create_cluster(int id, int n_points, int contour, coord_point center, selected_point *points, selected_point point_izq, selected_point point_der, selected_point point_sup, selected_point point_inf, enum Tipo_form type);
 double area_celda_km2(double lat_deg, double paso_deg);
 points_cluster *fill_clusters(selected_point **points, int size_x, int size_y, int n_clusters, double offset, double scale_factor);

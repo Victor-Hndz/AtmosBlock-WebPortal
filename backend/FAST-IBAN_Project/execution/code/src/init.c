@@ -278,7 +278,7 @@ void init_files(char* filename, char* filename2, char* log_file, char* speed_fil
         exit(EXIT_FAILURE);
     }
     escribir_cabecera(fp);  // ALG-305
-    fprintf(fp, "time,max_id,min1_id,min2_id,type\n");
+    fprintf(fp, "time,max_id,min1_id,min2_id,type,truncada\n");  // ALG-376
     fclose(fp);
 
     buffer_size = strlen(file_path) + strlen(temp) + strlen(fecha) + EXTRA_STR_SIZE;

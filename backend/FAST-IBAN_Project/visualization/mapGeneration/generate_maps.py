@@ -555,18 +555,20 @@ class MapGenerator:
             min1_ids = forms_data['min1_id'].copy()
             min2_ids = forms_data['min2_id'].copy()
             f_types = forms_data['type'].copy()
+            # ALG-376: columna opcional; los CSV anteriores a ALG-376 no la traen.
+            f_truncadas = forms_data['truncada'].copy() if 'truncada' in forms_data.columns else [0] * len(f_types)
             
             Points = namedtuple('Points', ['lat', 'lon', 'var', 'cluster', 'type'])
-            Formations = namedtuple('Formations', ['max', 'min1', 'min2', 'type'])
+            Formations = namedtuple('Formations', ['max', 'min1', 'min2', 'type', 'truncada'])
             
             formations_array = []
             
-            for max_id, min1_id, min2_id, f_type in zip(max_ids, min1_ids, min2_ids, f_types):
+            for max_id, min1_id, min2_id, f_type, truncada in zip(max_ids, min1_ids, min2_ids, f_types, f_truncadas):
                 max_points = [Points(lat, lon, var, clus, t) for lat, lon, var, clus, t in zip(s_lat, s_lon, s_variable, s_cluster, s_type) if clus == max_id]
                 min1_points = [Points(lat, lon, var, clus, t) for lat, lon, var, clus, t in zip(s_lat, s_lon, s_variable, s_cluster, s_type) if clus == min1_id]
                 min2_points = [Points(lat, lon, var, clus, t) for lat, lon, var, clus, t in zip(s_lat, s_lon, s_variable, s_cluster, s_type) if clus == min2_id] if f_type == 'OMEGA' else None
         
-                formations_array.append(Formations(max_points, min1_points, min2_points, f_type))
+                formations_array.append(Formations(max_points, min1_points, min2_points, f_type, bool(truncada)))
         
             dataset_nc = get_dataset(self.file_name)
             
@@ -679,14 +681,15 @@ class MapGenerator:
                     centroid = np.mean(polygon_points, axis=0)
                     polygon_points = polygon_points + padding * (polygon_points - centroid)
                     
-                    # Trazar el polígono
+                    # Trazar el polígono (ALG-376: a trazos si la formación está truncada por el borde del fichero)
+                    estilo = (0, (4, 2)) if formation.truncada else '-'
                     ax.plot(polygon_points[:, 1], polygon_points[:, 0], 
-                            color='black', linewidth=0.75, 
+                            color='black', linewidth=0.75, linestyle=estilo,
                             transform=ccrs.PlateCarree(), zorder=10
                     )
                     ax.plot([polygon_points[0, 1], polygon_points[-1, 1]], 
                             [polygon_points[0, 0], polygon_points[-1, 0]], 
-                            color='black', linewidth=0.75, transform=ccrs.PlateCarree(), 
+                            color='black', linewidth=0.75, linestyle=estilo, transform=ccrs.PlateCarree(), 
                             zorder=10
                     )
                     
@@ -702,7 +705,8 @@ class MapGenerator:
                     else:
                         an_xy = (mid_lon, mid_lat)
                         
-                    type_an = ax.annotate(formation.type, an_xy, fontsize=4, ha='center', 
+                    etiqueta = f"{formation.type}*" if formation.truncada else formation.type
+                    type_an = ax.annotate(etiqueta, an_xy, fontsize=4, ha='center', 
                                           color='white', transform=ccrs.PlateCarree(), zorder=13)
                     plt.setp(type_an, 
                              path_effects=[path_effects.Stroke(linewidth=1, foreground='black'), 
