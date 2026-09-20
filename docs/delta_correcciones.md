@@ -197,6 +197,18 @@ En la búsqueda de la Omega, un mínimo es flanco izquierdo (oeste) o derecho (e
 - **Acuerdo 0,25°/1° en 2014-15:** 1088 → 926 emparejadas sobre 1217 → 1046 formaciones (89 % → 89 %).
 - Líneas base del caso fijo y de 2003 actualizadas.
 
+**Revisión manual de las Omegas perdidas (2026-09-20).** Se revisaron las 12 Omegas que pierde 1983-01-31…02-21, con sus mapas de formaciones generados con el código del portal:
+
+| Caso | Flanco más cercano | Posición respecto a la alta | Veredicto |
+|---|---|---|---|
+| Pasos 10, 11, 14, 15 (Norteamérica occidental) | 404–569 km | 13–16° hacia el ecuador | Alta sobre baja: el rechazo es correcto |
+| Paso 35 (dos casos, golfo de Alaska y mar de Bering) | 59 y 443 km | 9,5 y 13° hacia el ecuador | Correcto |
+| Paso 66 (Atlántico oriental) | 245 km | 18° hacia el ecuador | Correcto |
+| Paso 80 (Asia central) | 290 km | 6° hacia el ecuador, justo debajo | Correcto |
+| **Pasos 50, 66, 67, 70 (Siberia central)** | **501–682 km** | **5–9° hacia el ecuador, casi al lado** | **Fronterizos:** el flanco está entre el 72 % y el 97 % del umbral y a la altura de la alta; en el mapa la configuración se lee como Omega |
+
+Ocho de las doce son rechazos claros. Las cuatro fronterizas son la misma alta siberiana en cuatro pasos consecutivos, con su flanco oeste justo por debajo de los 700 km: son el precio del umbral elegido, no un fallo de la regla. Queda anotado por si en la validación del umbral del Rex (ALG-368) se revisa el valor.
+
 ## ALG-374: el dominio de análisis depende del hemisferio
 
 `FILA_LAT_MIN` (ALG-302) y la parada de los rayos usaban siempre `LAT_LIM_MIN` como límite hacia el ecuador. En el hemisferio sur ese límite es el **polar**: con `-90 -25` se recorrían las filas desde la primera del fichero (0°) y ningún rayo paraba antes de −90°, así que se analizaba la franja de 0° a −25° que en el norte queda fuera.
