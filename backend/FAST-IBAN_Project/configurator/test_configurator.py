@@ -48,6 +48,11 @@ api_request = _cargar("api_request_real", RAIZ / "utils" / "api_request.py")
 llamadas_adapt = []
 _stub("utils.api_request", request_data=api_request.request_data)
 _stub("utils.netcdf_editor", adapt_netcdf=llamadas_adapt.append)
+# ALG-369 / WEB-359: las rutas de descarga viven aparte, sin dependencias, para que la prueba de extremo a extremo
+# pueda preguntarle al configurador dónde espera cada fichero.
+sys.path.insert(0, str(RAIZ / "configurator"))
+rutas = _cargar("rutas", RAIZ / "configurator" / "rutas.py")
+sys.modules["rutas"] = rutas
 configurator = _cargar("configurator_CLI", RAIZ / "configurator" / "configurator_CLI.py")
 
 from utils.consts.consts import STATUS_ERROR, STATUS_OK  # noqa: E402
@@ -147,7 +152,7 @@ class AreaDeDescargaTest(unittest.TestCase):
     def test_distancia_de_los_rayos_igual_que_en_params_yaml(self):
         params = (RAIZ / "execution" / "code" / "config" / "params.yaml").read_text(encoding="utf-8")
         valor = next(float(l.split(":")[1]) for l in params.splitlines() if l.startswith("ray_distance_km:"))
-        self.assertEqual(configurator.RAY_DISTANCE_KM, valor)
+        self.assertEqual(rutas.RAY_DISTANCE_KM, valor)
 
     def test_el_fichero_va_en_un_directorio_por_area(self):
         args = {"variableName": "geopotential", "pressureLevels": ["500"], "years": ["2022"], "months": ["03"],

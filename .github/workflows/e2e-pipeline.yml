@@ -44,10 +44,22 @@ jobs:
           docker compose up -d --build
           timeout 300 sh -c 'until curl -fs http://localhost:3000/api/health; do sleep 5; done'
       - name: Caso de ejemplo en el volumen del configurador
-        run: >
-          docker compose cp
-          backend/FAST-IBAN_Project/execution/code/tests/fixtures/geopot_500hPa_2022-03-14_00-06-12-18UTC.nc
-          "configurator_module:/app/config/data/geopotential_500hPa_2022-03-(14)_00-06-12-18UTC.nc"
+        # WEB-359: la carpeta la decide el configurador (ALG-369: el área descargada va en la ruta), así que se le
+        # pregunta en vez de repetir aquí la fórmula del margen. Si el fichero no queda donde lo busca, intenta
+        # descargar del CDS —sin clave en el CI— y la prueba se cuelga hasta el tiempo límite.
+        run: |
+          RUTA=$(docker compose exec -T configurator_module python -c "
+          import sys
+          sys.path[:0] = ['/app', '/app/configurator']
+          from rutas import area_de_descarga, mount_file_name
+          peticion = {'variableName': 'geopotential', 'pressureLevels': ['500'], 'years': ['2022'],
+                      'months': ['03'], 'days': ['14'], 'hours': ['0', '6', '12', '18']}
+          print(mount_file_name(peticion, area_de_descarga(['90', '-180', '0', '180'], 'geopotential')))" | tail -1)
+          echo "El configurador espera el fichero en $RUTA"
+          docker compose exec -T configurator_module mkdir -p "$(dirname "$RUTA")"
+          CASO=backend/FAST-IBAN_Project/execution/code/tests/fixtures/geopot_500hPa_2022-03-14_00-06-12-18UTC.nc
+          docker compose cp "$CASO" "configurator_module:$RUTA"
+          docker compose exec -T configurator_module test -s "$RUTA"
       - name: Dependencias del frontend
         working-directory: frontend
         run: npm ci
