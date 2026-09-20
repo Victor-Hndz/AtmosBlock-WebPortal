@@ -3,16 +3,16 @@
 // Para una cúpula isótropa cuyo perfil radial decrece de forma monótona, un candidato a distancia r del centro ve, en
 // el acimut θ, un punto a distancia d(θ) = sqrt(r² + D² − 2rD cos θ) del centro (D = ray_distance_km). El rayo falla
 // (el vecino está más alto) cuando d(θ) < r, es decir cuando cos θ > D/(2r). La fracción de acimutes que fallan es
-// arccos(D/(2r))/π, así que el punto sigue siendo MAX mientras esa fracción no pase de 1 − pass_fraction:
+// arccos(D/(2r))/π, así que el punto sigue siendo MAX mientras no pase de la fracción que admite el umbral:
 //
-//     r_huella = D / (2 cos(π (1 − pass_fraction)))     y     A_huella = π r_huella²
+//     r_huella = D / (2 cos(π · fracción_que_falla))     y     A_huella = π r_huella²
 //
-// Con D = 500 km y pass_fraction = 0,9: r = 265,6 km y A = 2,216·10⁵ km². **No depende del ancho de la cúpula ni de
+// Con D = 500 km y 57 de 64 rayos (7/64 = 0,109375): r = 265,5 km y A = 2,214·10⁵ km². **No depende del ancho de la cúpula ni de
 // la latitud ni de la resolución**: solo del muestreo por rayos. El filtro de ALG-306 (22 000 km²) queda un orden de
 // magnitud por debajo, así que no recorta cúpulas isótropas, solo objetos estrechos o truncados.
 //
 // Predicción escrita antes de medir: el área medida de la huella coincide con A_huella dentro del error de
-// discretización de la rejilla de candidatos (1°), igual a 30°, 60° y 80° de latitud, con dos anchos de cúpula y con
+// discretización de la rejilla de candidatos (1°), igual a 30°, 55° y 80° de latitud, con dos anchos de cúpula y con
 // datos a 0,25° y a 1°.
 #include "../libraries/calc.h"
 #include "../libraries/init.h"
@@ -91,11 +91,21 @@ static double area_de_la_huella(double lat_c) {
                 id++;
             }
 
+    // El cluster buscado es el del candidato más cercano al centro (el centroide no sirve para una dorsal zonal).
+    int mejor_i = 0, mejor_j = 0;
+    double mejor = 1e30;
+    coord_point centro = create_point((float)lat_c, 0);
+    for (int i = 0; i < size_x; i++)
+        for (int j = 0; j < size_y; j++) {
+            double d = point_distance(centro, puntos[i][j].point);
+            if (d < mejor) { mejor = d; mejor_i = i; mejor_j = j; }
+        }
+    int buscado = puntos[mejor_i][mejor_j].cluster;
+
     points_cluster *clusters = fill_clusters(puntos, size_x, size_y, id, DESPLAZAMIENTO, ESCALA);
     double area = 0;
-    coord_point centro = create_point((float)lat_c, 0);
     for (int c = 0; c < id; c++) {
-        if (clusters[c].type == MAX && point_distance(centro, clusters[c].center) < 300)
+        if (clusters[c].id == buscado && clusters[c].type == MAX)
             area = clusters[c].area_km2;
         free(clusters[c].points);
     }
@@ -103,6 +113,20 @@ static double area_de_la_huella(double lat_c) {
     free(puntos[0]);
     free(puntos);
     return area;
+}
+
+// Dorsal zonal: el campo solo depende de la distancia al paralelo lat_c, así que es invariante en longitud. Un
+// candidato a distancia perpendicular p de la cresta falla el rayo del acimut θ cuando 0 < D cos θ < 2p, es decir en
+// una fracción (π/2 − arccos(2p/D))/π de los acimutes, y sigue siendo MAX mientras esa fracción no pase de
+// la fracción que admite el umbral: 2p = D·sin(π·fracción_que_falla). Con D = 500 km y 57 de 64 rayos, 169 km.
+static void preparar_dorsal(double res, double lat_c, double ancho_km) {
+    preparar(res, lat_c, ancho_km);
+    for (int i = 0; i < NLAT; i++) {
+        double p = fabs(lats[i] - lat_c) * M_PI / 180 * R;
+        short valor = (short)empaquetar(BASE_M + AMPLITUD_M * exp(-(p / ancho_km) * (p / ancho_km)));
+        for (int j = 0; j < NLON; j++)
+            z[i][j] = valor;
+    }
 }
 
 static void comprobar(double res, double lat_c, double ancho_km, double esperada, double tolerancia) {
@@ -117,7 +141,10 @@ static void comprobar(double res, double lat_c, double ancho_km, double esperada
 
 int main(void) {
     cargar_parametros(NULL);
-    double radio = PARAMS.ray_distance_km / (2 * cos(M_PI * (1 - PARAMS.pass_fraction)));
+    // El umbral real es entero: (int)(n_rays · pass_fraction) = 57 de 64, así que la fracción de rayos que pueden
+    // fallar es 7/64 = 0,109375, no 0,1.
+    double fallan = 1 - (double)((int)(PARAMS.n_rays * PARAMS.pass_fraction)) / PARAMS.n_rays;
+    double radio = PARAMS.ray_distance_km / (2 * cos(M_PI * fallan));
     double esperada = M_PI * radio * radio;
     printf("radio de la huella %.1f km, área %.0f km², filtro %.0f km²\n", radio, esperada, PARAMS.min_cluster_area_km2);
 
@@ -125,9 +152,28 @@ int main(void) {
     // discretización esperado es de decenas por ciento, no de un factor.
     for (int i = 0; i < 3; i++) {
         double lat = 30 + 25 * i;
-        comprobar(1.0, lat, 600, esperada, 0.35);
-        comprobar(1.0, lat, 1500, esperada, 0.35);
-        comprobar(0.25, lat, 600, esperada, 0.35);
+        comprobar(1.0, lat, 600, esperada, 0.2);
+        comprobar(1.0, lat, 1500, esperada, 0.2);
+        comprobar(0.25, lat, 600, esperada, 0.2);
     }
+
+    // Dorsal zonal: la franja mide 2p = D·sin(π·fracción_que_falla). Se mide con candidatos cada 0,25°, porque
+    // con el espaciado por defecto (1° = 111 km) la franja no llega a dos filas y solo se vería la discretización.
+    // A 55° la franja sale un 15 % más ancha que la predicción plana: un rayo lanzado hacia el este o el oeste es un
+    // círculo máximo que se aparta del paralelo hacia el ecuador, así que baja por la dorsal antes de lo previsto.
+    double franja = PARAMS.ray_distance_km * sin(M_PI * fallan);
+    PARAMS.candidate_spacing_deg = 0.25;
+    for (int i = 0; i < 2; i++) {
+        double lat = 30 + 25 * i;
+        preparar_dorsal(0.25, lat, 600);
+        double ancho = area_de_la_huella(lat) / (2 * M_PI * R * cos(lat * M_PI / 180));
+        double error = fabs(ancho - franja) / franja;
+        printf("dorsal zonal a %4.1f°: franja de %5.1f km (esperado %.1f, error %4.1f %%)%s\n", lat, ancho, franja,
+               100 * error, error <= 0.2 ? "" : "  <-- FALLA");
+        fallos += error > 0.2;
+        liberar();
+    }
+    // Una dorsal solo pasa el filtro de área si es larga: 22 000 km² / 169 km ≈ 130 km.
+    printf("longitud mínima de una dorsal para pasar el filtro: %.0f km\n", PARAMS.min_cluster_area_km2 / franja);
     return fallos != 0;
 }
