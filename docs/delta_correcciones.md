@@ -286,6 +286,14 @@ El filtro de tamaño exigía al menos 2 puntos por cluster. Con candidatos cada 
 
 Test `test_area_celda`: 1° en el ecuador ≈ 12 364 km², la mitad a 60°, igual en el HS, y 16 celdas de 0,25° = 1 de 1°.
 
+**Validación del umbral (ALG-371, 2026-09-20).** La derivación de 22 000 km² era geometría plana con perfiles ideales, sin comprobar. Ahora hay predicción analítica y medida:
+
+- **Cúpula isótropa:** un candidato a distancia *r* del centro falla el rayo del acimut θ cuando cos θ > D/(2r), así que la huella MAX es un disco de radio D/(2 cos(π·fracción de rayos que pueden fallar)) = 265,5 km, es decir 2,21·10⁵ km², **sin depender del ancho de la cúpula, de la latitud ni de la resolución**. Medido con el código real (`test_area_cupula`): 224 806 km² a 30°, 233 971 a 55° y 244 720 (1°) / 231 843 (0,25°) a 80°; el ancho (600 y 1500 km) no cambia el resultado.
+- **Dorsal sin pendiente:** la franja mide D·sin(π·fracción que falla) = 169 km. Medido: 167,0 km a 30° y 194,6 km a 55° (la desviación es geométrica: un rayo hacia el este es un círculo máximo que se aparta del paralelo hacia el ecuador). Una dorsal necesita 131 km de longitud para llegar a 22 000 km².
+- **Distribución real** (1983, sin filtro, 2239 clusters; `tests/validacion/area_minima.py`): la mediana de un cluster MAX son 214 886 km², casi la huella teórica. El filtro quita el 13,6 % de los MAX y el 10,0 % de los MIN, todos por debajo de una huella.
+- **Sensibilidad:** subir el umbral de 22 000 a 28 800 km² solo quitaría un 1,8 % más de MAX y un 1,5 % más de MIN; entre 22 000 y 22 300 no cambia nada. La elección exacta no decide detecciones.
+- **Qué quita hoy:** en el caso fijo, nada (el Rex que desaparecía en ALG-306 ya no existe tras los cambios posteriores). En 1983 quita 46 de 217 formaciones y no añade ninguna: 25 Omega, 9 Rex y **12 de las 15 `POLAR_HIGH`**, casi todas por encima de 85°, donde las huellas son estrechas porque la lógica direccional degenera.
+
 ## ALG-364: separación del Rex en km, no en grados
 
 La regla del Rex exigía que el mínimo quedara a ≤10° de longitud del máximo. Pero 10° de longitud son ~950 km a 30°N, 556 km a 60°N y 193 km a 80°N: la tolerancia dependía de la latitud. Ahora se mide la distancia del mínimo al círculo máximo del meridiano del máximo, `d = R·asin(cos φ_min·|sin Δλ|)`, solo con cos Δλ > 0 (si no, el mínimo está al otro lado del polo). Es periódica en longitud, así que la vuelta en ±180° sale sola.
