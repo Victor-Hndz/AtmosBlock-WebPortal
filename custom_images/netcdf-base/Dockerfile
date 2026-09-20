@@ -33,6 +33,10 @@ COPY /execution/install_netcdf.yaml /app/install_netcdf.yml
 # Run Ansible playbook
 RUN ansible-playbook install_netcdf.yml
 
+# ALG-356: sin esto, ncdump (4.9.2, compilado en /usr/local) resuelve libnetcdf.so.19 contra la de apt (4.8.1) y
+# muere con "undefined symbol: nc_reclaim_data". ldconfig deja /usr/local/lib por delante en la caché del enlazador.
+RUN ldconfig && ncdump 2>&1 | head -1
+
 # Set environment variables for NetCDF and HDF5
 ENV HDF5_DIR=/usr/local/hdf5-1.14.3
 ENV NETCDF4_DIR=/usr/local
