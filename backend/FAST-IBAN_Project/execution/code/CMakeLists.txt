@@ -50,6 +50,8 @@ add_library(INIT src/init.c libraries/init.h src/yaml_plano.c libraries/yaml_pla
 # ALG-305 (L4): ruta por defecto de los parámetros; se sustituye con la variable de entorno FAST_IBAN_PARAMS.
 target_compile_definitions(INIT PRIVATE FAST_IBAN_PARAMS_DEFECTO="${CMAKE_CURRENT_SOURCE_DIR}/config/params.yaml")
 add_library(LIB src/lib.c libraries/lib.h)
+# ALG-379: primitiva topológica del contorno cerrado (ruta A).
+add_library(TOPOLOGIA src/topologia.c libraries/topologia.h)
 
 
 add_executable(FAST-IBAN FAST-IBAN_main.c)
