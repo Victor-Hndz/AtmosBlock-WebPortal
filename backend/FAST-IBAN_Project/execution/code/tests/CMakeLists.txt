@@ -274,7 +274,7 @@ add_test(NAME area_cupula_isotropa COMMAND TEST_area_cupula)
 
 # ALG-379: la primitiva topológica, sobre campos sintéticos donde la respuesta se sabe.
 add_executable(TEST_topologia test_topologia.c)
-target_link_libraries(TEST_topologia TOPOLOGIA LIB m)
+target_link_libraries(TEST_topologia TOPOLOGIA CALC UTILS INIT LIB m netcdf OpenMP::OpenMP_C)
 add_test(NAME topologia_contorno_cerrado COMMAND TEST_topologia)
 
 add_executable(TEST_parametros test_parametros.c)

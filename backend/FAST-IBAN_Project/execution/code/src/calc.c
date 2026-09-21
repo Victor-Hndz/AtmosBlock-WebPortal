@@ -1,5 +1,7 @@
 #include "../libraries/calc.h"
 
+#include "../libraries/topologia.h"
+
 
 
 coord_point coord_from_great_circle(coord_point initial, double dist, double bearing) {
@@ -284,16 +286,37 @@ bool minimo_rex_valido(points_cluster minimo, int contour, int abierto_alta) {
            check_contour_dir_omega(minimo, contour, -1, 0) && !check_contour_dir_rex(minimo, contour, 0, -abierto_alta);
 }
 
+// ALG-379: hasta dónde baja la escalera de niveles antes de rendirse (m por debajo del centro). No es un umbral
+// físico: la escalera acaba sola cuando la componente alcanza el cinturón; esto solo evita un bucle infinito si el
+// campo tiene huecos raros.
+#define LIMITE_ESCALERA_M 3000
+
+// ¿Está el acimut dentro del sector de ±45° alrededor de `direccion`? Con NAN (sin silla) no hay dirección.
+static bool sector_contiene(double acimut, double direccion) {
+    if (!isfinite(acimut))
+        return false;
+    double d = fmod(fabs(acimut - direccion), 360.0);
+    return fmin(d, 360.0 - d) <= 45.0;
+}
+
 void search_formation(points_cluster *clusters, int size, short **z_in, float *lats, float *lons, double scale_factor, double offset, char* filename, int time) {
-    int i, j, index_lat, index_lon, contour_top;
+    int i, j;
     double mean_dist, pair_score, best_score;
-    bool contour_bot, contour_izq, contour_der;
     points_cluster selected_izq = {0}, selected_der = {0}, selected_rex = {0};
     formation formation;
 
-    // ALG-360: extremos de los rayos geodésicos de todos los clusters, una vez por paso temporal.
-    for(i=0; i<size; i++)
-        calcular_extremos_rayos(&clusters[i], z_in, lats, lons, scale_factor, offset);
+    // ALG-379: retícula de análisis del hemisferio, una vez por paso temporal. El test topológico se hace siempre
+    // sobre el hemisferio completo (decisión del usuario, 2026-09-20), así que el resultado no depende del área
+    // pedida: si la componente no toca el borde de los datos, es la misma que sobre el globo entero.
+    rejilla_analisis *rejilla_norte = NULL, *rejilla_sur = NULL;
+    for(i=0; i<size; i++) {
+        if(hemisferio(clusters[i].center.lat) > 0 && rejilla_norte == NULL)
+            rejilla_norte = rejilla_del_campo(z_in, lats, lons, scale_factor, offset, 1,
+                                              PARAMS.candidate_spacing_deg, PARAMS.subtropical_belt_deg);
+        if(hemisferio(clusters[i].center.lat) < 0 && rejilla_sur == NULL)
+            rejilla_sur = rejilla_del_campo(z_in, lats, lons, scale_factor, offset, -1,
+                                            PARAMS.candidate_spacing_deg, PARAMS.subtropical_belt_deg);
+    }
 
     for(i=0; i<size;i++) {
         if(clusters[i].type == MAX) {
@@ -303,8 +326,7 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                 export_formation_to_csv(create_formation(clusters[i].id, -1, -1, POLAR_HIGH, clusters[i].truncado), filename, time);
                 continue;
             }
-            index_lat = findIndex(lats, NLAT, clusters[i].center.lat);
-            index_lon = findIndex(lons, NLON, clusters[i].center.lon);
+            const rejilla_analisis *rejilla = hemisferio(clusters[i].center.lat) > 0 ? rejilla_norte : rejilla_sur;
             mean_dist = INF;
             // B5: candidatos válidos de cada lado (índices en clusters); la pareja se elige tras recorrer los contornos.
             int cand_izq[size], cand_der[size], n_izq = 0, n_der = 0;
@@ -315,26 +337,43 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
             selected_rex.center = create_point(INF, INF);
             selected_rex.id = -1;
 
-            // ALG-360: niveles explícitos, sin saltos (niveles_hacia_el_polo).
-            double altura_centro = (index_lat >= 0 && index_lon >= 0) ? ((z_in[index_lat][index_lon]*scale_factor) + offset)/g_0 : -INF;
-            int max_niveles = clusters[i].extremo_polo < altura_centro ? (int)((altura_centro - clusters[i].extremo_polo) / PARAMS.contour_step_m) + 2 : 1;
-            int niveles[max_niveles];
-            int n_niveles = niveles_hacia_el_polo(&clusters[i], altura_centro, niveles, max_niveles);
-
-            for(int nivel = 0; nivel < n_niveles; nivel++) {
-                contour_top = niveles[nivel];
-
-                if(check_closed_contour(clusters[i], contour_top))
+            // ALG-379 (ruta A): nivel intrínseco. Se baja escalón a escalón mientras la componente conexa de la
+            // isohipsa que contiene al centro siga cerrada; el último nivel cerrado es el contorno cerrado más
+            // externo, y el siguiente es aquel en el que la alta se funde con el cinturón subtropical. Ya no hay
+            // barrido de niveles ni radio de búsqueda: el nivel lo pone el campo.
+            int nodo_i, nodo_j;
+            nodo_de(rejilla, clusters[i].center, &nodo_i, &nodo_j);
+            bool hay_cierre = false;
+            int nivel_cierre = 0;
+            // La escalera arranca del valor de la retícula en el nodo, no de la altura del fichero: si el nodo interpolado
+            // queda por debajo del primer nivel, el centro no está en su propio conjunto y todo sale INDETERMINADO.
+            double techo_nodo = valor_rejilla(rejilla, nodo_i, nodo_j);
+            for(int nivel = (int)floor(techo_nodo / PARAMS.contour_step_m) * PARAMS.contour_step_m;
+                nivel > techo_nodo - LIMITE_ESCALERA_M; nivel -= PARAMS.contour_step_m) {
+                enum Cierre estado = estado_contorno(rejilla, nodo_i, nodo_j, nivel, MAX, PARAMS.subtropical_belt_deg);
+                if(estado == CIERRE_CERRADO) {
+                    nivel_cierre = nivel;
+                    hay_cierre = true;
                     continue;
+                }
+                // ALG-376: si la componente toca el borde de los datos, no se puede demostrar nada más abajo.
+                if(estado == CIERRE_INDETERMINADO)
+                    clusters[i].truncado = true;
+                break;
+            }
+            if(!hay_cierre)  // ya abierta en su propio nivel: es el cinturón, no un bloqueo
+                continue;
 
-                contour_bot = check_contour_dir_rex(clusters[i], contour_top, 1, 0);   
-                contour_izq = check_contour_dir_omega(clusters[i], contour_top, 0, -1);
-                contour_der = check_contour_dir_omega(clusters[i], contour_top, 0, 1);
+            int nivel_apertura = nivel_cierre - PARAMS.contour_step_m;
+            double acimut = acimut_de_la_silla(rejilla, nodo_i, nodo_j, nivel_cierre, nivel_apertura,
+                                               PARAMS.subtropical_belt_deg, clusters[i].center);
+            int hemi = hemisferio(clusters[i].center.lat);
+            // Sectores de ±45° alrededor de un punto intrínseco (la silla), no de 17 rayos de 64.
+            bool abierta_ecuador = sector_contiene(acimut, hemi > 0 ? 180 : 0);
+            bool abierta_este = sector_contiene(acimut, 90), abierta_oeste = sector_contiene(acimut, 270);
 
-                if(contour_der && contour_izq && !contour_bot) {
-                    contour_bot = false;
-                    contour_der = false;
-                    contour_izq = false;
+            {
+                if(abierta_ecuador) {
 
                     for(j=0; j<size; j++) {
                         if(point_distance(clusters[j].center, clusters[i].center) > PARAMS.search_radius_km)
@@ -342,60 +381,50 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
                         
                         int lado = lado_flanco_omega(clusters[i].center, clusters[j].center);
 
-                        if(clusters[j].type == MIN && hemisferio(clusters[i].center.lat) * clusters[j].center.lat <= hemisferio(clusters[i].center.lat) * clusters[i].center.lat && lado < 0) {
-                            if(check_closed_contour(clusters[j], contour_top))
-                                continue;
-                            
-                            if(clusters[i].contour == clusters[j].contour)
-                                continue;
+                        if(clusters[j].type != MIN || hemisferio(clusters[i].center.lat) * clusters[j].center.lat > hemisferio(clusters[i].center.lat) * clusters[i].center.lat || lado == 0)
+                            continue;
+                        if(clusters[i].contour == clusters[j].contour)
+                            continue;
 
-                            //izquierda.
-                            contour_bot = check_contour_dir_omega(clusters[j], contour_top, 1, 0);
-                            contour_der = check_contour_dir_omega(clusters[j], contour_top, 0, 1);
+                        // ALG-379: las dos patas de la Omega son dos bajas separadas por la alta, es decir, en
+                        // componentes distintas de {z <= nivel_apertura}. Eso sustituye a los sectores de rayos.
+                        int min_i, min_j;
+                        nodo_de(rejilla, clusters[j].center, &min_i, &min_j);
+                        if(misma_componente(rejilla, nodo_i, nodo_j, min_i, min_j, nivel_apertura, MIN))
+                            continue;
 
-                            if(contour_bot && contour_der) {
-                                int k = 0;
-                                while(k < n_izq && cand_izq[k] != j) k++;
-                                if(k == n_izq) cand_izq[n_izq++] = j;
-                            }
-                        } else if(clusters[j].type == MIN && hemisferio(clusters[i].center.lat) * clusters[j].center.lat <= hemisferio(clusters[i].center.lat) * clusters[i].center.lat && lado > 0) {
-                            if(check_closed_contour(clusters[j], contour_top))
-                                continue;
-
-                            if(clusters[i].contour == clusters[j].contour)
-                                continue;
-
-                            //derecha.
-                            contour_bot = check_contour_dir_omega(clusters[j], contour_top, 1, 0);
-                            contour_izq = check_contour_dir_omega(clusters[j], contour_top, 0, -1);
-
-                            if(contour_bot && contour_izq) {
-                                int k = 0;
-                                while(k < n_der && cand_der[k] != j) k++;
-                                if(k == n_der) cand_der[n_der++] = j;
-                            }
+                        if(lado < 0) {
+                            int k = 0;
+                            while(k < n_izq && cand_izq[k] != j) k++;
+                            if(k == n_izq) cand_izq[n_izq++] = j;
+                        } else {
+                            int k = 0;
+                            while(k < n_der && cand_der[k] != j) k++;
+                            if(k == n_der) cand_der[n_der++] = j;
                         }
                     }
                 } else {
-                    contour_bot = check_contour_dir_rex(clusters[i], contour_top, 1, 0);   
-                    contour_izq = check_contour_dir_rex(clusters[i], contour_top, 0, -1);
-                    contour_der = check_contour_dir_rex(clusters[i], contour_top, 0, 1);
-                    
-                    // ALG-377: alta cerrada hacia el ecuador y por un lado, abierta por el otro (-1 oeste, 1 este).
-                    int abierto_alta = contour_bot && contour_der && !contour_izq ? -1 : contour_bot && contour_izq && !contour_der ? 1 : 0;
+                    // ALG-377 + ALG-379: la alta se abre por un solo lado, este u oeste (-1 oeste, 1 este).
+                    int abierto_alta = abierta_oeste ? -1 : abierta_este ? 1 : 0;
                     if(abierto_alta != 0) {
                         for(j=0; j<size; j++) {
                             if(point_distance(clusters[j].center, clusters[i].center) > PARAMS.search_radius_km)
                                 continue;
 
-                            if(check_closed_contour(clusters[j], contour_top))
+                            if(clusters[j].type != MIN || hemisferio(clusters[i].center.lat) * clusters[j].center.lat > hemisferio(clusters[i].center.lat) * clusters[i].center.lat || distancia_al_meridiano(clusters[j].center, clusters[i].center) > PARAMS.rex_max_offset_km)
                                 continue;
 
-                            if(clusters[j].type == MIN && hemisferio(clusters[i].center.lat) * clusters[j].center.lat <= hemisferio(clusters[i].center.lat) * clusters[i].center.lat && distancia_al_meridiano(clusters[j].center, clusters[i].center) <= PARAMS.rex_max_offset_km) {
-                                if(minimo_rex_valido(clusters[j], contour_top, abierto_alta))
-                                    if(point_distance(clusters[j].center, clusters[i].center) < point_distance(selected_rex.center, clusters[i].center)) 
-                                        selected_rex = clusters[j];
-                            }
+                            // ALG-379: la baja de un Rex es una baja DESPRENDIDA de la vaguada circumpolar, así que su
+                            // contorno tiene que estar cerrado. Antes se descartaba justo cuando lo estaba, lo que
+                            // funcionaba como filtro de tamaño encubierto, no como criterio físico
+                            // (Rex 1950; Berggren, Bolin y Rossby 1949).
+                            int min_i, min_j;
+                            nodo_de(rejilla, clusters[j].center, &min_i, &min_j);
+                            if(estado_contorno(rejilla, min_i, min_j, nivel_apertura, MIN, PARAMS.subtropical_belt_deg) != CIERRE_CERRADO)
+                                continue;
+
+                            if(point_distance(clusters[j].center, clusters[i].center) < point_distance(selected_rex.center, clusters[i].center))
+                                selected_rex = clusters[j];
                         }
                     }  
                 }
@@ -446,10 +475,8 @@ void search_formation(points_cluster *clusters, int size, short **z_in, float *l
         }
     }
 
-    for(i=0; i<size; i++) {
-        free(clusters[i].extremos);
-        clusters[i].extremos = NULL;
-    }
+    liberar_rejilla(rejilla_norte);
+    liberar_rejilla(rejilla_sur);
 }
 
 

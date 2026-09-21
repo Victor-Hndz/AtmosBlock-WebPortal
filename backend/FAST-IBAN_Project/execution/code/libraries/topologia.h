@@ -49,4 +49,23 @@ enum Cierre estado_contorno(const rejilla_analisis *r, int i0, int j0, double ni
 // Tamaño de la componente conexa (nodos), para diagnóstico y tests. Devuelve 0 si (i0, j0) no pertenece al conjunto.
 int tam_componente(const rejilla_analisis *r, int i0, int j0, double nivel, enum Tipo_form tipo);
 
+// Retícula de análisis del hemisferio `hemi` (+1 norte, -1 sur) construida del campo del paso temporal, del polo
+// hasta la latitud de referencia (o hasta donde lleguen los datos), interpolando con bilinear_interpolation. Los
+// nodos sin datos quedan a NAN, que es lo que produce INDETERMINADO.
+rejilla_analisis *rejilla_del_campo(short **z, float *lats, float *lons, double scale_factor, double offset, int hemi,
+                                    double paso, double lat_referencia);
+
+// ¿Están los dos nodos en la misma componente conexa del conjunto de nivel? (flancos de la Omega: deben estar en
+// componentes distintas, porque son dos bajas separadas por la alta).
+bool misma_componente(const rejilla_analisis *r, int i1, int j1, int i2, int j2, double nivel, enum Tipo_form tipo);
+
+// Acimut (grados desde el norte, en sentido horario) del punto de silla por el que la componente cerrada en
+// `nivel_cierre` se funde con el cinturón al bajar a `nivel_apertura`. Es la dirección por la que la alta está
+// abierta, sin rayos ni sectores sobre 64 acimutes. Devuelve NAN si no encuentra el cuello.
+double acimut_de_la_silla(const rejilla_analisis *r, int i0, int j0, double nivel_cierre, double nivel_apertura,
+                          double lat_referencia, coord_point centro);
+
+// Nodo de la retícula más cercano a un punto.
+void nodo_de(const rejilla_analisis *r, coord_point p, int *i, int *j);
+
 #endif // TOPOLOGIA

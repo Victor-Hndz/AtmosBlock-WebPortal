@@ -29,6 +29,12 @@ contour_ray_step_km: 25
 # la que da sentido al método (el antiguo 85 no tenía base física y dejaba fuera las altas polares). Los mismos valores
 # en el HS: su climatología de bloqueo está en 40-70°S, lejos de 30° (asesoría física, 2026-09-16).
 cluster_lat_min_deg: 30
+
+# ALG-379 (ruta A): latitud del cinturón subtropical de altas, la referencia del test de contorno cerrado. Una alta
+# está "abierta hacia el ecuador" si la componente conexa de su isohipsa alcanza esta latitud, es decir, si es una
+# dorsal conectada al anticiclón subtropical. Sobre la esfera, "cerrado" no significa nada sin una referencia: toda
+# curva de nivel es cerrada. 30° coincide con cluster_lat_min_deg y con la latitud del anticiclón subtropical.
+subtropical_belt_deg: 30
 cluster_lat_max_deg: 90
 
 # Área mínima de un cluster, en km²: suma de R²·Δλ·Δφ·cos φ de sus celdas de candidatos (ALG-306). Sustituye al número

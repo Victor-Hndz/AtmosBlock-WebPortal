@@ -66,6 +66,7 @@ typedef struct {
     double min_cluster_area_km2;   // área mínima de un cluster, suma de R²·Δλ·Δφ·cos φ de sus celdas (ALG-306)
     double rex_max_offset_km;      // distancia máxima del mínimo de un Rex al meridiano del máximo (ALG-364)
     double temperature_threshold_c;  // ALG-352: solo la variante de temperatura; umbral estricto de selección, en °C
+    double subtropical_belt_deg;   // ALG-379: latitud de referencia del test de contorno cerrado topológico
 } parametros;
 extern parametros PARAMS;
 

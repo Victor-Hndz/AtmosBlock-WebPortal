@@ -52,6 +52,10 @@ target_compile_definitions(INIT PRIVATE FAST_IBAN_PARAMS_DEFECTO="${CMAKE_CURREN
 add_library(LIB src/lib.c libraries/lib.h)
 # ALG-379: primitiva topológica del contorno cerrado (ruta A).
 add_library(TOPOLOGIA src/topologia.c libraries/topologia.h)
+# CALC y TOPOLOGIA se usan mutuamente (la retícula interpola con bilinear_interpolation, y la clasificación
+# consulta la topología): se declara el ciclo y CMake repite las bibliotecas en el enlace.
+target_link_libraries(TOPOLOGIA PUBLIC CALC LIB m)
+target_link_libraries(CALC PUBLIC TOPOLOGIA)
 
 
 add_executable(FAST-IBAN FAST-IBAN_main.c)
