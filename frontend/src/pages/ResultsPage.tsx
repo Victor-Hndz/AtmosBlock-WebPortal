@@ -17,8 +17,6 @@ const FilePreview: React.FC<{ file: ResultFile }> = ({ file }) => {
   const isImage = file.name.match(/\.(jpeg|jpg|png|gif|svg)$/i);
   const isPdf = file.name.match(/\.pdf$/i);
 
-  console.log(`Rendering preview for file: ${file.name}, URL: ${file.url}, isImage: ${isImage}, isPdf: ${isPdf}`);
-
   useEffect(() => {
     // Reset states when file changes
     setImageLoaded(false);
@@ -193,7 +191,6 @@ export default function ResultsPage(): React.ReactElement {
 
       // Only reset states when starting a new connection for a new request
       if (isNewRequest) {
-        console.log("New request detected, resetting states");
         setIsConnected(false);
         setHasError(false);
         setIsComplete(false);
@@ -211,7 +208,6 @@ export default function ResultsPage(): React.ReactElement {
       cleanup = ProgressService.connectToProgressStream({
         requestHash,
         onConnect: () => {
-          console.log("Connected to progress stream successfully");
           setIsConnected(true);
           setHasError(false);
           // Set default progress to 5% and default message
@@ -219,8 +215,6 @@ export default function ResultsPage(): React.ReactElement {
           setProgressMessage("CONFIG: " + t("results.initializing", "Initializing processing..."));
         },
         onUpdate: (data: ProgressUpdateData) => {
-          console.log(`Received progress update: ${JSON.stringify(data)}`);
-
           // WEB-211: the request failed on the server; show the error and don't fetch results
           if (data.error) {
             setHasError(true);
@@ -243,7 +237,6 @@ export default function ResultsPage(): React.ReactElement {
 
           // If completed flag is sent, set progress to 100%
           if (data.completed === true) {
-            console.log("Server signaled completion");
             setTotalProgress(MAX_PROGRESS);
             setProgressComplete(true);
             setIsConnected(false);
@@ -262,7 +255,6 @@ export default function ResultsPage(): React.ReactElement {
           }
         },
         onComplete: () => {
-          console.log("Progress stream completed");
           setIsConnected(false);
           const flags = streamFlagsRef.current;
 

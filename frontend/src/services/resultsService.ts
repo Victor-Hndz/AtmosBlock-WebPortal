@@ -40,7 +40,6 @@ export const ResultsService = {
       }
 
       const data = await response.json();
-      console.log("Received result data:", data);
       return data;
     } catch (error) {
       console.error("Error fetching results:", error);
@@ -60,7 +59,6 @@ export const ResultsService = {
       // Add all files to the zip
       const fetchPromises = files.map(async file => {
         try {
-          console.log(`Downloading file: ${file.name} from URL: ${file.url}`);
           const response = await fetch(file.url);
           if (!response.ok) {
             console.error(`Error downloading file ${file.name}: ${response.statusText}`);
