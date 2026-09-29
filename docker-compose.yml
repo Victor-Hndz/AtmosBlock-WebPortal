@@ -162,8 +162,9 @@ services:
     restart: unless-stopped
 
   minio:
-    # minio/minio ya no existe en Docker Hub (2026-09): última versión comunitaria en quay.io, congelada y sin parches.
-    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
+    # MinIO retiró sus imágenes públicas (Docker Hub 2026-09, quay.io 401 desde 2026-09-27): copia en GHCR de la última
+    # versión comunitaria (quay.io@sha256:14cea493…, solo amd64), congelada y sin parches hasta sustituirla (WEB-219).
+    image: ghcr.io/victor-hndz/minio:RELEASE.2025-09-07T16-13-09Z@sha256:a1a8bd4ac40ad7881a245bab97323e18f971e4d4cba2c2007ec1bedd21cbaba2
     container_name: minio
     env_file: .env
     environment:
@@ -177,8 +178,8 @@ services:
     restart: unless-stopped
 
   minio-init:
-    # minio/minio ya no existe en Docker Hub (2026-09): última versión comunitaria en quay.io, congelada y sin parches.
-    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
+    # Misma copia en GHCR que el servicio minio (WEB-219).
+    image: ghcr.io/victor-hndz/minio:RELEASE.2025-09-07T16-13-09Z@sha256:a1a8bd4ac40ad7881a245bab97323e18f971e4d4cba2c2007ec1bedd21cbaba2
     depends_on:
       minio:
         condition: service_started
