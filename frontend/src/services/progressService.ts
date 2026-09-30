@@ -31,7 +31,6 @@ const openProgressStream = (progressStreamUrl: string, callbacks: ProgressConnec
 
   // Initialize connection
   eventSource.onopen = () => {
-    console.log("Connected to progress stream");
     if (callbacks.onConnect) {
       callbacks.onConnect();
     }
@@ -46,7 +45,6 @@ const openProgressStream = (progressStreamUrl: string, callbacks: ProgressConnec
       // Check if the progress is complete (either by explicit flag or by progress value)
       if ((data.completed === true || data.increment >= MAX_PROGRESS) && !completed) {
         completed = true;
-        console.log("Progress completed, calling onComplete callback");
 
         // Ensure we call onComplete with a slight delay to allow UI to update
         setTimeout(() => {
@@ -65,25 +63,17 @@ const openProgressStream = (progressStreamUrl: string, callbacks: ProgressConnec
   // Handle errors
   eventSource.onerror = error => {
     console.error("Progress stream error:", error);
-    console.log("Completed status:", completed);
 
     // If we've been connected for a while and have already completed, don't call error handler
     if (completed || Date.now() - connectionTimestamp > 5000) {
-      console.log("Error occurred but progress was already marked complete, ignoring");
       eventSource.close();
       return;
-    }
-
-    // Only close if we're still having issues (avoid closing during temporary disconnects)
-    if (eventSource.readyState === EventSource.CLOSED) {
-      console.log("Connection was closed permanently");
     }
   };
 
   // Add handler for when SSE connection naturally closes
   const originalClose = eventSource.close;
   eventSource.close = function () {
-    console.log("Progress stream connection closing");
     if (!completed && callbacks.onComplete) {
       // If we're closing but haven't completed, call onComplete
       completed = true;
@@ -128,7 +118,6 @@ export const ProgressService = {
 
     // Return cleanup function to close the connection
     return () => {
-      console.log("Closing progress stream connection");
       closed = true;
       eventSource?.close();
     };
