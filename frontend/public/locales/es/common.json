@@ -411,7 +411,7 @@
       "LLB-Atl": "Atlántico",
       "LLB-Pac": "Pacífico"
     },
-    "censura": "En los días 12–15 solo pueden aparecer bloqueos que ya han empezado.",
+    "censura": "En los días 12–15 no aparecen bloqueos que empiecen después del día 11: no les caben los 5 días de persistencia.",
     "inicioTitulo": "Posible inicio de bloqueo",
     "inicioExplicacion": "Solo se evalúa en los sectores sin bloqueo en los 5 días previos: probabilidad de que empiece un bloqueo en los días 1–5 y 6–10.",
     "ventanas": {

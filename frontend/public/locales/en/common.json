@@ -411,7 +411,7 @@
       "LLB-Atl": "Atlantic",
       "LLB-Pac": "Pacific"
     },
-    "censura": "On days 12–15 only blocks that have already started can appear.",
+    "censura": "On days 12–15, blocks starting after day 11 cannot appear: the 5-day persistence does not fit.",
     "inicioTitulo": "Possible blocking onset",
     "inicioExplicacion": "Only evaluated in sectors without blocking in the previous 5 days: probability that a block starts on days 1–5 and 6–10.",
     "ventanas": {

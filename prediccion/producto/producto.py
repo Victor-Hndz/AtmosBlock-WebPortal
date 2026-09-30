@@ -4,8 +4,9 @@ Por miembro, la serie de 20 días = pseudoanálisis de d−4…d−1 (media de l
 de cada día, común a IFS y AIFS) + los 16 pasos del miembro (F3-3). Sobre ella: DAV principal (dav.py) → eventos
 (eventos.py) → sector bloqueado por paso (sectores.py, F3-4) → inicio y probabilidad de inicio en los días 1–5 y 6–10
 si el sector está en calma (F3-5; calma = sin sector bloqueado en la DAV instantánea de la pseudoanálisis d−4…d,
-aclaración del 2026-09-30). En los pasos 12–15 solo caben bloqueos ya iniciados (censura declarada). Si falta algún
-día de historia se usan los días seguidos disponibles y se marca historia_incompleta. Nunca entra ERA5.
+aclaración del 2026-09-30). En los pasos 12–15 no aparecen bloqueos que empiecen después del paso 11: no les caben
+5 días en la ventana (censura declarada). Si falta algún día de historia se usan los días seguidos disponibles y se
+marca historia_incompleta. Nunca entra ERA5.
 
 Producto experimental: diagnostica la previsión de ECMWF; su habilidad no está verificada (F5).
 
@@ -71,7 +72,7 @@ def calcular(z, historia, analisis_d):
                 "dia": np.arange(-h, 1), "latitude": z.latitude.values, "longitude": z.longitude.values},
         attrs={"preregistro": PREREGISTRO, "version": os.environ.get("GITHUB_SHA", "local"),
                "indice": "DAV principal (Davini et al. 2012) + seguimiento y filtro de blocktrack v1.1",
-               "censura": "pasos 12-15: solo bloqueos iniciados en el paso s-4 o antes",
+               "censura": "pasos 12-15: no aparecen bloqueos que empiecen después del paso 11 (no les caben 5 días)",
                "atribucion": ATRIBUCION, "aviso": AVISO})
 
 

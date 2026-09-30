@@ -93,6 +93,13 @@ class Pasada(unittest.TestCase):
         self.assertEqual(int(ds["historia_incompleta"]), 1)
         self.assertEqual(int(ds["dias_historia"]), 2)
 
+    def test_censura_solo_excluye_los_que_empiezan_despues_del_paso_11(self):
+        # la ventana acaba en el paso 15: un bloqueo que empieza en el 12 no llega a 5 días; uno del 10 sí se ve en el 12
+        for inicio, visibles in ((10, list(range(10, 16))), (11, list(range(11, 16))), (12, [])):
+            ds = producto.calcular(miembros([set(range(inicio, 16))]), historia([False] * 4), analisis_d())
+            self.assertEqual([s for s in range(16) if ds["bloqueado"][EA, 0, s]], visibles, inicio)
+        self.assertIn("después del paso 11", ds.attrs["censura"])
+
     def test_guarda_la_pseudoanalisis_y_el_preregistro(self):
         ds = producto.calcular(miembros([set()]), historia([False] * 4), analisis_d())
         self.assertEqual(ds["pseudoanalisis"].shape, (5, LAT.size, LON.size))
