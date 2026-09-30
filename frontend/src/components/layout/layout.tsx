@@ -1,6 +1,6 @@
 import React, { JSX } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { House, LogIn, Info, Menu, ListTodo, LucideProps } from "lucide-react";
+import { House, LogIn, Info, Menu, ListTodo, CloudSun, LucideProps } from "lucide-react";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import * as Separator from "@radix-ui/react-separator";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -33,6 +33,7 @@ interface NavItem {
     | "app.description"
     | "navigation-header.home"
     | "navigation-header.requests"
+    | "navigation-header.prediccion"
     | "navigation-header.login"
     | "navigation-footer.about"
     | "language.switchLanguage";
@@ -42,6 +43,7 @@ interface NavItem {
   tooltipKey?:
     | "navigation-tooltips.home"
     | "navigation-tooltips.requests"
+    | "navigation-tooltips.prediccion"
     | "navigation-tooltips.login"
     | "navigation-tooltips.about";
   /** Position of the item in the menu (left/right/center) */
@@ -145,6 +147,14 @@ const Layout: React.FC = (): JSX.Element => {
       labelKey: "navigation-header.requests",
       icon: ListTodo,
       tooltipKey: "navigation-tooltips.requests",
+      position: "l",
+      collapse: true,
+    },
+    {
+      path: "/prediccion",
+      labelKey: "navigation-header.prediccion",
+      icon: CloudSun,
+      tooltipKey: "navigation-tooltips.prediccion",
       position: "l",
       collapse: true,
     },

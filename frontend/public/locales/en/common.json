@@ -7,7 +7,8 @@
     "home": "Home",
     "requests": "Requests",
     "login": "Login",
-    "progress": "Progress"
+    "progress": "Progress",
+    "prediccion": "Forecast"
   },
   "navigation-tooltips": {
     "home": "Go to Homepage",
@@ -15,7 +16,8 @@
     "login": "Sign in to your account",
     "about": "Learn more about this application",
     "help": "Help",
-    "progress": "View real-time progress updates"
+    "progress": "View real-time progress updates",
+    "prediccion": "Blocking probability in ECMWF ensemble forecasts (experimental)"
   },
   "navigation-footer": {
     "about": "About",
@@ -385,5 +387,40 @@
     "viewDetails": "View Details",
     "error": "Error while processing",
     "initializing": "Downloading netcdf file..."
+  },
+  "prediccion": {
+    "titulo": "Blocking forecast",
+    "descripcion": "Probability of atmospheric blocking in ECMWF ensemble forecasts (50 members, 00 UTC run), by sector and lead day.",
+    "experimental": "Experimental product: it diagnoses the ECMWF forecast; its skill has not been verified yet.",
+    "modelo": "Model",
+    "fecha": "Run",
+    "cargando": "Loading the forecast…",
+    "error": "The forecast data could not be loaded.",
+    "sinDatos": "No runs have been published yet.",
+    "historiaIncompleta": "Incomplete history: previous pseudo-analysis days are missing, so this run is excluded from the main verification.",
+    "tablaTitulo": "Probability of a blocked sector by lead day",
+    "sector": "Sector",
+    "dia": "Day {{n}}",
+    "bajaLatitud": "Low-latitude blocking (30–40°N)",
+    "sectores": {
+      "GRL": "Greenland",
+      "EA": "Euro-Atlantic",
+      "URA": "Urals",
+      "PA": "Pacific",
+      "NAM": "North America",
+      "LLB-Atl": "Atlantic",
+      "LLB-Pac": "Pacific"
+    },
+    "censura": "On days 12–15 only blocks that have already started can appear.",
+    "inicioTitulo": "Possible blocking onset",
+    "inicioExplicacion": "Only evaluated in sectors without blocking in the previous 5 days: probability that a block starts on days 1–5 and 6–10.",
+    "ventanas": {
+      "dias_1_5": "days 1–5",
+      "dias_6_10": "days 6–10"
+    },
+    "sinCalma": "not evaluated (recent blocking)",
+    "aviso": "alert",
+    "mapaTitulo": "Probability of a blocking event (days 1, 5, 10 and 15)",
+    "mapaAlt": "{{modelo}} blocking event probability map for the {{fecha}} run"
   }
 }
