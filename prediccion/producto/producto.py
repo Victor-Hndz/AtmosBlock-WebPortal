@@ -148,6 +148,7 @@ def main(argv=None):
     ds = calcular(z.transpose("number", "step", ...), hist, ifs_d.isel(step=0).mean("number"))
     ds.attrs.update(modelo=a.modelo, fecha=a.fecha)
     base = pathlib.Path(a.salida) / f"producto_{a.modelo}_{a.fecha}"
+    base.parent.mkdir(parents=True, exist_ok=True)
     ds.to_netcdf(base.with_suffix(".nc"), encoding={v: {"zlib": True, "complevel": 4} for v in ds.data_vars
                                                      if ds[v].ndim > 0})
     base.with_suffix(".json").write_text(json.dumps(resumen_json(ds, a.modelo, a.fecha), ensure_ascii=False, indent=1),
