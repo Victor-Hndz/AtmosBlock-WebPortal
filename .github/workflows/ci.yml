@@ -188,7 +188,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Tests del archivo diario de la ENS de ECMWF (PRD-101), del índice DAV (PRD-201), de los eventos y del producto y de la verificación (PRD-301 a 303, 401 y 501)
+      - name: Tests del archivo diario de la ENS de ECMWF (PRD-101), del índice DAV (PRD-201), de los eventos y del producto y de la verificación (PRD-301 a 303, 401, 501 y 502)
         run: |
           python3 -m venv .venv
           .venv/bin/pip install -q -r prediccion/archivo/requirements.txt
@@ -201,6 +201,7 @@ jobs:
           bash prediccion/producto/test_generar.sh
           bash prediccion/producto/test_publicar.sh
           .venv/bin/python prediccion/verificacion/test_verdad.py
+          .venv/bin/python prediccion/verificacion/test_puntuaciones.py
 
   e2e:
     # WEB-217: navegador y API contra la pila real (sin el pipeline de cálculo ni el CDS)
