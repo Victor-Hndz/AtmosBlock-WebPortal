@@ -1,7 +1,8 @@
 name: Archivo ENS
 
 # PRD-101: guarda cada día el Z500 de las previsiones por conjuntos abiertas de ECMWF (IFS y AIFS) en un release
-# mensual. Dos ejecuciones al día: la segunda recoge lo que la primera no encontró publicado.
+# mensual; PRD-303: genera con él el producto de bloqueo en otro release mensual. Dos ejecuciones al día: la segunda
+# recoge lo que la primera no encontró publicado.
 on:
   schedule:
     - cron: "30 10 * * *"
@@ -33,8 +34,17 @@ jobs:
         run: |
           .venv/bin/python prediccion/archivo/test_archivar.py
           bash prediccion/archivo/test_subir.sh
+          .venv/bin/python prediccion/producto/test_producto.py
+          bash prediccion/producto/test_generar.sh
       - name: Archivar y subir
         env:
           GH_TOKEN: ${{ github.token }}
           FECHA: ${{ inputs.fecha }} # por entorno, nunca interpolado en el script; subir.sh valida el formato
         run: bash prediccion/archivo/subir.sh
+      - name: Producto de bloqueo (PRD-303)
+        if: ${{ !cancelled() }} # aunque falle un día anterior del archivo, se genera lo que se pueda
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FECHA: ${{ inputs.fecha }}
+          ARCHIVO: salida # reutiliza lo recién archivado; generar.sh baja del release lo que falte
+        run: bash prediccion/producto/generar.sh
