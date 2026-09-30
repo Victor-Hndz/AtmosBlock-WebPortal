@@ -196,6 +196,7 @@ jobs:
           bash prediccion/archivo/test_subir.sh
           .venv/bin/python prediccion/indice/test_dav.py
           .venv/bin/python prediccion/indice/test_eventos.py
+          .venv/bin/python prediccion/indice/test_sectores.py
 
   e2e:
     # WEB-217: navegador y API contra la pila real (sin el pipeline de cálculo ni el CDS)
