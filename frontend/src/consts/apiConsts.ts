@@ -10,3 +10,7 @@ export const API_URL_AUTH_REGISTER = `${API_URL_AUTH}/register`;
 export const API_URL_REQUESTS_MY_REQUESTS = `${API_URL_REQUESTS}/my-requests`;
 
 export const API_URL_USERS_PROFILE = `${API_URL_USERS}/profile`;
+
+/** Datos de la previsión de bloqueos en GitHub Pages (PRD-401) */
+export const PREDICCION_URL =
+  import.meta.env.VITE_PREDICCION_URL ?? "https://victor-hndz.github.io/AtmosBlock-WebPortal/prediccion";
