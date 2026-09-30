@@ -1,8 +1,8 @@
 name: Archivo ENS
 
 # PRD-101: guarda cada día el Z500 de las previsiones por conjuntos abiertas de ECMWF (IFS y AIFS) en un release
-# mensual; PRD-303: genera con él el producto de bloqueo en otro release mensual. Dos ejecuciones al día: la segunda
-# recoge lo que la primera no encontró publicado.
+# mensual; PRD-303: genera con él el producto de bloqueo en otro release mensual; PRD-401: publica sus JSON en GitHub
+# Pages (rama gh-pages) para el portal. Dos ejecuciones al día: la segunda recoge lo que la primera no encontró.
 on:
   schedule:
     - cron: "30 10 * * *"
@@ -36,6 +36,7 @@ jobs:
           bash prediccion/archivo/test_subir.sh
           .venv/bin/python prediccion/producto/test_producto.py
           bash prediccion/producto/test_generar.sh
+          bash prediccion/producto/test_publicar.sh
       - name: Archivar y subir
         env:
           GH_TOKEN: ${{ github.token }}
@@ -48,3 +49,14 @@ jobs:
           FECHA: ${{ inputs.fecha }}
           ARCHIVO: salida # reutiliza lo recién archivado; generar.sh baja del release lo que falte
         run: bash prediccion/producto/generar.sh
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          ref: gh-pages
+          path: paginas
+      - name: Publicar los JSON en GitHub Pages (PRD-401)
+        if: ${{ !cancelled() }}
+        run: |
+          git -C paginas config user.name "github-actions[bot]"
+          git -C paginas config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          bash prediccion/producto/publicar.sh
