@@ -143,6 +143,15 @@ class Diario(unittest.TestCase):
                 self.assertEqual(int(ds["historia_incompleta"]), 1)
                 self.assertEqual(int(ds["dias_historia"]), 0)
 
+    def test_crea_la_carpeta_de_salida(self):
+        # el workflow llama con --salida producto sin crearla (fallo del 2026-09-30 en Actions)
+        with tempfile.TemporaryDirectory() as d:
+            escribir_archivo(d, "ifs", "20260930")
+            salida = pathlib.Path(d) / "no" / "existe"
+            self.assertEqual(producto.main(["--fecha", "20260930", "--modelo", "ifs", "--archivo", d,
+                                            "--salida", str(salida)]), 0)
+            self.assertTrue((salida / "producto_ifs_20260930.json").exists())
+
 
 if __name__ == "__main__":
     unittest.main()
