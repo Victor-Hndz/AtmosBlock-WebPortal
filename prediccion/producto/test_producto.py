@@ -16,7 +16,8 @@ import producto  # noqa: E402
 
 LAT = np.arange(0, 90.01, 2.5)
 LON = np.arange(-180, 180, 2.5)
-EA = list(producto.sectores.SECTORES).index("EA")
+SECT = list(producto.sectores.SECTORES)
+EA = SECT.index("EA")
 
 
 def dia(alta=False):
@@ -189,6 +190,37 @@ class Diario(unittest.TestCase):
                 self.assertEqual(len(j["sectores"]["EA"]["probabilidad"]), 16)
                 self.assertIn("CC-BY-4.0", j["atribucion"])
                 self.assertGreater(base.with_suffix(".png").stat().st_size, 0)
+
+    def test_json_con_mapa_y_normal_para_la_epoca(self):
+        with tempfile.TemporaryDirectory() as d:
+            for f in ("20260926", "20260927", "20260928", "20260929"):
+                escribir_archivo(d, "ifs", f)
+            escribir_archivo(d, "ifs", "20260930", alta_en_pasos=range(2, 10))
+            clima = pathlib.Path(d) / "clima.nc"
+            doy = np.arange(1, 367)
+            xr.Dataset({"prob_bloqueo": (("sector", "paso", "dia_del_anio"),
+                                         np.broadcast_to(doy / 1000, (len(SECT), 16, 366)))},
+                       coords={"sector": SECT, "paso": np.arange(16), "dia_del_anio": doy}).to_netcdf(clima)
+            self.assertEqual(producto.main(["--fecha", "20260930", "--modelo", "ifs", "--archivo", d, "--salida", d,
+                                            "--climatologia", str(clima)]), 0)
+            j = json.loads((pathlib.Path(d) / "producto_ifs_20260930.json").read_text(encoding="utf-8"))
+            m = j["mapa"]
+            self.assertEqual(m["lat"], list(np.arange(30, 75.01, 2.5)))
+            self.assertEqual((m["lon0"], m["dlon"], len(m["prob"]), len(m["prob"][0]), len(m["prob"][0][0])),
+                             (-180, 2.5, 16, 19, 144))
+            self.assertEqual(m["prob"][3][m["lat"].index(60)][int((10 + 180) / 2.5)], 100)  # 2 miembros, los 2
+            self.assertEqual(m["prob"][0][0][0], 0)
+            self.assertEqual(j["sectores_geo"]["PA"], {"lat": [40, 75], "lon": [120, -140]})
+            # 30-09 es el día 273 del año: normal del paso s = (273 + s) / 1000
+            self.assertEqual(j["sectores"]["EA"]["normal"][:2], [0.273, 0.274])
+
+    def test_sin_climatologia_no_hay_normal(self):
+        with tempfile.TemporaryDirectory() as d:
+            escribir_archivo(d, "ifs", "20260930")
+            self.assertEqual(producto.main(["--fecha", "20260930", "--modelo", "ifs", "--archivo", d, "--salida", d,
+                                            "--climatologia", str(pathlib.Path(d) / "no_existe.nc")]), 0)
+            j = json.loads((pathlib.Path(d) / "producto_ifs_20260930.json").read_text(encoding="utf-8"))
+            self.assertIsNone(j["sectores"]["EA"]["normal"])
 
     def test_sin_historia_marca_incompleta(self):
         with tempfile.TemporaryDirectory() as d:

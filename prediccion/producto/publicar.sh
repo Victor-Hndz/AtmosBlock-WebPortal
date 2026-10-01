@@ -9,7 +9,11 @@ set -euo pipefail
 PRODUCTO=${PRODUCTO:-producto}
 PAGINAS=${PAGINAS:-paginas}
 REPO=${GITHUB_REPOSITORY:-Victor-Hndz/AtmosBlock-WebPortal}
+VISOR=$(cd "$(dirname "$0")/../pages" && pwd)
 shopt -s nullglob
+
+# PRD-508: el visor público (prediccion/pages) en la raíz de gh-pages; sin package.json ni tests
+cp "$VISOR"/index.html "$VISOR"/*.css "$VISOR"/*.js "$PAGINAS/"
 
 for j in "$PRODUCTO"/producto_*_*.json; do
   [[ $(basename "$j") =~ ^producto_(ifs|aifs)_([0-9]{8})\.json$ ]] || continue
