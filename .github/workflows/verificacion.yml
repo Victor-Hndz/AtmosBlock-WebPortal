@@ -1,8 +1,8 @@
 name: Verificación
 
 # PRD-504 (D12): archiva cada día ERA5 Z500 de 00 UTC desde el CDS (la verdad, con ~5 días de retraso) y registra la
-# verificación de las pasadas cuya ventana d−4…d+15 ya está completa. Necesita el secreto CDSAPI_KEY (token del CDS,
-# con la licencia de ERA5 aceptada en la web del CDS).
+# verificación de las pasadas cuya ventana d−4…d+15 ya está completa; PRD-506: publica el resumen de puntuaciones en
+# GitHub Pages. Necesita el secreto CDSAPI_KEY (token del CDS, con la licencia de ERA5 aceptada en la web del CDS).
 on:
   schedule:
     - cron: "0 12 * * *"
@@ -35,6 +35,8 @@ jobs:
           bash prediccion/verificacion/test_subir_era5.sh
           .venv/bin/python prediccion/verificacion/test_verificar.py
           bash prediccion/verificacion/test_verificar.sh
+          .venv/bin/python prediccion/verificacion/test_resumen.py
+          bash prediccion/verificacion/test_publicar_resumen.sh
       - name: Archivar ERA5
         env:
           GH_TOKEN: ${{ github.token }}
@@ -49,3 +51,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: bash prediccion/verificacion/verificar.sh
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          ref: gh-pages
+          path: paginas
+      - name: Publicar el resumen de puntuaciones en GitHub Pages (PRD-506)
+        if: ${{ !cancelled() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git -C paginas config user.name "github-actions[bot]"
+          git -C paginas config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          bash prediccion/verificacion/publicar_resumen.sh
