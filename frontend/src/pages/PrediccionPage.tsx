@@ -105,7 +105,15 @@ const PrediccionPage: React.FC = (): JSX.Element => {
   }, []);
 
   const fechas = indice ? [...indice.modelos[modelo]].reverse() : [];
-  const fechaActiva = fechas.includes(fecha) ? fecha : fechas[0];
+  // siempre un elemento del índice, no el valor del desplegable (CodeQL js/xss-through-dom)
+  const fechaActiva = fechas[Math.max(0, fechas.indexOf(fecha))];
+  const srcVisor = (() => {
+    const url = new URL(VISOR_URL);
+    url.searchParams.set("embed", "1");
+    url.searchParams.set("modelo", modelo === "aifs" ? "aifs" : "ifs");
+    if (/^\d{8}$/.test(fechaActiva ?? "")) url.searchParams.set("fecha", fechaActiva);
+    return url.toString();
+  })();
 
   useEffect(() => {
     if (!fechaActiva) return;
@@ -182,7 +190,7 @@ const PrediccionPage: React.FC = (): JSX.Element => {
           <p className="mb-3 text-slate-600">{t("prediccion.vistazo.texto")}</p>
           <iframe
             title={t("prediccion.vistazo.iframe")}
-            src={`${VISOR_URL}?embed=1&modelo=${modelo}&fecha=${fechaActiva}`}
+            src={srcVisor}
             className="w-full rounded-lg border border-slate-200"
             style={{ height: alturaVisor }}
             loading="lazy"
