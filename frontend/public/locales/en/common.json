@@ -421,6 +421,14 @@
     "sinCalma": "not evaluated (recent blocking)",
     "aviso": "alert",
     "mapaTitulo": "Probability of a blocking event (days 1, 5, 10 and 15)",
-    "mapaAlt": "{{modelo}} blocking event probability map for the {{fecha}} run"
+    "mapaAlt": "{{modelo}} blocking event probability map for the {{fecha}} run",
+    "verificacion": {
+      "titulo": "Verification against ERA5",
+      "explicacion": "Skill of sector occupation against the ERA5 1991–2020 climatology (BSS by lead day; 1 is perfect, 0 is no better than climatology). Preregistered: there is skill only if the bootstrap 90% interval excludes 0.",
+      "pendiente": "No runs have been verified yet: each run needs ERA5 for its 15 lead days, which arrives about 5 days late. The first ones around 20 October 2026.",
+      "pasadas": "{{completas}} runs with complete history out of {{total}}",
+      "habilidad": "* The 90% interval excludes 0: skill against climatology.",
+      "detalles": "Secondary results, by season and IFS − AIFS difference in the full JSON"
+    }
   }
 }

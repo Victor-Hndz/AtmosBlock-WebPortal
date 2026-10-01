@@ -27,6 +27,20 @@ interface Producto {
   >;
 }
 
+/** prediccion/verificacion.json de GitHub Pages (resumen.py, PRD-506); vacío hasta que haya pasadas verificadas */
+interface Verificacion {
+  pasadas: Partial<Record<Modelo, number>>;
+  pasadas_completas?: Partial<Record<Modelo, number>>;
+  primario?: {
+    modelo: Modelo;
+    sector: Sector;
+    paso: number;
+    bss: number | null;
+    ic90: (number | null)[];
+    habilidad: boolean;
+  }[];
+}
+
 type Modelo = "ifs" | "aifs";
 const MODELOS: Record<Modelo, string> = { ifs: "IFS ENS", aifs: "AIFS ENS" };
 const SECTORES = {
@@ -64,12 +78,17 @@ const PrediccionPage: React.FC = (): JSX.Element => {
   const [fecha, setFecha] = useState<string>("");
   const [producto, setProducto] = useState<Producto | null>(null);
   const [error, setError] = useState(false);
+  const [verificacion, setVerificacion] = useState<Verificacion | null>(null);
 
   useEffect(() => {
     fetch(`${PREDICCION_URL}/index.json`)
       .then(r => (r.ok ? r.json() : Promise.reject(r.status)))
       .then((i: Indice) => setIndice(i))
       .catch(() => setError(true));
+    fetch(`${PREDICCION_URL}/verificacion.json`)
+      .then(r => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((v: Verificacion) => setVerificacion(v))
+      .catch(() => setVerificacion(null)); // sin resumen publicado, la sección no se muestra
   }, []);
 
   const fechas = indice ? [...indice.modelos[modelo]].reverse() : [];
@@ -207,6 +226,76 @@ const PrediccionPage: React.FC = (): JSX.Element => {
           />
           <p className="text-xs text-slate-500">{producto.atribucion}</p>
         </>
+      )}
+
+      {verificacion && (
+        <section className="mt-10">
+          <h2 id="titulo-verificacion" className="text-xl font-semibold mb-1">
+            {t("prediccion.verificacion.titulo")}
+          </h2>
+          <p className="mb-3 text-sm text-slate-600">{t("prediccion.verificacion.explicacion")}</p>
+          {!verificacion.primario?.length ? (
+            <p className="text-sm">{t("prediccion.verificacion.pendiente")}</p>
+          ) : (
+            <>
+              <ul className="mb-2 text-sm">
+                {(Object.keys(verificacion.pasadas) as Modelo[]).map(m => (
+                  <li key={m}>
+                    {MODELOS[m]}:{" "}
+                    {t("prediccion.verificacion.pasadas", {
+                      completas: verificacion.pasadas_completas?.[m] ?? 0,
+                      total: verificacion.pasadas[m],
+                    })}
+                  </li>
+                ))}
+              </ul>
+              <div className="overflow-x-auto mb-2">
+                <table aria-labelledby="titulo-verificacion" className="border-collapse text-sm">
+                  <thead>
+                    <tr>
+                      <th scope="col" className="px-2 py-1 text-left">
+                        {t("prediccion.sector")}
+                      </th>
+                      {Array.from({ length: 15 }, (_, i) => (
+                        <th key={i} scope="col" className="px-1 py-1 text-xs font-normal">
+                          {t("prediccion.dia", { n: i + 1 })}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(Object.keys(MODELOS) as Modelo[]).flatMap(m =>
+                      (["EA", "PA"] as Sector[]).map(s => {
+                        const celdas = verificacion.primario!.filter(x => x.modelo === m && x.sector === s);
+                        if (!celdas.length) return null;
+                        return (
+                          <tr key={`${m}-${s}`}>
+                            <th scope="row" className="px-2 py-1 text-left font-medium whitespace-nowrap">
+                              {MODELOS[m]} · {t(SECTORES[s])}
+                            </th>
+                            {celdas.map(x => (
+                              <td
+                                key={x.paso}
+                                title={`IC90 [${x.ic90.map(v => v?.toFixed(2) ?? "–").join(", ")}]`}
+                                className={`px-1 py-1 text-center text-xs tabular-nums ${x.habilidad ? "font-semibold text-emerald-700" : ""}`}
+                              >
+                                {x.bss === null ? "–" : `${x.bss.toFixed(2)}${x.habilidad ? "*" : ""}`}
+                              </td>
+                            ))}
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              <p className="mb-1 text-xs text-slate-500">{t("prediccion.verificacion.habilidad")}</p>
+            </>
+          )}
+          <a className="text-xs text-blue-700 underline" href={`${PREDICCION_URL}/verificacion.json`}>
+            {t("prediccion.verificacion.detalles")}
+          </a>
+        </section>
       )}
     </div>
   );
