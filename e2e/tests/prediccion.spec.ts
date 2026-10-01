@@ -31,7 +31,17 @@ const producto = (modelo: string, fecha: string, ea: number, historia_incompleta
   },
 });
 
-async function simularPages(page: Page, pedidas: string[] = []) {
+const primario = (modelo: string, sector: string, bss: number, habilidad: boolean) =>
+  Array.from({ length: 15 }, (_, i) => ({ modelo, sector, paso: i + 1, bss, ic90: [bss - 0.2, bss + 0.2], habilidad }));
+const SIN_REGISTROS = { pasadas: {} };
+const CON_REGISTROS = {
+  pasadas: { ifs: 30, aifs: 30 },
+  pasadas_completas: { ifs: 28, aifs: 28 },
+  primario: [...primario("ifs", "EA", 0.42, true), ...primario("ifs", "PA", -0.05, false)],
+};
+
+async function simularPages(page: Page, pedidas: string[] = [], verificacion: object = SIN_REGISTROS) {
+  await page.route("**/prediccion/verificacion.json", r => r.fulfill({ json: verificacion }));
   await page.route("**/prediccion/index.json", r =>
     r.fulfill({
       json: {
@@ -99,4 +109,27 @@ test("«Previsión» aparece en la navegación", async ({ page }) => {
 
   await page.getByRole("link", { name: es["navigation-header"].prediccion }).click();
   await expect(page).toHaveURL(/\/prediccion$/);
+});
+
+test("sin registros, la verificación dice cuándo empieza", async ({ page }) => {
+  await simularPages(page);
+  await page.goto("/prediccion");
+
+  await expect(page.getByRole("heading", { name: t.verificacion.titulo })).toBeVisible();
+  await expect(page.getByText(t.verificacion.pendiente)).toBeVisible();
+});
+
+test("con registros, la verificación muestra el BSS primario y marca la habilidad", async ({ page }) => {
+  await simularPages(page, [], CON_REGISTROS);
+  await page.goto("/prediccion");
+
+  const tabla = page.getByRole("table", { name: t.verificacion.titulo });
+  const ea = tabla.getByRole("row", { name: new RegExp(`IFS ENS.*${t.sectores.EA}`) });
+  await expect(ea.getByRole("cell").first()).toHaveText("0.42*");
+  const pa = tabla.getByRole("row", { name: new RegExp(`IFS ENS.*${t.sectores.PA}`) });
+  await expect(pa.getByRole("cell").first()).toHaveText("-0.05");
+  await expect(page.getByText(t.verificacion.habilidad)).toBeVisible();
+  await expect(
+    page.getByText(t.verificacion.pasadas.replace("{{completas}}", "28").replace("{{total}}", "30")).first()
+  ).toBeVisible();
 });

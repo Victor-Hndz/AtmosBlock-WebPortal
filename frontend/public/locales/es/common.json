@@ -421,6 +421,14 @@
     "sinCalma": "no se evalúa (bloqueo reciente)",
     "aviso": "aviso",
     "mapaTitulo": "Probabilidad de evento de bloqueo (días 1, 5, 10 y 15)",
-    "mapaAlt": "Mapa de probabilidad de evento de bloqueo de {{modelo}} para la pasada del {{fecha}}"
+    "mapaAlt": "Mapa de probabilidad de evento de bloqueo de {{modelo}} para la pasada del {{fecha}}",
+    "verificacion": {
+      "titulo": "Verificación frente a ERA5",
+      "explicacion": "Habilidad de la ocupación del sector frente a la climatología ERA5 1991–2020 (BSS por día de plazo; 1 es perfecto, 0 no mejora a la climatología). Preregistrado: solo hay habilidad si el intervalo IC90 por bootstrap excluye 0.",
+      "pendiente": "Todavía no hay pasadas verificadas: cada pasada necesita ERA5 de los 15 días de plazo, que llega con unos 5 días de retraso. Las primeras, hacia el 20 de octubre de 2026.",
+      "pasadas": "{{completas}} pasadas con historia completa de {{total}}",
+      "habilidad": "* El IC90 excluye 0: habilidad frente a la climatología.",
+      "detalles": "Resultados secundarios, por estación y diferencia IFS − AIFS en el JSON completo"
+    }
   }
 }
