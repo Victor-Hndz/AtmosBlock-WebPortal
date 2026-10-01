@@ -3,7 +3,8 @@
 # release mensual producto-ens-AAAA-MM. Usa los ficheros de $ARCHIVO y baja de los releases archivo-ens-* los que
 # falten: IFS y AIFS del día y la historia IFS de los 4 días anteriores. Omite lo ya subido. Un modelo aún sin
 # archivar solo avisa (lo recoge la siguiente ejecución); un fallo del cálculo hace fallar el job.
-# Uso: FECHA="AAAAMMDD [AAAAMMDD...]" bash prediccion/producto/generar.sh   (requiere gh con GH_TOKEN)
+# Con REGENERAR=1 rehace también lo ya subido y lo sustituye (p. ej., tras un cambio del formato del producto).
+# Uso: FECHA="AAAAMMDD [AAAAMMDD...]" [REGENERAR=1] bash prediccion/producto/generar.sh   (requiere gh con GH_TOKEN)
 set -euo pipefail
 
 PY=${PY:-.venv/bin/python}
@@ -33,13 +34,14 @@ Contains modified ECMWF open data, licencia CC-BY-4.0: https://www.ecmwf.int/en/
 
   for m in ifs aifs; do
     base="producto_${m}_${f}"
-    if grep -qx "$base.json" <<<"$subidos"; then echo "ya generado: $base"; continue; fi
+    if [[ -z ${REGENERAR:-} ]] && grep -qx "$base.json" <<<"$subidos"; then echo "ya generado: $base"; continue; fi
     if [[ ! -f $ARCHIVO/$(nombre "$m" "$f") || ! -f $ARCHIVO/$(nombre ifs "$f") ]]; then
       echo "::warning::$base sin archivo del día; se reintenta en la siguiente ejecución"
       continue
     fi
     if "$PY" prediccion/producto/producto.py --fecha "$f" --modelo "$m" --archivo "$ARCHIVO" --salida producto; then
-      gh release upload "$tag" "producto/$base.nc" "producto/$base.json" "producto/$base.png"
+      gh release upload "$tag" "producto/$base.nc" "producto/$base.json" "producto/$base.png" \
+        ${REGENERAR:+--clobber}
     else
       echo "::error::no se pudo generar $base"
       fallos=$((fallos + 1))

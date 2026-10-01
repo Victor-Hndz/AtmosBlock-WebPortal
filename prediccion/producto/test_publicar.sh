@@ -38,6 +38,9 @@ comprobar "índice con las fechas ordenadas por modelo" \
   'en_origen prediccion/index.json | tr -d " \n" | grep -qF "\"ifs\":[\"20260929\",\"20260930\"],\"aifs\":[\"20260929\"]"'
 comprobar "índice con la plantilla del PNG del release" \
   '[[ $(en_origen prediccion/index.json) == *github.com/dueno/repo/releases/download/producto-ens-{aaaa}-{mm}/producto_{modelo}_{fecha}.png* ]]'
+comprobar "publica el visor en la raíz (sin package.json ni tests)" \
+  '[[ $(en_origen index.html) == *visor.js* && -n $(en_origen logica.js) && -n $(en_origen visor.css) ]] &&
+   ! git -C "$T/origen.git" ls-tree --name-only gh-pages | grep -qE "package.json|test_"'
 antes=$(commits)
 publicar
 comprobar "sin cambios no hace commit" '[[ $(commits) == "$antes" ]]'

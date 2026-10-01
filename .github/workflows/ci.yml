@@ -200,6 +200,7 @@ jobs:
           .venv/bin/python prediccion/producto/test_producto.py
           bash prediccion/producto/test_generar.sh
           bash prediccion/producto/test_publicar.sh
+          node --test prediccion/pages/test_logica.mjs
           .venv/bin/python prediccion/verificacion/test_verdad.py
           .venv/bin/python prediccion/verificacion/test_puntuaciones.py
           .venv/bin/python prediccion/verificacion/test_climatologia.py
