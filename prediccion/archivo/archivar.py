@@ -26,6 +26,8 @@ MODELOS = {
     "aifs": {"model": "aifs-ens", "param": "z", "factor": 1 / G},
 }
 RANGO_M = (4000.0, 6500.0)  # Z500 físico; fuera de aquí son unidades o datos equivocados
+CODIFICACION = {"dtype": "int16", "scale_factor": 0.1, "add_offset": 5000.0, "_FillValue": -32768, "zlib": True,
+                "complevel": 5, "shuffle": True}  # 0,1 m de resolución entre 1723,2 y 8276,7 m
 ATRIBUCION = ("Contains modified ECMWF open data (IFS/AIFS ensemble, stream enfo), "
               "https://www.ecmwf.int/en/forecasts/datasets/open-data")
 
@@ -66,9 +68,7 @@ def escribir(z, ruta, modelo, fecha):
                 "license": "CC-BY-4.0", "attribution": ATRIBUCION, "forecast_date": fecha,
                 "grid": "HN 0–90°N, 1,25°, nodos de la rejilla de 0,25° sin interpolar",
                 "history": f"prediccion/archivo/archivar.py {dt.datetime.now(dt.timezone.utc):%Y-%m-%dT%H:%MZ}"}
-    codificacion = {"z500": {"dtype": "int16", "scale_factor": 0.1, "add_offset": 5000.0, "_FillValue": -32768,
-                             "zlib": True, "complevel": 5, "shuffle": True}}
-    ds.to_netcdf(ruta, encoding=codificacion)
+    ds.to_netcdf(ruta, encoding={"z500": CODIFICACION})
 
 
 def descargar(modelo, fecha, destino):
