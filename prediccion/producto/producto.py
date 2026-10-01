@@ -35,6 +35,8 @@ DIAS_HISTORIA = 4
 VENTANAS = {"dias_1_5": (1, 5), "dias_6_10": (6, 10)}
 REGLAS = {"F3-4": False, "F3-4-V1": True}  # regla de sector de la génesis: ¿filas de 55–65°N?
 GENESIS, GENESIS_DIVISION = 1, 2
+CLIMATOLOGIA = pathlib.Path(__file__).resolve().parents[1] / "verificacion" / "climatologia_era5_1991_2020.nc"
+LAT_MAPA = (30, 75)  # rejilla del mapa del JSON: donde se calcula DAV
 UMBRAL_AVISO = 0.5  # solo para mostrar; la verificación usa la probabilidad entera (F3-5)
 PREREGISTRO = ("F3 firmado el 2026-09-29; aclaración de F3-5 y variante V1 el 2026-09-30 "
                "(PLAN_PREDICCION_BLOQUEOS)")
@@ -114,7 +116,19 @@ def calcular(z, historia, analisis_d):
                "atribucion": ATRIBUCION, "aviso": AVISO})
 
 
-def resumen_json(ds, modelo, fecha):
+def normal_para_la_epoca(ruta, fecha, pasos):
+    """Probabilidad climatológica (ERA5 1991–2020) del sector bloqueado en la fecha de validez de cada paso, o None."""
+    if not pathlib.Path(ruta).exists():
+        return None
+    validez = np.datetime64(f"{fecha[:4]}-{fecha[4:6]}-{fecha[6:]}") + np.arange(pasos).astype("timedelta64[D]")
+    doy = (validez - validez.astype("datetime64[Y]")).astype(int)  # índice 0…365
+    with xr.open_dataset(ruta) as c:
+        p = c["prob_bloqueo"].isel(paso=xr.DataArray(np.arange(pasos), dims="paso"),
+                                   dia_del_anio=xr.DataArray(doy, dims="paso")).load()
+    return {str(s): [round(float(x), 3) for x in p.sel(sector=s).values] for s in p.sector.values}
+
+
+def resumen_json(ds, modelo, fecha, normal=None):
     sect = {}
     for s in ds.sector.values:
         d = ds.sel(sector=s)
@@ -122,12 +136,17 @@ def resumen_json(ds, modelo, fecha):
         prob = {v: (None if not calma else round(float(d["prob_inicio"].sel(ventana=v)), 3)) for v in VENTANAS}
         sect[str(s)] = {"probabilidad": [round(float(x), 3) for x in d["prob_sector"].values],
                         "fraccion_area": [round(float(x), 4) for x in d["fraccion_area"].values],
+                        "normal": None if normal is None else normal[str(s)],
                         "calma": calma, "prob_inicio": prob,
                         "aviso_inicio": [v for v, p in prob.items() if p is not None and p >= UMBRAL_AVISO]}
     return {"modelo": modelo, "fecha": fecha, "pasada": "00 UTC", "pasos_dias": list(range(ds.sizes["paso"])),
             "historia_incompleta": bool(ds["historia_incompleta"]), "dias_historia": int(ds["dias_historia"]),
             "preregistro": ds.attrs["preregistro"], "version": ds.attrs["version"], "censura": ds.attrs["censura"],
-            "aviso": AVISO, "atribucion": ATRIBUCION, "sectores": sect}
+            "aviso": AVISO, "atribucion": ATRIBUCION, "sectores": sect,
+            "sectores_geo": {s: {"lat": [g[0], g[1]], "lon": [g[3], g[4]]} for s, g in sectores.SECTORES.items()},
+            "mapa": {"lat":[float(x) for x in ds.latitude.sel(latitude=slice(*LAT_MAPA)).values],
+                     "lon0": float(ds.longitude[0]), "dlon": float(ds.longitude[1] - ds.longitude[0]),
+                     "prob": np.rint(ds["prob_evento"].sel(latitude=slice(*LAT_MAPA)) * 100).astype(int).values.tolist()}}
 
 
 def mapa(ds, ruta, titulo):
@@ -166,6 +185,7 @@ def main(argv=None):
     p.add_argument("--modelo", choices=("ifs", "aifs"), required=True)
     p.add_argument("--archivo", required=True, help="carpeta con los z500_*_hn_1p25.nc")
     p.add_argument("--salida", required=True)
+    p.add_argument("--climatologia", default=str(CLIMATOLOGIA), help="para la probabilidad normal para la época")
     a = p.parse_args(argv)
     fecha = datetime.datetime.strptime(a.fecha, "%Y%m%d")
 
@@ -190,7 +210,9 @@ def main(argv=None):
     base.parent.mkdir(parents=True, exist_ok=True)
     ds.to_netcdf(base.with_suffix(".nc"), encoding={v: {"zlib": True, "complevel": 4} for v in ds.data_vars
                                                      if ds[v].ndim > 0})
-    base.with_suffix(".json").write_text(json.dumps(resumen_json(ds, a.modelo, a.fecha), ensure_ascii=False, indent=1),
+    normal = normal_para_la_epoca(a.climatologia, a.fecha, ds.sizes["paso"])
+    base.with_suffix(".json").write_text(json.dumps(resumen_json(ds, a.modelo, a.fecha, normal), ensure_ascii=False,
+                                                    separators=(",", ":")),
                                          encoding="utf-8")
     mapa(ds, base.with_suffix(".png"), f"{a.modelo.upper()} ENS {a.fecha} 00 UTC")
     return 0

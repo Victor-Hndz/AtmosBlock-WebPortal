@@ -12,6 +12,10 @@ on:
       fecha:
         description: "Fechas AAAAMMDD separadas por espacios (vacío = hoy y ayer)"
         required: false
+      regenerar:
+        description: "Rehacer y sustituir el producto de esas fechas aunque ya esté subido"
+        type: boolean
+        default: false
 
 permissions:
   contents: write # crear el release del mes y subir los ficheros
@@ -37,6 +41,7 @@ jobs:
           .venv/bin/python prediccion/producto/test_producto.py
           bash prediccion/producto/test_generar.sh
           bash prediccion/producto/test_publicar.sh
+          node --test prediccion/pages/test_logica.mjs
       - name: Archivar y subir
         env:
           GH_TOKEN: ${{ github.token }}
@@ -47,6 +52,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           FECHA: ${{ inputs.fecha }}
+          REGENERAR: ${{ inputs.regenerar && '1' || '' }}
           ARCHIVO: salida # reutiliza lo recién archivado; generar.sh baja del release lo que falte
         run: bash prediccion/producto/generar.sh
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
