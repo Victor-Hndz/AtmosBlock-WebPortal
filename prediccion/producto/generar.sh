@@ -17,8 +17,8 @@ for f in $fechas; do
   tag="producto-ens-${f:0:4}-${f:4:2}"
   if ! gh release view "$tag" >/dev/null 2>&1; then
     gh release create "$tag" --prerelease --title "Producto ENS de bloqueo ${f:0:4}-${f:4:2}" --notes \
-      "Producto experimental de probabilidad de bloqueo (índice de Davini + eventos de blocktrack, sectores de \
-Matsueda 2009) sobre IFS ENS y AIFS ENS de 00 UTC. Diagnostica la previsión; su habilidad no está verificada. \
+      "Producto experimental de ocupación de sectores por eventos de bloqueo (índice de Davini + eventos de \
+blocktrack, sectores de Matsueda 2009) sobre IFS ENS y AIFS ENS de 00 UTC. Diagnostica la previsión; su habilidad no está verificada. \
 Contains modified ECMWF open data, licencia CC-BY-4.0: https://www.ecmwf.int/en/forecasts/datasets/open-data"
   fi
   subidos=$(gh release view "$tag" --json assets -q '.assets[].name')
