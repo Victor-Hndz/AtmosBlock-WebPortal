@@ -429,6 +429,13 @@
       "pasadas": "{{completas}} pasadas con historia completa de {{total}}",
       "habilidad": "* El IC90 excluye 0: habilidad frente a la climatología.",
       "detalles": "Resultados secundarios, por estación y diferencia IFS − AIFS en el JSON completo"
-    }
+    },
+    "vistazo": {
+      "titulo": "La previsión de un vistazo",
+      "texto": "Mapa y regiones en lenguaje sencillo: lo que prevé cada sistema frente a lo habitual para la época. Mueve el control del día para ver los próximos 15 días.",
+      "iframe": "Visor público de la previsión de bloqueos",
+      "abrir": "Abrir el visor completo"
+    },
+    "detalle": "Detalle técnico"
   }
 }

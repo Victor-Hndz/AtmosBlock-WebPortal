@@ -1,6 +1,6 @@
 import React, { JSX, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { PREDICCION_URL } from "@/consts/apiConsts";
+import { PREDICCION_URL, VISOR_URL } from "@/consts/apiConsts";
 
 /** prediccion/index.json de GitHub Pages (PRD-401) */
 interface Indice {
@@ -79,6 +79,19 @@ const PrediccionPage: React.FC = (): JSX.Element => {
   const [producto, setProducto] = useState<Producto | null>(null);
   const [error, setError] = useState(false);
   const [verificacion, setVerificacion] = useState<Verificacion | null>(null);
+  const [alturaVisor, setAlturaVisor] = useState(1200);
+
+  useEffect(() => {
+    // el visor incrustado avisa de su altura para no necesitar barra de desplazamiento propia
+    const origen = new URL(VISOR_URL).origin;
+    const alRecibir = (e: MessageEvent) => {
+      if (e.origin === origen && e.data?.tipo === "atmosblock-altura" && Number.isFinite(e.data.altura)) {
+        setAlturaVisor(Math.min(3000, Math.max(400, e.data.altura)));
+      }
+    };
+    window.addEventListener("message", alRecibir);
+    return () => window.removeEventListener("message", alRecibir);
+  }, []);
 
   useEffect(() => {
     fetch(`${PREDICCION_URL}/index.json`)
@@ -163,8 +176,26 @@ const PrediccionPage: React.FC = (): JSX.Element => {
         </div>
       )}
 
+      {fechaActiva && (
+        <section className="mb-10">
+          <h2 className="text-2xl font-semibold mb-1">{t("prediccion.vistazo.titulo")}</h2>
+          <p className="mb-3 text-slate-600">{t("prediccion.vistazo.texto")}</p>
+          <iframe
+            title={t("prediccion.vistazo.iframe")}
+            src={`${VISOR_URL}?embed=1&modelo=${modelo}&fecha=${fechaActiva}`}
+            className="w-full rounded-lg border border-slate-200"
+            style={{ height: alturaVisor }}
+            loading="lazy"
+          />
+          <a className="text-sm text-blue-700 underline" href={VISOR_URL} target="_blank" rel="noopener noreferrer">
+            {t("prediccion.vistazo.abrir")}
+          </a>
+        </section>
+      )}
+
       {producto && indice && (
         <>
+          <h2 className="text-2xl font-semibold mb-3">{t("prediccion.detalle")}</h2>
           {producto.historia_incompleta && (
             <p className="mb-4 text-sm text-slate-700">{t("prediccion.historiaIncompleta")}</p>
           )}

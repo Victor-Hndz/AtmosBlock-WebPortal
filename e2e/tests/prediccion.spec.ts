@@ -133,3 +133,20 @@ test("con registros, la verificación muestra el BSS primario y marca la habilid
     page.getByText(t.verificacion.pasadas.replace("{{completas}}", "28").replace("{{total}}", "30")).first()
   ).toBeVisible();
 });
+
+test("la previsión de un vistazo incrusta el visor público con el modelo y la pasada elegidos", async ({ page }) => {
+  await page.route(/\/AtmosBlock-WebPortal\/\?embed=1/, r =>
+    r.fulfill({ contentType: "text/html", body: "<p>visor</p>" })
+  );
+  await simularPages(page);
+  await page.goto("/prediccion");
+
+  await expect(page.getByRole("heading", { name: t.vistazo.titulo })).toBeVisible();
+  const visor = page.getByTitle(t.vistazo.iframe);
+  await expect(visor).toHaveAttribute("src", /\?embed=1&modelo=ifs&fecha=20260930$/);
+  await expect(page.getByRole("link", { name: t.vistazo.abrir })).toHaveAttribute("href", /AtmosBlock-WebPortal\/$/);
+  await expect(page.getByRole("heading", { name: t.detalle })).toBeVisible();
+
+  await page.getByLabel(t.modelo).selectOption("aifs");
+  await expect(visor).toHaveAttribute("src", /modelo=aifs&fecha=20260930$/);
+});

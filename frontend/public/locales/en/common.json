@@ -429,6 +429,13 @@
       "pasadas": "{{completas}} runs with complete history out of {{total}}",
       "habilidad": "* The 90% interval excludes 0: skill against climatology.",
       "detalles": "Secondary results, by season and IFS − AIFS difference in the full JSON"
-    }
+    },
+    "vistazo": {
+      "titulo": "The forecast at a glance",
+      "texto": "Map and regions in plain language: what each system forecasts compared with what is usual for the time of year (visor in Spanish). Move the day slider to see the next 15 days.",
+      "iframe": "Public blocking forecast viewer",
+      "abrir": "Open the full viewer"
+    },
+    "detalle": "Technical detail"
   }
 }
