@@ -390,7 +390,7 @@
   },
   "prediccion": {
     "titulo": "Blocking forecast",
-    "descripcion": "Probability of atmospheric blocking in ECMWF ensemble forecasts (50 members, 00 UTC run), by sector and lead day.",
+    "descripcion": "Probability that each sector is occupied by a Davini-index (DAV) blocking event in the ECMWF ensemble forecasts (50 members, 00 UTC run), by lead day.",
     "experimental": "Experimental product: it diagnoses the ECMWF forecast; its skill has not been verified yet.",
     "modelo": "Model",
     "fecha": "Run",
@@ -398,7 +398,7 @@
     "error": "The forecast data could not be loaded.",
     "sinDatos": "No runs have been published yet.",
     "historiaIncompleta": "Incomplete history: previous pseudo-analysis days are missing, so this run is excluded from the main verification.",
-    "tablaTitulo": "Probability of a blocked sector by lead day",
+    "tablaTitulo": "Sector occupation by blocking events (DAV): probability by lead day",
     "sector": "Sector",
     "dia": "Day {{n}}",
     "bajaLatitud": "Low-latitude blocking (30–40°N)",
@@ -411,7 +411,7 @@
       "LLB-Atl": "Atlantic",
       "LLB-Pac": "Pacific"
     },
-    "censura": "On days 12–15 only blocks that have already started can appear.",
+    "censura": "On days 12–15, blocks starting after day 11 cannot appear: the 5-day persistence does not fit.",
     "inicioTitulo": "Possible blocking onset",
     "inicioExplicacion": "Only evaluated in sectors without blocking in the previous 5 days: probability that a block starts on days 1–5 and 6–10.",
     "ventanas": {

@@ -390,7 +390,7 @@
   },
   "prediccion": {
     "titulo": "Previsión de bloqueos",
-    "descripcion": "Probabilidad de bloqueo atmosférico en las previsiones por conjuntos de ECMWF (50 miembros, pasada de 00 UTC), por sector y día de plazo.",
+    "descripcion": "Probabilidad de que cada sector esté ocupado por un evento de bloqueo del índice de Davini (DAV) en las previsiones por conjuntos de ECMWF (50 miembros, pasada de 00 UTC), por día de plazo.",
     "experimental": "Producto experimental: diagnostica la previsión de ECMWF; su habilidad todavía no está verificada.",
     "modelo": "Modelo",
     "fecha": "Pasada",
@@ -398,7 +398,7 @@
     "error": "No se pudieron cargar los datos de la previsión.",
     "sinDatos": "Todavía no hay pasadas publicadas.",
     "historiaIncompleta": "Historia incompleta: faltan días previos de pseudoanálisis y esta pasada queda fuera de la verificación principal.",
-    "tablaTitulo": "Probabilidad de sector bloqueado por día de plazo",
+    "tablaTitulo": "Ocupación del sector por eventos de bloqueo (DAV): probabilidad por día de plazo",
     "sector": "Sector",
     "dia": "Día {{n}}",
     "bajaLatitud": "Bloqueo de baja latitud (30–40°N)",
@@ -411,7 +411,7 @@
       "LLB-Atl": "Atlántico",
       "LLB-Pac": "Pacífico"
     },
-    "censura": "En los días 12–15 solo pueden aparecer bloqueos que ya han empezado.",
+    "censura": "En los días 12–15 no aparecen bloqueos que empiecen después del día 11: no les caben los 5 días de persistencia.",
     "inicioTitulo": "Posible inicio de bloqueo",
     "inicioExplicacion": "Solo se evalúa en los sectores sin bloqueo en los 5 días previos: probabilidad de que empiece un bloqueo en los días 1–5 y 6–10.",
     "ventanas": {

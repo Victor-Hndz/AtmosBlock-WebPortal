@@ -84,15 +84,19 @@ def _desplazamiento_medio(centros):
     return dist / len(lons)
 
 
-def eventos(mascara):
-    """Máscara booleana (días, lat 0→90 a 2,5°, lon −180→177,5) de las celdas que pertenecen a un evento filtrado."""
+def etiquetas_filtradas(mascara):
+    """Etiqueta de evento por celda (días, lat 0→90 a 2,5°, lon −180→177,5); 0 fuera de los eventos filtrados."""
     et = _seguir(np.asarray(mascara))
-    salida = et > 0
     for e in np.unique(et[et > 0]):
         b = et == e
         dias = np.nonzero(b.any(axis=(1, 2)))[0]
         area_media = sum(_area(b[t]) / len(dias) for t in dias)
         if (len(dias) < PERSISTENCIA_MIN or area_media < AREA_MIN_KM2
                 or _desplazamiento_medio([_centro(b[t]) for t in dias]) > DESPLAZAMIENTO_MAX_KM_DIA):
-            salida[b] = False
-    return salida
+            et[b] = 0
+    return et
+
+
+def eventos(mascara):
+    """Máscara booleana de las celdas que pertenecen a un evento filtrado."""
+    return etiquetas_filtradas(mascara) > 0

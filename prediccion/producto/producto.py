@@ -4,8 +4,13 @@ Por miembro, la serie de 20 días = pseudoanálisis de d−4…d−1 (media de l
 de cada día, común a IFS y AIFS) + los 16 pasos del miembro (F3-3). Sobre ella: DAV principal (dav.py) → eventos
 (eventos.py) → sector bloqueado por paso (sectores.py, F3-4) → inicio y probabilidad de inicio en los días 1–5 y 6–10
 si el sector está en calma (F3-5; calma = sin sector bloqueado en la DAV instantánea de la pseudoanálisis d−4…d,
-aclaración del 2026-09-30). En los pasos 12–15 solo caben bloqueos ya iniciados (censura declarada). Si falta algún
-día de historia se usan los días seguidos disponibles y se marca historia_incompleta. Nunca entra ERA5.
+aclaración del 2026-09-30). En los pasos 12–15 no aparecen bloqueos que empiecen después del paso 11: no les caben
+5 días en la ventana (censura declarada). Si falta algún día de historia se usan los días seguidos disponibles y se
+marca historia_incompleta. Nunca entra ERA5. B_S mide la ocupación del sector por eventos DAV.
+
+Variante V1 (firmada el 2026-09-30, secundaria): sector bloqueado solo con las filas de 55–65°N (F3-4-V1) e inicio
+por génesis (F3-5-V1): primer día de una etiqueta de evento que no aparece antes en la ventana, en los pasos 1…15, si
+su huella cumple la regla de sector; se marca como nacida de una división si solapa la DAV del día anterior.
 
 Producto experimental: diagnostica la previsión de ECMWF; su habilidad no está verificada (F5).
 
@@ -28,11 +33,35 @@ import sectores  # noqa: E402
 
 DIAS_HISTORIA = 4
 VENTANAS = {"dias_1_5": (1, 5), "dias_6_10": (6, 10)}
+REGLAS = {"F3-4": False, "F3-4-V1": True}  # regla de sector de la génesis: ¿filas de 55–65°N?
+GENESIS, GENESIS_DIVISION = 1, 2
 UMBRAL_AVISO = 0.5  # solo para mostrar; la verificación usa la probabilidad entera (F3-5)
-PREREGISTRO = "F3 firmado el 2026-09-29; aclaración de F3-5 el 2026-09-30 (PLAN_PREDICCION_BLOQUEOS)"
+PREREGISTRO = ("F3 firmado el 2026-09-29; aclaración de F3-5 y variante V1 el 2026-09-30 "
+               "(PLAN_PREDICCION_BLOQUEOS)")
 ATRIBUCION = ("Contains modified ECMWF open data (IFS ENS / AIFS ENS), CC-BY-4.0: "
               "https://www.ecmwf.int/en/forecasts/datasets/open-data")
 AVISO = "Producto experimental: diagnostica la previsión de ECMWF; su habilidad todavía no está verificada."
+
+
+def genesis(et, dav, h):
+    """et: etiquetas de evento (h+pasos, lat, lon); dav: DAV instantánea de la misma serie; h: días de historia.
+    Devuelve (regla, sector, paso): 1 génesis, 2 génesis nacida de una división (solapa la DAV del día anterior)."""
+    nombres = list(sectores.SECTORES)
+    g = np.zeros((len(REGLAS), len(nombres), et.shape[0] - h), dtype=np.uint8)
+    vistas = set(np.unique(et[:h + 1]).tolist())  # hasta el paso 0: el paso 0 no puede ser génesis
+    for s in range(1, et.shape[0] - h):
+        t = h + s
+        for e in np.unique(et[t][et[t] > 0]):
+            if e in vistas:
+                continue
+            huella = et[t] == e
+            valor = GENESIS_DIVISION if (huella & (dav[t - 1] > 0)).any() else GENESIS
+            for i, matsueda in enumerate(REGLAS.values()):
+                for j, n in enumerate(nombres):
+                    if sectores.sector_bloqueado(huella, n, matsueda):
+                        g[i, j, s] = max(g[i, j, s], valor)
+        vistas.update(np.unique(et[t]).tolist())
+    return g
 
 
 def calcular(z, historia, analisis_d):
@@ -43,7 +72,9 @@ def calcular(z, historia, analisis_d):
     serie = np.concatenate([np.broadcast_to(historia.values, (n, *historia.shape)), z.values], axis=1)
     coords = {"latitude": z.latitude, "longitude": z.longitude}
     mascara = dav.mascara(xr.DataArray(serie, dims=("number", "dia", "latitude", "longitude"), coords=coords)).values
-    ev = np.stack([eventos.eventos(mascara[m]) for m in range(n)])[:, h:]
+    et = [eventos.etiquetas_filtradas(mascara[m]) for m in range(n)]
+    ev = np.stack([e > 0 for e in et])[:, h:]
+    gen = np.stack([genesis(et[m], mascara[m], h) for m in range(n)], axis=2)  # (regla, sector, number, paso)
     pseudo = np.concatenate([historia.values, analisis_d.values[None]])
     instantanea = dav.mascara(xr.DataArray(pseudo, dims=("dia", "latitude", "longitude"), coords=coords)).values
 
@@ -54,6 +85,9 @@ def calcular(z, historia, analisis_d):
     prob_inicio = np.array([[((inicio[i] >= a) & (inicio[i] <= b)).mean() if calma[i] else np.nan
                              for a, b in VENTANAS.values()] for i in range(len(nombres))])
     fraccion = np.stack([sectores.fraccion_area(ev, s).mean(axis=0) for s in nombres])
+    bloqueado_v1 = np.stack([sectores.sector_bloqueado(ev, s, matsueda=True) for s in nombres])
+    prob_genesis = np.array([[[(gen[i, j][:, a:b + 1] > 0).any(axis=1).mean() for a, b in VENTANAS.values()]
+                              for j in range(len(nombres))] for i in range(len(REGLAS))])
 
     paso = np.arange(pasos)
     return xr.Dataset(
@@ -63,15 +97,20 @@ def calcular(z, historia, analisis_d):
          "fraccion_area": (("sector", "paso"), fraccion.astype("float32")),
          "calma": (("sector",), calma.astype("uint8")),
          "prob_inicio": (("sector", "ventana"), prob_inicio.astype("float32")),
+         "bloqueado_v1": (("sector", "number", "paso"), bloqueado_v1.astype("uint8")),
+         "prob_sector_v1": (("sector", "paso"), bloqueado_v1.mean(axis=1).astype("float32")),
+         "genesis": (("regla", "sector", "number", "paso"), gen),
+         "prob_genesis": (("regla", "sector", "ventana"), prob_genesis.astype("float32")),
          "prob_evento": (("paso", "latitude", "longitude"), ev.mean(axis=0).astype("float32")),
          "pseudoanalisis": (("dia", "latitude", "longitude"), pseudo.astype("float32")),
          "historia_incompleta": ((), np.uint8(h < DIAS_HISTORIA)),
          "dias_historia": ((), np.uint8(h))},
         coords={"sector": nombres, "number": z.number.values, "paso": paso, "ventana": list(VENTANAS),
+                "regla": list(REGLAS),
                 "dia": np.arange(-h, 1), "latitude": z.latitude.values, "longitude": z.longitude.values},
         attrs={"preregistro": PREREGISTRO, "version": os.environ.get("GITHUB_SHA", "local"),
                "indice": "DAV principal (Davini et al. 2012) + seguimiento y filtro de blocktrack v1.1",
-               "censura": "pasos 12-15: solo bloqueos iniciados en el paso s-4 o antes",
+               "censura": "pasos 12-15: no aparecen bloqueos que empiecen después del paso 11 (no les caben 5 días)",
                "atribucion": ATRIBUCION, "aviso": AVISO})
 
 
