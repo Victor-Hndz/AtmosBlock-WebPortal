@@ -42,6 +42,8 @@ class Verdad(unittest.TestCase):
         np.testing.assert_array_equal(v["bloqueado"].values, esperado["bloqueado"].values[:, 0])
         np.testing.assert_array_equal(v["inicio"].values, esperado["inicio"].values[:, 0])
         np.testing.assert_array_equal(v["calma"].values, esperado["calma"].values)
+        np.testing.assert_array_equal(v["bloqueado_v1"].values, esperado["bloqueado_v1"].values[:, 0])
+        np.testing.assert_array_equal(v["genesis"].values, esperado["genesis"].values[:, :, 0])
         self.assertEqual(int(v["inicio"].sel(sector="EA")), 3)
 
     def test_la_calma_usa_la_dav_instantanea_de_era5(self):

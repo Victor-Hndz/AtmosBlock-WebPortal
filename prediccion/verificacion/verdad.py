@@ -30,5 +30,5 @@ def verdad(z, d):
     hist = z.isel(time=slice(0, HISTORIA)).rename(time="dia")
     miembro = z.isel(time=slice(HISTORIA, None)).rename(time="step").expand_dims(number=[0])
     ds = producto.calcular(miembro.assign_coords(step=np.arange(PASOS)), hist, z.isel(time=HISTORIA))
-    return ds[["bloqueado", "inicio", "fraccion_area", "calma"]].isel(number=0).assign(
+    return ds[["bloqueado", "inicio", "fraccion_area", "calma", "bloqueado_v1", "genesis"]].isel(number=0).assign(
         evento=(ds["prob_evento"] > 0).astype("uint8")).assign_attrs(fecha=str(d), fuente="ERA5 00 UTC")

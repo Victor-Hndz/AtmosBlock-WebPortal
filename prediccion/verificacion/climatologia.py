@@ -6,6 +6,10 @@ el día de validez − (s − 11), porque en la ventana [d−4, d+15] no les cab
 paso 11. La calma de un día es la de la aclaración de F3-5: ningún sector bloqueado en la DAV instantánea de ese día
 ni de los 4 anteriores.
 
+Variante V1 (firmada el 2026-09-30): también el sector bloqueado con las filas de 55–65°N y la génesis (primer día de
+cada evento del catálogo continuo cuya huella cumple la regla de sector, con la misma función que el producto): su
+probabilidad por ventana de días 1–5 y 6–10 y la fracción de génesis nacidas de una división.
+
 Probabilidad climatológica por sector, paso y día del año: frecuencia en 1991–2020 en los días a ±15 del día del
 año (circular, periodo 365,25 días). La de inicio, condicionada a la calma del día de la pasada. Es una aproximación
 de la verdad por ventanas: su discrepancia se mide y se publica en la verificación (F5).
@@ -21,8 +25,10 @@ import xarray as xr
 
 AQUI = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(AQUI.parent / "indice"))
+sys.path.insert(0, str(AQUI.parent / "producto"))
 import dav  # noqa: E402
 import eventos  # noqa: E402
+import producto  # noqa: E402
 import sectores  # noqa: E402
 
 G = 9.80665
@@ -35,6 +41,7 @@ NOMBRES = list(sectores.SECTORES)
 
 
 def _catalogo_tramo(m):
+    """(k, sector, día) del sector bloqueado con censura k, lo mismo en V1, y la génesis (regla, sector, día)."""
     et = eventos.etiquetas_filtradas(m)
     inicio = {}
     for t in range(len(et)):
@@ -44,8 +51,9 @@ def _catalogo_tramo(m):
     for e, t in inicio.items():
         comienzo[et == e] = t
     dia = np.arange(len(et))[:, None, None]
-    return np.stack([np.stack([sectores.sector_bloqueado((et > 0) & (comienzo <= dia - k), s) for s in NOMBRES])
-                     for k in range(K_MAX + 1)])  # (k, sector, día)
+    censurado = [(et > 0) & (comienzo <= dia - k) for k in range(K_MAX + 1)]
+    return [np.stack([np.stack([sectores.sector_bloqueado(c, s, matsueda) for s in NOMBRES]) for c in censurado])
+            for matsueda in (False, True)] + [producto.genesis(et, m, 0)]
 
 
 def catalogo(m, tramo=None, solape=60):
@@ -53,17 +61,21 @@ def catalogo(m, tramo=None, solape=60):
     m = np.asarray(m)
     n = len(m)
     if tramo is None:
-        bloqueado = _catalogo_tramo(m)
+        bloqueado, bloqueado_v1, gen = _catalogo_tramo(m)
     else:
         bloqueado = np.zeros((K_MAX + 1, len(NOMBRES), n), dtype=bool)
+        bloqueado_v1 = np.zeros_like(bloqueado)
+        gen = np.zeros((len(producto.REGLAS), len(NOMBRES), n), dtype=np.uint8)
         for a in range(0, n, tramo):
             lo, hi = max(0, a - solape), min(n, a + tramo + solape)
-            bloqueado[:, :, a:a + tramo] = _catalogo_tramo(m[lo:hi])[:, :, a - lo:a - lo + min(tramo, n - a)]
+            corte = slice(a - lo, a - lo + min(tramo, n - a))
+            for destino, parte in zip((bloqueado, bloqueado_v1, gen), _catalogo_tramo(m[lo:hi])):
+                destino[:, :, a:a + tramo] = parte[:, :, corte]
     inst = np.stack([sectores.sector_bloqueado(m.astype(bool), s) for s in NOMBRES])
     calma = np.zeros_like(inst)
     for d in range(HISTORIA_CALMA - 1, n):
         calma[:, d] = ~inst[:, d - HISTORIA_CALMA + 1:d + 1].any(axis=1)
-    return {"bloqueado": bloqueado, "calma": calma}
+    return {"bloqueado": bloqueado, "calma": calma, "bloqueado_v1": bloqueado_v1, "genesis": gen}
 
 
 def _cerca(dias, medio_ancho):
@@ -95,6 +107,19 @@ def prob_inicio(b, calma, dias, medio_ancho=MEDIO_ANCHO):
     return p, n
 
 
+def prob_genesis(gen, dias, medio_ancho=MEDIO_ANCHO):
+    """gen (regla, sector, día) → P(≥ 1 génesis en cada ventana) (regla, sector, ventana, día del año) de todas las
+    pasadas, y la fracción de génesis nacidas de una división (regla, sector)."""
+    t = gen.shape[2] - max(z for _, z in VENTANAS.values())
+    cerca = _cerca(np.asarray(dias, "datetime64[D]")[:t], medio_ancho).astype(float)
+    n = cerca.sum(axis=1)
+    p = np.stack([np.stack([(gen[..., a + d:z + d + 1] > 0).any(axis=-1) for d in range(t)], axis=-1) @ cerca.T / n
+                  for a, z in VENTANAS.values()], axis=2)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        division = (gen == producto.GENESIS_DIVISION).sum(axis=2) / (gen > 0).sum(axis=2)
+    return p, division
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--era5", required=True, help="carpeta con geopot_500hPa_AAAA_00UTC_HN.nc de 1991 a 2020")
@@ -113,16 +138,22 @@ def main(argv=None):
     cat = catalogo(dav.mascara(z).values, tramo=365)
     pb = prob_bloqueo(cat["bloqueado"], dias)
     pi, n = prob_inicio(cat["bloqueado"], cat["calma"], dias)
+    pg, division = prob_genesis(cat["genesis"], dias)
     salida = xr.Dataset(
         {"prob_bloqueo": (("sector", "paso", "dia_del_anio"), pb.astype("float32")),
          "prob_inicio": (("sector", "ventana", "dia_del_anio"), pi.astype("float32")),
          "n_calma": (("sector", "dia_del_anio"), n.astype("int32")),
-         "frecuencia_calma": (("sector",), cat["calma"].mean(axis=1).astype("float32"))},
+         "frecuencia_calma": (("sector",), cat["calma"].mean(axis=1).astype("float32")),
+         "prob_bloqueo_v1": (("sector", "paso", "dia_del_anio"),
+                             prob_bloqueo(cat["bloqueado_v1"], dias).astype("float32")),
+         "prob_genesis": (("regla", "sector", "ventana", "dia_del_anio"), pg.astype("float32")),
+         "fraccion_genesis_division": (("regla", "sector"), division.astype("float32"))},
         coords={"sector": NOMBRES, "paso": np.arange(PASOS), "ventana": list(VENTANAS),
-                "dia_del_anio": np.arange(1, 367)},
+                "regla": list(producto.REGLAS), "dia_del_anio": np.arange(1, 367)},
         attrs={"periodo": f"{a.desde}-{a.hasta}", "fuente": "ERA5 a 00 UTC; Contains modified Copernicus Climate "
                "Change Service information", "preregistro": "F5 firmado el 2026-09-29; aclaración de F3-5 del "
-               "2026-09-30", "ventana_calendario": f"±{MEDIO_ANCHO} días, circular de periodo 365,25",
+               "2026-09-30; variante V1 del 2026-09-30",
+               "ventana_calendario": f"±{MEDIO_ANCHO} días, circular de periodo 365,25",
                "tramos": "catálogo por años con 60 días de solape; los extremos de la serie no tienen días previos"})
     salida.to_netcdf(a.salida, encoding={v: {"zlib": True, "complevel": 4} for v in salida.data_vars})
     return 0

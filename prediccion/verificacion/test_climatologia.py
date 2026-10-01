@@ -52,8 +52,18 @@ class Catalogo(unittest.TestCase):
         m = dav_serie(400, list(range(50, 58)) + list(range(180, 200)) + list(range(360, 368)))
         entero = cl.catalogo(m)
         tramos = cl.catalogo(m, tramo=120, solape=30)
-        for v in ("bloqueado", "calma"):
+        for v in ("bloqueado", "calma", "bloqueado_v1", "genesis"):
             np.testing.assert_array_equal(entero[v], tramos[v], v)
+
+
+class CatalogoV1(unittest.TestCase):
+    def test_a_45N_ocupa_el_sector_pero_no_en_v1(self):
+        cat = cl.catalogo(dav_serie(30, range(10, 21), lat=(42.5, 47.5)))
+        self.assertTrue(cat["bloqueado"][0, EA, 12])
+        self.assertFalse(cat["bloqueado_v1"][:, EA].any())
+        reglas = list(cl.producto.REGLAS)
+        np.testing.assert_array_equal(np.nonzero(cat["genesis"][reglas.index("F3-4"), EA])[0], [10])
+        self.assertFalse(cat["genesis"][reglas.index("F3-4-V1"), EA].any())
 
 
 class Probabilidades(unittest.TestCase):
@@ -84,6 +94,18 @@ class Probabilidades(unittest.TestCase):
         p, n = cl.prob_inicio(b, calma, dias)
         np.testing.assert_array_equal(p[EA, :, 19], [1.0, 0.0])  # día del año 20: su ventana incluye el 21
         self.assertEqual(int(n[EA, 19]), 1)
+
+
+class GenesisClimatologica(unittest.TestCase):
+    def test_probabilidad_por_ventana_y_fraccion_de_division(self):
+        # una génesis en el índice 23: la tienen en los días 1–5 las pasadas 18…22 y en los días 6–10 las 13…17
+        dias = np.arange(np.datetime64("2001-01-01"), np.datetime64("2001-03-01"))
+        gen = np.zeros((2, len(sectores.SECTORES), len(dias)), dtype=np.uint8)
+        gen[0, EA, 23] = 2
+        p, division = cl.prob_genesis(gen, dias, medio_ancho=0)
+        np.testing.assert_array_equal(p[0, EA, :, 17:23], [[0, 1, 1, 1, 1, 1], [1, 0, 0, 0, 0, 0]])
+        self.assertEqual(float(division[0, EA]), 1.0)
+        self.assertTrue(np.isnan(division[1, EA]))
 
 
 if __name__ == "__main__":

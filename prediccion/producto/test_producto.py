@@ -106,6 +106,55 @@ class Pasada(unittest.TestCase):
         self.assertIn("2026-09-29", ds.attrs["preregistro"])
 
 
+def etiquetas(h, bloques):
+    """Etiquetas (h+16, 37, 144) con [(etiqueta, días, lat0, lat1, lon0, lon1)] en índices de la serie."""
+    et = np.zeros((h + 16, 37, 144), dtype=np.int64)
+    for e, dias, la0, la1, lo0, lo1 in bloques:
+        for d in dias:
+            et[d, int(la0 / 2.5):int(la1 / 2.5) + 1, int((lo0 + 180) / 2.5):int((lo1 + 180) / 2.5) + 1] = e
+    return et
+
+
+class GenesisV1(unittest.TestCase):
+    """F3-5-V1 (firmada el 2026-09-30): génesis = primer día de una etiqueta nueva en la ventana, en los pasos 1…15,
+    si su huella cumple la regla de sector (F3-4 o F3-4-V1); 2 si solapa la DAV del día anterior (división)."""
+
+    H = 4
+    REGLAS = list(producto.REGLAS)
+
+    def g(self, et, dav=None):
+        dav = np.zeros(et.shape, dtype=bool) if dav is None else dav
+        return producto.genesis(et, dav, self.H)
+
+    def test_evento_nuevo_en_el_paso_3(self):
+        g = self.g(etiquetas(self.H, [(5, range(self.H + 3, self.H + 10), 55, 62.5, 0, 30)]))
+        np.testing.assert_array_equal(np.nonzero(g[:, EA])[1], [3, 3])  # las dos reglas, solo en el paso 3
+        self.assertEqual(int(g.sum()), 2)
+
+    def test_evento_que_viene_de_la_historia_no_es_genesis(self):
+        self.assertEqual(int(self.g(etiquetas(self.H, [(5, range(0, 12), 55, 62.5, 0, 30)])).sum()), 0)
+
+    def test_paso_0_no_cuenta(self):
+        self.assertEqual(int(self.g(etiquetas(self.H, [(5, range(self.H, 12), 55, 62.5, 0, 30)])).sum()), 0)
+
+    def test_a_45N_solo_la_regla_firmada(self):
+        g = self.g(etiquetas(self.H, [(5, range(self.H + 2, self.H + 9), 42.5, 47.5, 0, 30)]))
+        self.assertEqual(int(g[self.REGLAS.index("F3-4"), EA, 2]), 1)
+        self.assertEqual(int(g[self.REGLAS.index("F3-4-V1"), EA].sum()), 0)
+
+    def test_nacida_de_una_division(self):
+        et = etiquetas(self.H, [(5, range(self.H + 3, self.H + 10), 55, 62.5, 0, 30)])
+        dav = np.zeros(et.shape, dtype=bool)
+        dav[self.H + 2, 22, 72] = True  # 55°N, 0°: una celda con DAV el día anterior dentro de la huella
+        np.testing.assert_array_equal(self.g(et, dav)[:, EA, 3], [2, 2])
+
+    def test_en_el_producto(self):
+        ds = producto.calcular(miembros([set(range(3, 11)), set()]), historia([False] * 4), analisis_d())
+        np.testing.assert_array_equal(ds["prob_genesis"].sel(regla="F3-4", sector="EA"), [0.5, 0.0])
+        np.testing.assert_array_equal(ds["prob_sector_v1"].sel(sector="EA")[3:11], np.full(8, 0.5))
+        self.assertEqual(int(ds["genesis"].sel(regla="F3-4-V1", sector="EA", number=1, paso=3)), 1)
+
+
 def escribir_archivo(carpeta, modelo, fecha, alta_en_pasos=()):
     """Fichero con el formato de archivar.py: lat 90→0 y lon −180→178,75 a 1,25°, z500 en m, 2 miembros."""
     lat = np.arange(90, -0.01, -1.25)
