@@ -1,5 +1,5 @@
 {
- "modelos": {"ifs": ["20260928", "20260929", "20260930", "20261001", "20261002"], "aifs": ["20260928", "20260929", "20260930", "20261001", "20261002"]},
+ "modelos": {"ifs": ["20260928", "20260929", "20260930", "20261001", "20261002", "20261003"], "aifs": ["20260928", "20260929", "20260930", "20261001", "20261002", "20261003"]},
  "png": "https://github.com/Victor-Hndz/AtmosBlock-WebPortal/releases/download/producto-ens-{aaaa}-{mm}/producto_{modelo}_{fecha}.png",
  "atribucion": "Contains modified ECMWF open data, CC-BY-4.0: https://www.ecmwf.int/en/forecasts/datasets/open-data"
 }
