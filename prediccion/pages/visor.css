@@ -341,3 +341,20 @@ body.embed .solo-completo {
 body.embed main {
   padding-top: 8px;
 }
+
+.fila-marca {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.idiomas a {
+  margin-left: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--tenue);
+}
+.idiomas a[aria-current="true"] {
+  color: var(--acento);
+  text-decoration: underline;
+}

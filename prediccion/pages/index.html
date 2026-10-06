@@ -15,13 +15,19 @@
   </head>
   <body>
     <header class="cabecera solo-completo">
-      <p class="marca">AtmosBlock</p>
-      <h1>¿Bloqueos atmosféricos a la vista?</h1>
-      <p class="entradilla">
+      <div class="fila-marca">
+        <p class="marca">AtmosBlock</p>
+        <nav class="idiomas" aria-label="Idioma / Language">
+          <a href="?lang=es" data-lang="es" lang="es">ES</a>
+          <a href="?lang=en" data-lang="en" lang="en">EN</a>
+        </nav>
+      </div>
+      <h1 data-t="titulo">¿Bloqueos atmosféricos a la vista?</h1>
+      <p class="entradilla" data-t="entradilla">
         Probabilidad de bloqueo en el hemisferio norte para los próximos 15 días, a partir de las 50 previsiones de
         cada uno de los dos sistemas de ECMWF: el físico (IFS) y el de inteligencia artificial (AIFS).
       </p>
-      <p class="aviso">
+      <p class="aviso" data-t-html="aviso">
         <strong>Experimental.</strong> No es una predicción oficial: muestra lo que dicen las previsiones de ECMWF
         sobre los bloqueos, y todavía no se ha comprobado cuánto aciertan.
       </p>
@@ -29,29 +35,36 @@
 
     <main>
       <details class="que-es solo-completo">
-        <summary>¿Qué es un bloqueo atmosférico?</summary>
-        <p>
+        <summary data-t="queEs">¿Qué es un bloqueo atmosférico?</summary>
+        <p data-t="queEs1">
           Un anticiclón que se queda quieto durante varios días en latitudes medias o altas y desvía las borrascas a su
           alrededor. Mientras dura, el tiempo se repite: detrás de muchas olas de calor y de frío, sequías e
           inundaciones persistentes hay un bloqueo.
         </p>
-        <p>
+        <p data-t="queEs2">
           Aquí se cuenta un bloqueo cuando el índice de Davini detecta un evento que dura al menos 5 días y ocupa una
           parte de la región. La probabilidad es la fracción de las 50 previsiones de cada sistema que lo muestran.
         </p>
       </details>
 
-      <section class="controles" aria-label="Elegir previsión">
-        <div class="grupo" role="group" aria-label="Sistema de previsión">
-          <button type="button" class="modelo" data-modelo="ifs" aria-pressed="true">IFS (físico)</button>
-          <button type="button" class="modelo" data-modelo="aifs" aria-pressed="false">AIFS (IA)</button>
+      <section class="controles" aria-label="IFS / AIFS">
+        <div class="grupo" role="group" aria-label="IFS / AIFS">
+          <button type="button" class="modelo" data-modelo="ifs" data-t="modelos.ifs" aria-pressed="true">
+            IFS (físico)
+          </button>
+          <button type="button" class="modelo" data-modelo="aifs" data-t="modelos.aifs" aria-pressed="false">
+            AIFS (IA)
+          </button>
         </div>
         <label class="pasada">
-          Previsión del
+          <span data-t="previsionDel">Previsión del</span>
           <select id="pasada"></select>
         </label>
         <label class="dia">
-          <span>Día: <strong id="dia-texto">+1</strong> <span id="fecha-valida" class="tenue"></span></span>
+          <span
+            ><span data-t="dia">Día:</span> <strong id="dia-texto">+1</strong>
+            <span id="fecha-valida" class="tenue"></span
+          ></span>
           <input id="dia" type="range" min="0" max="15" value="1" />
         </label>
       </section>
@@ -60,34 +73,34 @@
 
       <section class="principal">
         <figure class="mapa">
-          <svg id="mapa" viewBox="0 0 600 600" role="img" aria-label="Mapa del hemisferio norte con la probabilidad de bloqueo"></svg>
+          <svg id="mapa" viewBox="0 0 600 600" role="img" data-t-aria="mapaAria"></svg>
           <figcaption>
             <span class="leyenda" aria-hidden="true"></span>
-            <span>
+            <span data-t="leyenda">
               Probabilidad de que cada punto esté dentro de un bloqueo · las líneas marcan las cinco regiones. Más
               atenuados, al sur de 40°N, los bloqueos de baja latitud: el índice los detecta, pero no suelen frenar el
               flujo del oeste.
             </span>
           </figcaption>
         </figure>
-        <div id="tarjetas" class="tarjetas" aria-label="Regiones"></div>
+        <div id="tarjetas" class="tarjetas"></div>
       </section>
 
       <section id="verificacion" class="verificacion solo-completo">
-        <h2>¿Aciertan estas previsiones?</h2>
+        <h2 data-t="verificacionTitulo">¿Aciertan estas previsiones?</h2>
         <div id="verificacion-contenido"></div>
       </section>
     </main>
 
     <footer class="pie">
-      <p>
+      <p data-t="pie">
         Datos: previsiones abiertas de ECMWF (IFS ENS y AIFS ENS, CC-BY-4.0) y ERA5 de Copernicus C3S; costas de
         Natural Earth. Contains modified ECMWF open data and modified Copernicus Climate Change Service information.
       </p>
       <p class="solo-completo">
-        <a href="prediccion/index.json">Datos en JSON</a> ·
-        <a href="https://github.com/Victor-Hndz/AtmosBlock-WebPortal/releases">Archivo y mapas</a> ·
-        <a href="https://github.com/Victor-Hndz/AtmosBlock-WebPortal">Código (MIT)</a>
+        <a href="prediccion/index.json" data-t="enlaceDatos">Datos en JSON</a> ·
+        <a href="https://github.com/Victor-Hndz/AtmosBlock-WebPortal/releases" data-t="enlaceArchivo">Archivo y mapas</a>
+        · <a href="https://github.com/Victor-Hndz/AtmosBlock-WebPortal" data-t="enlaceCodigo">Código (MIT)</a>
       </p>
     </footer>
   </body>

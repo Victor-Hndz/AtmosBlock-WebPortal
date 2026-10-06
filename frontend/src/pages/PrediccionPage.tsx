@@ -72,7 +72,7 @@ const fechaLegible = (f: string) => `${f.slice(0, 4)}-${f.slice(4, 6)}-${f.slice
  * conjuntos de ECMWF, leída de GitHub Pages. Producto experimental.
  */
 const PrediccionPage: React.FC = (): JSX.Element => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [indice, setIndice] = useState<Indice | null>(null);
   const [modelo, setModelo] = useState<Modelo>("ifs");
   const [fecha, setFecha] = useState<string>("");
@@ -112,6 +112,7 @@ const PrediccionPage: React.FC = (): JSX.Element => {
     url.searchParams.set("embed", "1");
     url.searchParams.set("modelo", modelo === "aifs" ? "aifs" : "ifs");
     if (/^\d{8}$/.test(fechaActiva ?? "")) url.searchParams.set("fecha", fechaActiva);
+    url.searchParams.set("lang", i18n.language?.startsWith("en") ? "en" : "es");
     return url.toString();
   })();
 
