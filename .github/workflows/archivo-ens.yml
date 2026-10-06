@@ -19,6 +19,7 @@ on:
 
 permissions:
   contents: write # crear el release del mes y subir los ficheros
+  issues: write # avisar_fallo.sh abre o comenta un issue si el workflow falla
 
 concurrency:
   group: archivo-ens
@@ -41,7 +42,7 @@ jobs:
           .venv/bin/python prediccion/producto/test_producto.py
           bash prediccion/producto/test_generar.sh
           bash prediccion/producto/test_publicar.sh
-          node --test prediccion/pages/test_logica.mjs
+          node --test prediccion/pages/test_logica.mjs prediccion/pages/test_textos.mjs
       - name: Archivar y subir
         env:
           GH_TOKEN: ${{ github.token }}
@@ -66,3 +67,10 @@ jobs:
           git -C paginas config user.name "github-actions[bot]"
           git -C paginas config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           bash prediccion/producto/publicar.sh
+      - name: Avisar del fallo con un issue
+        if: ${{ failure() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW: ${{ github.workflow }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: bash prediccion/avisar_fallo.sh

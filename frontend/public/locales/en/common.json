@@ -432,7 +432,7 @@
     },
     "vistazo": {
       "titulo": "The forecast at a glance",
-      "texto": "Map and regions in plain language: what each system forecasts compared with what is usual for the time of year (visor in Spanish). Move the day slider to see the next 15 days.",
+      "texto": "Map and regions in plain language: what each system forecasts compared with what is usual for the time of year. Move the day slider to see the next 15 days.",
       "iframe": "Public blocking forecast viewer",
       "abrir": "Open the full viewer"
     },

@@ -62,6 +62,10 @@ async function simularPages(page: Page, pedidas: string[] = [], verificacion: ob
     });
   });
   await page.route("**/releases/download/**", r => r.fulfill({ status: 200, contentType: "image/png", body: "" }));
+  // el visor público incrustado pediría los mismos JSON que el portal (y saldría a la red)
+  await page.route(/\/AtmosBlock-WebPortal\/\?embed=1/, r =>
+    r.fulfill({ contentType: "text/html", body: "<p>visor</p>" })
+  );
 }
 
 test("la previsión muestra la última pasada con la tabla por sector, el aviso experimental y la atribución", async ({
@@ -100,6 +104,7 @@ test("cambiar de modelo y de pasada carga su JSON y marca la historia incompleta
   await page.getByLabel(t.modelo).selectOption("ifs");
   await page.getByLabel(t.fecha).selectOption("20260929");
   await expect(page.getByText(t.historiaIncompleta)).toBeVisible();
+  await page.waitForLoadState("networkidle"); // también lo que pida el iframe del visor
   expect(pedidas).toEqual(["ifs/20260930", "aifs/20260930", "ifs/20260930", "ifs/20260929"]);
 });
 
@@ -135,18 +140,15 @@ test("con registros, la verificación muestra el BSS primario y marca la habilid
 });
 
 test("la previsión de un vistazo incrusta el visor público con el modelo y la pasada elegidos", async ({ page }) => {
-  await page.route(/\/AtmosBlock-WebPortal\/\?embed=1/, r =>
-    r.fulfill({ contentType: "text/html", body: "<p>visor</p>" })
-  );
   await simularPages(page);
   await page.goto("/prediccion");
 
   await expect(page.getByRole("heading", { name: t.vistazo.titulo })).toBeVisible();
   const visor = page.getByTitle(t.vistazo.iframe);
-  await expect(visor).toHaveAttribute("src", /\?embed=1&modelo=ifs&fecha=20260930$/);
+  await expect(visor).toHaveAttribute("src", /\?embed=1&modelo=ifs&fecha=20260930&lang=es$/);
   await expect(page.getByRole("link", { name: t.vistazo.abrir })).toHaveAttribute("href", /AtmosBlock-WebPortal\/$/);
   await expect(page.getByRole("heading", { name: t.detalle })).toBeVisible();
 
   await page.getByLabel(t.modelo).selectOption("aifs");
-  await expect(visor).toHaveAttribute("src", /modelo=aifs&fecha=20260930$/);
+  await expect(visor).toHaveAttribute("src", /modelo=aifs&fecha=20260930&lang=es$/);
 });

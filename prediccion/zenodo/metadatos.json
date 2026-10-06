@@ -1,0 +1,17 @@
+{
+  "_nota": "Revisa autores, afiliación y ORCID antes de publicar: un DOI publicado en Zenodo no se puede borrar.",
+  "creators": [
+    {
+      "name": "Hernández, Víctor"
+    }
+  ],
+  "keywords": [
+    "atmospheric blocking",
+    "ensemble forecast",
+    "ECMWF",
+    "IFS",
+    "AIFS",
+    "Z500",
+    "forecast verification"
+  ]
+}

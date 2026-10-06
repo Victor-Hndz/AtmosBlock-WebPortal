@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: write # releases era5-* y verificacion-*
+  issues: write # avisar_fallo.sh abre o comenta un issue si el workflow falla
 
 concurrency:
   group: verificacion
@@ -64,3 +65,10 @@ jobs:
           git -C paginas config user.name "github-actions[bot]"
           git -C paginas config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           bash prediccion/verificacion/publicar_resumen.sh
+      - name: Avisar del fallo con un issue
+        if: ${{ failure() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW: ${{ github.workflow }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: bash prediccion/avisar_fallo.sh
