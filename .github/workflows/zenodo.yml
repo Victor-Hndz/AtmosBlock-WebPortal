@@ -1,0 +1,48 @@
+name: Zenodo
+
+# Depósito mensual en Zenodo de los datos de la previsión de bloqueos: archivo ENS, producto, ERA5 y verificación del
+# mes. Solo a mano. Por defecto prueba en sandbox.zenodo.org y deja un borrador; publicar crea un DOI que no se puede
+# borrar. Secretos: ZENODO_SANDBOX_TOKEN (sandbox) y ZENODO_TOKEN (Zenodo), con deposit:write y deposit:actions.
+on:
+  workflow_dispatch:
+    inputs:
+      mes:
+        description: "Mes a depositar (AAAA-MM)"
+        required: true
+      sandbox:
+        description: "Usar sandbox.zenodo.org (pruebas)"
+        type: boolean
+        default: true
+      publicar:
+        description: "Publicar (crea el DOI; irreversible). Si no, queda en borrador"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  depositar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Bajar los ficheros del mes de los releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MES: ${{ inputs.mes }} # por entorno, nunca interpolado en el script
+        run: |
+          [[ $MES =~ ^[0-9]{4}-[0-9]{2}$ ]] || { echo "::error::mes no válido: $MES"; exit 2; }
+          mkdir -p deposito
+          for tag in "archivo-ens-$MES" "producto-ens-$MES" "era5-$MES" "verificacion-$MES"; do
+            gh release download "$tag" -D deposito 2>/dev/null || echo "::warning::sin release $tag"
+          done
+          ls deposito | wc -l
+          du -sh deposito
+      - name: Depositar
+        env:
+          ZENODO_TOKEN: ${{ inputs.sandbox && secrets.ZENODO_SANDBOX_TOKEN || secrets.ZENODO_TOKEN }}
+          MES: ${{ inputs.mes }}
+          SANDBOX: ${{ inputs.sandbox && '--sandbox' || '' }}
+          PUBLICAR: ${{ inputs.publicar && '--publicar' || '' }}
+        run: python3 prediccion/zenodo/depositar.py --mes "$MES" --carpeta deposito $SANDBOX $PUBLICAR

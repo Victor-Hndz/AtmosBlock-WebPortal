@@ -3,7 +3,9 @@
 Rejilla de 2,5° (lat 0→90, lon −180→177,5). Una celda está en un sector si oeste ≤ λ < este; el Pacífico y el LLB del
 Pacífico cruzan ±180°. Principales en 40 ≤ φ ≤ 75°N con los límites de Matsueda (2009); LLB en 30 ≤ φ < 40°N
 (construcción propia). Un sector está bloqueado si la máscara de evento, colapsada en latitud dentro de sus filas,
-tiene ≥ 3 longitudes adyacentes bloqueadas dentro de sus límites (Matsueda 2009).
+tiene ≥ 3 longitudes adyacentes bloqueadas dentro de sus límites (Matsueda 2009). Lo que mide es la ocupación del
+sector por eventos DAV. Variante V1 (F3-4-V1, firmada el 2026-09-30): la misma regla solo en las filas de 55–65°N,
+las latitudes centrales de Matsueda (2009), en los sectores principales; LLB sin cambio.
 """
 import numpy as np
 
@@ -22,10 +24,13 @@ SECTORES = {
     "LLB-Pac": (30, 40, False, 120, -90),
 }
 PRINCIPALES = ("GRL", "EA", "URA", "PA", "NAM")
+LAT_MATSUEDA = (55, 65)
 
 
-def filas(nombre):
+def filas(nombre, matsueda=False):
     s, n, incluye, _, _ = SECTORES[nombre]
+    if matsueda and nombre in PRINCIPALES:
+        (s, n), incluye = LAT_MATSUEDA, True
     return np.nonzero((LAT >= s) & ((LAT <= n) if incluye else (LAT < n)))[0]
 
 
@@ -37,9 +42,9 @@ def columnas(nombre):
     return np.concatenate([np.nonzero(LON >= oeste)[0], np.nonzero(LON < este)[0]])
 
 
-def sector_bloqueado(ev, nombre):
-    """ev (..., lat, lon) booleana → (...) booleana."""
-    b = ev[..., filas(nombre), :][..., columnas(nombre)].any(axis=-2)
+def sector_bloqueado(ev, nombre, matsueda=False):
+    """ev (..., lat, lon) booleana → (...) booleana. matsueda: variante V1 (filas de 55–65°N)."""
+    b = ev[..., filas(nombre, matsueda), :][..., columnas(nombre)].any(axis=-2)
     racha = b[..., : b.shape[-1] - ADYACENTES_MIN + 1].copy()
     for k in range(1, ADYACENTES_MIN):
         racha &= b[..., k: b.shape[-1] - ADYACENTES_MIN + 1 + k]

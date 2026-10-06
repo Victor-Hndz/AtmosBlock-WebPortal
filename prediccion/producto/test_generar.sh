@@ -36,7 +36,7 @@ caso() { # caso <nombre> <código> <FECHA> <SUBIDOS> <DISPONIBLES> <FALLA> <patr
   : >"$T/gh.log"
   rm -rf "$T/archivo" "$T/producto"
   (cd "$T" && PATH="$T/bin:$PATH" PY="$T/py" LOG="$T/gh.log" FECHA="$3" SUBIDOS="$4" DISPONIBLES="$5" FALLA="$6" \
-    bash "$AQUI/generar.sh" >"$T/salida.txt" 2>&1)
+    REGENERAR="${REGENERAR:-}" bash "$AQUI/generar.sh" >"$T/salida.txt" 2>&1)
   local rc=$?
   if [[ $rc -ne $2 ]] || { [[ -n $7 ]] && ! grep -q -- "$7" "$T/gh.log"; } ||
     { [[ -n ${8:-} ]] && grep -q -- "$8" "$T/gh.log"; }; then
@@ -57,6 +57,8 @@ caso "sin archivo del modelo solo avisa" 0 20260102 "" "$(a ifs 20260102)" "" \
   "upload producto-ens-2026-01 producto/producto_ifs" "producto/producto_aifs"
 caso "un fallo del cálculo hace fallar el job" 1 20260102 "" "$COMPLETO" "aifs:20260102" \
   "upload producto-ens-2026-01 producto/producto_ifs" "producto/producto_aifs"
+REGENERAR=1 caso "regenerar sustituye lo ya generado" 0 20260102 "producto_ifs_20260102.json" "$COMPLETO" "" \
+  "producto/producto_ifs_20260102.json producto/producto_ifs_20260102.png --clobber"
 caso "fecha mal formada" 2 "2026-01-02" "" "" "" "" "release"
 
 exit $((errores > 0 ? 1 : 0))

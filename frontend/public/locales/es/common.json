@@ -7,7 +7,8 @@
     "home": "Inicio",
     "requests": "Solicitudes",
     "login": "Iniciar sesión",
-    "progress": "Progreso"
+    "progress": "Progreso",
+    "prediccion": "Previsión"
   },
   "navigation-tooltips": {
     "home": "Ir a la Página Principal",
@@ -15,7 +16,8 @@
     "login": "Iniciar sesión en tu cuenta",
     "about": "Conocer más sobre esta aplicación",
     "help": "Ayuda",
-    "progress": "Ver actualizaciones de progreso en tiempo real"
+    "progress": "Ver actualizaciones de progreso en tiempo real",
+    "prediccion": "Probabilidad de bloqueo en las previsiones por conjuntos de ECMWF (experimental)"
   },
   "navigation-footer": {
     "about": "Acerca de",
@@ -385,5 +387,55 @@
     "viewDetails": "Ver Detalles",
     "error": "Error durante el procesamiento",
     "initializing": "Descargando archivo NetCDF..."
+  },
+  "prediccion": {
+    "titulo": "Previsión de bloqueos",
+    "descripcion": "Probabilidad de que cada sector esté ocupado por un evento de bloqueo del índice de Davini (DAV) en las previsiones por conjuntos de ECMWF (50 miembros, pasada de 00 UTC), por día de plazo.",
+    "experimental": "Producto experimental: diagnostica la previsión de ECMWF; su habilidad todavía no está verificada.",
+    "modelo": "Modelo",
+    "fecha": "Pasada",
+    "cargando": "Cargando la previsión…",
+    "error": "No se pudieron cargar los datos de la previsión.",
+    "sinDatos": "Todavía no hay pasadas publicadas.",
+    "historiaIncompleta": "Historia incompleta: faltan días previos de pseudoanálisis y esta pasada queda fuera de la verificación principal.",
+    "tablaTitulo": "Ocupación del sector por eventos de bloqueo (DAV): probabilidad por día de plazo",
+    "sector": "Sector",
+    "dia": "Día {{n}}",
+    "bajaLatitud": "Bloqueo de baja latitud (30–40°N)",
+    "sectores": {
+      "GRL": "Groenlandia",
+      "EA": "Euroatlántico",
+      "URA": "Urales",
+      "PA": "Pacífico",
+      "NAM": "Norteamérica",
+      "LLB-Atl": "Atlántico",
+      "LLB-Pac": "Pacífico"
+    },
+    "censura": "En los días 12–15 no aparecen bloqueos que empiecen después del día 11: no les caben los 5 días de persistencia.",
+    "inicioTitulo": "Posible inicio de bloqueo",
+    "inicioExplicacion": "Solo se evalúa en los sectores sin bloqueo en los 5 días previos: probabilidad de que empiece un bloqueo en los días 1–5 y 6–10.",
+    "ventanas": {
+      "dias_1_5": "días 1–5",
+      "dias_6_10": "días 6–10"
+    },
+    "sinCalma": "no se evalúa (bloqueo reciente)",
+    "aviso": "aviso",
+    "mapaTitulo": "Probabilidad de evento de bloqueo (días 1, 5, 10 y 15)",
+    "mapaAlt": "Mapa de probabilidad de evento de bloqueo de {{modelo}} para la pasada del {{fecha}}",
+    "verificacion": {
+      "titulo": "Verificación frente a ERA5",
+      "explicacion": "Habilidad de la ocupación del sector frente a la climatología ERA5 1991–2020 (BSS por día de plazo; 1 es perfecto, 0 no mejora a la climatología). Preregistrado: solo hay habilidad si el intervalo IC90 por bootstrap excluye 0.",
+      "pendiente": "Todavía no hay pasadas verificadas: cada pasada necesita ERA5 de los 15 días de plazo, que llega con unos 5 días de retraso. Las primeras, hacia el 20 de octubre de 2026.",
+      "pasadas": "{{completas}} pasadas con historia completa de {{total}}",
+      "habilidad": "* El IC90 excluye 0: habilidad frente a la climatología.",
+      "detalles": "Resultados secundarios, por estación y diferencia IFS − AIFS en el JSON completo"
+    },
+    "vistazo": {
+      "titulo": "La previsión de un vistazo",
+      "texto": "Mapa y regiones en lenguaje sencillo: lo que prevé cada sistema frente a lo habitual para la época. Mueve el control del día para ver los próximos 15 días.",
+      "iframe": "Visor público de la previsión de bloqueos",
+      "abrir": "Abrir el visor completo"
+    },
+    "detalle": "Detalle técnico"
   }
 }
