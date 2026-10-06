@@ -1,0 +1,74 @@
+name: Verificación
+
+# PRD-504 (D12): archiva cada día ERA5 Z500 de 00 UTC desde el CDS (la verdad, con ~5 días de retraso) y registra la
+# verificación de las pasadas cuya ventana d−4…d+15 ya está completa; PRD-506: publica el resumen de puntuaciones en
+# GitHub Pages. Necesita el secreto CDSAPI_KEY (token del CDS, con la licencia de ERA5 aceptada en la web del CDS).
+on:
+  schedule:
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+    inputs:
+      fecha:
+        description: "Fechas de ERA5 AAAAMMDD separadas por espacios (vacío = los 12 días hasta hoy−5)"
+        required: false
+
+permissions:
+  contents: write # releases era5-* y verificacion-*
+  issues: write # avisar_fallo.sh abre o comenta un issue si el workflow falla
+
+concurrency:
+  group: verificacion
+  cancel-in-progress: false
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Entorno
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install -q -r prediccion/archivo/requirements.txt
+      - name: Tests
+        run: |
+          .venv/bin/python prediccion/verificacion/test_era5.py
+          bash prediccion/verificacion/test_subir_era5.sh
+          .venv/bin/python prediccion/verificacion/test_verificar.py
+          bash prediccion/verificacion/test_verificar.sh
+          .venv/bin/python prediccion/verificacion/test_resumen.py
+          bash prediccion/verificacion/test_publicar_resumen.sh
+      - name: Archivar ERA5
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CDSAPI_URL: https://cds.climate.copernicus.eu/api
+          CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
+          FECHA: ${{ inputs.fecha }} # por entorno, nunca interpolado en el script; subir_era5.sh valida el formato
+        run: |
+          if [ -z "$CDSAPI_KEY" ]; then echo "::error::falta el secreto CDSAPI_KEY del repositorio"; exit 1; fi
+          bash prediccion/verificacion/subir_era5.sh
+      - name: Registrar la verificación
+        if: ${{ !cancelled() }} # aunque falle un día de ERA5, se verifica lo que tenga la ventana completa
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash prediccion/verificacion/verificar.sh
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          ref: gh-pages
+          path: paginas
+      - name: Publicar el resumen de puntuaciones en GitHub Pages (PRD-506)
+        if: ${{ !cancelled() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git -C paginas config user.name "github-actions[bot]"
+          git -C paginas config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          bash prediccion/verificacion/publicar_resumen.sh
+      - name: Avisar del fallo con un issue
+        if: ${{ failure() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW: ${{ github.workflow }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: bash prediccion/avisar_fallo.sh

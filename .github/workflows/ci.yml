@@ -188,7 +188,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Tests del archivo diario de la ENS de ECMWF (PRD-101), del índice DAV (PRD-201), de los eventos y del producto (PRD-301 a 303)
+      - name: Tests del archivo diario de la ENS de ECMWF (PRD-101), del índice DAV (PRD-201), de los eventos y del producto y de la verificación (PRD-301 a 303, 401, 501 a 506)
         run: |
           python3 -m venv .venv
           .venv/bin/pip install -q -r prediccion/archivo/requirements.txt
@@ -199,6 +199,19 @@ jobs:
           .venv/bin/python prediccion/indice/test_sectores.py
           .venv/bin/python prediccion/producto/test_producto.py
           bash prediccion/producto/test_generar.sh
+          bash prediccion/producto/test_publicar.sh
+          node --test prediccion/pages/test_logica.mjs prediccion/pages/test_textos.mjs
+          bash prediccion/test_avisar_fallo.sh
+          .venv/bin/python prediccion/zenodo/test_depositar.py
+          .venv/bin/python prediccion/verificacion/test_verdad.py
+          .venv/bin/python prediccion/verificacion/test_puntuaciones.py
+          .venv/bin/python prediccion/verificacion/test_climatologia.py
+          .venv/bin/python prediccion/verificacion/test_era5.py
+          bash prediccion/verificacion/test_subir_era5.sh
+          .venv/bin/python prediccion/verificacion/test_verificar.py
+          bash prediccion/verificacion/test_verificar.sh
+          .venv/bin/python prediccion/verificacion/test_resumen.py
+          bash prediccion/verificacion/test_publicar_resumen.sh
 
   e2e:
     # WEB-217: navegador y API contra la pila real (sin el pipeline de cálculo ni el CDS)

@@ -83,6 +83,21 @@ class SectorBloqueado(unittest.TestCase):
         self.assertTrue(b[1, 2])
 
 
+class VarianteV1(unittest.TestCase):
+    """F3-4-V1 (firmada el 2026-09-30): la misma regla solo en las filas de 55–65°N; LLB sin cambio."""
+
+    def test_filas_de_matsueda(self):
+        np.testing.assert_array_equal(sectores.LAT[sectores.filas("EA", matsueda=True)], [55, 57.5, 60, 62.5, 65])
+        np.testing.assert_array_equal(sectores.filas("LLB-Atl", matsueda=True), sectores.filas("LLB-Atl"))
+
+    def test_solo_cuenta_55_65(self):
+        a45 = mascara((45, 0), (45, 2.5), (45, 5))[None]
+        a60 = mascara((60, 0), (60, 2.5), (60, 5))[None]
+        self.assertTrue(sectores.sector_bloqueado(a45, "EA")[0])
+        self.assertFalse(sectores.sector_bloqueado(a45, "EA", matsueda=True)[0])
+        self.assertTrue(sectores.sector_bloqueado(a60, "EA", matsueda=True)[0])
+
+
 class FraccionArea(unittest.TestCase):
     def test_sector_entero_y_vacio(self):
         m = np.zeros((2, 37, 144), dtype=bool)

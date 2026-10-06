@@ -16,7 +16,8 @@ import producto  # noqa: E402
 
 LAT = np.arange(0, 90.01, 2.5)
 LON = np.arange(-180, 180, 2.5)
-EA = list(producto.sectores.SECTORES).index("EA")
+SECT = list(producto.sectores.SECTORES)
+EA = SECT.index("EA")
 
 
 def dia(alta=False):
@@ -93,10 +94,66 @@ class Pasada(unittest.TestCase):
         self.assertEqual(int(ds["historia_incompleta"]), 1)
         self.assertEqual(int(ds["dias_historia"]), 2)
 
+    def test_censura_solo_excluye_los_que_empiezan_despues_del_paso_11(self):
+        # la ventana acaba en el paso 15: un bloqueo que empieza en el 12 no llega a 5 días; uno del 10 sí se ve en el 12
+        for inicio, visibles in ((10, list(range(10, 16))), (11, list(range(11, 16))), (12, [])):
+            ds = producto.calcular(miembros([set(range(inicio, 16))]), historia([False] * 4), analisis_d())
+            self.assertEqual([s for s in range(16) if ds["bloqueado"][EA, 0, s]], visibles, inicio)
+        self.assertIn("después del paso 11", ds.attrs["censura"])
+
     def test_guarda_la_pseudoanalisis_y_el_preregistro(self):
         ds = producto.calcular(miembros([set()]), historia([False] * 4), analisis_d())
         self.assertEqual(ds["pseudoanalisis"].shape, (5, LAT.size, LON.size))
         self.assertIn("2026-09-29", ds.attrs["preregistro"])
+
+
+def etiquetas(h, bloques):
+    """Etiquetas (h+16, 37, 144) con [(etiqueta, días, lat0, lat1, lon0, lon1)] en índices de la serie."""
+    et = np.zeros((h + 16, 37, 144), dtype=np.int64)
+    for e, dias, la0, la1, lo0, lo1 in bloques:
+        for d in dias:
+            et[d, int(la0 / 2.5):int(la1 / 2.5) + 1, int((lo0 + 180) / 2.5):int((lo1 + 180) / 2.5) + 1] = e
+    return et
+
+
+class GenesisV1(unittest.TestCase):
+    """F3-5-V1 (firmada el 2026-09-30): génesis = primer día de una etiqueta nueva en la ventana, en los pasos 1…15,
+    si su huella cumple la regla de sector (F3-4 o F3-4-V1); 2 si solapa la DAV del día anterior (división)."""
+
+    H = 4
+    REGLAS = list(producto.REGLAS)
+
+    def g(self, et, dav=None):
+        dav = np.zeros(et.shape, dtype=bool) if dav is None else dav
+        return producto.genesis(et, dav, self.H)
+
+    def test_evento_nuevo_en_el_paso_3(self):
+        g = self.g(etiquetas(self.H, [(5, range(self.H + 3, self.H + 10), 55, 62.5, 0, 30)]))
+        np.testing.assert_array_equal(np.nonzero(g[:, EA])[1], [3, 3])  # las dos reglas, solo en el paso 3
+        self.assertEqual(int(g.sum()), 2)
+
+    def test_evento_que_viene_de_la_historia_no_es_genesis(self):
+        self.assertEqual(int(self.g(etiquetas(self.H, [(5, range(0, 12), 55, 62.5, 0, 30)])).sum()), 0)
+
+    def test_paso_0_no_cuenta(self):
+        self.assertEqual(int(self.g(etiquetas(self.H, [(5, range(self.H, 12), 55, 62.5, 0, 30)])).sum()), 0)
+
+    def test_a_45N_solo_la_regla_firmada(self):
+        g = self.g(etiquetas(self.H, [(5, range(self.H + 2, self.H + 9), 42.5, 47.5, 0, 30)]))
+        self.assertEqual(int(g[self.REGLAS.index("F3-4"), EA, 2]), 1)
+        self.assertEqual(int(g[self.REGLAS.index("F3-4-V1"), EA].sum()), 0)
+
+    def test_nacida_de_una_division(self):
+        et = etiquetas(self.H, [(5, range(self.H + 3, self.H + 10), 55, 62.5, 0, 30)])
+        dav = np.zeros(et.shape, dtype=bool)
+        dav[self.H + 2, 22, 72] = True  # 55°N, 0°: una celda con DAV el día anterior dentro de la huella
+        np.testing.assert_array_equal(self.g(et, dav)[:, EA, 3], [2, 2])
+
+    def test_en_el_producto(self):
+        ds = producto.calcular(miembros([set(range(3, 11)), set()]), historia([False] * 4), analisis_d())
+        np.testing.assert_array_equal(ds["prob_genesis"].sel(regla="F3-4", sector="EA"), [0.5, 0.0])
+        np.testing.assert_array_equal(ds["prob_sector_v1"].sel(sector="EA")[3:11], np.full(8, 0.5))
+        self.assertEqual(int(ds["genesis"].sel(regla="F3-4-V1", sector="EA", number=1, paso=3)), 1)
 
 
 def escribir_archivo(carpeta, modelo, fecha, alta_en_pasos=()):
@@ -134,6 +191,37 @@ class Diario(unittest.TestCase):
                 self.assertIn("CC-BY-4.0", j["atribucion"])
                 self.assertGreater(base.with_suffix(".png").stat().st_size, 0)
 
+    def test_json_con_mapa_y_normal_para_la_epoca(self):
+        with tempfile.TemporaryDirectory() as d:
+            for f in ("20260926", "20260927", "20260928", "20260929"):
+                escribir_archivo(d, "ifs", f)
+            escribir_archivo(d, "ifs", "20260930", alta_en_pasos=range(2, 10))
+            clima = pathlib.Path(d) / "clima.nc"
+            doy = np.arange(1, 367)
+            xr.Dataset({"prob_bloqueo": (("sector", "paso", "dia_del_anio"),
+                                         np.broadcast_to(doy / 1000, (len(SECT), 16, 366)))},
+                       coords={"sector": SECT, "paso": np.arange(16), "dia_del_anio": doy}).to_netcdf(clima)
+            self.assertEqual(producto.main(["--fecha", "20260930", "--modelo", "ifs", "--archivo", d, "--salida", d,
+                                            "--climatologia", str(clima)]), 0)
+            j = json.loads((pathlib.Path(d) / "producto_ifs_20260930.json").read_text(encoding="utf-8"))
+            m = j["mapa"]
+            self.assertEqual(m["lat"], list(np.arange(30, 75.01, 2.5)))
+            self.assertEqual((m["lon0"], m["dlon"], len(m["prob"]), len(m["prob"][0]), len(m["prob"][0][0])),
+                             (-180, 2.5, 16, 19, 144))
+            self.assertEqual(m["prob"][3][m["lat"].index(60)][int((10 + 180) / 2.5)], 100)  # 2 miembros, los 2
+            self.assertEqual(m["prob"][0][0][0], 0)
+            self.assertEqual(j["sectores_geo"]["PA"], {"lat": [40, 75], "lon": [120, -140]})
+            # 30-09 es el día 273 del año: normal del paso s = (273 + s) / 1000
+            self.assertEqual(j["sectores"]["EA"]["normal"][:2], [0.273, 0.274])
+
+    def test_sin_climatologia_no_hay_normal(self):
+        with tempfile.TemporaryDirectory() as d:
+            escribir_archivo(d, "ifs", "20260930")
+            self.assertEqual(producto.main(["--fecha", "20260930", "--modelo", "ifs", "--archivo", d, "--salida", d,
+                                            "--climatologia", str(pathlib.Path(d) / "no_existe.nc")]), 0)
+            j = json.loads((pathlib.Path(d) / "producto_ifs_20260930.json").read_text(encoding="utf-8"))
+            self.assertIsNone(j["sectores"]["EA"]["normal"])
+
     def test_sin_historia_marca_incompleta(self):
         with tempfile.TemporaryDirectory() as d:
             escribir_archivo(d, "ifs", "20260930")
@@ -142,6 +230,15 @@ class Diario(unittest.TestCase):
             with xr.open_dataset(pathlib.Path(d) / "producto_ifs_20260930.nc") as ds:
                 self.assertEqual(int(ds["historia_incompleta"]), 1)
                 self.assertEqual(int(ds["dias_historia"]), 0)
+
+    def test_crea_la_carpeta_de_salida(self):
+        # el workflow llama con --salida producto sin crearla (fallo del 2026-09-30 en Actions)
+        with tempfile.TemporaryDirectory() as d:
+            escribir_archivo(d, "ifs", "20260930")
+            salida = pathlib.Path(d) / "no" / "existe"
+            self.assertEqual(producto.main(["--fecha", "20260930", "--modelo", "ifs", "--archivo", d,
+                                            "--salida", str(salida)]), 0)
+            self.assertTrue((salida / "producto_ifs_20260930.json").exists())
 
 
 if __name__ == "__main__":

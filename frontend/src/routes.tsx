@@ -14,6 +14,7 @@ const RequestsPage = lazy(() => import("@/pages/requestsPage"));
 const ProfilePage = lazy(() => import("@/pages/ProfilePage"));
 const SettingsPage = lazy(() => import("@/pages/SettingsPage"));
 const ResultsPage = lazy(() => import("@/pages/ResultsPage"));
+const PrediccionPage = lazy(() => import("@/pages/PrediccionPage"));
 
 // Simple loading spinner component
 const LoadingFallback = () => (
@@ -85,6 +86,14 @@ function AppRoutes(): JSX.Element {
           element: (
             <Suspense fallback={<LoadingFallback />}>
               <ResultsPage />
+            </Suspense>
+          ),
+        },
+        {
+          path: "prediccion",
+          element: (
+            <Suspense fallback={<LoadingFallback />}>
+              <PrediccionPage />
             </Suspense>
           ),
         },
