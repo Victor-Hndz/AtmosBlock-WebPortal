@@ -23,13 +23,14 @@ D = np.datetime64("2010-07-06")  # pasada; la ventana ERA5 de test_verdad es 201
 
 
 def climatologia():
-    """Climatología sintética: cada probabilidad vale día_del_año / 1000 (y la de V1, / 2000)."""
+    """Climatología sintética: cada probabilidad vale día_del_año / 1000 (la de V1, / 2000; la de inicio V2, / 4000)."""
     sect, doy = list(producto.sectores.SECTORES), np.arange(1, 367)
     base = np.broadcast_to(doy / 1000, (len(sect), 16, 366))
     return xr.Dataset(
         {"prob_bloqueo": (("sector", "paso", "dia_del_anio"), base),
          "prob_bloqueo_v1": (("sector", "paso", "dia_del_anio"), base / 2),
          "prob_inicio": (("sector", "ventana", "dia_del_anio"), np.broadcast_to(doy / 1000, (len(sect), 2, 366))),
+         "prob_inicio_v2": (("sector", "ventana", "dia_del_anio"), np.broadcast_to(doy / 4000, (len(sect), 2, 366))),
          "prob_genesis": (("regla", "sector", "ventana", "dia_del_anio"),
                           np.broadcast_to(doy / 1000, (2, len(sect), 2, 366)))},
         coords={"sector": sect, "paso": np.arange(16), "ventana": list(producto.VENTANAS),
@@ -61,6 +62,7 @@ class Registro(unittest.TestCase):
         np.testing.assert_array_equal(ea["k_inicio"], [2, 0])
         np.testing.assert_array_equal(ea["obs_inicio"], [1, 0])
         self.assertEqual(int(ea["calma"]), 1)
+        self.assertEqual((int(ea["calma_v2"]), int(ea["calma_v2_era5"])), (1, 1))  # variante V2
         np.testing.assert_array_equal(ea["k_genesis"].sel(regla="F3-4"), [2, 0])
         np.testing.assert_array_equal(ea["obs_genesis"].sel(regla="F3-4"), [1, 0])
 
@@ -70,6 +72,7 @@ class Registro(unittest.TestCase):
         np.testing.assert_allclose(ea["clim"][[0, 15]], [0.187, 0.202])
         np.testing.assert_allclose(ea["clim_v1"][0], 0.0935)
         np.testing.assert_allclose(ea["clim_inicio"], [0.187, 0.187])
+        np.testing.assert_allclose(ea["clim_inicio_v2"], [0.04675, 0.04675])
         np.testing.assert_allclose(ea["clim_genesis"].sel(regla="F3-4-V1"), [0.187, 0.187])
 
     def test_marcas(self):

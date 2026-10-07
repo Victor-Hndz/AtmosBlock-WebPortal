@@ -413,12 +413,14 @@
     },
     "censura": "En los días 12–15 no aparecen bloqueos que empiecen después del día 11: no les caben los 5 días de persistencia.",
     "inicioTitulo": "Posible inicio de bloqueo",
-    "inicioExplicacion": "Solo se evalúa en los sectores sin bloqueo en los 5 días previos: probabilidad de que empiece un bloqueo en los días 1–5 y 6–10.",
+    "inicioExplicacion": "Solo se evalúa en los sectores sin bloqueos grandes (≥ 500 000 km²) en los 5 días previos (variante V2 del preregistro): probabilidad de que empiece un bloqueo en los días 1–5 y 6–10.",
     "ventanas": {
       "dias_1_5": "días 1–5",
       "dias_6_10": "días 6–10"
     },
-    "sinCalma": "no se evalúa (bloqueo reciente)",
+    "sinCalma": "no evaluado: sector no en calma",
+    "genesisTitulo": "Aparición de un evento nuevo en la previsión (variante V1, experimental)",
+    "genesisExplicacion": "Fracción de miembros en los que aparece un evento de bloqueo nuevo en el sector en los días 1–5 y 6–10, haya o no otro bloqueo. Cerca de la mitad de estas apariciones pueden ser artefactos del seguimiento: un bloqueo existente que se divide o se fusiona.",
     "aviso": "aviso",
     "mapaTitulo": "Probabilidad de evento de bloqueo (días 1, 5, 10 y 15)",
     "mapaAlt": "Mapa de probabilidad de evento de bloqueo de {{modelo}} para la pasada del {{fecha}}",

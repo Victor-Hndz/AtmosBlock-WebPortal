@@ -4,7 +4,8 @@ Catálogo continuo: DAV principal de ERA5 a 00 UTC → eventos (seguimiento y fi
 día, con la regla de censura de la ventana: para el paso s ≥ 12 solo cuentan los eventos que empezaron como tarde en
 el día de validez − (s − 11), porque en la ventana [d−4, d+15] no les caben 5 días a los que empiezan después del
 paso 11. La calma de un día es la de la aclaración de F3-5: ningún sector bloqueado en la DAV instantánea de ese día
-ni de los 4 anteriores.
+ni de los 4 anteriores. La calma-V2 (variante firmada el 2026-10-07) solo la quitan los objetos instantáneos de
+≥ 5×10⁵ km² ese día cuya huella cumpla la regla de sector (producto.grandes_por_sector).
 
 Variante V1 (firmada el 2026-09-30): también el sector bloqueado con las filas de 55–65°N y la génesis (primer día de
 cada evento del catálogo continuo cuya huella cumple la regla de sector, con la misma función que el producto): su
@@ -37,6 +38,7 @@ K_MAX = PASOS - 1 - PASO_LIBRE  # 4
 HISTORIA_CALMA = 5
 VENTANAS = {"dias_1_5": (1, 5), "dias_6_10": (6, 10)}
 MEDIO_ANCHO = 15
+ESTACIONES = {"DEF": (12, 1, 2), "MAM": (3, 4, 5), "JJA": (6, 7, 8), "SON": (9, 10, 11)}
 NOMBRES = list(sectores.SECTORES)
 
 
@@ -71,11 +73,16 @@ def catalogo(m, tramo=None, solape=60):
             corte = slice(a - lo, a - lo + min(tramo, n - a))
             for destino, parte in zip((bloqueado, bloqueado_v1, gen), _catalogo_tramo(m[lo:hi])):
                 destino[:, :, a:a + tramo] = parte[:, :, corte]
+    def calma(inst):  # (sector, día): sin sector bloqueado ni ese día ni los 4 anteriores
+        c = np.zeros_like(inst)
+        for d in range(HISTORIA_CALMA - 1, n):
+            c[:, d] = ~inst[:, d - HISTORIA_CALMA + 1:d + 1].any(axis=1)
+        return c
+
     inst = np.stack([sectores.sector_bloqueado(m.astype(bool), s) for s in NOMBRES])
-    calma = np.zeros_like(inst)
-    for d in range(HISTORIA_CALMA - 1, n):
-        calma[:, d] = ~inst[:, d - HISTORIA_CALMA + 1:d + 1].any(axis=1)
-    return {"bloqueado": bloqueado, "calma": calma, "bloqueado_v1": bloqueado_v1, "genesis": gen}
+    inst_v2 = np.stack([producto.grandes_por_sector(t) for t in m.astype(bool)], axis=1)
+    return {"bloqueado": bloqueado, "calma": calma(inst), "bloqueado_v1": bloqueado_v1, "genesis": gen,
+            "calma_v2": calma(inst_v2)}
 
 
 def _cerca(dias, medio_ancho):
@@ -105,6 +112,12 @@ def prob_inicio(b, calma, dias, medio_ancho=MEDIO_ANCHO):
         p = np.stack([(en_calma * ((primero >= a) & (primero <= z))) @ cerca.T / n for a, z in VENTANAS.values()],
                      axis=1)
     return p, n
+
+
+def frecuencia_por_estacion(calma, dias):
+    """(sector, estación): fracción de los días de cada estación en calma."""
+    meses = np.asarray(dias, "datetime64[M]").astype(int) % 12 + 1
+    return np.stack([calma[:, np.isin(meses, de)].mean(axis=1) for de in ESTACIONES.values()], axis=1)
 
 
 def prob_genesis(gen, dias, medio_ancho=MEDIO_ANCHO):
@@ -138,6 +151,7 @@ def main(argv=None):
     cat = catalogo(dav.mascara(z).values, tramo=365)
     pb = prob_bloqueo(cat["bloqueado"], dias)
     pi, n = prob_inicio(cat["bloqueado"], cat["calma"], dias)
+    pi_v2, n_v2 = prob_inicio(cat["bloqueado"], cat["calma_v2"], dias)
     pg, division = prob_genesis(cat["genesis"], dias)
     salida = xr.Dataset(
         {"prob_bloqueo": (("sector", "paso", "dia_del_anio"), pb.astype("float32")),
@@ -147,12 +161,17 @@ def main(argv=None):
          "prob_bloqueo_v1": (("sector", "paso", "dia_del_anio"),
                              prob_bloqueo(cat["bloqueado_v1"], dias).astype("float32")),
          "prob_genesis": (("regla", "sector", "ventana", "dia_del_anio"), pg.astype("float32")),
-         "fraccion_genesis_division": (("regla", "sector"), division.astype("float32"))},
+         "fraccion_genesis_division": (("regla", "sector"), division.astype("float32")),
+         "prob_inicio_v2": (("sector", "ventana", "dia_del_anio"), pi_v2.astype("float32")),
+         "n_calma_v2": (("sector", "dia_del_anio"), n_v2.astype("int32")),
+         "frecuencia_calma_v2": (("sector",), cat["calma_v2"].mean(axis=1).astype("float32")),
+         "frecuencia_calma_v2_estacion": (("sector", "estacion"),
+                                          frecuencia_por_estacion(cat["calma_v2"], dias).astype("float32"))},
         coords={"sector": NOMBRES, "paso": np.arange(PASOS), "ventana": list(VENTANAS),
-                "regla": list(producto.REGLAS), "dia_del_anio": np.arange(1, 367)},
+                "regla": list(producto.REGLAS), "dia_del_anio": np.arange(1, 367), "estacion": list(ESTACIONES)},
         attrs={"periodo": f"{a.desde}-{a.hasta}", "fuente": "ERA5 a 00 UTC; Contains modified Copernicus Climate "
                "Change Service information", "preregistro": "F5 firmado el 2026-09-29; aclaración de F3-5 del "
-               "2026-09-30; variante V1 del 2026-09-30",
+               "2026-09-30; variante V1 del 2026-09-30; variante V2 del 2026-10-07",
                "ventana_calendario": f"±{MEDIO_ANCHO} días, circular de periodo 365,25",
                "tramos": "catálogo por años con 60 días de solape; los extremos de la serie no tienen días previos"})
     salida.to_netcdf(a.salida, encoding={v: {"zlib": True, "complevel": 4} for v in salida.data_vars})

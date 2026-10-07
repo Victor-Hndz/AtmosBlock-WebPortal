@@ -2,8 +2,9 @@
 
 ERA5 a 00 UTC en la ventana d−4…d+15 pasa por producto.calcular como único miembro, con ERA5 también como historia
 (d−4…d−1) y como análisis del día d: mismo índice, mismos eventos, misma censura y misma regla de sector. La calma
-resultante es la de la DAV instantánea de ERA5 en d−4…d, la que el preregistro usa en la climatología; la muestra de
-pasadas verificadas la decide la calma de la pseudoanálisis del producto, no esta.
+resultante (y la calma-V2 de la variante del 2026-10-07) es la de la DAV instantánea de ERA5 en d−4…d, la que el
+preregistro usa en la climatología; la muestra de pasadas verificadas la decide la calma de la pseudoanálisis del
+producto, no esta.
 """
 import pathlib
 import sys
@@ -30,5 +31,6 @@ def verdad(z, d):
     hist = z.isel(time=slice(0, HISTORIA)).rename(time="dia")
     miembro = z.isel(time=slice(HISTORIA, None)).rename(time="step").expand_dims(number=[0])
     ds = producto.calcular(miembro.assign_coords(step=np.arange(PASOS)), hist, z.isel(time=HISTORIA))
-    return ds[["bloqueado", "inicio", "fraccion_area", "calma", "bloqueado_v1", "genesis"]].isel(number=0).assign(
-        evento=(ds["prob_evento"] > 0).astype("uint8")).assign_attrs(fecha=str(d), fuente="ERA5 00 UTC")
+    variables = ["bloqueado", "inicio", "fraccion_area", "calma", "calma_v2", "bloqueado_v1", "genesis"]
+    return ds[variables].isel(number=0).assign(evento=(ds["prob_evento"] > 0).astype("uint8")).assign_attrs(
+        fecha=str(d), fuente="ERA5 00 UTC")

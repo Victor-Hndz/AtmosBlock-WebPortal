@@ -1,7 +1,7 @@
 // PRD-508: lógica pura del visor público (sin navegador). Uso: node --test prediccion/pages/test_logica.mjs
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { comparar, fechaValida, celdas, nivelBss, MARGEN_HABITUAL } from "./logica.js";
+import { comparar, fechaValida, celdas, nivelBss, posibleInicio, MARGEN_HABITUAL } from "./logica.js";
 
 test("compara lo previsto con lo habitual para la época, con un margen de 10 puntos", () => {
   assert.equal(MARGEN_HABITUAL, 0.1);
@@ -32,4 +32,18 @@ test("lectura sencilla del BSS", () => {
   assert.equal(nivelBss({ bss: 0.1, habilidad: false }), "dudoso");
   assert.equal(nivelBss({ bss: -0.2, habilidad: false }), "peor");
   assert.equal(nivelBss({ bss: null, habilidad: false }), "sin_datos");
+});
+
+test("posible inicio solo con la región en calma (variante V2) y con el aviso de p ≥ 0,5", () => {
+  const enCalma = {
+    calma_v2: true,
+    prob_inicio_v2: { dias_1_5: 0.62, dias_6_10: 0.2 },
+    aviso_inicio_v2: ["dias_1_5"],
+  };
+  assert.deepEqual(posibleInicio(enCalma), [
+    { ventana: "dias_1_5", p: 0.62, aviso: true },
+    { ventana: "dias_6_10", p: 0.2, aviso: false },
+  ]);
+  assert.equal(posibleInicio({ ...enCalma, calma_v2: false }), null);
+  assert.equal(posibleInicio({ probabilidad: [] }), null); // JSON anterior a la variante V2
 });

@@ -1,12 +1,14 @@
-"""PRD-506: resumen de puntuaciones sobre los registros de verificación (F5 preregistrado y variante V1).
+"""PRD-506: resumen de puntuaciones sobre los registros de verificación (F5 preregistrado y variantes V1 y V2).
 
 Primario: BSS de la ocupación del sector (B_S) por paso 1–15 en EA y PA, IFS y AIFS por separado, frente a la
 climatología ERA5 1991–2020, sin las pasadas con historia incompleta; solo se afirma habilidad si el IC90 (bootstrap
 por bloques de 16 pasadas consecutivas) excluye 0. Secundario, con FDR de Benjamini-Hochberg: resto de sectores y
-LLB, V1, inicios (solo pasadas en calma según el producto) y génesis; con < 10 sucesos observados, solo recuentos.
+LLB, V1, inicios (solo pasadas en calma según el producto; en V2, en calma-V2) y génesis; con < 10 sucesos
+observados, solo recuentos. De la calma, lo que manda publicar F5-V2: pasadas en cada calma, fracción en que la
+calma-V2 del producto y la de ERA5 difieren, fracción en calma-V2 también en calma (A) y frecuencia climatológica.
 Además: ΔBS IFS − AIFS emparejado en el primario y desglose por estación cuando una estación tiene ≥ 90 pasadas.
 
-Uso: python prediccion/verificacion/resumen.py --registros DIR --salida resumen.json
+Uso: python prediccion/verificacion/resumen.py --registros DIR --salida resumen.json [--climatologia FICHERO]
 """
 import argparse
 import json
@@ -65,7 +67,16 @@ def _apilar(regs):
     return ap.assign_coords(fecha=("pasada", [r.attrs["fecha"] for r in regs]))
 
 
-def resumir(registros, n_rep=pu.REPLICAS):
+def calma_climatologica(ruta):
+    """{sector: {estación: frecuencia de la calma-V2 en ERA5 1991–2020}}, o None sin el fichero."""
+    if not pathlib.Path(ruta).exists():
+        return None
+    with xr.open_dataset(ruta) as c:
+        f = c["frecuencia_calma_v2_estacion"].load()
+    return {str(s): {str(e): _num(f.sel(sector=s, estacion=e)) for e in f.estacion.values} for s in f.sector.values}
+
+
+def resumir(registros, n_rep=pu.REPLICAS, calma_clim=None):
     modelos = sorted({r.attrs["modelo"] for r in registros})
     por_modelo = {m: _apilar([r for r in registros if r.attrs["modelo"] == m]) for m in modelos}
     completas = {m: ap.isel(pasada=ap["historia_incompleta"].values == 0) for m, ap in por_modelo.items()}
@@ -73,7 +84,8 @@ def resumir(registros, n_rep=pu.REPLICAS):
     principales = list(producto.sectores.PRINCIPALES)
     salida = {"preregistro": producto.PREREGISTRO, "pasadas": {m: ap.sizes["pasada"] for m, ap in por_modelo.items()},
               "pasadas_completas": {m: ap.sizes["pasada"] for m, ap in completas.items()},
-              "primario": [], "secundario": [], "ifs_menos_aifs": [], "por_estacion": []}
+              "primario": [], "secundario": [], "ifs_menos_aifs": [], "por_estacion": [], "calma": [],
+              "calma_v2_climatologia": calma_clim}
 
     def fila(ap, var, obs, clim, **sel):
         return puntuar(*_series(ap, var, obs, clim, **sel), int(ap["miembros"].values[0]), n_rep)
@@ -103,10 +115,14 @@ def resumir(registros, n_rep=pu.REPLICAS):
                 if s in principales:
                     secundario.append(({"familia": "ocupacion_v1", "modelo": m, "sector": s, "paso": paso},
                                        ap, ("k_v1", "obs_v1", "clim_v1"), {"sector": s, "paso": paso}))
-            en_calma = ap.isel(pasada=ap["calma"].sel(sector=s).values == 1)
+            a, v2, v2_era5 = (ap[x].sel(sector=s).values == 1 for x in ("calma", "calma_v2", "calma_v2_era5"))
+            salida["calma"].append({"modelo": m, "sector": s, "pasadas": len(a), "en_calma": int(a.sum()),
+                                    "en_calma_v2": int(v2.sum()), "v2_difiere_era5": _num((v2 != v2_era5).mean()),
+                                    "v2_tambien_en_calma": _num((a & v2).sum() / v2.sum()) if v2.any() else None})
             for v in producto.VENTANAS:
-                secundario.append(({"familia": "inicio", "modelo": m, "sector": s, "ventana": v}, en_calma,
-                                   ("k_inicio", "obs_inicio", "clim_inicio"), {"sector": s, "ventana": v}))
+                for familia, en, clim in (("inicio", a, "clim_inicio"), ("inicio_v2", v2, "clim_inicio_v2")):
+                    secundario.append(({"familia": familia, "modelo": m, "sector": s, "ventana": v}, ap.isel(pasada=en),
+                                       ("k_inicio", "obs_inicio", clim), {"sector": s, "ventana": v}))
                 for regla in producto.REGLAS:
                     if regla == "F3-4-V1" and s not in principales:
                         continue  # en los LLB la regla V1 es la firmada
@@ -149,9 +165,11 @@ def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--registros", type=pathlib.Path, required=True)
     p.add_argument("--salida", type=pathlib.Path, required=True)
+    p.add_argument("--climatologia", type=pathlib.Path, default=AQUI / "climatologia_era5_1991_2020.nc")
     a = p.parse_args(argv)
     regs = [xr.load_dataset(f) for f in sorted(a.registros.glob("verificacion_*_*.nc"))]
-    a.salida.write_text(json.dumps(resumir(regs) if regs else {"pasadas": {}}, ensure_ascii=False, indent=1),
+    salida = resumir(regs, calma_clim=calma_climatologica(a.climatologia)) if regs else {"pasadas": {}}
+    a.salida.write_text(json.dumps(salida, ensure_ascii=False, indent=1),
                         encoding="utf-8")
     return 0
 

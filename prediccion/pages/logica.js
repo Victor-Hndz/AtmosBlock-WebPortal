@@ -40,3 +40,11 @@ export function nivelBss(fila) {
   if (fila.habilidad) return "mejor";
   return fila.bss < 0 ? "peor" : "dudoso";
 }
+
+/** Probabilidad de que empiece un bloqueo en los días 1–5 y 6–10 (variante V2 del preregistro), solo si la región
+ *  está en calma-V2: sin bloqueos grandes en los 5 días previos. null si no se evalúa. */
+export function posibleInicio(sector) {
+  if (!sector?.calma_v2 || !sector.prob_inicio_v2) return null;
+  const avisos = sector.aviso_inicio_v2 ?? [];
+  return Object.entries(sector.prob_inicio_v2).map(([ventana, p]) => ({ ventana, p, aviso: avisos.includes(ventana) }));
+}

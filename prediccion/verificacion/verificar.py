@@ -1,9 +1,10 @@
-"""PRD-504: registro de verificación de una pasada (F5 del preregistro, aclaración de F3-5 y variante V1).
+"""PRD-504: registro de verificación de una pasada (F5 del preregistro, aclaración de F3-5 y variantes V1 y V2).
 
 Cruza el producto de la pasada del día d (cuántos de los miembros dan cada suceso) con la verdad ERA5 de su ventana
 d−4…d+15 (verdad.py, la misma función que el producto) y con la climatología 1991–2020 en la fecha de validez de
 cada paso. Las puntuaciones se calculan después sobre el conjunto de registros. La muestra de inicios la decide la
-calma del producto (pseudoanálisis), no la de ERA5, que se guarda solo como dato descriptivo.
+calma del producto (pseudoanálisis), no la de ERA5, que se guarda solo como dato descriptivo; en V2, la calma-V2.
+El inicio es el mismo en F3-5 y en V2: solo cambia qué pasadas son elegibles.
 
 Uso: python prediccion/verificacion/verificar.py --fecha AAAAMMDD --modelo ifs|aifs --producto DIR --era5 DIR
      --climatologia FICHERO --salida DIR      (código 3 = falta ERA5 de la ventana: pendiente, no es un error)
@@ -57,6 +58,8 @@ def registro(prod, v, clim, d):
         "obs_v1": v["bloqueado_v1"],
         "calma": prod["calma"],
         "calma_era5": v["calma"],
+        "calma_v2": prod["calma_v2"],
+        "calma_v2_era5": v["calma_v2"],
         "k_inicio": por_ventana(prod["inicio"]).sum("number"),
         "obs_inicio": por_ventana(v["inicio"]),
         "k_genesis": _en_ventana(prod["genesis"] > 0).sum("number"),
@@ -66,10 +69,12 @@ def registro(prod, v, clim, d):
         "clim": clim["prob_bloqueo"].isel(en_paso).drop_vars("dia_del_anio"),
         "clim_v1": clim["prob_bloqueo_v1"].isel(en_paso).drop_vars("dia_del_anio"),
         "clim_inicio": clim["prob_inicio"].isel(dia_del_anio=doy_pasada).drop_vars("dia_del_anio"),
+        "clim_inicio_v2": clim["prob_inicio_v2"].isel(dia_del_anio=doy_pasada).drop_vars("dia_del_anio"),
         "clim_genesis": clim["prob_genesis"].isel(dia_del_anio=doy_pasada).drop_vars("dia_del_anio"),
         "historia_incompleta": prod["historia_incompleta"],
     })
-    for var in ("obs", "obs_v1", "calma", "calma_era5", "obs_inicio", "obs_genesis", "historia_incompleta"):
+    for var in ("obs", "obs_v1", "calma", "calma_era5", "calma_v2", "calma_v2_era5", "obs_inicio", "obs_genesis",
+                "historia_incompleta"):
         r[var] = r[var].astype("uint8")
     return r.assign_attrs(fecha=str(d), preregistro=producto.PREREGISTRO, version=os.environ.get("GITHUB_SHA", "local"),
                           verdad="ERA5 a 00 UTC (primera versión disponible, ERA5T)")

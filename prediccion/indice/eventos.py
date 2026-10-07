@@ -97,6 +97,17 @@ def etiquetas_filtradas(mascara):
     return et
 
 
+def objetos_grandes(m):
+    """Variante V2 de la calma (2026-10-07): objetos de un día (lat, lon) con la conectividad del seguimiento y área
+    de ese día ≥ AREA_MIN_KM2; etiqueta por celda, 0 en el resto. Sin persistencia ni desplazamiento (piden días
+    futuros)."""
+    et = _objetos_del_dia(np.asarray(m), 0)
+    for e in np.unique(et[et > 0]):
+        if _area(et == e) < AREA_MIN_KM2:
+            et[et == e] = 0
+    return et
+
+
 def eventos(mascara):
     """Máscara booleana de las celdas que pertenecen a un evento filtrado."""
     return etiquetas_filtradas(mascara) > 0

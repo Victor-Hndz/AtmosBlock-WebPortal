@@ -52,8 +52,32 @@ class Catalogo(unittest.TestCase):
         m = dav_serie(400, list(range(50, 58)) + list(range(180, 200)) + list(range(360, 368)))
         entero = cl.catalogo(m)
         tramos = cl.catalogo(m, tramo=120, solape=30)
-        for v in ("bloqueado", "calma", "bloqueado_v1", "genesis"):
+        for v in ("bloqueado", "calma", "bloqueado_v1", "genesis", "calma_v2"):
             np.testing.assert_array_equal(entero[v], tramos[v], v)
+
+
+class CatalogoV2(unittest.TestCase):
+    """Variante V2 (2026-10-07): la calma solo la quitan los objetos instantáneos grandes (≥ 5×10⁵ km² ese día)."""
+
+    def test_un_objeto_pequenio_no_quita_la_calma_v2(self):
+        cat = cl.catalogo(dav_serie(30, [3], lat=(60, 62.5), lon=(0, 5)))  # 2 × 3 celdas: ~2,2×10⁵ km²
+        self.assertFalse(cat["calma"][EA, 3:8].any())
+        self.assertTrue(cat["calma_v2"][EA, 4:9].all())
+
+    def test_un_objeto_grande_quita_la_calma_v2_5_dias(self):
+        cat = cl.catalogo(dav_serie(30, [3]))  # 4 × 13 celdas
+        calma = cat["calma_v2"][EA]
+        self.assertTrue(calma[8] and not calma[3:8].any())
+        self.assertFalse(calma[:4].any())  # sin 5 días de historia no hay calma
+
+    def test_frecuencia_por_estacion(self):
+        dias = np.arange(np.datetime64("2001-01-01"), np.datetime64("2002-01-01"))
+        calma = np.zeros((len(sectores.SECTORES), len(dias)), dtype=bool)
+        calma[EA, :59] = True  # enero y febrero: 59 de los 90 días de DEF
+        f = cl.frecuencia_por_estacion(calma, dias)
+        self.assertAlmostEqual(float(f[EA, 0]), 59 / 90)
+        np.testing.assert_array_equal(f[EA, 1:], [0, 0, 0])
+        self.assertEqual(list(cl.ESTACIONES), ["DEF", "MAM", "JJA", "SON"])
 
 
 class CatalogoV1(unittest.TestCase):

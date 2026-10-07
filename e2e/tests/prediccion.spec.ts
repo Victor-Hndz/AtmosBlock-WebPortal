@@ -8,11 +8,21 @@ const t = es.prediccion;
 const PNG = "https://github.com/dueno/repo/releases/download/producto-ens-{aaaa}-{mm}/producto_{modelo}_{fecha}.png";
 const ATRIBUCION = "Contains modified ECMWF open data, CC-BY-4.0";
 
-const sector = (p: number, calma = false, prob_inicio = { dias_1_5: null, dias_6_10: null }, aviso: string[] = []) => ({
+// calma (A) nunca: lo que se muestra es la calma de la variante V2
+const sector = (
+  p: number,
+  calma_v2 = false,
+  prob_inicio_v2 = { dias_1_5: null, dias_6_10: null },
+  aviso: string[] = []
+) => ({
   probabilidad: Array.from({ length: 16 }, () => p),
-  calma,
-  prob_inicio,
-  aviso_inicio: aviso,
+  calma: false,
+  prob_inicio: { dias_1_5: null, dias_6_10: null },
+  aviso_inicio: [],
+  calma_v2,
+  prob_inicio_v2,
+  aviso_inicio_v2: aviso,
+  prob_genesis: { dias_1_5: 0.3, dias_6_10: 0.1 },
 });
 
 const producto = (modelo: string, fecha: string, ea: number, historia_incompleta = false) => ({
@@ -80,6 +90,10 @@ test("la previsión muestra la última pasada con la tabla por sector, el aviso 
   await expect(ea.getByRole("cell").first()).toHaveText("74 %");
   await expect(page.getByRole("rowgroup").filter({ hasText: t.bajaLatitud })).toContainText("90 %");
   await expect(page.getByText(`${t.ventanas.dias_1_5} 62 % (${t.aviso})`)).toBeVisible();
+  await expect(page.getByRole("listitem").filter({ hasText: t.sectores.EA }).first()).toContainText(t.sinCalma);
+  const genesis = page.getByRole("list", { name: t.genesisTitulo });
+  await expect(genesis.getByRole("listitem").first()).toContainText(`${t.ventanas.dias_1_5} 30 %`);
+  await expect(page.getByText(t.genesisExplicacion)).toBeVisible();
   await expect(page.getByRole("img")).toHaveAttribute(
     "src",
     "https://github.com/dueno/repo/releases/download/producto-ens-2026-09/producto_ifs_20260930.png"

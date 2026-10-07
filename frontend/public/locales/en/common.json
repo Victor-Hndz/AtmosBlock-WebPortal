@@ -413,12 +413,14 @@
     },
     "censura": "On days 12–15, blocks starting after day 11 cannot appear: the 5-day persistence does not fit.",
     "inicioTitulo": "Possible blocking onset",
-    "inicioExplicacion": "Only evaluated in sectors without blocking in the previous 5 days: probability that a block starts on days 1–5 and 6–10.",
+    "inicioExplicacion": "Only evaluated in sectors without large blocks (≥ 500,000 km²) in the previous 5 days (variant V2 of the preregistration): probability that a block starts on days 1–5 and 6–10.",
     "ventanas": {
       "dias_1_5": "days 1–5",
       "dias_6_10": "days 6–10"
     },
-    "sinCalma": "not evaluated (recent blocking)",
+    "sinCalma": "not evaluated: sector not calm",
+    "genesisTitulo": "Appearance of a new event in the forecast (variant V1, experimental)",
+    "genesisExplicacion": "Share of members in which a new blocking event appears in the sector on days 1–5 and 6–10, whether or not another block is present. About half of these appearances may be tracking artefacts: an existing block that splits or merges.",
     "aviso": "alert",
     "mapaTitulo": "Probability of a blocking event (days 1, 5, 10 and 15)",
     "mapaAlt": "{{modelo}} blocking event probability map for the {{fecha}} run",
