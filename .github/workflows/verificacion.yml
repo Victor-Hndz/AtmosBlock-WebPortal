@@ -38,6 +38,7 @@ jobs:
           bash prediccion/verificacion/test_verificar.sh
           .venv/bin/python prediccion/verificacion/test_resumen.py
           bash prediccion/verificacion/test_publicar_resumen.sh
+          bash prediccion/test_vigilar_archivo.sh
       - name: Archivar ERA5
         env:
           GH_TOKEN: ${{ github.token }}
@@ -65,6 +66,12 @@ jobs:
           git -C paginas config user.name "github-actions[bot]"
           git -C paginas config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           bash prediccion/verificacion/publicar_resumen.sh
+      - name: Vigilar que el archivo ENS no se haya saltado el día de ayer
+        if: ${{ !cancelled() }} # un cron que GitHub no lanza no falla; esto lo detecta y abre el issue de «Archivo ENS»
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: bash prediccion/vigilar_archivo.sh
       - name: Avisar del fallo con un issue
         if: ${{ failure() }}
         env:

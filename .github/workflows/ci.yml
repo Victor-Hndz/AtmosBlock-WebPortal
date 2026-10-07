@@ -202,6 +202,7 @@ jobs:
           bash prediccion/producto/test_publicar.sh
           node --test prediccion/pages/test_logica.mjs prediccion/pages/test_textos.mjs
           bash prediccion/test_avisar_fallo.sh
+          bash prediccion/test_vigilar_archivo.sh
           .venv/bin/python prediccion/zenodo/test_depositar.py
           .venv/bin/python prediccion/verificacion/test_verdad.py
           .venv/bin/python prediccion/verificacion/test_puntuaciones.py

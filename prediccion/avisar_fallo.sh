@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # Avisa de un fallo de un workflow de la previsión con un issue (etiqueta prediccion-fallo): lo abre si no hay uno
 # abierto para ese workflow y, si lo hay, lo comenta, para no llenar el repositorio de issues repetidos.
-# Uso: WORKFLOW="nombre" RUN_URL="url de la ejecución" bash prediccion/avisar_fallo.sh   (requiere gh con GH_TOKEN)
+# Uso: WORKFLOW="nombre" RUN_URL="url de la ejecución" [DETALLE="texto del aviso"] bash prediccion/avisar_fallo.sh
+#      (requiere gh con GH_TOKEN; DETALLE sustituye a "Ha fallado la ejecución …")
 set -euo pipefail
 
 ETIQUETA=prediccion-fallo
 titulo="Fallo del workflow «$WORKFLOW»"
-cuerpo="Ha fallado la ejecución $RUN_URL ($(date -u +%Y-%m-%dT%H:%MZ))."
+cuerpo="${DETALLE:-Ha fallado la ejecución ${RUN_URL:-}} ($(date -u +%Y-%m-%dT%H:%MZ))."
 
 gh label create "$ETIQUETA" --color D93F0B --description "Fallo de un workflow de la previsión de bloqueos" \
   --force >/dev/null

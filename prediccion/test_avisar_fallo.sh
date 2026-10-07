@@ -19,7 +19,7 @@ chmod +x "$T/bin/gh"
 errores=0
 caso() { # caso <nombre> <ABIERTO> <patrón en gh.log> [patrón que no]
   : >"$T/gh.log"
-  PATH="$T/bin:$PATH" LOG="$T/gh.log" ABIERTO="$2" WORKFLOW="Archivo ENS" \
+  PATH="$T/bin:$PATH" LOG="$T/gh.log" ABIERTO="$2" WORKFLOW="Archivo ENS" DETALLE="${DETALLE_CASO:-}" \
     RUN_URL="https://github.com/o/r/actions/runs/42" bash "$AQUI/avisar_fallo.sh" >"$T/salida.txt" 2>&1
   local rc=$?
   if [[ $rc -ne 0 ]] || ! grep -q -- "$3" "$T/gh.log" || { [[ -n ${4:-} ]] && grep -q -- "$4" "$T/gh.log"; }; then
@@ -33,5 +33,7 @@ caso "sin issue abierto, crea uno con la etiqueta" "" "issue create --title Fall
 caso "con uno abierto, lo comenta" "17" "issue comment 17 --body" "issue create"
 caso "el aviso enlaza la ejecución" "" "actions/runs/42"
 caso "crea la etiqueta si no existe" "" "label create prediccion-fallo"
+DETALLE_CASO="Falta el archivo del 20261006" caso "con DETALLE, el aviso lo usa" "" "Falta el archivo del 20261006" \
+  "Ha fallado"
 
 exit $((errores > 0 ? 1 : 0))
