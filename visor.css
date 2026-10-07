@@ -358,3 +358,13 @@ body.embed main {
   color: var(--acento);
   text-decoration: underline;
 }
+
+.inicio {
+  margin: 8px 0 0;
+  font-size: 14px;
+}
+
+.aviso-inicio {
+  font-weight: 600;
+  color: var(--mas);
+}

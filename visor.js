@@ -1,7 +1,7 @@
 // PRD-508: visor público de la previsión de bloqueos (GitHub Pages). Lee prediccion/index.json, el JSON diario del
 // producto y prediccion/verificacion.json. Con ?embed=1 solo muestra controles, mapa y tarjetas (para el portal).
 /* global d3, topojson */
-import { comparar, fechaValida, celdas, nivelBss } from "./logica.js";
+import { comparar, fechaValida, celdas, nivelBss, posibleInicio } from "./logica.js";
 import { TEXTOS, elegirIdioma } from "./textos.js";
 
 const BASE = "prediccion";
@@ -185,6 +185,7 @@ function dibujarTarjetas() {
       const prevista = d.probabilidad[estado.dia];
       const normal = d.normal ? d.normal[estado.dia] : null;
       const c = comparar(prevista, normal);
+      const inicio = (posibleInicio(d) ?? []).filter(x => x.ventana in T.ventanas);
       return `<article class="tarjeta">
         <h3>${nombre}</h3>
         <div class="cifras">
@@ -194,6 +195,13 @@ function dibujarTarjetas() {
         </div>
         ${miniGrafica(d.probabilidad, d.normal, estado.dia)}
         <span class="tenue" style="font-size:12px">${T.notaTarjeta}</span>
+        ${
+          inicio.length
+            ? `<p class="inicio">${T.inicio}: ${inicio
+                .map(x => `<span class="${x.aviso ? "aviso-inicio" : ""}">${T.ventanas[x.ventana]} ${pct(x.p)}</span>`)
+                .join(" · ")}<br><span class="tenue" style="font-size:12px">${T.notaInicio}</span></p>`
+            : ""
+        }
       </article>`;
     })
     .join("");
