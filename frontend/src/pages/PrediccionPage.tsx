@@ -23,6 +23,12 @@ interface Producto {
       calma: boolean;
       prob_inicio: Record<Ventana, number | null>;
       aviso_inicio: Ventana[];
+      /** Variante V2 (2026-10-07): calma sin objetos instantáneos grandes; ausentes en JSON anteriores */
+      calma_v2?: boolean;
+      prob_inicio_v2?: Record<Ventana, number | null>;
+      aviso_inicio_v2?: Ventana[];
+      /** Génesis de la variante V1 con la regla de sector F3-4 */
+      prob_genesis?: Record<Ventana, number>;
     }
   >;
 }
@@ -245,11 +251,11 @@ const PrediccionPage: React.FC = (): JSX.Element => {
               return (
                 <li key={s}>
                   <strong>{t(SECTORES[s])}:</strong>{" "}
-                  {d.calma
+                  {d.calma_v2 && d.prob_inicio_v2
                     ? (Object.keys(VENTANAS) as Ventana[]).map(v => (
-                        <span key={v} className={d.aviso_inicio.includes(v) ? "font-semibold text-red-700" : ""}>
-                          {t(VENTANAS[v])} {pct(d.prob_inicio[v] ?? 0)}
-                          {d.aviso_inicio.includes(v) && ` (${t("prediccion.aviso")})`}{" "}
+                        <span key={v} className={d.aviso_inicio_v2?.includes(v) ? "font-semibold text-red-700" : ""}>
+                          {t(VENTANAS[v])} {pct(d.prob_inicio_v2?.[v] ?? 0)}
+                          {d.aviso_inicio_v2?.includes(v) && ` (${t("prediccion.aviso")})`}{" "}
                         </span>
                       ))
                     : t("prediccion.sinCalma")}
@@ -257,6 +263,25 @@ const PrediccionPage: React.FC = (): JSX.Element => {
               );
             })}
           </ul>
+
+          {producto.sectores[PRINCIPALES[0]].prob_genesis && (
+            <>
+              <h2 id="titulo-genesis" className="text-xl font-semibold mb-1">
+                {t("prediccion.genesisTitulo")}
+              </h2>
+              <p className="mb-2 text-sm text-slate-600">{t("prediccion.genesisExplicacion")}</p>
+              <ul aria-labelledby="titulo-genesis" className="mb-6 text-sm">
+                {PRINCIPALES.map(s => (
+                  <li key={s}>
+                    <strong>{t(SECTORES[s])}:</strong>{" "}
+                    {(Object.keys(VENTANAS) as Ventana[])
+                      .map(v => `${t(VENTANAS[v])} ${pct(producto.sectores[s].prob_genesis?.[v] ?? 0)}`)
+                      .join(" · ")}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
 
           <h2 className="text-xl font-semibold mb-2">{t("prediccion.mapaTitulo")}</h2>
           <img
