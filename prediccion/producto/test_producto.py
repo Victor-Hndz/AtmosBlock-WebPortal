@@ -107,6 +107,54 @@ class Pasada(unittest.TestCase):
         self.assertIn("2026-09-29", ds.attrs["preregistro"])
 
 
+def mascara_dia(*bloques):
+    """DAV de un día (lat, lon) a 2,5° con rectángulos (lat0, lat1, lon0, lon1), extremos incluidos, en grados."""
+    m = np.zeros((LAT.size, LON.size), bool)
+    for a, b, c, e in bloques:
+        m[np.ix_((LAT >= a) & (LAT <= b), (LON >= c) & (LON <= e))] = True
+    return m
+
+
+class CalmaV2(unittest.TestCase):
+    """F3-5-V2 (firmada el 2026-10-07): solo quitan la calma los objetos instantáneos de ≥ 5×10⁵ km² ese día."""
+
+    def grandes(self, m, sector):
+        return bool(producto.grandes_por_sector(m)[SECT.index(sector)])
+
+    def test_objeto_pequenio_no_quita_la_calma_v2(self):
+        m = mascara_dia((60, 62.5, 0, 5))  # 2 filas × 3 longitudes en EA: ~2,2×10⁵ km²
+        self.assertTrue(producto.sectores.sector_bloqueado(m, "EA"))  # sí quita la calma de la aclaración (A)
+        self.assertFalse(self.grandes(m, "EA"))
+
+    def test_objeto_grande_en_el_sector_quita_la_calma_v2(self):
+        self.assertTrue(self.grandes(mascara_dia((55, 65, 0, 10)), "EA"))  # 5 × 5 celdas: ~9,7×10⁵ km²
+
+    def test_la_regla_se_aplica_a_la_huella_de_cada_objeto(self):
+        # A: grande, con solo 2 longitudes en EA (37,5 y 40); B: grande, con solo la de 35 en las filas de EA.
+        # La unión colapsada tendría 3 longitudes seguidas, pero ninguna huella por separado.
+        a = (55, 65, 37.5, 60)
+        b = [(40, 45, 35, 35), (20, 37.5, 0, 35)]
+        m = mascara_dia(a, *b)
+        self.assertTrue(producto.sectores.sector_bloqueado(m, "EA"))
+        self.assertFalse(self.grandes(m, "EA"))
+
+    def test_un_objeto_que_cruza_180_cuenta_entero(self):
+        # 3 filas en 57,5–62,5°N: 2 longitudes al oeste de 180° y 3 al este (~2,3 y 3,5×10⁵ km²; juntas, 5,8×10⁵)
+        m = mascara_dia((57.5, 62.5, 175, 177.5), (57.5, 62.5, -180, -175))
+        self.assertTrue(self.grandes(m, "PA"))
+
+    def test_en_el_producto(self):
+        # el bloqueo grande de dia(True) en d−2 quita las dos calmas
+        ds = producto.calcular(miembros([set(range(3, 11))]), historia([False, False, True, False]), analisis_d())
+        self.assertEqual((int(ds["calma"][EA]), int(ds["calma_v2"][EA])), (0, 0))
+        self.assertTrue(np.isnan(ds["prob_inicio_v2"][EA]).all())
+        # en calma (A) también hay calma-V2, con el mismo inicio
+        ds = producto.calcular(miembros([set(range(3, 11)), set()]), historia([False] * 4), analisis_d())
+        self.assertEqual((int(ds["calma"][EA]), int(ds["calma_v2"][EA])), (1, 1))
+        np.testing.assert_array_equal(ds["prob_inicio_v2"][EA], ds["prob_inicio"][EA])
+        self.assertIn("V2 el 2026-10-07", ds.attrs["preregistro"])
+
+
 def etiquetas(h, bloques):
     """Etiquetas (h+16, 37, 144) con [(etiqueta, días, lat0, lat1, lon0, lon1)] en índices de la serie."""
     et = np.zeros((h + 16, 37, 144), dtype=np.int64)
@@ -187,6 +235,10 @@ class Diario(unittest.TestCase):
                 j = json.loads(base.with_suffix(".json").read_text(encoding="utf-8"))
                 self.assertEqual(j["modelo"], modelo)
                 self.assertEqual(j["sectores"]["EA"]["aviso_inicio"], ["dias_1_5"])
+                ea = j["sectores"]["EA"]
+                self.assertEqual((ea["calma_v2"], ea["prob_inicio_v2"], ea["aviso_inicio_v2"]),
+                                 (True, {"dias_1_5": 1.0, "dias_6_10": 0.0}, ["dias_1_5"]))
+                self.assertEqual(ea["prob_genesis"], {"dias_1_5": 1.0, "dias_6_10": 0.0})  # regla F3-4
                 self.assertEqual(len(j["sectores"]["EA"]["probabilidad"]), 16)
                 self.assertIn("CC-BY-4.0", j["atribucion"])
                 self.assertGreater(base.with_suffix(".png").stat().st_size, 0)

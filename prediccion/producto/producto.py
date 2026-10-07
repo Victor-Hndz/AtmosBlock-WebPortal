@@ -12,6 +12,9 @@ Variante V1 (firmada el 2026-09-30, secundaria): sector bloqueado solo con las f
 por génesis (F3-5-V1): primer día de una etiqueta de evento que no aparece antes en la ventana, en los pasos 1…15, si
 su huella cumple la regla de sector; se marca como nacida de una división si solapa la DAV del día anterior.
 
+Variante V2 (firmada el 2026-10-07, secundaria): calma-V2 = ningún objeto de la DAV instantánea de la pseudoanálisis
+d−4…d con ≥ 5×10⁵ km² ese día cuya huella cumpla la regla de sector; el inicio y sus ventanas, los de F3-5.
+
 Producto experimental: diagnostica la previsión de ECMWF; su habilidad no está verificada (F5).
 
 Uso: python prediccion/producto/producto.py --fecha AAAAMMDD --modelo ifs|aifs --archivo DIR --salida DIR
@@ -38,7 +41,7 @@ GENESIS, GENESIS_DIVISION = 1, 2
 CLIMATOLOGIA = pathlib.Path(__file__).resolve().parents[1] / "verificacion" / "climatologia_era5_1991_2020.nc"
 LAT_MAPA = (30, 75)  # rejilla del mapa del JSON: donde se calcula DAV
 UMBRAL_AVISO = 0.5  # solo para mostrar; la verificación usa la probabilidad entera (F3-5)
-PREREGISTRO = ("F3 firmado el 2026-09-29; aclaración de F3-5 y variante V1 el 2026-09-30 "
+PREREGISTRO = ("F3 firmado el 2026-09-29; aclaración de F3-5 y variante V1 el 2026-09-30; variante V2 el 2026-10-07 "
                "(PLAN_PREDICCION_BLOQUEOS)")
 ATRIBUCION = ("Contains modified ECMWF open data (IFS ENS / AIFS ENS), CC-BY-4.0: "
               "https://www.ecmwf.int/en/forecasts/datasets/open-data")
@@ -66,6 +69,20 @@ def genesis(et, dav, h):
     return g
 
 
+def grandes_por_sector(m):
+    """F3-5-V2: (sector,) ¿algún objeto grande de la DAV instantánea de un día (lat, lon) cumple, con su propia huella,
+    la regla de F3-4 en el sector? Uno así quita la calma-V2."""
+    et = eventos.objetos_grandes(m)
+    huellas = [et == e for e in np.unique(et[et > 0])]
+    return np.array([any(sectores.sector_bloqueado(h, s) for h in huellas) for s in sectores.SECTORES])
+
+
+def _prob_inicio(inicio, calma):
+    """(sector, ventana): fracción de miembros con el inicio en cada ventana; NaN si el sector no está en calma."""
+    return np.array([[((inicio[i] >= a) & (inicio[i] <= b)).mean() if calma[i] else np.nan
+                      for a, b in VENTANAS.values()] for i in range(len(calma))])
+
+
 def calcular(z, historia, analisis_d):
     """z (number, step=16, lat, lon), historia (dia=H, lat, lon) de d−H…d−1 y analisis_d (lat, lon), en m a 2,5°."""
     z, historia, analisis_d = (dav.a_2p5(a).transpose(..., "latitude", "longitude") for a in (z, historia, analisis_d))
@@ -84,8 +101,7 @@ def calcular(z, historia, analisis_d):
     bloqueado = np.stack([sectores.sector_bloqueado(ev, s) for s in nombres])  # (sector, number, paso)
     inicio = np.where(bloqueado.any(axis=2), bloqueado.argmax(axis=2), -1)
     calma = np.array([not sectores.sector_bloqueado(instantanea.astype(bool), s).any() for s in nombres])
-    prob_inicio = np.array([[((inicio[i] >= a) & (inicio[i] <= b)).mean() if calma[i] else np.nan
-                             for a, b in VENTANAS.values()] for i in range(len(nombres))])
+    calma_v2 = ~np.stack([grandes_por_sector(t) for t in instantanea.astype(bool)]).any(axis=0)
     fraccion = np.stack([sectores.fraccion_area(ev, s).mean(axis=0) for s in nombres])
     bloqueado_v1 = np.stack([sectores.sector_bloqueado(ev, s, matsueda=True) for s in nombres])
     prob_genesis = np.array([[[(gen[i, j][:, a:b + 1] > 0).any(axis=1).mean() for a, b in VENTANAS.values()]
@@ -98,7 +114,9 @@ def calcular(z, historia, analisis_d):
          "prob_sector": (("sector", "paso"), bloqueado.mean(axis=1).astype("float32")),
          "fraccion_area": (("sector", "paso"), fraccion.astype("float32")),
          "calma": (("sector",), calma.astype("uint8")),
-         "prob_inicio": (("sector", "ventana"), prob_inicio.astype("float32")),
+         "prob_inicio": (("sector", "ventana"), _prob_inicio(inicio, calma).astype("float32")),
+         "calma_v2": (("sector",), calma_v2.astype("uint8")),
+         "prob_inicio_v2": (("sector", "ventana"), _prob_inicio(inicio, calma_v2).astype("float32")),
          "bloqueado_v1": (("sector", "number", "paso"), bloqueado_v1.astype("uint8")),
          "prob_sector_v1": (("sector", "paso"), bloqueado_v1.mean(axis=1).astype("float32")),
          "genesis": (("regla", "sector", "number", "paso"), gen),
@@ -130,15 +148,22 @@ def normal_para_la_epoca(ruta, fecha, pasos):
 
 def resumen_json(ds, modelo, fecha, normal=None):
     sect = {}
+    def inicio(d, calma, var):
+        prob = {v: (None if not calma else round(float(d[var].sel(ventana=v)), 3)) for v in VENTANAS}
+        return prob, [v for v, p in prob.items() if p is not None and p >= UMBRAL_AVISO]
+
     for s in ds.sector.values:
         d = ds.sel(sector=s)
-        calma = bool(d["calma"])
-        prob = {v: (None if not calma else round(float(d["prob_inicio"].sel(ventana=v)), 3)) for v in VENTANAS}
+        calma, calma_v2 = bool(d["calma"]), bool(d["calma_v2"])
+        prob, aviso = inicio(d, calma, "prob_inicio")
+        prob_v2, aviso_v2 = inicio(d, calma_v2, "prob_inicio_v2")
         sect[str(s)] = {"probabilidad": [round(float(x), 3) for x in d["prob_sector"].values],
                         "fraccion_area": [round(float(x), 4) for x in d["fraccion_area"].values],
                         "normal": None if normal is None else normal[str(s)],
-                        "calma": calma, "prob_inicio": prob,
-                        "aviso_inicio": [v for v, p in prob.items() if p is not None and p >= UMBRAL_AVISO]}
+                        "calma": calma, "prob_inicio": prob, "aviso_inicio": aviso,
+                        "calma_v2": calma_v2, "prob_inicio_v2": prob_v2, "aviso_inicio_v2": aviso_v2,
+                        "prob_genesis": {v: round(float(d["prob_genesis"].sel(regla="F3-4", ventana=v)), 3)
+                                         for v in VENTANAS}}
     return {"modelo": modelo, "fecha": fecha, "pasada": "00 UTC", "pasos_dias": list(range(ds.sizes["paso"])),
             "historia_incompleta": bool(ds["historia_incompleta"]), "dias_historia": int(ds["dias_historia"]),
             "preregistro": ds.attrs["preregistro"], "version": ds.attrs["version"], "censura": ds.attrs["censura"],
