@@ -17,7 +17,7 @@ Todos los comandos se lanzan desde la raíz del repositorio.
 
 - [Git](https://git-scm.com/) y [Docker](https://docs.docker.com/get-docker/) (Docker Desktop en
   Windows y macOS; arráncalo antes de lanzar cualquier comando).
-- Para los niveles 2 y 3: [Node.js 22](https://nodejs.org/) con npm, y Python 3.10 o posterior.
+- Para los niveles 2 y 3: [Node.js 22](https://nodejs.org/) con pnpm 12 (`corepack enable`, con Node 22.22.1 o posterior, o `npm i -g pnpm@12`), y Python 3.10 o posterior.
 - Para el nivel 3: una cuenta gratuita en el [Climate Data Store de Copernicus](https://cds.climate.copernicus.eu).
 
 **Un único procedimiento para todos los sistemas.** En Linux y macOS usa tu terminal habitual. En
@@ -172,9 +172,9 @@ de Docker.
 
 ```bash
 cd backend/nestjs
-npm ci
-npx eslint "{src,apps,libs,test}/**/*.ts" --max-warnings=0
-npx jest --ci
+pnpm install --frozen-lockfile
+pnpm exec eslint "{src,apps,libs,test}/**/*.ts" --max-warnings=0
+pnpm exec jest --ci
 ```
 
 Resultado esperado: todas las suites pasan. Los tests de integración (`*.int-spec.ts`) necesitan
@@ -185,9 +185,9 @@ y lanzarlos.
 
 ```bash
 cd frontend
-npm ci
-npm run lint
-npm run build
+pnpm install --frozen-lockfile
+pnpm run lint
+pnpm run build
 ```
 
 ### 2.3 Servicios de Python
@@ -257,8 +257,8 @@ en desarrollo, arranca Adminer con `docker compose --profile dev up -d adminer` 
 ```bash
 cp frontend/.env.example frontend/.env
 cd frontend
-npm ci
-npm run dev
+pnpm install --frozen-lockfile
+pnpm run dev
 ```
 
 Abre <http://localhost:5173>. La interfaz está disponible en inglés y en español.
@@ -297,9 +297,9 @@ Con la pila levantada (3.3) y el frontend en <http://localhost:5173> (3.4):
 
 ```bash
 cd e2e
-npm ci
-npx playwright install chromium
-npm test                    # proyecto portal
+pnpm install --frozen-lockfile
+pnpm exec playwright install chromium
+pnpm test                    # proyecto portal
 ```
 
 La primera ejecución registra por API un usuario de prueba desechable. Si el frontend no está levantado,
@@ -308,10 +308,10 @@ Playwright lo arranca. Para el pipeline completo, copia antes el caso de ejemplo
 ```bash
 docker compose cp backend/FAST-IBAN_Project/execution/code/tests/fixtures/geopot_500hPa_2022-03-14_00-06-12-18UTC.nc \
   "configurator_module:/app/config/data/geopotential_500hPa_2022-03-(14)_00-06-12-18UTC.nc"
-cd e2e && npm run test:pipeline
+cd e2e && pnpm run test:pipeline
 ```
 
-En Git Bash, antepón `MSYS_NO_PATHCONV=1` a `docker compose cp`. `npm run report` abre el informe HTML de
+En Git Bash, antepón `MSYS_NO_PATHCONV=1` a `docker compose cp`. `pnpm run report` abre el informe HTML de
 la última ejecución. La API de autenticación admite 5 peticiones por minuto: espera un minuto antes de
 lanzar la batería dos veces seguidas.
 

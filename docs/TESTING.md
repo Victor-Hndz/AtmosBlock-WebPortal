@@ -17,7 +17,7 @@ All commands run from the repository root.
 
 - [Git](https://git-scm.com/) and [Docker](https://docs.docker.com/get-docker/) (Docker Desktop on
   Windows and macOS; start it before running any command).
-- For levels 2 and 3: [Node.js 22](https://nodejs.org/) with npm, and Python 3.10 or newer.
+- For levels 2 and 3: [Node.js 22](https://nodejs.org/) with pnpm 12 (`corepack enable`, on Node 22.22.1 or newer, or `npm i -g pnpm@12`), and Python 3.10 or newer.
 - For level 3: a free account on the [Copernicus Climate Data Store](https://cds.climate.copernicus.eu).
 
 **One procedure for every system.** On Linux and macOS use your usual terminal. On Windows use
@@ -173,9 +173,9 @@ Docker.
 
 ```bash
 cd backend/nestjs
-npm ci
-npx eslint "{src,apps,libs,test}/**/*.ts" --max-warnings=0
-npx jest --ci
+pnpm install --frozen-lockfile
+pnpm exec eslint "{src,apps,libs,test}/**/*.ts" --max-warnings=0
+pnpm exec jest --ci
 ```
 
 Expected result: all test suites pass. Integration tests (`*.int-spec.ts`) need a PostgreSQL
@@ -186,9 +186,9 @@ and run them.
 
 ```bash
 cd frontend
-npm ci
-npm run lint
-npm run build
+pnpm install --frozen-lockfile
+pnpm run lint
+pnpm run build
 ```
 
 ### 2.3 Python services
@@ -258,8 +258,8 @@ development, start Adminer with `docker compose --profile dev up -d adminer` and
 ```bash
 cp frontend/.env.example frontend/.env
 cd frontend
-npm ci
-npm run dev
+pnpm install --frozen-lockfile
+pnpm run dev
 ```
 
 Open <http://localhost:5173>. The interface is available in English and Spanish.
@@ -298,9 +298,9 @@ With the stack running (3.3) and the frontend on <http://localhost:5173> (3.4):
 
 ```bash
 cd e2e
-npm ci
-npx playwright install chromium
-npm test                    # portal project
+pnpm install --frozen-lockfile
+pnpm exec playwright install chromium
+pnpm test                    # portal project
 ```
 
 The first run registers a disposable test user through the API. If the frontend is not running,
@@ -309,10 +309,10 @@ Playwright starts it. To run the full pipeline, copy the sample case into the co
 ```bash
 docker compose cp backend/FAST-IBAN_Project/execution/code/tests/fixtures/geopot_500hPa_2022-03-14_00-06-12-18UTC.nc \
   "configurator_module:/app/config/data/geopotential_500hPa_2022-03-(14)_00-06-12-18UTC.nc"
-cd e2e && npm run test:pipeline
+cd e2e && pnpm run test:pipeline
 ```
 
-In Git Bash, prefix `docker compose cp` with `MSYS_NO_PATHCONV=1`. `npm run report` opens the HTML report
+In Git Bash, prefix `docker compose cp` with `MSYS_NO_PATHCONV=1`. `pnpm run report` opens the HTML report
 of the last run. The authentication API allows 5 requests per minute: wait a minute before running the
 suite twice in a row.
 

@@ -123,7 +123,8 @@ docker run --rm -v "$PWD:/src:ro" -w /src \
 cp .env.example .env                    # then replace every "change-me" value
 docker compose up -d --build
 cp frontend/.env.example frontend/.env
-cd frontend && npm ci && npm run dev    # http://localhost:5173
+# pnpm 12: corepack enable (Node 22.22.1+) or npm i -g pnpm@12
+cd frontend && pnpm install --frozen-lockfile && pnpm run dev    # http://localhost:5173
 ```
 
 A step-by-step explanation of the detection algorithm, in plain language and in technical terms, is in
