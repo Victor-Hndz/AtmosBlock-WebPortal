@@ -1,0 +1,13 @@
+# Proyecto pnpm independiente (sin monorepo).
+# Defensas de cadena de suministro escritas explícitamente aunque coincidan con los valores por
+# defecto, para que ninguna configuración global las desactive (WEB-300).
+minimumReleaseAge: 1440
+strictDepBuilds: true
+dangerouslyAllowAllBuilds: false
+# Un paquete por línea con script de instalación; true solo si sin él se rompe build, tests o runtime.
+allowBuilds:
+  # El postinstall solo valida el binario de la plataforma (dependencia opcional @esbuild/<plataforma>)
+  # y lo descarga si falta; vite usa la API de JS, que localiza ese binario sin el script.
+  esbuild: false
+  # Solo macOS (vigilancia de ficheros de vite en dev); el paquete ya incluye fsevents.node compilado.
+  fsevents: false
