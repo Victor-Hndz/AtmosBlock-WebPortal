@@ -2,15 +2,19 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# pnpm en la versión fijada en package.json (packageManager); corepack comprueba su hash
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN corepack enable
 
-RUN npm install
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN npm run build
+RUN pnpm run build
 
 EXPOSE ${PORT}
 
-CMD ["npm", "run", "start:prod"]
-# CMD ["npm", "run", "start:dev"]
+CMD ["pnpm", "run", "start:prod"]
+# CMD ["pnpm", "run", "start:dev"]
