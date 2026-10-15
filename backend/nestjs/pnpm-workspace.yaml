@@ -1,0 +1,19 @@
+# Proyecto pnpm independiente (sin monorepo): el contexto de build del Dockerfile no cambia.
+# Defensas de cadena de suministro escritas explícitamente aunque coincidan con los valores por
+# defecto, para que ninguna configuración global las desactive (WEB-300).
+minimumReleaseAge: 1440
+strictDepBuilds: true
+dangerouslyAllowAllBuilds: false
+overrides:
+  multer: 2.3.0
+# Un paquete por línea con script de instalación; true solo si sin él se rompe build, tests o runtime.
+allowBuilds:
+  # Telemetría de instalación que trae swagger-ui-dist: no aporta nada al proyecto.
+  '@scarf/scarf': false
+  # El postinstall solo comprueba el binario nativo; ese llega como dependencia opcional por plataforma.
+  '@swc/core': false
+  # Trae binarios precompilados (linux-x64 glibc y musl, win32-x64, arm64): el script (node-gyp-build)
+  # solo compila desde fuente si falta el de la plataforma. Cambiar a true en plataformas sin precompilado (p. ej. macOS Intel).
+  argon2: false
+  # Solo macOS y solo dev (vigilancia de ficheros); el paquete ya incluye fsevents.node compilado.
+  fsevents: false

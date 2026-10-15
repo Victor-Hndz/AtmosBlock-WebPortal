@@ -2,7 +2,7 @@
 // NO la ejecuta el CI (el patrón de jest es `\.spec\.ts$`). Uso local:
 //   docker run -d --name atmos-pg-test -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test \
 //     -e POSTGRES_DB=atmos_test -p 55432:5432 postgres:16
-//   npx jest --testRegex 'int-spec\.ts$'
+//   pnpm exec jest --testRegex 'int-spec\.ts$'
 import { DataSource } from "typeorm";
 import { RequestEntity } from "@/requests/persistence/entities/request.entity";
 import { UserEntity } from "@/users/persistence/entities/user.entity";

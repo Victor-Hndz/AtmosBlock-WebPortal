@@ -1,0 +1,10 @@
+# Proyecto pnpm independiente (sin monorepo).
+# Defensas de cadena de suministro escritas explícitamente aunque coincidan con los valores por
+# defecto, para que ninguna configuración global las desactive (WEB-300).
+minimumReleaseAge: 1440
+strictDepBuilds: true
+dangerouslyAllowAllBuilds: false
+# Ninguna dependencia tiene hoy script de instalación (los navegadores se instalan aparte con
+# `pnpm exec playwright install`). Si una nueva lo trae, strictDepBuilds hace fallar la instalación
+# hasta que se añada aquí con su motivo (true solo si sin él se rompen las pruebas).
+allowBuilds: {}

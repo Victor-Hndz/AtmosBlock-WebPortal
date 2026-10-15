@@ -22,13 +22,16 @@ jobs:
         working-directory: backend/nestjs
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: backend/nestjs/package.json
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: backend/nestjs/package-lock.json
-      - run: npm ci
-      - run: npm run build
+          cache: pnpm
+          cache-dependency-path: backend/nestjs/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
 
   frontend-build:
     runs-on: ubuntu-latest
@@ -37,13 +40,16 @@ jobs:
         working-directory: frontend
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: frontend/package.json
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
-      - run: npm ci
-      - run: npm run build
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
 
   c-core:
     runs-on: ubuntu-latest
@@ -100,17 +106,20 @@ jobs:
         working-directory: backend/nestjs
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: backend/nestjs/package.json
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: backend/nestjs/package-lock.json
-      - run: npm ci
+          cache: pnpm
+          cache-dependency-path: backend/nestjs/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
       - name: Lint (sin --fix)
-        run: npx eslint "{src,apps,libs,test}/**/*.ts" --max-warnings=0
+        run: pnpm exec eslint "{src,apps,libs,test}/**/*.ts" --max-warnings=0
       - name: Tests
         if: ${{ !cancelled() }}
-        run: npx jest --ci
+        run: pnpm exec jest --ci
 
   backend-integration:
     # WEB-214: pruebas de integración (*.int-spec.ts) contra PostgreSQL real
@@ -134,13 +143,16 @@ jobs:
           --health-retries 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: backend/nestjs/package.json
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: backend/nestjs/package-lock.json
-      - run: npm ci
-      - run: npm run test:int
+          cache: pnpm
+          cache-dependency-path: backend/nestjs/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run test:int
 
   frontend-quality:
     runs-on: ubuntu-latest
@@ -149,13 +161,16 @@ jobs:
         working-directory: frontend
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: frontend/package.json
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
-      - run: npm ci
-      - run: npm run lint
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run lint
 
   compose-seguridad:
     runs-on: ubuntu-latest
@@ -220,13 +235,16 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: e2e/package.json
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
           cache-dependency-path: |
-            frontend/package-lock.json
-            e2e/package-lock.json
+            frontend/pnpm-lock.yaml
+            e2e/pnpm-lock.yaml
       - name: Entorno de pruebas (secretos aleatorios, sin clave del CDS)
         run: |
           SECRETO=$(openssl rand -hex 24)
@@ -236,13 +254,13 @@ jobs:
         run: docker compose up -d --build --wait nest_api
       - name: Dependencias del frontend
         working-directory: frontend
-        run: npm ci
+        run: pnpm install --frozen-lockfile
       - name: Playwright y Chromium
         working-directory: e2e
-        run: npm ci && npx playwright install --with-deps chromium
+        run: pnpm install --frozen-lockfile && pnpm exec playwright install --with-deps chromium
       - name: Pruebas del portal
         working-directory: e2e
-        run: npm test
+        run: pnpm test
       - name: Logs de la API
         if: failure()
         run: docker compose logs --no-color nest_api

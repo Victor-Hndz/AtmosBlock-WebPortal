@@ -124,7 +124,8 @@ docker run --rm -v "$PWD:/src:ro" -w /src \
 cp .env.example .env                    # y sustituye todos los valores "change-me"
 docker compose up -d --build
 cp frontend/.env.example frontend/.env
-cd frontend && npm ci && npm run dev    # http://localhost:5173
+# pnpm 12: corepack enable (Node 22.22.1+) o npm i -g pnpm@12
+cd frontend && pnpm install --frozen-lockfile && pnpm run dev    # http://localhost:5173
 ```
 
 La explicación del algoritmo paso a paso, en lenguaje llano y en términos técnicos, está en
