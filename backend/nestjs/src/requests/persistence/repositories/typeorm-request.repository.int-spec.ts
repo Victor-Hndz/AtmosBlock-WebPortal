@@ -80,4 +80,13 @@ describe("TypeOrmRequestRepository contra PostgreSQL (propiedad y peticiones com
     expect(await repositorio.findOneByIdAndUser(compartida.id, usuarioB.id)).not.toBeNull();
     expect(await dataSource.getRepository(RequestEntity).findOneBy({ id: compartida.id })).not.toBeNull();
   });
+
+  it("findByRequestHash sin hash (null o undefined) no resuelve a ninguna petición", async () => {
+    // Un resultado ERROR sin request_hash no debe poder marcar una petición ajena: null o rechazo valen.
+    const sinHash = (hash: null | undefined) =>
+      repositorio.findByRequestHash(hash as unknown as string).catch(() => null);
+
+    expect(await sinHash(null)).toBeNull();
+    expect(await sinHash(undefined)).toBeNull();
+  });
 });
