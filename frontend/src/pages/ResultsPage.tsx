@@ -9,34 +9,18 @@ import { MAX_PROGRESS } from "@/consts/progressConsts";
 // Component for displaying file preview
 const FilePreview: React.FC<{ file: ResultFile }> = ({ file }) => {
   const [enlarged, setEnlarged] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [hasError, setHasError] = useState(false);
   const { t } = useTranslation();
   const imageTimeoutRef = useRef<number | null>(null);
 
-  const isImage = file.name.match(/\.(jpeg|jpg|png|gif|svg)$/i);
-  const isPdf = file.name.match(/\.pdf$/i);
+  const isImage = /\.(jpeg|jpg|png|gif|svg)$/i.test(file.name);
+  const isPdf = /\.pdf$/i.test(file.name);
 
+  // Log the image as failed if it neither loads nor errors within 10 seconds
   useEffect(() => {
-    // Reset states when file changes
-    setImageLoaded(false);
-    setHasError(false);
-
-    // Set a timeout to avoid infinite loading state
-    if (isImage) {
-      // Clear any existing timeout
-      if (imageTimeoutRef.current) {
-        window.clearTimeout(imageTimeoutRef.current);
-      }
-
-      // Set a new timeout (10 seconds) after which we'll consider the image loading failed
-      imageTimeoutRef.current = window.setTimeout(() => {
-        if (!imageLoaded && !hasError) {
-          console.error(`Image load timeout for: ${file.url}`);
-          setHasError(true);
-        }
-      }, 10000); // 10 seconds timeout
-    }
+    if (!isImage) return;
+    imageTimeoutRef.current = window.setTimeout(() => {
+      console.error(`Image load timeout for: ${file.url}`);
+    }, 10000);
 
     return () => {
       // Clean up timeout on unmount or when file changes
@@ -44,15 +28,18 @@ const FilePreview: React.FC<{ file: ResultFile }> = ({ file }) => {
         window.clearTimeout(imageTimeoutRef.current);
       }
     };
-  }, [file, isImage, imageLoaded, hasError]);
+  }, [file, isImage]);
+
+  const clearImageTimeout = () => {
+    if (imageTimeoutRef.current) {
+      window.clearTimeout(imageTimeoutRef.current);
+    }
+  };
 
   // Handle image loading errors
   const handleImageError = () => {
     console.error(`Failed to load image: ${file.url}`);
-    setHasError(true);
-    if (imageTimeoutRef.current) {
-      window.clearTimeout(imageTimeoutRef.current);
-    }
+    clearImageTimeout();
   };
 
   if (!isImage && !isPdf) {
@@ -92,7 +79,7 @@ const FilePreview: React.FC<{ file: ResultFile }> = ({ file }) => {
               src={file.url}
               alt={file.name}
               className={`object-contain ${enlarged ? "w-full h-full" : "max-h-60 w-auto mx-auto"}`}
-              onLoad={() => setImageLoaded(true)}
+              onLoad={clearImageTimeout}
               onError={handleImageError}
             />
           </div>
@@ -104,7 +91,7 @@ const FilePreview: React.FC<{ file: ResultFile }> = ({ file }) => {
               src={`${file.url}#toolbar=0&view=FitH`}
               className="w-full h-full border border-slate-200 rounded"
               title={file.name}
-              onLoad={() => setImageLoaded(true)}
+              onLoad={clearImageTimeout}
               onError={handleImageError}
             />
             <button
