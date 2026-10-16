@@ -11,13 +11,9 @@ allowBuilds:
   '@parcel/watcher': false
   # Telemetría de instalación que trae swagger-ui-dist: no aporta nada al proyecto.
   '@scarf/scarf': false
-  # El postinstall solo comprueba el binario nativo; ese llega como dependencia opcional por plataforma.
-  '@swc/core': false
   # Trae binarios precompilados (linux-x64 glibc y musl, win32-x64, arm64): el script (node-gyp-build)
   # solo compila desde fuente si falta el de la plataforma. Cambiar a true en plataformas sin precompilado (p. ej. macOS Intel).
   argon2: false
-  # Solo macOS y solo dev (vigilancia de ficheros); el paquete ya incluye fsevents.node compilado.
-  fsevents: false
   # De Jest 30 (jest-resolve): el postinstall (napi-postinstall) comprueba el binario nativo, que llega
   # como dependencia opcional por plataforma, y solo si falta lo descarga del registro.
   unrs-resolver: false
