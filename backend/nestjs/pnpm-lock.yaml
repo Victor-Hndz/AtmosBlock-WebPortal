@@ -180,7 +180,7 @@ importers:
         version: 12.0.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))
       '@nestjs/microservices':
         specifier: ^12.1.3
-        version: 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.1.3)(amqp-connection-manager@4.1.15(amqplib@0.10.9))(amqplib@0.10.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.1.3)(amqp-connection-manager@4.1.15(amqplib@2.2.0))(amqplib@2.2.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/passport':
         specifier: ^12.0.0
         version: 12.0.0(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(passport@0.7.0)
@@ -198,10 +198,10 @@ importers:
         version: 12.0.2(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.1.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.2(mysql2@3.24.5(@types/node@24.19.2))(pg@8.23.1)(supports-color@8.1.1)(ts-node@10.9.2(@swc/core@1.16.13)(@types/node@24.19.2)(typescript@5.9.3)))
       amqp-connection-manager:
         specifier: ^4.1.14
-        version: 4.1.15(amqplib@0.10.9)
+        version: 4.1.15(amqplib@2.2.0)
       amqplib:
-        specifier: ^0.10.8
-        version: 0.10.9
+        specifier: ^2.2.0
+        version: 2.2.0
       argon2:
         specifier: ^0.45.1
         version: 0.45.1
@@ -272,9 +272,6 @@ importers:
       '@swc/core':
         specifier: ^1.16.13
         version: 1.16.13
-      '@types/amqplib':
-        specifier: ^0.10.7
-        version: 0.10.8
       '@types/argon2':
         specifier: ^0.15.4
         version: 0.15.4
@@ -1489,9 +1486,6 @@ packages:
   '@tybys/wasm-util@0.10.4':
     resolution: {integrity: sha512-W3c4gRigFS0T/Ma4qIYF3GDAc5AQdHb1yL5znJT1Zv1YaD9Kitx656wBjvr19qbiosmZT8lWDM5BEMynUqX65A==}
 
-  '@types/amqplib@0.10.8':
-    resolution: {integrity: sha512-vtDp8Pk1wsE/AuQ8/Rgtm6KUZYqcnTgNvEHwzCkX8rL7AGsC6zqAfKAAJhUZXFhM/Pp++tbnUHiam/8vVpPztA==}
-
   '@types/argon2@0.15.4':
     resolution: {integrity: sha512-fZPJNvZTvoyt/okKhbyj99UsDOwqzEXYPvKqfK26mViH9JB/hOwzUwDUn5qbwq9XJkLw0kDcFNu6+bnb3u5a0A==}
     deprecated: This is a stub types definition. argon2 provides its own type definitions, so you do not need this installed.
@@ -1929,9 +1923,9 @@ packages:
     peerDependencies:
       amqplib: '*'
 
-  amqplib@0.10.9:
-    resolution: {integrity: sha512-jwSftI4QjS3mizvnSnOrPGYiUnm1vI2OP1iXeOUz5pb74Ua0nbf6nPyyTzuiCLEE3fMpaJORXh2K/TQ08H5xGA==}
-    engines: {node: '>=10'}
+  amqplib@2.2.0:
+    resolution: {integrity: sha512-VifzN9aHs/Q3zTruVHXh2yCisQyXexBN91CQ2E5iSyUKyNjH6ilYhJGte5AXZH/Bj1PaH7SwPhyuSf6Msd2udw==}
+    engines: {node: '>=18'}
 
   ansi-escapes@4.3.2:
     resolution: {integrity: sha512-gKXj5ALrKWQLsYG9jlTRmR/xKluxHV+Z9QEwNIgCfM1/uwPMCuzVVnh5mwTd+OuBZcwSIMbqssNWRm1lE51QaQ==}
@@ -2105,9 +2099,6 @@ packages:
 
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
-
-  buffer-more-ints@1.0.0:
-    resolution: {integrity: sha512-EMetuGFz5SLsT0QTnXzINh4Ksr+oo4i+UGTXEshiGCQWnsgSs7ZhJ8fzlwQ+OzEMs0MpDAMr1hxnblp5a4vcHg==}
 
   buffer@5.7.1:
     resolution: {integrity: sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ==}
@@ -3748,9 +3739,6 @@ packages:
     resolution: {integrity: sha512-hh2WYhq4fi8+b+/2Kg9CEge4fDPvHS534aOOvOZeQ3+Vf2mCFsaFBYj0i+iXcAq6I9Vzp5fjMFBlONvayDC1qg==}
     engines: {node: '>=6'}
 
-  querystringify@2.2.0:
-    resolution: {integrity: sha512-FIqgj2EUvTa7R50u0rGsyTftzjYmv/a3hO345bZNrqabNqjtgiDMgmo4mkUjd+nzU5oF3dClKqFIPUKybUyqoQ==}
-
   quick-lru@5.1.1:
     resolution: {integrity: sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==}
     engines: {node: '>=10'}
@@ -3791,9 +3779,6 @@ packages:
   require-from-string@2.0.2:
     resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
     engines: {node: '>=0.10.0'}
-
-  requires-port@1.0.0:
-    resolution: {integrity: sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ==}
 
   resolve-alpn@1.2.1:
     resolution: {integrity: sha512-0a1F4l73/ZFZOakJnQ3FvkJ2+gSTQWz/r2KE5OdDY0TxPm5h4GkqkWWfM47T7HsbnOtcJVEF4epCVy6u7Q3K+g==}
@@ -4364,9 +4349,6 @@ packages:
 
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
-
-  url-parse@1.5.10:
-    resolution: {integrity: sha512-WypcfiRhfeUP9vvF0j6rw0J3hrWrw6iZv3+22h6iRMJ/8z1Tj6XfLP4DsUix5MhMPnXpiHDoKyoZ/bdCkwBCiQ==}
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
@@ -5364,7 +5346,7 @@ snapshots:
       tslib: 2.8.1
       uid: 2.0.2
     optionalDependencies:
-      '@nestjs/microservices': 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.1.3)(amqp-connection-manager@4.1.15(amqplib@0.10.9))(amqplib@0.10.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/microservices': 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.1.3)(amqp-connection-manager@4.1.15(amqplib@2.2.0))(amqplib@2.2.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express': 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.1.3)(supports-color@8.1.1)
 
   '@nestjs/jwt@12.0.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))':
@@ -5381,7 +5363,7 @@ snapshots:
       class-transformer: 0.5.1
       class-validator: 0.15.1
 
-  '@nestjs/microservices@12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.1.3)(amqp-connection-manager@4.1.15(amqplib@0.10.9))(amqplib@0.10.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
+  '@nestjs/microservices@12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.1.3)(amqp-connection-manager@4.1.15(amqplib@2.2.0))(amqplib@2.2.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
     dependencies:
       '@nestjs/common': 12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
       '@nestjs/core': 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@12.1.3)(@nestjs/platform-express@12.1.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -5390,8 +5372,8 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
     optionalDependencies:
-      amqp-connection-manager: 4.1.15(amqplib@0.10.9)
-      amqplib: 0.10.9
+      amqp-connection-manager: 4.1.15(amqplib@2.2.0)
+      amqplib: 2.2.0
 
   '@nestjs/passport@12.0.0(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(passport@0.7.0)':
     dependencies:
@@ -5446,7 +5428,7 @@ snapshots:
       '@nestjs/core': 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@12.1.3)(@nestjs/platform-express@12.1.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       tslib: 2.8.1
     optionalDependencies:
-      '@nestjs/microservices': 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.1.3)(amqp-connection-manager@4.1.15(amqplib@0.10.9))(amqplib@0.10.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/microservices': 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.1.3)(amqp-connection-manager@4.1.15(amqplib@2.2.0))(amqplib@2.2.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express': 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.1.3)(supports-color@8.1.1)
 
   '@nestjs/throttler@6.7.1(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.1.3)(reflect-metadata@0.2.2)':
@@ -5658,10 +5640,6 @@ snapshots:
     dependencies:
       tslib: 2.8.1
     optional: true
-
-  '@types/amqplib@0.10.8':
-    dependencies:
-      '@types/node': 24.19.2
 
   '@types/argon2@0.15.4':
     dependencies:
@@ -6213,15 +6191,12 @@ snapshots:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
-  amqp-connection-manager@4.1.15(amqplib@0.10.9):
+  amqp-connection-manager@4.1.15(amqplib@2.2.0):
     dependencies:
-      amqplib: 0.10.9
+      amqplib: 2.2.0
       promise-breaker: 6.0.0
 
-  amqplib@0.10.9:
-    dependencies:
-      buffer-more-ints: 1.0.0
-      url-parse: 1.5.10
+  amqplib@2.2.0: {}
 
   ansi-escapes@4.3.2:
     dependencies:
@@ -6405,8 +6380,6 @@ snapshots:
 
   buffer-from@1.1.2:
     optional: true
-
-  buffer-more-ints@1.0.0: {}
 
   buffer@5.7.1:
     dependencies:
@@ -8189,8 +8162,6 @@ snapshots:
       split-on-first: 1.1.0
       strict-uri-encode: 2.0.0
 
-  querystringify@2.2.0: {}
-
   quick-lru@5.1.1: {}
 
   range-parser@1.3.0: {}
@@ -8222,8 +8193,6 @@ snapshots:
   require-directory@2.1.1: {}
 
   require-from-string@2.0.2: {}
-
-  requires-port@1.0.0: {}
 
   resolve-alpn@1.2.1: {}
 
@@ -8774,11 +8743,6 @@ snapshots:
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
-
-  url-parse@1.5.10:
-    dependencies:
-      querystringify: 2.2.0
-      requires-port: 1.0.0
 
   util-deprecate@1.0.2: {}
 

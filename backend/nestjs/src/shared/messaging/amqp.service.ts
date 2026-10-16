@@ -5,14 +5,13 @@ import { ConfigService } from "@nestjs/config";
 import { RabbitMQExchanges, RabbitMQRoutingKeys } from "../enums/rabbitmqQueues.enum";
 import { MessageContent } from "../interfaces/messageContentInterface.interface";
 import { errorMessage } from "../utils/errorMessage";
-import { ExtendedConnection, ExtendedChannel, asConnection, asChannel } from "./amqp-types";
 
 @Injectable()
 export class AmqpService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(AmqpService.name);
   private readonly url: string;
-  private connection: ExtendedConnection | null = null;
-  private channel: ExtendedChannel | null = null;
+  private connection: amqp.ChannelModel | null = null;
+  private channel: amqp.Channel | null = null;
 
   constructor(private readonly configService: ConfigService) {
     this.url = this.configService.get<string>("RABBITMQ_URL") ?? "amqp://admin:pass@localhost:5672";
@@ -35,8 +34,7 @@ export class AmqpService implements OnModuleInit, OnModuleDestroy {
       while (retries < maxRetries) {
         try {
           this.logger.log(`Connecting to RabbitMQ at ${this.url}...`);
-          const conn = await amqp.connect(this.url);
-          this.connection = asConnection(conn);
+          this.connection = await amqp.connect(this.url);
 
           if (this.connection) {
             this.connection.on("error", err => {
@@ -50,8 +48,7 @@ export class AmqpService implements OnModuleInit, OnModuleDestroy {
             });
 
             // Create a channel
-            const ch = await this.connection.createChannel();
-            this.channel = asChannel(ch);
+            this.channel = await this.connection.createChannel();
             this.logger.log("Successfully connected to RabbitMQ");
 
             // Set up exchanges
