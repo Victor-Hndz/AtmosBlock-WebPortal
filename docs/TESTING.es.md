@@ -174,7 +174,7 @@ de Docker.
 cd backend/nestjs
 pnpm install --frozen-lockfile
 pnpm exec eslint "{src,apps,libs,test}/**/*.ts" --max-warnings=0
-pnpm exec jest --ci
+pnpm test --ci
 ```
 
 Resultado esperado: todas las suites pasan. Los tests de integración (`*.int-spec.ts`) necesitan

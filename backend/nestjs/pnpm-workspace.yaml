@@ -4,10 +4,11 @@
 minimumReleaseAge: 1440
 strictDepBuilds: true
 dangerouslyAllowAllBuilds: false
-overrides:
-  multer: 2.3.0
 # Un paquete por línea con script de instalación; true solo si sin él se rompe build, tests o runtime.
 allowBuilds:
+  # De Jest 30 (jest-haste-map): el script solo compila desde fuente con build_from_source=true;
+  # el binario precompilado llega como dependencia opcional por plataforma.
+  '@parcel/watcher': false
   # Telemetría de instalación que trae swagger-ui-dist: no aporta nada al proyecto.
   '@scarf/scarf': false
   # El postinstall solo comprueba el binario nativo; ese llega como dependencia opcional por plataforma.
@@ -17,3 +18,6 @@ allowBuilds:
   argon2: false
   # Solo macOS y solo dev (vigilancia de ficheros); el paquete ya incluye fsevents.node compilado.
   fsevents: false
+  # De Jest 30 (jest-resolve): el postinstall (napi-postinstall) comprueba el binario nativo, que llega
+  # como dependencia opcional por plataforma, y solo si falta lo descarga del registro.
+  unrs-resolver: false

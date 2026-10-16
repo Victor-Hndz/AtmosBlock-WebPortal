@@ -119,7 +119,7 @@ jobs:
         run: pnpm exec eslint "{src,apps,libs,test}/**/*.ts" --max-warnings=0
       - name: Tests
         if: ${{ !cancelled() }}
-        run: pnpm exec jest --ci
+        run: pnpm test --ci
 
   backend-integration:
     # WEB-214: pruebas de integración (*.int-spec.ts) contra PostgreSQL real
