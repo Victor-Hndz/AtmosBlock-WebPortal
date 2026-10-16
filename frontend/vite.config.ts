@@ -3,12 +3,15 @@ import path from "path";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
+// Módulos dentro de node_modules/<paquete>/ (ids de Vite siempre con "/", también con pnpm).
+const pkgs = (...names: string[]) => new RegExp(`/node_modules/(${names.join("|")})/`);
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"),
+      "@": path.resolve(import.meta.dirname, "src"),
     },
   },
   build: {
@@ -17,35 +20,20 @@ export default defineConfig({
     minify: "terser",
     cssCodeSplit: true,
     chunkSizeWarningLimit: 600,
-    rollupOptions: {
+    rolldownOptions: {
       output: {
-        manualChunks: {
-          // Split vendor code
-          vendor: ["react", "react-dom", "react-router-dom", "react-redux", "@reduxjs/toolkit"],
-          // Split UI libraries
-          ui: [
-            "@radix-ui/react-alert-dialog",
-            "@radix-ui/react-avatar",
-            "@radix-ui/react-checkbox",
-            "@radix-ui/react-collapsible",
-            "@radix-ui/react-dropdown-menu",
-            "@radix-ui/react-form",
-            "@radix-ui/react-hover-card",
-            "@radix-ui/react-label",
-            "@radix-ui/react-navigation-menu",
-            "@radix-ui/react-popover",
-            "@radix-ui/react-progress",
-            "@radix-ui/react-select",
-            "@radix-ui/react-separator",
-            "@radix-ui/react-switch",
-            "@radix-ui/react-tabs",
-            "@radix-ui/react-toast",
-            "@radix-ui/react-tooltip",
+        // Rolldown (Vite 8) no admite manualChunks en forma de objeto: mismos grupos por paquete.
+        codeSplitting: {
+          groups: [
+            // Split vendor code
+            { name: "vendor", test: pkgs("react", "react-dom", "react-router-dom", "react-redux", "@reduxjs/toolkit") },
+            // Split UI libraries
+            { name: "ui", test: pkgs("@radix-ui/[^/]+") },
+            // Split i18n
+            { name: "i18n", test: pkgs("i18next", "react-i18next", "i18next-browser-languagedetector", "i18next-http-backend") },
+            // Split icons
+            { name: "icons", test: pkgs("lucide-react", "react-icons") },
           ],
-          // Split i18n
-          i18n: ["i18next", "react-i18next", "i18next-browser-languagedetector", "i18next-http-backend"],
-          // Split icons
-          icons: ["lucide-react", "react-icons"],
         },
         // Ensure chunks are properly named and don't exceed size limit
         entryFileNames: "assets/[name]-[hash].js",
