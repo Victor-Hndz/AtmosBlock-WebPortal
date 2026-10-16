@@ -82,7 +82,8 @@ const PrediccionPage: React.FC = (): JSX.Element => {
   const [indice, setIndice] = useState<Indice | null>(null);
   const [modelo, setModelo] = useState<Modelo>("ifs");
   const [fecha, setFecha] = useState<string>("");
-  const [producto, setProducto] = useState<Producto | null>(null);
+  // producto de la última petición, con su clave (modelo/fecha) para no mostrar el de otra pasada
+  const [productoCargado, setProductoCargado] = useState<{ clave: string; datos: Producto } | null>(null);
   const [error, setError] = useState(false);
   const [verificacion, setVerificacion] = useState<Verificacion | null>(null);
   const [alturaVisor, setAlturaVisor] = useState(1200);
@@ -122,12 +123,15 @@ const PrediccionPage: React.FC = (): JSX.Element => {
     return url.toString();
   })();
 
+  const clave = `${modelo}/${fechaActiva}`;
+  const producto = productoCargado?.clave === clave ? productoCargado.datos : null;
+
   useEffect(() => {
     if (!fechaActiva) return;
-    setProducto(null);
-    fetch(`${PREDICCION_URL}/${modelo}/${fechaActiva}.json`)
+    const clave = `${modelo}/${fechaActiva}`;
+    fetch(`${PREDICCION_URL}/${clave}.json`)
       .then(r => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((p: Producto) => setProducto(p))
+      .then((p: Producto) => setProductoCargado({ clave, datos: p }))
       .catch(() => setError(true));
   }, [modelo, fechaActiva]);
 

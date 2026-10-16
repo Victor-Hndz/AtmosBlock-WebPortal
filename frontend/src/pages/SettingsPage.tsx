@@ -453,12 +453,14 @@ const SettingsPage: React.FC = () => {
     dispatch(fetchUserRequests());
   }, [dispatch]);
 
-  // Show error toast
-  useEffect(() => {
+  // Show error toast (adjusted while rendering, not in an effect)
+  const [shownError, setShownError] = useState<string | null>(null);
+  if (error !== shownError) {
+    setShownError(error);
     if (error) {
       setToastOpen(true);
     }
-  }, [error]);
+  }
 
   // Redirect if not authenticated
   if (!isAuthenticated || !user) {

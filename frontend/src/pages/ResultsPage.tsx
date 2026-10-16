@@ -128,7 +128,7 @@ export default function ResultsPage(): React.ReactElement {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const [requestHash, setRequestHash] = useState<string | null>(null);
+  const requestHash = new URLSearchParams(location.search).get("requestHash");
   const [totalProgress, setTotalProgress] = useState(0);
   const [progressMessage, setProgressMessage] = useState("");
   const [isConnected, setIsConnected] = useState(false);
@@ -139,10 +139,28 @@ export default function ResultsPage(): React.ReactElement {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isLoadingResults, setIsLoadingResults] = useState(false);
   const [progressComplete, setProgressComplete] = useState(false);
-  const previousRequestHashRef = useRef<string | null>(null);
   // Latest flags for the stream callbacks, so the stream is not reconnected when they change
   const streamFlagsRef = useRef({ hasError, isComplete, progressComplete });
-  streamFlagsRef.current = { hasError, isComplete, progressComplete };
+  useEffect(() => {
+    streamFlagsRef.current = { hasError, isComplete, progressComplete };
+  });
+
+  // Reset the progress state when a new request starts (adjusted while rendering, not in an effect);
+  // a reconnection to the same request keeps it
+  const [shownRequestHash, setShownRequestHash] = useState<string | null>(null);
+  if (requestHash !== shownRequestHash) {
+    setShownRequestHash(requestHash);
+    if (requestHash) {
+      setIsConnected(false);
+      setHasError(false);
+      setIsComplete(false);
+      setTotalProgress(0);
+      setProgressComplete(false);
+      setProgressMessage("");
+      setResultsData(null);
+      setPreviewFile(null);
+    }
+  }
 
   // Fetch result files when processing is complete
   const fetchResults = useCallback(async () => {
@@ -167,43 +185,18 @@ export default function ResultsPage(): React.ReactElement {
     }
   }, [requestHash]);
 
-  // Get request hash from URL parameters
+  // Redirect to home if no request hash is provided
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const hash = searchParams.get("requestHash");
-
-    if (!hash) {
-      // Redirect to home if no request hash is provided
+    if (!requestHash) {
       navigate("/", { replace: true });
-      return;
     }
-
-    setRequestHash(hash);
-  }, [location, navigate]);
+  }, [requestHash, navigate]);
 
   // Connect to progress stream when component mounts
   useEffect(() => {
     let cleanup: (() => void) | null = null;
 
     if (requestHash) {
-      // Check if this is a new request or just a page reload
-      const isNewRequest = previousRequestHashRef.current !== requestHash;
-
-      // Only reset states when starting a new connection for a new request
-      if (isNewRequest) {
-        setIsConnected(false);
-        setHasError(false);
-        setIsComplete(false);
-        setTotalProgress(0);
-        setProgressComplete(false);
-        setProgressMessage("");
-        setResultsData(null);
-        setPreviewFile(null);
-      }
-
-      // Update the reference for future comparisons
-      previousRequestHashRef.current = requestHash;
-
       // Connect to the progress stream
       cleanup = ProgressService.connectToProgressStream({
         requestHash,

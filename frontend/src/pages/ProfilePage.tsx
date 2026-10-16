@@ -36,40 +36,44 @@ const ProfilePage: React.FC = () => {
   // Confirmation dialog for delete
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  // Initialize form values when user data is available
-  useEffect(() => {
+  // Initialize form values when user data is available (adjusted while rendering, not in an effect)
+  const [formUser, setFormUser] = useState<typeof user>(null);
+  if (user !== formUser) {
+    setFormUser(user);
     if (user) {
       setName(user.name);
       setEmail(user.email);
     }
-  }, [user]);
+  }
 
   // Show toast for success/error messages
-  useEffect(() => {
+  const [shownSuccess, setShownSuccess] = useState<string | null>(null);
+  if (successMessage !== shownSuccess) {
+    setShownSuccess(successMessage);
     if (successMessage) {
       setToastType("success");
       setToastMessage(successMessage);
       setToastOpen(true);
-
-      // Clear messages after showing
-      setTimeout(() => {
-        dispatch(clearUserMessages());
-      }, 3000);
     }
-  }, [successMessage, dispatch]);
-
-  useEffect(() => {
+  }
+  const [shownError, setShownError] = useState<string | null>(null);
+  if (error !== shownError) {
+    setShownError(error);
     if (error) {
       setToastType("error");
       setToastMessage(error);
       setToastOpen(true);
+    }
+  }
 
-      // Clear messages after showing
+  // Clear messages after showing
+  useEffect(() => {
+    if (successMessage || error) {
       setTimeout(() => {
         dispatch(clearUserMessages());
       }, 3000);
     }
-  }, [error, dispatch]);
+  }, [successMessage, error, dispatch]);
 
   // Redirect to login if not authenticated
   if (!isAuthenticated || !user) {
