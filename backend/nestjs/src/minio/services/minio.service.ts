@@ -146,7 +146,7 @@ export class MinioService {
       return files;
     } catch (error) {
       this.logger.error(`Error listing files in ${folderPath}: ${error.message}`);
-      throw new Error(`Failed to list files: ${error.message}`);
+      throw new Error(`Failed to list files: ${error.message}`, { cause: error });
     }
   }
 
