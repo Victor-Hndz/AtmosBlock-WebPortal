@@ -111,7 +111,7 @@ flowchart LR
 
 ```bash
 docker run --rm -v "$PWD:/src:ro" -w /src \
-  victorhndz/netcdf-base@sha256:5ece2f005ca8457d43905e25017d52c3d9a2fda701a09bfeab4a98c0a03d4287 \
+  victorhndz/netcdf-base@sha256:79ad61d67670f6c5a080c9ac0ffd7b6054285711fc4d65dfbdcaef87f3a25cf6 \
   sh -c 'cmake -S backend/FAST-IBAN_Project/execution/code -B /tmp/build \
          && cmake --build /tmp/build --parallel \
          && ctest --test-dir /tmp/build --output-on-failure'

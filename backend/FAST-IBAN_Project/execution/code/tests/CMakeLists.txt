@@ -150,12 +150,13 @@ add_test(NAME latitudes_rejilla_1grado COMMAND sh ${COMPROBAR_LATITUDES} $<TARGE
 set_tests_properties(latitudes_desde_80N latitudes_rejilla_1grado PROPERTIES FIXTURES_REQUIRED recortes TIMEOUT 600)
 # Leer filas de más no siempre rompe el proceso; con valgrind (instalado en el CI) cualquier lectura fuera falla.
 find_program(VALGRIND valgrind)
-# ALG-355: las variantes MPI también bajo valgrind (2 procesos; MPICH no da falsos positivos), con la misma línea base.
+# ALG-355: las variantes MPI también bajo valgrind (2 procesos), con la misma línea base. WEB-363: el MPICH de
+# Ubuntu 26.04 usa UCX, que sí da falsos positivos; se suprimen solo los de libucs (valgrind_ucx.supp).
 if(VALGRIND)
     add_test(NAME valgrind_mpi_2 COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN_mpi>)
     add_test(NAME valgrind_omp_mpi_2x2 COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/regression/run_baseline.sh $<TARGET_FILE:FAST-IBAN_omp_mpi> 2)
     set_tests_properties(valgrind_mpi_2 valgrind_omp_mpi_2x2 PROPERTIES TIMEOUT 1800 ENVIRONMENT
-        "LANZADOR=${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} 2 ${VALGRIND} -q --error-exitcode=3")
+        "LANZADOR=${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} 2 ${VALGRIND} -q --error-exitcode=3 --suppressions=${CMAKE_CURRENT_SOURCE_DIR}/valgrind_ucx.supp")
 endif()
 if(VALGRIND)
     set_tests_properties(latitudes_desde_80N latitudes_rejilla_1grado PROPERTIES ENVIRONMENT
