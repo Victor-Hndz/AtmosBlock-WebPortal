@@ -1,7 +1,8 @@
 """Ejecución del núcleo: errores notificados sin tumbar el consumidor (WEB-207), argv construido aquí a partir de
 parámetros validados y nunca un comando recibido por la cola (V5/WEB-301), hash de petición validado en la entrada
 de todos los consumidores (V14/WEB-302), binario según el paralelismo pedido (WEB-218) y núcleo lanzado sin
-bloquear el bucle de eventos, con tiempo máximo y con los CPU del contenedor (V15/WEB-304).
+bloquear el bucle de eventos, con tiempo máximo y con los CPU del contenedor (V15/WEB-304), ya compilado en la imagen
+(WEB-303).
 
 Uso: python backend/FAST-IBAN_Project/execution/handler/test_exec_handler.py
 """
@@ -96,11 +97,11 @@ class ProcesoFalso:
 
 
 def lanzador(segundos_nucleo):
-    """create_subprocess_exec falso: cmake termina enseguida, el núcleo tarda segundos_nucleo. Devuelve (mock, procesos)."""
+    """create_subprocess_exec falso: el núcleo tarda segundos_nucleo. Devuelve (mock, procesos)."""
     procesos = {}
 
     async def crear(*argv, **kwargs):
-        proceso = ProcesoFalso(1000 + len(procesos), 0 if argv[0] == "cmake" else segundos_nucleo)
+        proceso = ProcesoFalso(1000 + len(procesos), segundos_nucleo)
         procesos[proceso.pid] = proceso
         return proceso
 
@@ -108,11 +109,11 @@ def lanzador(segundos_nucleo):
 
 
 def ejecutar(contenido, rabbit):
-    """Lanza handle_message con cmake, el build y el núcleo simulados (terminan con 0). Devuelve (ok, argvs)."""
+    """Lanza handle_message con el núcleo simulado (termina con 0). Devuelve (ok, argvs)."""
     crear, _ = lanzador(0)
-    with mock.patch.object(exec_handler.os, "makedirs"), mock.patch.object(
-        exec_handler, "cpus_disponibles", return_value=8
-    ), mock.patch.object(exec_handler.asyncio, "create_subprocess_exec", crear):
+    with mock.patch.object(exec_handler, "cpus_disponibles", return_value=8), mock.patch.object(
+        exec_handler.asyncio, "create_subprocess_exec", crear
+    ):
         ok = asyncio.run(exec_handler.handle_message(mensaje(**contenido), rabbit))
     return ok, [list(llamada.args) for llamada in crear.call_args_list]
 
@@ -144,7 +145,7 @@ class ProcessBodyTest(unittest.TestCase):
 
 
 class ExecHandlerTest(unittest.TestCase):
-    def test_variable_desconocida_notifica_error_sin_compilar(self):
+    def test_variable_desconocida_notifica_error_sin_ejecutar(self):
         rabbit = RabbitFalso()
         ok, lanzados = ejecutar(parametros(variable_name="humidity"), rabbit)
 
@@ -156,15 +157,16 @@ class ExecHandlerTest(unittest.TestCase):
         self.assertEqual(rabbit.errores()[0]["request_hash"], HASH)
 
     def test_fallo_inesperado_notifica_error(self):
+        # WEB-303: si la imagen se construyó sin el binario, la petición acaba en error en vez de colgarse.
         rabbit = RabbitFalso()
-        with mock.patch.object(exec_handler.os, "makedirs"), mock.patch.object(
-            exec_handler.asyncio, "create_subprocess_exec", side_effect=FileNotFoundError("cmake no encontrado")
+        with mock.patch.object(
+            exec_handler.asyncio, "create_subprocess_exec", side_effect=FileNotFoundError("./FAST-IBAN no encontrado")
         ):
             ok = asyncio.run(exec_handler.handle_message(mensaje(**parametros()), rabbit))
 
         self.assertFalse(ok)
         self.assertEqual(len(rabbit.errores()), 1)
-        self.assertIn("cmake no encontrado", rabbit.errores()[0]["exec_message"])
+        self.assertIn("./FAST-IBAN no encontrado", rabbit.errores()[0]["exec_message"])
 
 
 class ComandoRecibidoTest(unittest.TestCase):
@@ -182,6 +184,20 @@ class ComandoRecibidoTest(unittest.TestCase):
         )
         for argv in lanzados:
             self.assertNotIn("/bin/sh", argv)
+
+
+class NucleoCompiladoEnLaImagenTest(unittest.TestCase):
+    """WEB-303: cada petición recompilaba el núcleo con el gcc del contenedor; ahora el binario viene en la imagen."""
+
+    def test_una_peticion_lanza_solo_el_nucleo(self):
+        rabbit = RabbitFalso()
+        ok, lanzados = ejecutar(parametros(), rabbit)
+
+        self.assertTrue(ok)
+        self.assertEqual(lanzados, [["./FAST-IBAN", FICHERO, "-90", "90", "-180", "180", f"./out/{HASH}/", "1"]])
+        # El progreso total de la ejecución no cambia al quitar el paso de compilación.
+        progreso = [m["content"]["increment"] for m in rabbit.publicados if "increment" in m["content"]]
+        self.assertEqual(sum(progreso), 2)
 
 
 class HashInvalidoTest(unittest.TestCase):
@@ -210,7 +226,7 @@ class HashInvalidoTest(unittest.TestCase):
 
 
 class ParametrosInvalidosTest(unittest.TestCase):
-    """V5/WEB-301: los parámetros llegan por la cola; se validan antes de compilar o ejecutar nada."""
+    """V5/WEB-301: los parámetros llegan por la cola; se validan antes de ejecutar nada."""
 
     INVALIDOS = {
         "fichero fuera de la carpeta de datos": {"file": "/etc/passwd"},
@@ -232,7 +248,7 @@ class ParametrosInvalidosTest(unittest.TestCase):
         "mpi que no es booleano": {"mpi": 1},
     }
 
-    def test_parametros_invalidos_notifican_error_sin_compilar(self):
+    def test_parametros_invalidos_notifican_error_sin_ejecutar(self):
         for caso, cambios in self.INVALIDOS.items():
             with self.subTest(caso):
                 rabbit = RabbitFalso()
@@ -283,11 +299,10 @@ class ComandoEjecucionTest(unittest.TestCase):
 
 
 def subprocess_sincrono(segundos_nucleo):
-    """subprocess.run y Popen parcheados (versión síncrona): si se vuelve a ella, el test falla sin lanzar cmake."""
+    """subprocess.run y Popen parcheados (versión síncrona): si se vuelve a ella, el test falla sin lanzar el núcleo."""
 
     def run(cmd, **kwargs):
-        if cmd[0] != "cmake":
-            time.sleep(segundos_nucleo)
+        time.sleep(segundos_nucleo)
         return mock.Mock(returncode=0, stdout="", stderr="")
 
     pila = contextlib.ExitStack()
@@ -305,7 +320,6 @@ class TiempoAgotadoTest(unittest.TestCase):
         rabbit = RabbitFalso()
         crear, procesos = lanzador(None)
         with contextlib.ExitStack() as pila:
-            pila.enter_context(mock.patch.object(exec_handler.os, "makedirs"))
             pila.enter_context(mock.patch.object(exec_handler, "TIMEOUT_NUCLEO", 0.1, create=True))
             pila.enter_context(mock.patch.object(exec_handler.asyncio, "create_subprocess_exec", crear))
             pila.enter_context(subprocess_sincrono(0.3))
@@ -349,9 +363,7 @@ class BucleNoBloqueadoTest(unittest.TestCase):
             tarea.cancel()
             return ok, ticks
 
-        with mock.patch.object(exec_handler.os, "makedirs"), mock.patch.object(
-            exec_handler.asyncio, "create_subprocess_exec", crear
-        ), subprocess_sincrono(0.3):
+        with mock.patch.object(exec_handler.asyncio, "create_subprocess_exec", crear), subprocess_sincrono(0.3):
             ok, ticks = asyncio.run(escenario())
 
         self.assertTrue(ok)

@@ -13,18 +13,16 @@ from utils.rabbitMQ.rabbit_consts import NOTIFICATIONS_EXCHANGE, NOTIFY_HANDLER_
 from utils.minio.upload_files import upload_files_to_request_hash
 from utils.consts.consts import API_FOLDER, EXEC_FILE, STATUS_OK, STATUS_ERROR
 
-# Build folder of the C core for each variable.
+# Build folder of the C core for each variable, compiled into the image by the Dockerfile (WEB-303).
 BUILD_FOLDERS = {
     "geopotential": "./code/build",
     "temperature": "./code_t/build",
 }
 
-# Maximum time of each step (V15/WEB-304). The API does not limit how many days a request asks for; the 15-day case
-# takes ~16 s in serial. The whole message (cmake + build + core + upload) must be acked within RabbitMQ's
-# consumer_timeout (30 min by default) or the broker redelivers it: 120 + 120 + 1500 s leaves room for the upload.
-# cmake and the build go away with WEB-303, which compiles in the Dockerfile.
+# Maximum time of the core (V15/WEB-304). The API does not limit how many days a request asks for; the 15-day case
+# takes ~16 s in serial. The whole message (core + upload) must be acked within RabbitMQ's consumer_timeout
+# (30 min by default) or the broker redelivers it: 1500 s leaves room for the upload.
 TIMEOUT_NUCLEO = 1500
-TIMEOUT_CMAKE = 120
 
 
 class TiempoAgotado(Exception):
@@ -167,7 +165,7 @@ async def handle_message(body, rabbitmq_client):
 
 
 async def run_algorithm(data, rabbitmq_client):
-    """Compile and run the C core for the requested variable, then upload the results."""
+    """Run the C core for the requested variable, then upload the results."""
 
     request_hash = data["request_hash"]
     try:
@@ -178,24 +176,8 @@ async def run_algorithm(data, rabbitmq_client):
         return False
     build_folder = BUILD_FOLDERS[data["variable_name"]]
 
-    await notify_update(rabbitmq_client, request_hash, 1, "EXEC: Compilando algoritmo.")
-
-    os.makedirs(build_folder, exist_ok=True)
-    print("\n[ ] Compilando el algoritmo en la carpeta: ", build_folder)
-
-    await lanzar(["cmake", ".."], build_folder, TIMEOUT_CMAKE)
-
-    returncode, stdout, _ = await lanzar(["cmake", "--build", "."], build_folder, TIMEOUT_CMAKE)
-
-    if returncode == 0:
-        print(stdout)
-        print("\n✅ Build completado exitosamente.")
-    else:
-        print("\n❌ Error al ejecutar el build:")
-        await notify_execution(rabbitmq_client, request_hash, STATUS_ERROR, "Error al compilar")
-        return False
-
-    await notify_update(rabbitmq_client, request_hash, 1, "EXEC: Ejecutando algoritmo.")
+    # WEB-303: the binary comes compiled in the image; this step keeps the progress of the former compile step.
+    await notify_update(rabbitmq_client, request_hash, 2, "EXEC: Ejecutando algoritmo.")
 
     print("\n[ ] Ejecutando comando: ", run_cmd)
     returncode, _, stderr = await lanzar(run_cmd, build_folder, TIMEOUT_NUCLEO)

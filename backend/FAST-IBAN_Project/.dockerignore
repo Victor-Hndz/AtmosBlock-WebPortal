@@ -1,0 +1,2 @@
+# WEB-303: a local build/ carries a CMakeCache.txt with other paths and breaks the compile in execution/Dockerfile.
+**/build

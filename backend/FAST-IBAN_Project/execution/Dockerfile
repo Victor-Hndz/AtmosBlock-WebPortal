@@ -1,4 +1,5 @@
-FROM victorhndz/netcdf-base:latest
+# Same base as the c-core CI job, pinned by digest (WEB-303, ALG-356: netcdf-base:alg356, with ncdump fixed).
+FROM victorhndz/netcdf-base@sha256:5ece2f005ca8457d43905e25017d52c3d9a2fda701a09bfeab4a98c0a03d4287
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -8,25 +9,18 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 
-# Install Ansible and required tools and update dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    cmake \
-    git \
-    libcurl4-openssl-dev \
-    libnetcdf-dev \
-    m4 \
-    mpich \
-    python3 \
-    python3-apt \
-    python3-pip \
-    wget \
-    && pip install --upgrade pip \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+# No apt-get here: the base already has the build tools, and reinstalling them could update gcc and compile the core
+# with a different compiler than CI (WEB-303).
 
 # Copy project files to the container
 COPY ./execution/code /app/code
 COPY ./execution/code_t /app/code_t
+
+# WEB-303: the core is compiled once, into the image, in the build folders exec_handler.py uses; it is not
+# recompiled per request.
+RUN cmake -S code -B code/build && cmake --build code/build --parallel \
+    && cmake -S code_t -B code_t/build && cmake --build code_t/build --parallel
+
 COPY ./execution/handler /app/handler
 
 # Copy and install utils dependencies
