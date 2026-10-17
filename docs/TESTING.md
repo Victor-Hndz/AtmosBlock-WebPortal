@@ -29,7 +29,7 @@ You do not need a C compiler or NetCDF installed. The core is built inside the s
 the CI uses, pinned by digest:
 
 ```bash
-IMAGE=victorhndz/netcdf-base@sha256:5ece2f005ca8457d43905e25017d52c3d9a2fda701a09bfeab4a98c0a03d4287
+IMAGE=victorhndz/netcdf-base@sha256:79ad61d67670f6c5a080c9ac0ffd7b6054285711fc4d65dfbdcaef87f3a25cf6
 ```
 
 ## 1. Scientific core
