@@ -112,7 +112,7 @@ services:
     restart: unless-stopped
 
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:4-management
     container_name: rabbitmq_container
     env_file: .env
     volumes:

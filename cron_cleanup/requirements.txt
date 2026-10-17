@@ -1,4 +1,4 @@
 psycopg2-binary==2.9.13
-python-dotenv==1.2.3
+python-dotenv==1.2.4
 minio==7.2.20
 APScheduler==3.11.3

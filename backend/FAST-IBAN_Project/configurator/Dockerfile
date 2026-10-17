@@ -1,14 +1,7 @@
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 # Set working directory
 WORKDIR /app
-
-# Install system dependencies and upgrade pip in one layer
-RUN apt-get update && \
-    apt-get install -y python3-pip && \
-    pip install --upgrade pip && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 
 # Copy and install configurator dependencies first to leverage cache
 COPY ./configurator/requirements.txt /app/configurator/requirements.txt
