@@ -30,7 +30,7 @@ export class TypeOrmRequestRepository implements IRequestRepository {
   async findByRequestHash(requestHash: string): Promise<Request | null> {
     const requestEntity = await this.requestRepository.findOne({
       where: { requestHash },
-      relations: ["users", "generatedFiles"],
+      relations: { users: true, generatedFiles: true },
     });
     if (!requestEntity) {
       return null;

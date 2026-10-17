@@ -2,7 +2,6 @@ import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import * as amqp from "amqplib";
 import { ConfigService } from "@nestjs/config";
 import { errorMessage } from "../utils/errorMessage";
-import { ExtendedConnection, ExtendedChannel, asConnection, asChannel } from "./amqp-types";
 
 interface ConsumerHandler {
   routingKey: string;
@@ -20,8 +19,8 @@ export class AmqpConsumerService implements OnModuleInit {
   private readonly logger = new Logger(AmqpConsumerService.name);
   private readonly url: string;
   private readonly handlers: Map<string, ConsumerHandler> = new Map();
-  private connection: ExtendedConnection | null = null;
-  private channel: ExtendedChannel | null = null;
+  private connection: amqp.ChannelModel | null = null;
+  private channel: amqp.Channel | null = null;
   private reconnectTimer: NodeJS.Timeout | null = null;
 
   constructor(private readonly configService: ConfigService) {
@@ -63,8 +62,7 @@ export class AmqpConsumerService implements OnModuleInit {
       while (retries < maxRetries) {
         try {
           this.logger.log(`Connecting to RabbitMQ at ${this.url}...`);
-          const conn = await amqp.connect(this.url);
-          this.connection = asConnection(conn);
+          this.connection = await amqp.connect(this.url);
 
           if (this.connection) {
             this.connection.on("error", err => {
@@ -78,8 +76,7 @@ export class AmqpConsumerService implements OnModuleInit {
             });
 
             // Create a channel
-            const ch = await this.connection.createChannel();
-            this.channel = asChannel(ch);
+            this.channel = await this.connection.createChannel();
 
             if (this.channel) {
               await this.channel.prefetch(1); // Process one message at a time

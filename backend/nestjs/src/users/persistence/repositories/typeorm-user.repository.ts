@@ -80,7 +80,7 @@ export class TypeOrmUserRepository implements IUserRepository {
   async findOneWithRequests(id: string): Promise<User> {
     const userEntity = await this.userRepository.findOne({
       where: { id },
-      relations: ["requests"],
+      relations: { requests: true },
     });
 
     if (!userEntity) {
