@@ -1,8 +1,8 @@
-// Prueba de integración contra PostgreSQL real (WEB-103). NO la ejecuta el CI: el patrón de jest es
-// `\.spec\.ts$` y este fichero acaba en `-spec.ts`. Uso local:
+// Prueba de integración contra PostgreSQL real (WEB-103). `pnpm test` no la ejecuta: el patrón de jest es
+// `\.spec\.ts$` y este fichero acaba en `-spec.ts`; en el CI va en backend-integration. Uso local:
 //   docker run -d --name atmos-pg-test -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test \
 //     -e POSTGRES_DB=atmos_test -p 55432:5432 postgres:16
-//   pnpm exec jest --testRegex 'int-spec\.ts$'
+//   pnpm run test:int
 import { DataSource } from "typeorm";
 import { RequestEntity } from "@/requests/persistence/entities/request.entity";
 import { UserEntity } from "@/users/persistence/entities/user.entity";
@@ -79,5 +79,14 @@ describe("TypeOrmRequestRepository contra PostgreSQL (propiedad y peticiones com
     expect(await repositorio.findOneByIdAndUser(compartida.id, usuarioA.id)).toBeNull();
     expect(await repositorio.findOneByIdAndUser(compartida.id, usuarioB.id)).not.toBeNull();
     expect(await dataSource.getRepository(RequestEntity).findOneBy({ id: compartida.id })).not.toBeNull();
+  });
+
+  it("findByRequestHash sin hash (null o undefined) no resuelve a ninguna petición", async () => {
+    // Un resultado ERROR sin request_hash no debe poder marcar una petición ajena: null o rechazo valen.
+    const sinHash = (hash: null | undefined) =>
+      repositorio.findByRequestHash(hash as unknown as string).catch(() => null);
+
+    expect(await sinHash(null)).toBeNull();
+    expect(await sinHash(undefined)).toBeNull();
   });
 });

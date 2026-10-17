@@ -8,7 +8,7 @@ portal web completo. Cada nivel es independiente: quédate en el que necesites.
 | Nivel | Qué compruebas | Requisitos | Tiempo |
 |---|---|---|---|
 | [1. Núcleo científico](#1-núcleo-científico) | Compilación, tests unitarios y de regresión, ejecución del detector, determinismo, benchmark | Docker | ~5 min |
-| [2. Comprobaciones automáticas del portal](#2-comprobaciones-automáticas-del-portal) | Tests de la API, el frontend y los servicios de Python | Node.js 22, Python 3.10+ | ~5 min |
+| [2. Comprobaciones automáticas del portal](#2-comprobaciones-automáticas-del-portal) | Tests de la API, el frontend y los servicios de Python | Node.js 24, Python 3.10+ | ~5 min |
 | [3. Pila completa](#3-pila-completa) | El portal de principio a fin con datos ERA5 reales | Docker, Node.js 22, cuenta de Copernicus CDS | ~30 min |
 
 Todos los comandos se lanzan desde la raíz del repositorio.
@@ -17,7 +17,7 @@ Todos los comandos se lanzan desde la raíz del repositorio.
 
 - [Git](https://git-scm.com/) y [Docker](https://docs.docker.com/get-docker/) (Docker Desktop en
   Windows y macOS; arráncalo antes de lanzar cualquier comando).
-- Para los niveles 2 y 3: [Node.js 22](https://nodejs.org/) con pnpm 12 (`corepack enable`, con Node 22.22.1 o posterior, o `npm i -g pnpm@12`), y Python 3.10 o posterior.
+- Para los niveles 2 y 3: [Node.js 24](https://nodejs.org/) (para el nivel 3 basta Node.js 22: fuera de Docker solo se ejecuta el frontend) con pnpm 12 (`corepack enable`, con Node 22.22.1 o posterior, o `npm i -g pnpm@12`), y Python 3.10 o posterior.
 - Para el nivel 3: una cuenta gratuita en el [Climate Data Store de Copernicus](https://cds.climate.copernicus.eu).
 
 **Un único procedimiento para todos los sistemas.** En Linux y macOS usa tu terminal habitual. En
@@ -174,7 +174,7 @@ de Docker.
 cd backend/nestjs
 pnpm install --frozen-lockfile
 pnpm exec eslint "{src,apps,libs,test}/**/*.ts" --max-warnings=0
-pnpm exec jest --ci
+pnpm test --ci
 ```
 
 Resultado esperado: todas las suites pasan. Los tests de integración (`*.int-spec.ts`) necesitan

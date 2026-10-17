@@ -27,7 +27,7 @@ jobs:
           package_json_file: backend/nestjs/package.json
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
           cache-dependency-path: backend/nestjs/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
@@ -111,7 +111,7 @@ jobs:
           package_json_file: backend/nestjs/package.json
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
           cache-dependency-path: backend/nestjs/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
@@ -119,7 +119,7 @@ jobs:
         run: pnpm exec eslint "{src,apps,libs,test}/**/*.ts" --max-warnings=0
       - name: Tests
         if: ${{ !cancelled() }}
-        run: pnpm exec jest --ci
+        run: pnpm test --ci
 
   backend-integration:
     # WEB-214: pruebas de integración (*.int-spec.ts) contra PostgreSQL real
@@ -148,7 +148,7 @@ jobs:
           package_json_file: backend/nestjs/package.json
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
           cache-dependency-path: backend/nestjs/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile

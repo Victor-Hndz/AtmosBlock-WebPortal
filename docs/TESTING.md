@@ -8,7 +8,7 @@ complete web portal. Each level is independent: stop at the one you need.
 | Level | What you check | Requirements | Time |
 |---|---|---|---|
 | [1. Scientific core](#1-scientific-core) | Build, unit and regression tests, run the detector, determinism, benchmark | Docker | ~5 min |
-| [2. Automated portal checks](#2-automated-portal-checks) | API, frontend and Python service tests | Node.js 22, Python 3.10+ | ~5 min |
+| [2. Automated portal checks](#2-automated-portal-checks) | API, frontend and Python service tests | Node.js 24, Python 3.10+ | ~5 min |
 | [3. Full stack](#3-full-stack) | The portal end to end with real ERA5 data | Docker, Node.js 22, Copernicus CDS account | ~30 min |
 
 All commands run from the repository root.
@@ -17,7 +17,7 @@ All commands run from the repository root.
 
 - [Git](https://git-scm.com/) and [Docker](https://docs.docker.com/get-docker/) (Docker Desktop on
   Windows and macOS; start it before running any command).
-- For levels 2 and 3: [Node.js 22](https://nodejs.org/) with pnpm 12 (`corepack enable`, on Node 22.22.1 or newer, or `npm i -g pnpm@12`), and Python 3.10 or newer.
+- For levels 2 and 3: [Node.js 24](https://nodejs.org/) (22 is enough for level 3, which only runs the frontend outside Docker) with pnpm 12 (`corepack enable`, on Node 22.22.1 or newer, or `npm i -g pnpm@12`), and Python 3.10 or newer.
 - For level 3: a free account on the [Copernicus Climate Data Store](https://cds.climate.copernicus.eu).
 
 **One procedure for every system.** On Linux and macOS use your usual terminal. On Windows use
@@ -175,7 +175,7 @@ Docker.
 cd backend/nestjs
 pnpm install --frozen-lockfile
 pnpm exec eslint "{src,apps,libs,test}/**/*.ts" --max-warnings=0
-pnpm exec jest --ci
+pnpm test --ci
 ```
 
 Expected result: all test suites pass. Integration tests (`*.int-spec.ts`) need a PostgreSQL
