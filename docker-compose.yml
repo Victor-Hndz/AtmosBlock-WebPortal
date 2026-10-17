@@ -71,6 +71,10 @@ services:
       dockerfile: ./execution/Dockerfile
     container_name: execution_container
     env_file: .env
+    # V15/WEB-304: una petición con muchos hilos o procesos MPI no acapara el host
+    cpus: "4"
+    mem_limit: 2g
+    pids_limit: 256
     depends_on:
       rabbitmq:
         condition: service_started

@@ -1,6 +1,6 @@
-import subprocess
 import sys
 import os
+import signal
 import asyncio
 
 sys.path.append("/app/")
@@ -18,6 +18,57 @@ BUILD_FOLDERS = {
     "geopotential": "./code/build",
     "temperature": "./code_t/build",
 }
+
+# Maximum time of each step (V15/WEB-304). The API does not limit how many days a request asks for; the 15-day case
+# takes ~16 s in serial. The whole message (cmake + build + core + upload) must be acked within RabbitMQ's
+# consumer_timeout (30 min by default) or the broker redelivers it: 120 + 120 + 1500 s leaves room for the upload.
+# cmake and the build go away with WEB-303, which compiles in the Dockerfile.
+TIMEOUT_NUCLEO = 1500
+TIMEOUT_CMAKE = 120
+
+
+class TiempoAgotado(Exception):
+    """A step of the execution exceeded its maximum time; the process (and its children) has been killed."""
+
+
+def cpus_disponibles(cpu_max="/sys/fs/cgroup/cpu.max"):
+    """
+    CPUs of this container (V15/WEB-304): the cgroup v2 quota set by `cpus` in docker-compose.yml, rounded up.
+
+    os.cpu_count() sees the host's CPUs, not the container limit; it is still the cap and the fallback when there is
+    no quota ("max") or the file cannot be read.
+    """
+    cpus = os.cpu_count() or 1
+    try:
+        with open(cpu_max) as f:
+            cuota, periodo = f.read().split()
+        return min(cpus, -(-int(cuota) // int(periodo)))
+    except (OSError, ValueError, ZeroDivisionError):
+        return cpus
+
+
+async def lanzar(argv, cwd, timeout):
+    """
+    Run argv without blocking the event loop (V15/WEB-304) and return (returncode, stdout, stderr) as text.
+
+    On timeout the whole process group is killed (mpirun launches its own children) and TiempoAgotado is raised.
+    """
+    proc = await asyncio.create_subprocess_exec(
+        *argv, cwd=cwd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, start_new_session=True
+    )
+    try:
+        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout)
+    except asyncio.TimeoutError:
+        try:
+            if hasattr(os, "killpg"):
+                os.killpg(proc.pid, signal.SIGKILL)
+            else:
+                proc.kill()
+        except ProcessLookupError:
+            pass  # it finished right at the limit
+        await proc.wait()
+        raise TiempoAgotado(f"Tiempo de ejecución agotado ({timeout} s)")
+    return proc.returncode, stdout.decode("utf-8", errors="replace"), stderr.decode("utf-8", errors="replace")
 
 
 def _entero(data, clave, minimo, maximo):
@@ -67,7 +118,7 @@ def argv_de(data):
 
     # Defaults and cap from this container's CPU count. The output is invariant to the number of threads and
     # processes (ALG-004, ALG-206), so capping them does not change the results.
-    cpus = os.cpu_count() or 1
+    cpus = cpus_disponibles()
     if omp and mpi:
         processes = n_proces or 2
         threads = n_threads or max(1, cpus // processes)
@@ -105,6 +156,10 @@ async def handle_message(body, rabbitmq_client):
     # WEB-207: any failure is notified as an execution error instead of leaving the request hanging.
     try:
         return await run_algorithm(data, rabbitmq_client)
+    except TiempoAgotado as e:
+        print(f"\n❌ {e}")
+        await notify_execution(rabbitmq_client, data.get("request_hash"), STATUS_ERROR, str(e))
+        return False
     except Exception as e:
         print(f"\n❌ Error inesperado en la ejecución: {e}")
         await notify_execution(rabbitmq_client, data.get("request_hash"), STATUS_ERROR, f"Error inesperado en la ejecución: {e}")
@@ -128,19 +183,11 @@ async def run_algorithm(data, rabbitmq_client):
     os.makedirs(build_folder, exist_ok=True)
     print("\n[ ] Compilando el algoritmo en la carpeta: ", build_folder)
 
-    subprocess.run(["cmake", ".."], cwd=build_folder)
+    await lanzar(["cmake", ".."], build_folder, TIMEOUT_CMAKE)
 
-    build_cmd = ["cmake", "--build", "."]
-    process = subprocess.Popen(
-        build_cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        cwd=build_folder,
-    )
-    stdout, stderr = process.communicate()
+    returncode, stdout, _ = await lanzar(["cmake", "--build", "."], build_folder, TIMEOUT_CMAKE)
 
-    if process.returncode == 0:
+    if returncode == 0:
         print(stdout)
         print("\n✅ Build completado exitosamente.")
     else:
@@ -151,9 +198,9 @@ async def run_algorithm(data, rabbitmq_client):
     await notify_update(rabbitmq_client, request_hash, 1, "EXEC: Ejecutando algoritmo.")
 
     print("\n[ ] Ejecutando comando: ", run_cmd)
-    result = subprocess.run(run_cmd, capture_output=True, text=True, cwd=build_folder)
+    returncode, _, stderr = await lanzar(run_cmd, build_folder, TIMEOUT_NUCLEO)
 
-    if result.returncode == 0:
+    if returncode == 0:
         print("\n✅ Ejecución exitosa.")
 
         #save the files in minio
@@ -164,7 +211,7 @@ async def run_algorithm(data, rabbitmq_client):
         return True
     else:
         print("\n❌ Ejecución fallida.")
-        await notify_execution(rabbitmq_client, request_hash, STATUS_ERROR, result.stderr)
+        await notify_execution(rabbitmq_client, request_hash, STATUS_ERROR, stderr)
         return False
 
 
@@ -178,10 +225,11 @@ if __name__ == "__main__":
         async def message_handler(body):
             return await handle_message(body, rabbitmq_client)
 
-        # Start consuming messages
+        # Start consuming messages: one execution at a time (V15/WEB-304); the rest wait in the queue
         await rabbitmq_client.consume(
             EXECUTION_ALGORITHM_QUEUE,
-            callback=message_handler
+            callback=message_handler,
+            prefetch_count=1
         )
 
         # Keep the application running
