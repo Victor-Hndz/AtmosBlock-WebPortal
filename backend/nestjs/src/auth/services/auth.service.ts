@@ -75,6 +75,9 @@ export class AuthService {
       if (error instanceof ConflictException) {
         throw error;
       }
+      // No `cause` on purpose: a TypeORM error carries the query parameters (email and password hash)
+      // and the Nest logger prints the whole cause.
+      // eslint-disable-next-line preserve-caught-error
       throw new Error("Registration failed");
     }
   }

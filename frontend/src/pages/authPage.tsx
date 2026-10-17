@@ -300,16 +300,8 @@ const RegisterForm: React.FC<{
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordsMatch, setPasswordsMatch] = useState(true);
-
-  // Check if passwords match whenever either password field changes
-  useEffect(() => {
-    if (confirmPassword) {
-      setPasswordsMatch(password === confirmPassword);
-    } else {
-      setPasswordsMatch(true);
-    }
-  }, [password, confirmPassword]);
+  // Passwords match while the confirmation is empty or equal to the password
+  const passwordsMatch = !confirmPassword || password === confirmPassword;
 
   return (
     <Form.Root
@@ -466,13 +458,15 @@ export default function AuthPage(): JSX.Element {
     if (error) clearError();
   }, [activeTab, clearError, error]);
 
-  // Show toast notification when error occurs
-  useEffect(() => {
+  // Show toast notification when error occurs (adjusted while rendering, not in an effect)
+  const [shownError, setShownError] = useState<string | null>(null);
+  if (error !== shownError) {
+    setShownError(error);
     if (error) {
       setToastMessage(error);
       setToastOpen(true);
     }
-  }, [error]);
+  }
 
   // Toggle password visibility
   const toggleShowPassword = (): void => {

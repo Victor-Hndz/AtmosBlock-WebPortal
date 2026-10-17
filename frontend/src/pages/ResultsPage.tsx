@@ -9,34 +9,18 @@ import { MAX_PROGRESS } from "@/consts/progressConsts";
 // Component for displaying file preview
 const FilePreview: React.FC<{ file: ResultFile }> = ({ file }) => {
   const [enlarged, setEnlarged] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [hasError, setHasError] = useState(false);
   const { t } = useTranslation();
   const imageTimeoutRef = useRef<number | null>(null);
 
-  const isImage = file.name.match(/\.(jpeg|jpg|png|gif|svg)$/i);
-  const isPdf = file.name.match(/\.pdf$/i);
+  const isImage = /\.(jpeg|jpg|png|gif|svg)$/i.test(file.name);
+  const isPdf = /\.pdf$/i.test(file.name);
 
+  // Log the image as failed if it neither loads nor errors within 10 seconds
   useEffect(() => {
-    // Reset states when file changes
-    setImageLoaded(false);
-    setHasError(false);
-
-    // Set a timeout to avoid infinite loading state
-    if (isImage) {
-      // Clear any existing timeout
-      if (imageTimeoutRef.current) {
-        window.clearTimeout(imageTimeoutRef.current);
-      }
-
-      // Set a new timeout (10 seconds) after which we'll consider the image loading failed
-      imageTimeoutRef.current = window.setTimeout(() => {
-        if (!imageLoaded && !hasError) {
-          console.error(`Image load timeout for: ${file.url}`);
-          setHasError(true);
-        }
-      }, 10000); // 10 seconds timeout
-    }
+    if (!isImage) return;
+    imageTimeoutRef.current = window.setTimeout(() => {
+      console.error(`Image load timeout for: ${file.url}`);
+    }, 10000);
 
     return () => {
       // Clean up timeout on unmount or when file changes
@@ -44,15 +28,18 @@ const FilePreview: React.FC<{ file: ResultFile }> = ({ file }) => {
         window.clearTimeout(imageTimeoutRef.current);
       }
     };
-  }, [file, isImage, imageLoaded, hasError]);
+  }, [file, isImage]);
+
+  const clearImageTimeout = () => {
+    if (imageTimeoutRef.current) {
+      window.clearTimeout(imageTimeoutRef.current);
+    }
+  };
 
   // Handle image loading errors
   const handleImageError = () => {
     console.error(`Failed to load image: ${file.url}`);
-    setHasError(true);
-    if (imageTimeoutRef.current) {
-      window.clearTimeout(imageTimeoutRef.current);
-    }
+    clearImageTimeout();
   };
 
   if (!isImage && !isPdf) {
@@ -92,7 +79,7 @@ const FilePreview: React.FC<{ file: ResultFile }> = ({ file }) => {
               src={file.url}
               alt={file.name}
               className={`object-contain ${enlarged ? "w-full h-full" : "max-h-60 w-auto mx-auto"}`}
-              onLoad={() => setImageLoaded(true)}
+              onLoad={clearImageTimeout}
               onError={handleImageError}
             />
           </div>
@@ -104,7 +91,7 @@ const FilePreview: React.FC<{ file: ResultFile }> = ({ file }) => {
               src={`${file.url}#toolbar=0&view=FitH`}
               className="w-full h-full border border-slate-200 rounded"
               title={file.name}
-              onLoad={() => setImageLoaded(true)}
+              onLoad={clearImageTimeout}
               onError={handleImageError}
             />
             <button
@@ -128,7 +115,7 @@ export default function ResultsPage(): React.ReactElement {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const [requestHash, setRequestHash] = useState<string | null>(null);
+  const requestHash = new URLSearchParams(location.search).get("requestHash");
   const [totalProgress, setTotalProgress] = useState(0);
   const [progressMessage, setProgressMessage] = useState("");
   const [isConnected, setIsConnected] = useState(false);
@@ -139,10 +126,28 @@ export default function ResultsPage(): React.ReactElement {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isLoadingResults, setIsLoadingResults] = useState(false);
   const [progressComplete, setProgressComplete] = useState(false);
-  const previousRequestHashRef = useRef<string | null>(null);
   // Latest flags for the stream callbacks, so the stream is not reconnected when they change
   const streamFlagsRef = useRef({ hasError, isComplete, progressComplete });
-  streamFlagsRef.current = { hasError, isComplete, progressComplete };
+  useEffect(() => {
+    streamFlagsRef.current = { hasError, isComplete, progressComplete };
+  });
+
+  // Reset the progress state when a new request starts (adjusted while rendering, not in an effect);
+  // a reconnection to the same request keeps it
+  const [shownRequestHash, setShownRequestHash] = useState<string | null>(null);
+  if (requestHash !== shownRequestHash) {
+    setShownRequestHash(requestHash);
+    if (requestHash) {
+      setIsConnected(false);
+      setHasError(false);
+      setIsComplete(false);
+      setTotalProgress(0);
+      setProgressComplete(false);
+      setProgressMessage("");
+      setResultsData(null);
+      setPreviewFile(null);
+    }
+  }
 
   // Fetch result files when processing is complete
   const fetchResults = useCallback(async () => {
@@ -167,43 +172,18 @@ export default function ResultsPage(): React.ReactElement {
     }
   }, [requestHash]);
 
-  // Get request hash from URL parameters
+  // Redirect to home if no request hash is provided
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const hash = searchParams.get("requestHash");
-
-    if (!hash) {
-      // Redirect to home if no request hash is provided
+    if (!requestHash) {
       navigate("/", { replace: true });
-      return;
     }
-
-    setRequestHash(hash);
-  }, [location, navigate]);
+  }, [requestHash, navigate]);
 
   // Connect to progress stream when component mounts
   useEffect(() => {
     let cleanup: (() => void) | null = null;
 
     if (requestHash) {
-      // Check if this is a new request or just a page reload
-      const isNewRequest = previousRequestHashRef.current !== requestHash;
-
-      // Only reset states when starting a new connection for a new request
-      if (isNewRequest) {
-        setIsConnected(false);
-        setHasError(false);
-        setIsComplete(false);
-        setTotalProgress(0);
-        setProgressComplete(false);
-        setProgressMessage("");
-        setResultsData(null);
-        setPreviewFile(null);
-      }
-
-      // Update the reference for future comparisons
-      previousRequestHashRef.current = requestHash;
-
       // Connect to the progress stream
       cleanup = ProgressService.connectToProgressStream({
         requestHash,
