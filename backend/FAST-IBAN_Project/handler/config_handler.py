@@ -1,6 +1,5 @@
-import os
 import sys
-from typing import List, Optional
+from typing import Optional
 import asyncio
 
 sys.path.append('/app/')
@@ -11,7 +10,7 @@ from utils.rabbitMQ.create_message import create_message
 from utils.rabbitMQ.rabbit_consts import HANDLER_QUEUE, NOTIFICATIONS_QUEUE, EXECUTION_EXCHANGE, EXECUTION_ALGORITHM_KEY, EXECUTION_VISUALIZATION_KEY, NOTIFY_EXECUTION, NOTIFY_VISUALIZATION
 from utils.clean_folder_files import clean_directory
 from utils.rabbitMQ.notify_results import notify_result
-from utils.consts.consts import EXEC_FILE, STATUS_OK, STATUS_ERROR
+from utils.consts.consts import STATUS_OK, STATUS_ERROR
 
 OUT_DIR = "./out"
 
@@ -143,50 +142,26 @@ class ConfigHandler:
 
         print(f"\n[ ] Ejecutando el programa para el archivo: {config['file']}")
 
-        cmd = self.prepare_execution_command(config, lat_range, lon_range)
-
         print("\n[ ] Enviando mensaje a la cola de ejecución...")
 
-        data = {"cmd": cmd, "request_hash": config["requestHash"], "variable_name": config["variableName"].lower()}
+        # V5/WEB-301: parameters, never a command; exec_handler validates them and builds the argv itself.
+        data = {
+            "request_hash": config["requestHash"],
+            "variable_name": config["variableName"].lower(),
+            "file": config["file"],
+            "lat_min": lat_range[0],
+            "lat_max": lat_range[1],
+            "lon_min": lon_range[0],
+            "lon_max": lon_range[1],
+            "omp": bool(config["omp"]),
+            "mpi": bool(config["mpi"]),
+            "n_threads": config["nThreads"],
+            "n_proces": config["nProces"],
+        }
 
         # The result arrives on NOTIFICATIONS_QUEUE, consumed once at startup
         message = create_message(STATUS_OK, "", data)
         await self.rabbitmq.publish(EXECUTION_EXCHANGE, EXECUTION_ALGORITHM_KEY, message)
-
-    def prepare_execution_command(self, config: dict, lat_range: List[int], lon_range: List[int]) -> List[str]:
-        """
-        Prepare the execution command based on configuration.
-
-        Args:
-            config: Configuration of the request
-            lat_range: Latitude range [min, max]
-            lon_range: Longitude range [min, max]
-
-        Returns:
-            List of command arguments
-        """
-        out_dir = OUT_DIR+"/"+config["requestHash"]+"/"
-        area = [config["file"], str(lat_range[0]), str(lat_range[1]), str(lon_range[0]), str(lon_range[1]), out_dir]
-
-        # WEB-218: each mode has its own binary (./FAST-IBAN, _omp, _mpi, _omp_mpi). Only the geopotential core
-        # (code/) builds the parallel variants; the temperature core (code_t/) is serial only.
-        parallel = config["variableName"].lower() == "geopotential"
-        omp = bool(config["omp"]) and parallel
-        mpi = bool(config["mpi"]) and parallel
-
-        # ponytail: defaults from this container's CPU count (the execution container runs on the same host);
-        # the form has no thread/process fields yet.
-        cpus = os.cpu_count() or 1
-        if omp and mpi:
-            processes = config["nProces"] or 2
-            threads = config["nThreads"] or max(1, cpus // processes)
-        else:
-            processes = config["nProces"] or cpus
-            threads = config["nThreads"] or cpus
-
-        binary = EXEC_FILE + ("_omp" if omp else "") + ("_mpi" if mpi else "")
-        cmd = [binary, *area, str(threads) if omp else "1"]
-        return ["mpirun", "-n", str(processes), *cmd] if mpi else cmd
 
     async def process_map_generation(self, config: dict) -> None:
         """

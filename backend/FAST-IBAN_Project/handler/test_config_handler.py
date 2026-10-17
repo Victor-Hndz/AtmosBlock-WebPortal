@@ -1,16 +1,16 @@
 """Handler de configuración: errores notificados a la API (WEB-211), peticiones independientes (WEB-222)
-y comando del núcleo según el paralelismo pedido (WEB-218).
+y parámetros, no un comando, hacia la cola de ejecución (V5/WEB-301).
 
 Uso: python backend/FAST-IBAN_Project/handler/test_config_handler.py
 """
 import asyncio
+import hashlib
 import importlib.util
 import json
 import pathlib
 import sys
 import types
 import unittest
-from unittest import mock
 
 RAIZ = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ))
@@ -56,6 +56,10 @@ class RabbitFalso:
         return [m for k, m in self.publicados if k == clave]
 
 
+# La API genera el hash con SHA-256 en hexadecimal (requests.service.ts); process_body rechaza otros (V14).
+H1, A, B = (hashlib.sha256(nombre.encode()).hexdigest() for nombre in ("h1", "a", "b"))
+
+
 def mensaje(**contenido):
     return json.dumps({"status": STATUS_OK, "message": "", "content": contenido}).encode()
 
@@ -86,19 +90,19 @@ class ConfigHandlerTest(unittest.TestCase):
         asyncio.run(manejador(mensaje(request_type=tipo, request_hash=request_hash, exec_status=estado, exec_message=texto)))
 
     def test_error_de_ejecucion_se_notifica_a_la_api(self):
-        asyncio.run(self.handler.handle_config_message(configuracion("h1")))
-        self.notificar(NOTIFY_EXECUTION, "h1", STATUS_ERROR, "segfault")
+        asyncio.run(self.handler.handle_config_message(configuracion(H1)))
+        self.notificar(NOTIFY_EXECUTION, H1, STATUS_ERROR, "segfault")
 
         resultados = self.rabbit.con_clave(RESULTS_DONE_KEY)
         self.assertEqual(len(resultados), 1)
         self.assertEqual(resultados[0]["status"], STATUS_ERROR)
-        self.assertEqual(resultados[0]["content"]["requestHash"], "h1")
+        self.assertEqual(resultados[0]["content"]["requestHash"], H1)
         self.assertIn("segfault", resultados[0]["content"]["content"])
 
     def test_error_de_mapas_se_notifica_a_la_api(self):
-        asyncio.run(self.handler.handle_config_message(configuracion("h1")))
-        self.notificar(NOTIFY_EXECUTION, "h1", STATUS_OK)
-        self.notificar(NOTIFY_VISUALIZATION, "h1", STATUS_ERROR, "cartopy")
+        asyncio.run(self.handler.handle_config_message(configuracion(H1)))
+        self.notificar(NOTIFY_EXECUTION, H1, STATUS_OK)
+        self.notificar(NOTIFY_VISUALIZATION, H1, STATUS_ERROR, "cartopy")
 
         resultados = self.rabbit.con_clave(RESULTS_DONE_KEY)
         self.assertEqual(len(resultados), 1)
@@ -107,62 +111,55 @@ class ConfigHandlerTest(unittest.TestCase):
 
     def test_cada_paso_publica_sin_volver_a_suscribirse(self):
         # Antes, process_file y process_map_generation llamaban otra vez a consume(NOTIFICATIONS_QUEUE).
-        asyncio.run(self.handler.handle_config_message(configuracion("h1")))
-        self.notificar(NOTIFY_EXECUTION, "h1", STATUS_OK)
+        asyncio.run(self.handler.handle_config_message(configuracion(H1)))
+        self.notificar(NOTIFY_EXECUTION, H1, STATUS_OK)
 
         self.assertEqual(len(self.rabbit.con_clave(EXECUTION_ALGORITHM_KEY)), 1)
         self.assertEqual(len(self.rabbit.con_clave(EXECUTION_VISUALIZATION_KEY)), 1)
 
     def test_peticiones_simultaneas_no_se_pisan(self):
-        asyncio.run(self.handler.handle_config_message(configuracion("a", noMaps=True)))
-        asyncio.run(self.handler.handle_config_message(configuracion("b")))
+        asyncio.run(self.handler.handle_config_message(configuracion(A, noMaps=True)))
+        asyncio.run(self.handler.handle_config_message(configuracion(B)))
 
-        self.notificar(NOTIFY_EXECUTION, "a", STATUS_OK)
+        self.notificar(NOTIFY_EXECUTION, A, STATUS_OK)
 
         resultados = self.rabbit.con_clave(RESULTS_DONE_KEY)
-        self.assertEqual([r["content"]["requestHash"] for r in resultados], ["a"])
+        self.assertEqual([r["content"]["requestHash"] for r in resultados], [A])
         self.assertEqual(resultados[0]["status"], STATUS_OK)
         self.assertEqual(self.rabbit.con_clave(EXECUTION_VISUALIZATION_KEY), [], "a no pidió mapas")
-        self.assertEqual(limpiados, ["./out/a"])
+        self.assertEqual(limpiados, [f"./out/{A}"])
 
-        self.notificar(NOTIFY_EXECUTION, "b", STATUS_OK)
+        self.notificar(NOTIFY_EXECUTION, B, STATUS_OK)
         mapas = self.rabbit.con_clave(EXECUTION_VISUALIZATION_KEY)
-        self.assertEqual([m["content"]["request_hash"] for m in mapas], ["b"])
+        self.assertEqual([m["content"]["request_hash"] for m in mapas], [B])
 
 
-class ComandoEjecucionTest(unittest.TestCase):
-    """WEB-218: el portal lanzaba siempre ./FAST-IBAN (serie) y pasaba None como hilos o procesos."""
+class MensajeEjecucionTest(unittest.TestCase):
+    """V5/WEB-301: el handler mandaba el argv completo (data["cmd"]) y exec_handler lo ejecutaba tal cual."""
 
-    AREA = ["/app/config/data/h.nc", "-90", "90", "-180", "180", "./out/h/"]
+    def publicado(self, **cambios):
+        rabbit = RabbitFalso()
+        asyncio.run(config_handler.ConfigHandler(rabbit).handle_config_message(configuracion(H1, **cambios)))
+        (enviado,) = rabbit.con_clave(EXECUTION_ALGORITHM_KEY)
+        return enviado["content"]
 
-    def comando(self, **cambios):
-        handler = config_handler.ConfigHandler(RabbitFalso())
-        with mock.patch.object(config_handler.os, "cpu_count", return_value=8):
-            cmd = handler.prepare_execution_command(datos_configuracion("h", **cambios), [-90, 90], [-180, 180])
-        self.assertTrue(all(isinstance(arg, str) for arg in cmd), f"subprocess exige texto: {cmd}")
-        return cmd
-
-    def test_serie(self):
-        self.assertEqual(self.comando(), ["./FAST-IBAN", *self.AREA, "1"])
-
-    def test_openmp_usa_su_binario_y_todos_los_nucleos_por_defecto(self):
-        self.assertEqual(self.comando(omp=True), ["./FAST-IBAN_omp", *self.AREA, "8"])
-
-    def test_openmp_respeta_los_hilos_pedidos(self):
-        self.assertEqual(self.comando(omp=True, nThreads=3), ["./FAST-IBAN_omp", *self.AREA, "3"])
-
-    def test_mpi_usa_mpirun_y_su_binario(self):
-        self.assertEqual(self.comando(mpi=True), ["mpirun", "-n", "8", "./FAST-IBAN_mpi", *self.AREA, "1"])
-        self.assertEqual(self.comando(mpi=True, nProces=3), ["mpirun", "-n", "3", "./FAST-IBAN_mpi", *self.AREA, "1"])
-
-    def test_hibrido_reparte_los_nucleos_entre_procesos_e_hilos(self):
+    def test_publica_parametros_y_no_un_comando(self):
         self.assertEqual(
-            self.comando(omp=True, mpi=True), ["mpirun", "-n", "2", "./FAST-IBAN_omp_mpi", *self.AREA, "4"]
+            self.publicado(),
+            {
+                "request_hash": H1, "variable_name": "geopotential", "file": f"/app/config/data/{H1}.nc",
+                "lat_min": -90, "lat_max": 90, "lon_min": -180, "lon_max": 180,
+                "omp": False, "mpi": False, "n_threads": None, "n_proces": None,
+            },
         )
 
-    def test_temperatura_solo_tiene_version_en_serie(self):
-        # code_t solo compila el binario en serie.
-        self.assertEqual(self.comando(variableName="temperature", omp=True, mpi=True), ["./FAST-IBAN", *self.AREA, "1"])
+    def test_paralelismo_pedido_tal_cual(self):
+        contenido = self.publicado(variableName="Geopotential", omp=1, mpi=True, nThreads=3, nProces=2)
+        self.assertNotIn("cmd", contenido)
+        self.assertEqual(contenido["variable_name"], "geopotential")
+        self.assertEqual(
+            (contenido["omp"], contenido["mpi"], contenido["n_threads"], contenido["n_proces"]), (True, True, 3, 2)
+        )
 
 
 if __name__ == "__main__":

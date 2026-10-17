@@ -1,14 +1,4 @@
-import {
-  IsString,
-  IsBoolean,
-  IsArray,
-  ValidateIf,
-  IsNotEmpty,
-  IsOptional,
-  IsUUID,
-  IsNumber,
-  IsIn,
-} from "class-validator";
+import { IsString, IsBoolean, IsArray, IsNotEmpty, IsOptional, IsUUID, IsInt, Min, IsIn } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Request } from "@/requests/domain/entities/request.entity";
 import { requestStatus } from "@/shared/enums/requestStatus.enum";
@@ -100,14 +90,14 @@ export class CreateRequestDto {
   mpi?: boolean;
 
   @ApiPropertyOptional({ description: "Number of threads for OpenMP" })
-  @ValidateIf(o => o.omp === true)
-  @IsNumber()
+  @IsInt()
+  @Min(1)
   @IsOptional()
   nThreads?: number;
 
   @ApiPropertyOptional({ description: "Number of processes for MPI" })
-  @ValidateIf(o => o.mpi === true)
-  @IsNumber()
+  @IsInt()
+  @Min(1)
   @IsOptional()
   nProces?: number;
 
