@@ -1,14 +1,7 @@
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 # Set the working directory inside the container
 WORKDIR /app
-
-# Install Ansible and required tools and update dependencies
-RUN apt-get update && \
-	apt-get install -y python3-pip \
-	&& pip install --upgrade pip && \
-	apt-get clean && \
-	rm -rf /var/lib/apt/lists/*
 
 COPY ./handler /app/handler
 
