@@ -1,45 +1,28 @@
-# Base image with build tools and libraries
-FROM ubuntu:22.04
+# Base image of the C core (CI job c-core and execution/Dockerfile). WEB-363: Ubuntu 26.04 with everything from apt
+# (NetCDF 4.9.3, formerly compiled from source with ansible). Not 24.04: its MPICH 4.2.0 is built against PMIx but its
+# mpiexec does not speak PMIx, so every rank runs alone ("rank 0 of 1").
+FROM ubuntu:26.04@sha256:c098726dd9b9733f3e885f8de0ef375206a311b0a317eadc40d347b1115fb944
 
-# Set up environment variables
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 
-# Install Ansible and required tools and update dependencies
-RUN apt-get update && apt-get install -y \
-    ansible \
+# Ubuntu archive snapshot: rebuilding the image installs the same package versions (same gcc, same NetCDF).
+# The snapshot server is HTTPS only, so the CA certificates come first, from the live archive.
+ARG SNAPSHOT=20261017T000000Z
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+    && apt-get update --snapshot $SNAPSHOT && apt-get install -y --no-install-recommends --snapshot $SNAPSHOT \
     build-essential \
     cmake \
     git \
-    libcurl4-openssl-dev \
+    libmpich-dev \
     libnetcdf-dev \
-    m4 \
     mpich \
+    netcdf-bin \
     python3 \
-    python3-apt \
     python3-pip \
-    wget \
-    unzip \
-    && pip install --upgrade pip \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy playbook and related files
-COPY /execution/install_netcdf.yaml /app/install_netcdf.yml
-
-# Run Ansible playbook
-RUN ansible-playbook install_netcdf.yml
-
-# ALG-356: sin esto, ncdump (4.9.2, compilado en /usr/local) resuelve libnetcdf.so.19 contra la de apt (4.8.1) y
-# muere con "undefined symbol: nc_reclaim_data". ldconfig deja /usr/local/lib por delante en la caché del enlazador.
-RUN ldconfig && ncdump 2>&1 | head -1
-
-# Set environment variables for NetCDF and HDF5
-ENV HDF5_DIR=/usr/local/hdf5-1.14.3
-ENV NETCDF4_DIR=/usr/local
-
-# Define default command (can be overridden)
 CMD ["/bin/bash"]
