@@ -8,6 +8,9 @@ import { MinioService } from "../services/minio.service";
 import { firmaRuta } from "../signed-url";
 
 const SECRETO = "secreto-solo-para-tests";
+// SHA-256 en hex, como los genera la API (RequestHashPipe rechaza el resto, V14/WEB-302).
+const H1 = "1".repeat(64);
+const H2 = "2".repeat(64);
 
 // WEB-102 (V2): el proxy solo sirve ficheros con una URL firmada y vigente emitida por la API.
 describe("GET /files/proxy/:requestHash/:filename (URL firmada)", () => {
@@ -39,34 +42,43 @@ describe("GET /files/proxy/:requestHash/:filename (URL firmada)", () => {
   const enUnaHora = () => Math.floor(Date.now() / 1000) + 3600;
 
   it("sin firma devuelve 403 y no lee MinIO", async () => {
-    await request(app.getHttpServer()).get("/files/proxy/hash-1/mapa.png").expect(403);
+    await request(app.getHttpServer()).get(`/files/proxy/${H1}/mapa.png`).expect(403);
 
     expect(getFile).not.toHaveBeenCalled();
   });
 
   it("con firma válida sirve el fichero", async () => {
     const expira = enUnaHora();
-    const firma = firmaRuta("hash-1/mapa.png", expira, SECRETO);
+    const firma = firmaRuta(`${H1}/mapa.png`, expira, SECRETO);
 
-    await request(app.getHttpServer()).get(`/files/proxy/hash-1/mapa.png?expires=${expira}&sig=${firma}`).expect(200);
+    await request(app.getHttpServer()).get(`/files/proxy/${H1}/mapa.png?expires=${expira}&sig=${firma}`).expect(200);
 
-    expect(getFile).toHaveBeenCalledWith("hash-1/mapa.png");
+    expect(getFile).toHaveBeenCalledWith(`${H1}/mapa.png`);
   });
 
   it("la firma de un fichero no sirve para otro (403)", async () => {
     const expira = enUnaHora();
+    const firma = firmaRuta(`${H1}/mapa.png`, expira, SECRETO);
+
+    await request(app.getHttpServer()).get(`/files/proxy/${H2}/datos.nc?expires=${expira}&sig=${firma}`).expect(403);
+
+    expect(getFile).not.toHaveBeenCalled();
+  });
+
+  it("un hash que no es SHA-256 en hex devuelve 400 y no lee MinIO (V14/WEB-302)", async () => {
+    const expira = enUnaHora();
     const firma = firmaRuta("hash-1/mapa.png", expira, SECRETO);
 
-    await request(app.getHttpServer()).get(`/files/proxy/hash-2/datos.nc?expires=${expira}&sig=${firma}`).expect(403);
+    await request(app.getHttpServer()).get(`/files/proxy/hash-1/mapa.png?expires=${expira}&sig=${firma}`).expect(400);
 
     expect(getFile).not.toHaveBeenCalled();
   });
 
   it("una URL caducada devuelve 403", async () => {
     const expira = Math.floor(Date.now() / 1000) - 60;
-    const firma = firmaRuta("hash-1/mapa.png", expira, SECRETO);
+    const firma = firmaRuta(`${H1}/mapa.png`, expira, SECRETO);
 
-    await request(app.getHttpServer()).get(`/files/proxy/hash-1/mapa.png?expires=${expira}&sig=${firma}`).expect(403);
+    await request(app.getHttpServer()).get(`/files/proxy/${H1}/mapa.png?expires=${expira}&sig=${firma}`).expect(403);
 
     expect(getFile).not.toHaveBeenCalled();
   });

@@ -1,5 +1,6 @@
 """Ejecución del núcleo: errores notificados sin tumbar el consumidor (WEB-207), argv construido aquí a partir de
-parámetros validados y nunca un comando recibido por la cola (V5/WEB-301) y binario según el paralelismo pedido (WEB-218).
+parámetros validados y nunca un comando recibido por la cola (V5/WEB-301), hash de petición validado en la entrada
+de todos los consumidores (V14/WEB-302) y binario según el paralelismo pedido (WEB-218).
 
 Uso: python backend/FAST-IBAN_Project/execution/handler/test_exec_handler.py
 """
@@ -84,6 +85,25 @@ class ProcessBodyTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             process_body(b"{esto no es json")
 
+    def test_hash_invalido_lanza_valueerror(self):
+        # V14: el hash acaba en rutas de disco (./out/<hash>) y en claves de MinIO.
+        for invalido in ["../../etc", HASH.upper(), HASH[:63], HASH + "0", None, 7]:
+            with self.subTest(hash=invalido), self.assertRaises(ValueError):
+                process_body(mensaje(request_hash=invalido))
+        with self.assertRaises(ValueError):
+            process_body(mensaje(otro="sin hash"))
+
+    def test_acepta_request_hash_y_requesthash_en_texto(self):
+        self.assertEqual(process_body(mensaje(request_hash=HASH))["request_hash"], HASH)
+        # La API manda el contenido como texto JSON y con requestHash (configurador).
+        cuerpo = json.dumps({"status": "OK", "message": "", "content": json.dumps({"requestHash": HASH})}).encode()
+        self.assertEqual(process_body(cuerpo)["requestHash"], HASH)
+
+    def test_contenido_que_no_es_un_objeto_lanza_valueerror(self):
+        cuerpo = json.dumps({"status": "OK", "message": "", "content": json.dumps([HASH])}).encode()
+        with self.assertRaises(ValueError):
+            process_body(cuerpo)
+
 
 class ExecHandlerTest(unittest.TestCase):
     def test_variable_desconocida_notifica_error_sin_compilar(self):
@@ -125,6 +145,34 @@ class ComandoRecibidoTest(unittest.TestCase):
         )
         for llamada in run.call_args_list:
             self.assertNotIn("/bin/sh", llamada.args[0])
+
+
+class HashInvalidoTest(unittest.TestCase):
+    """V14/WEB-302: un hash con ../ salía de ./out al compilar la ruta de salida o al limpiarla."""
+
+    def test_hash_invalido_no_ejecuta_ni_publica(self):
+        for invalido in ["../../etc", HASH.upper(), HASH[:63], None]:
+            with self.subTest(hash=invalido):
+                rabbit = RabbitFalso()
+                with self.assertRaises(ValueError):
+                    ejecutar(parametros(request_hash=invalido), rabbit)
+                self.assertEqual(rabbit.publicados, [])
+
+        rabbit = RabbitFalso()
+        contenido = parametros()
+        del contenido["request_hash"]
+        with self.assertRaises(ValueError):
+            ejecutar(contenido, rabbit)
+        self.assertEqual(rabbit.publicados, [])
+
+    def test_hash_invalido_no_llama_a_subprocess(self):
+        with mock.patch.object(exec_handler.subprocess, "run") as run, mock.patch.object(
+            exec_handler.subprocess, "Popen"
+        ) as popen:
+            with self.assertRaises(ValueError):
+                asyncio.run(exec_handler.handle_message(mensaje(**parametros(request_hash="../../etc")), RabbitFalso()))
+        run.assert_not_called()
+        popen.assert_not_called()
 
 
 class ParametrosInvalidosTest(unittest.TestCase):

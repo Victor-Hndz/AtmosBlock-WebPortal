@@ -2,6 +2,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { Observable, Subject, concat, defer, filter, of, takeWhile } from "rxjs";
 import { ProgressEvent } from "../domain/progress.interface";
 import { MAX_PROGRESS } from "@/shared/consts/consts";
+import { REQUEST_HASH } from "@/shared/request-hash";
 
 @Injectable()
 export class ProgressService {
@@ -18,8 +19,9 @@ export class ProgressService {
     const { requestHash, increment, message, error } = progressEvent;
     this.logger.log(`Progress update: ${JSON.stringify(progressEvent)}`);
 
-    if (!requestHash) {
-      this.logger.warn("Progress update without requestHash ignored");
+    // V14/WEB-302: every producer (AMQP consumers and RequestsService) goes through here.
+    if (typeof requestHash !== "string" || !REQUEST_HASH.test(requestHash)) {
+      this.logger.warn(`Progress update with an invalid request hash ignored: ${JSON.stringify(requestHash)}`);
       return;
     }
     if (increment < 0 || increment > MAX_PROGRESS) {

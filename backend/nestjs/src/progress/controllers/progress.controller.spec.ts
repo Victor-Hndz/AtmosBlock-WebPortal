@@ -12,6 +12,9 @@ import { firmaRuta } from "@/minio/signed-url";
 import { MAX_PROGRESS } from "@/shared/consts/consts";
 
 const SECRETO = "secreto-solo-para-tests";
+// SHA-256 en hex, como los genera la API (RequestHashPipe rechaza el resto, V14/WEB-302).
+const PROPIO = "a".repeat(64);
+const AJENO = "b".repeat(64);
 
 // WEB-210: el stream de progreso solo con URL firmada, emitida al dueño de la petición.
 describe("Progreso por SSE (autenticación y propiedad)", () => {
@@ -47,38 +50,48 @@ describe("Progreso por SSE (autenticación y propiedad)", () => {
 
   beforeEach(() => {
     getRequestHashesByUserId.mockReset();
-    getRequestHashesByUserId.mockResolvedValue(["hash-propio"]);
+    getRequestHashesByUserId.mockResolvedValue([PROPIO]);
   });
 
   const enUnaHora = () => Math.floor(Date.now() / 1000) + 3600;
 
   it("pedir la URL del stream sin token devuelve 401", async () => {
-    await request(app.getHttpServer()).get("/progress/stream-url/hash-propio").expect(401);
+    await request(app.getHttpServer()).get(`/progress/stream-url/${PROPIO}`).expect(401);
 
     expect(getRequestHashesByUserId).not.toHaveBeenCalled();
   });
 
   it("pedir la URL del stream de una petición ajena devuelve 404", async () => {
     await request(app.getHttpServer())
-      .get("/progress/stream-url/hash-ajeno")
+      .get(`/progress/stream-url/${AJENO}`)
       .set("Authorization", `Bearer ${token}`)
       .expect(404);
 
     expect(getRequestHashesByUserId).toHaveBeenCalledWith("usuario-1");
   });
 
+  it("un hash que no es SHA-256 en hex devuelve 400 (V14/WEB-302)", async () => {
+    await request(app.getHttpServer())
+      .get("/progress/stream-url/hash-propio")
+      .set("Authorization", `Bearer ${token}`)
+      .expect(400);
+    await request(app.getHttpServer()).get("/progress/stream/..%2F..%2Fx").expect(400);
+
+    expect(getRequestHashesByUserId).not.toHaveBeenCalled();
+  });
+
   it("el stream sin firma devuelve 403", async () => {
-    const res = await request(app.getHttpServer()).get("/progress/stream/hash-propio").expect(403);
+    const res = await request(app.getHttpServer()).get(`/progress/stream/${PROPIO}`).expect(403);
 
     expect(res.headers["content-type"]).not.toContain("text/event-stream");
   });
 
   it("la firma de una petición no sirve para otra (403)", async () => {
     const expira = enUnaHora();
-    const firma = firmaRuta("progress:hash-propio", expira, SECRETO);
+    const firma = firmaRuta(`progress:${PROPIO}`, expira, SECRETO);
 
     const res = await request(app.getHttpServer())
-      .get(`/progress/stream/hash-ajeno?expires=${expira}&sig=${firma}`)
+      .get(`/progress/stream/${AJENO}?expires=${expira}&sig=${firma}`)
       .expect(403);
 
     expect(res.headers["content-type"]).not.toContain("text/event-stream");
@@ -86,10 +99,10 @@ describe("Progreso por SSE (autenticación y propiedad)", () => {
 
   it("la firma de un fichero no abre el stream (403)", async () => {
     const expira = enUnaHora();
-    const firma = firmaRuta("hash-propio/mapa.png", expira, SECRETO);
+    const firma = firmaRuta(`${PROPIO}/mapa.png`, expira, SECRETO);
 
     const res = await request(app.getHttpServer())
-      .get(`/progress/stream/hash-propio?expires=${expira}&sig=${firma}`)
+      .get(`/progress/stream/${PROPIO}?expires=${expira}&sig=${firma}`)
       .expect(403);
 
     expect(res.headers["content-type"]).not.toContain("text/event-stream");
@@ -97,14 +110,14 @@ describe("Progreso por SSE (autenticación y propiedad)", () => {
 
   it("con la URL emitida para el dueño recibe el progreso de su petición", async () => {
     const { body } = await request(app.getHttpServer())
-      .get("/progress/stream-url/hash-propio")
+      .get(`/progress/stream-url/${PROPIO}`)
       .set("Authorization", `Bearer ${token}`)
       .expect(200);
 
-    expect(body.url).toMatch(/^\/progress\/stream\/hash-propio\?expires=\d+&sig=[0-9a-f]{64}$/);
+    expect(body.url).toMatch(/^\/progress\/stream\/a{64}\?expires=\d+&sig=[0-9a-f]{64}$/);
 
     // Petición ya terminada: el stream reenvía el último estado y se cierra.
-    progressService.updateProgress({ requestHash: "hash-propio", increment: MAX_PROGRESS, message: "listo" });
+    progressService.updateProgress({ requestHash: PROPIO, increment: MAX_PROGRESS, message: "listo" });
     const res = await request(app.getHttpServer()).get(body.url).expect(200);
 
     expect(res.headers["content-type"]).toContain("text/event-stream");

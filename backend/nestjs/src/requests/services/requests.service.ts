@@ -12,6 +12,7 @@ import { MinioService } from "@/minio/services/minio.service";
 import { GeneratedFiles } from "@/generatedFiles/domain/entities/generatedFiles.entity";
 import { UsersService } from "@/users/services/users.service";
 import { ProgressService } from "@/progress/services/progress.service";
+import { REQUEST_HASH } from "@/shared/request-hash";
 
 @Injectable()
 export class RequestsService {
@@ -180,6 +181,12 @@ export class RequestsService {
       const messageContent = message.content as ResultMessageContent;
       const requestHash = messageContent.requestHash;
       const messageText = messageContent.content;
+
+      // V14/WEB-302: the hash arrives over AMQP; only a hex SHA-256 reaches the repository or MinIO.
+      if (typeof requestHash !== "string" || !REQUEST_HASH.test(requestHash)) {
+        this.logger.warn(`Result message with an invalid request hash: ${JSON.stringify(requestHash)}`);
+        return;
+      }
 
       if (messageStatus !== "OK") {
         this.logger.error(

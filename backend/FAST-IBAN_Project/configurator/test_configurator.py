@@ -6,6 +6,7 @@ el wrapper del consumidor tragaba la excepción y la petición se quedaba en GEN
 Uso: python backend/FAST-IBAN_Project/configurator/test_configurator.py
 """
 import asyncio
+import hashlib
 import importlib.util
 import json
 import pathlib
@@ -59,6 +60,10 @@ from utils.consts.consts import STATUS_ERROR, STATUS_OK  # noqa: E402
 from utils.rabbitMQ.rabbit_consts import HANDLER_START_KEY, PROGRESS_UPDATE_KEY, RESULTS_DONE_KEY  # noqa: E402
 
 
+# La API genera el hash con SHA-256 en hexadecimal (requests.service.ts); process_body rechaza otros (V14).
+H1, A, B = (hashlib.sha256(nombre.encode()).hexdigest() for nombre in ("h1", "a", "b"))
+
+
 class RabbitFalso:
     def __init__(self):
         self.publicados = []
@@ -74,7 +79,7 @@ class RabbitFalso:
 
 def peticion(**cambios):
     contenido = {
-        "requestHash": "h1", "variableName": "humidity", "pressureLevels": ["500"], "years": ["2022"],
+        "requestHash": H1, "variableName": "humidity", "pressureLevels": ["500"], "years": ["2022"],
         "months": ["03"], "days": ["14"], "hours": ["12"], "areaCovered": ["90", "-180", "-90", "180"],
         "mapTypes": ["comb"], "fileFormat": "png", **cambios,
     }
@@ -99,7 +104,7 @@ class ConfiguratorErroresTest(unittest.TestCase):
         resultados = rabbit.con_clave(RESULTS_DONE_KEY)
         self.assertEqual(len(resultados), 1)
         self.assertEqual(resultados[0]["status"], STATUS_ERROR)
-        self.assertEqual(resultados[0]["content"]["requestHash"], "h1")
+        self.assertEqual(resultados[0]["content"]["requestHash"], H1)
         self.assertEqual(llamadas_adapt, [], "no debe adaptar un fichero que no se ha descargado")
         self.assertEqual(rabbit.con_clave(HANDLER_START_KEY), [], "no debe lanzar el handler")
 
@@ -113,19 +118,19 @@ class ConfiguratorConcurrenciaTest(unittest.TestCase):
 
         async def ambas():
             await asyncio.gather(
-                conf.process_message(peticion(requestHash="a", variableName="geopotential", hours=["0"])),
-                conf.process_message(peticion(requestHash="b", variableName="geopotential", hours=["6"])),
+                conf.process_message(peticion(requestHash=A, variableName="geopotential", hours=["0"])),
+                conf.process_message(peticion(requestHash=B, variableName="geopotential", hours=["6"])),
             )
 
         with mock.patch.object(configurator.os.path, "exists", return_value=True):
             asyncio.run(ambas())
 
         enviados = {m["content"]["requestHash"]: m["content"]["file"] for m in rabbit.con_clave(HANDLER_START_KEY)}
-        self.assertEqual(sorted(enviados), ["a", "b"])
-        self.assertTrue(enviados["a"].endswith("_00UTC.nc"), enviados["a"])
-        self.assertTrue(enviados["b"].endswith("_06UTC.nc"), enviados["b"])
+        self.assertEqual(sorted(enviados), sorted([A, B]))
+        self.assertTrue(enviados[A].endswith("_00UTC.nc"), enviados[A])
+        self.assertTrue(enviados[B].endswith("_06UTC.nc"), enviados[B])
         progreso = [m["content"]["requestHash"] for m in rabbit.con_clave(PROGRESS_UPDATE_KEY)]
-        self.assertEqual((progreso.count("a"), progreso.count("b")), (3, 3))
+        self.assertEqual((progreso.count(A), progreso.count(B)), (3, 3))
 
 
 class AreaDeDescargaTest(unittest.TestCase):
