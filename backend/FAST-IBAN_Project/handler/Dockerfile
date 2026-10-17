@@ -10,11 +10,6 @@ RUN apt-get update && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/*
 
-
-COPY ./handler/requirements.txt /app/handler/requirements.txt
-RUN --mount=type=cache,target=/root/.cache/pip \
-	pip install --no-cache-dir -r ./handler/requirements.txt
-
 COPY ./handler /app/handler
 
 # Copy and install utils dependencies
