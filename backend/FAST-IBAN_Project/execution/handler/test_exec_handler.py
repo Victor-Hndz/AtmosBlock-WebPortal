@@ -1,15 +1,21 @@
 """Ejecución del núcleo: errores notificados sin tumbar el consumidor (WEB-207), argv construido aquí a partir de
 parámetros validados y nunca un comando recibido por la cola (V5/WEB-301), hash de petición validado en la entrada
-de todos los consumidores (V14/WEB-302) y binario según el paralelismo pedido (WEB-218).
+de todos los consumidores (V14/WEB-302), binario según el paralelismo pedido (WEB-218) y núcleo lanzado sin
+bloquear el bucle de eventos, con tiempo máximo y con los CPU del contenedor (V15/WEB-304).
 
 Uso: python backend/FAST-IBAN_Project/execution/handler/test_exec_handler.py
 """
 import asyncio
+import contextlib
 import hashlib
 import importlib.util
 import json
+import os
 import pathlib
+import signal
 import sys
+import tempfile
+import time
 import types
 import unittest
 from unittest import mock
@@ -65,18 +71,50 @@ def parametros(**cambios):
     }
 
 
+class ProcesoFalso:
+    """Proceso de asyncio.create_subprocess_exec simulado: tarda `segundos` (None: no termina hasta que lo maten)."""
+
+    def __init__(self, pid, segundos=0):
+        self.pid, self.segundos, self.returncode, self.matado = pid, segundos, None, False
+        self._fin = asyncio.Event()
+
+    async def communicate(self):
+        if self.segundos is None:
+            await self._fin.wait()
+        else:
+            await asyncio.sleep(self.segundos)
+            self.returncode = 0
+        return b"", b""
+
+    def kill(self):
+        self.matado, self.returncode = True, -9
+        self._fin.set()
+
+    async def wait(self):
+        await self._fin.wait()
+        return self.returncode
+
+
+def lanzador(segundos_nucleo):
+    """create_subprocess_exec falso: cmake termina enseguida, el núcleo tarda segundos_nucleo. Devuelve (mock, procesos)."""
+    procesos = {}
+
+    async def crear(*argv, **kwargs):
+        proceso = ProcesoFalso(1000 + len(procesos), 0 if argv[0] == "cmake" else segundos_nucleo)
+        procesos[proceso.pid] = proceso
+        return proceso
+
+    return mock.Mock(side_effect=crear), procesos
+
+
 def ejecutar(contenido, rabbit):
-    """Lanza handle_message con cmake, el build y el núcleo simulados (devuelven 0). Devuelve (ok, run, popen)."""
+    """Lanza handle_message con cmake, el build y el núcleo simulados (terminan con 0). Devuelve (ok, argvs)."""
+    crear, _ = lanzador(0)
     with mock.patch.object(exec_handler.os, "makedirs"), mock.patch.object(
-        exec_handler.os, "cpu_count", return_value=8
-    ), mock.patch.object(exec_handler.subprocess, "run") as run, mock.patch.object(
-        exec_handler.subprocess, "Popen"
-    ) as popen:
-        run.return_value.returncode = 0
-        popen.return_value.communicate.return_value = ("", "")
-        popen.return_value.returncode = 0
+        exec_handler, "cpus_disponibles", return_value=8
+    ), mock.patch.object(exec_handler.asyncio, "create_subprocess_exec", crear):
         ok = asyncio.run(exec_handler.handle_message(mensaje(**contenido), rabbit))
-    return ok, run, popen
+    return ok, [list(llamada.args) for llamada in crear.call_args_list]
 
 
 class ProcessBodyTest(unittest.TestCase):
@@ -108,11 +146,10 @@ class ProcessBodyTest(unittest.TestCase):
 class ExecHandlerTest(unittest.TestCase):
     def test_variable_desconocida_notifica_error_sin_compilar(self):
         rabbit = RabbitFalso()
-        ok, run, popen = ejecutar(parametros(variable_name="humidity"), rabbit)
+        ok, lanzados = ejecutar(parametros(variable_name="humidity"), rabbit)
 
         self.assertFalse(ok)
-        run.assert_not_called()
-        popen.assert_not_called()
+        self.assertEqual(lanzados, [])
         self.assertEqual(len(rabbit.errores()), 1)
         self.assertIn("humidity", rabbit.errores()[0]["exec_message"])
         # WEB-222: el handler enruta la notificación a su petición por el hash.
@@ -121,7 +158,7 @@ class ExecHandlerTest(unittest.TestCase):
     def test_fallo_inesperado_notifica_error(self):
         rabbit = RabbitFalso()
         with mock.patch.object(exec_handler.os, "makedirs"), mock.patch.object(
-            exec_handler.subprocess, "run", side_effect=FileNotFoundError("cmake no encontrado")
+            exec_handler.asyncio, "create_subprocess_exec", side_effect=FileNotFoundError("cmake no encontrado")
         ):
             ok = asyncio.run(exec_handler.handle_message(mensaje(**parametros()), rabbit))
 
@@ -135,16 +172,16 @@ class ComandoRecibidoTest(unittest.TestCase):
 
     def test_ignora_el_cmd_del_mensaje_y_ejecuta_el_nucleo_con_los_parametros(self):
         rabbit = RabbitFalso()
-        ok, run, _ = ejecutar(parametros(cmd=["/bin/sh", "-c", "echo pwned"]), rabbit)
+        ok, lanzados = ejecutar(parametros(cmd=["/bin/sh", "-c", "echo pwned"]), rabbit)
 
         self.assertTrue(ok)
         self.assertEqual(rabbit.errores(), [])
         self.assertEqual(
-            run.call_args_list[-1].args[0],
+            lanzados[-1],
             ["./FAST-IBAN", FICHERO, "-90", "90", "-180", "180", f"./out/{HASH}/", "1"],
         )
-        for llamada in run.call_args_list:
-            self.assertNotIn("/bin/sh", llamada.args[0])
+        for argv in lanzados:
+            self.assertNotIn("/bin/sh", argv)
 
 
 class HashInvalidoTest(unittest.TestCase):
@@ -166,13 +203,10 @@ class HashInvalidoTest(unittest.TestCase):
         self.assertEqual(rabbit.publicados, [])
 
     def test_hash_invalido_no_llama_a_subprocess(self):
-        with mock.patch.object(exec_handler.subprocess, "run") as run, mock.patch.object(
-            exec_handler.subprocess, "Popen"
-        ) as popen:
+        with mock.patch.object(exec_handler.asyncio, "create_subprocess_exec") as crear:
             with self.assertRaises(ValueError):
                 asyncio.run(exec_handler.handle_message(mensaje(**parametros(request_hash="../../etc")), RabbitFalso()))
-        run.assert_not_called()
-        popen.assert_not_called()
+        crear.assert_not_called()
 
 
 class ParametrosInvalidosTest(unittest.TestCase):
@@ -202,11 +236,10 @@ class ParametrosInvalidosTest(unittest.TestCase):
         for caso, cambios in self.INVALIDOS.items():
             with self.subTest(caso):
                 rabbit = RabbitFalso()
-                ok, run, popen = ejecutar(parametros(**cambios), rabbit)
+                ok, lanzados = ejecutar(parametros(**cambios), rabbit)
 
                 self.assertFalse(ok)
-                run.assert_not_called()
-                popen.assert_not_called()
+                self.assertEqual(lanzados, [])
                 self.assertEqual(len(rabbit.errores()), 1)
                 self.assertEqual(rabbit.errores()[0]["request_hash"], HASH)
 
@@ -217,7 +250,7 @@ class ComandoEjecucionTest(unittest.TestCase):
     AREA = [FICHERO, "-90", "90", "-180", "180", f"./out/{HASH}/"]
 
     def comando(self, **cambios):
-        with mock.patch.object(exec_handler.os, "cpu_count", return_value=8):
+        with mock.patch.object(exec_handler, "cpus_disponibles", return_value=8):
             cmd = exec_handler.argv_de(parametros(**cambios))
         self.assertTrue(all(isinstance(arg, str) for arg in cmd), f"subprocess exige texto: {cmd}")
         return cmd
@@ -247,6 +280,113 @@ class ComandoEjecucionTest(unittest.TestCase):
     def test_hilos_y_procesos_por_encima_de_los_nucleos_se_recortan(self):
         self.assertEqual(self.comando(omp=True, n_threads=500), ["./FAST-IBAN_omp", *self.AREA, "8"])
         self.assertEqual(self.comando(mpi=True, n_proces=64), ["mpirun", "-n", "8", "./FAST-IBAN_mpi", *self.AREA, "1"])
+
+
+def subprocess_sincrono(segundos_nucleo):
+    """subprocess.run y Popen parcheados (versión síncrona): si se vuelve a ella, el test falla sin lanzar cmake."""
+
+    def run(cmd, **kwargs):
+        if cmd[0] != "cmake":
+            time.sleep(segundos_nucleo)
+        return mock.Mock(returncode=0, stdout="", stderr="")
+
+    pila = contextlib.ExitStack()
+    pila.enter_context(mock.patch("subprocess.run", side_effect=run))
+    popen = pila.enter_context(mock.patch("subprocess.Popen"))
+    popen.return_value.communicate.return_value = ("", "")
+    popen.return_value.returncode = 0
+    return pila
+
+
+class TiempoAgotadoTest(unittest.TestCase):
+    """V15/WEB-304: el núcleo se lanzaba sin timeout; una ejecución colgada bloqueaba el consumidor para siempre."""
+
+    def test_nucleo_que_no_termina_se_mata_y_notifica_error(self):
+        rabbit = RabbitFalso()
+        crear, procesos = lanzador(None)
+        with contextlib.ExitStack() as pila:
+            pila.enter_context(mock.patch.object(exec_handler.os, "makedirs"))
+            pila.enter_context(mock.patch.object(exec_handler, "TIMEOUT_NUCLEO", 0.1, create=True))
+            pila.enter_context(mock.patch.object(exec_handler.asyncio, "create_subprocess_exec", crear))
+            pila.enter_context(subprocess_sincrono(0.3))
+            if hasattr(os, "killpg"):  # POSIX: se mata el grupo (mpirun lanza hijos); en Windows, proc.kill()
+                killpg = pila.enter_context(
+                    mock.patch.object(exec_handler.os, "killpg", side_effect=lambda pid, sig: procesos[pid].kill())
+                )
+            # Guarda externa: si el handler no corta el núcleo, el test falla en vez de colgar la suite.
+            ok = asyncio.run(asyncio.wait_for(exec_handler.handle_message(mensaje(**parametros()), rabbit), 5))
+
+        self.assertFalse(ok, "el núcleo superó el tiempo máximo y no se cortó")
+        self.assertEqual(len(rabbit.errores()), 1)
+        self.assertEqual(rabbit.errores()[0]["request_hash"], HASH)
+        self.assertIn("Tiempo de ejecución agotado", rabbit.errores()[0]["exec_message"])
+        nucleo = procesos[max(procesos)]
+        self.assertTrue(nucleo.matado)
+        # Sin sesión propia, killpg no alcanza a los hijos de mpirun.
+        self.assertTrue(crear.call_args.kwargs.get("start_new_session"))
+        if hasattr(os, "killpg"):
+            killpg.assert_called_once_with(nucleo.pid, signal.SIGKILL)
+
+
+class BucleNoBloqueadoTest(unittest.TestCase):
+    """V15/WEB-304: subprocess síncrono bloqueaba el bucle; sin heartbeats, RabbitMQ re-entregaba el mensaje."""
+
+    def test_el_bucle_avanza_mientras_corre_el_nucleo(self):
+        crear, _ = lanzador(0.3)
+
+        async def escenario():
+            ticks = 0
+
+            async def reloj():
+                nonlocal ticks
+                while True:
+                    await asyncio.sleep(0.05)
+                    ticks += 1
+
+            tarea = asyncio.create_task(reloj())
+            await asyncio.sleep(0)
+            ok = await exec_handler.handle_message(mensaje(**parametros()), RabbitFalso())
+            tarea.cancel()
+            return ok, ticks
+
+        with mock.patch.object(exec_handler.os, "makedirs"), mock.patch.object(
+            exec_handler.asyncio, "create_subprocess_exec", crear
+        ), subprocess_sincrono(0.3):
+            ok, ticks = asyncio.run(escenario())
+
+        self.assertTrue(ok)
+        self.assertGreaterEqual(ticks, 3, "el bucle de eventos no avanzó mientras corría el núcleo")
+
+
+class CpusDisponiblesTest(unittest.TestCase):
+    """V15/WEB-304: os.cpu_count() ve los CPU del host, no el límite del contenedor (cgroup v2, cpu.max)."""
+
+    def cpus(self, contenido, cpu_count=8):
+        with tempfile.TemporaryDirectory() as carpeta, mock.patch.object(
+            exec_handler.os, "cpu_count", return_value=cpu_count
+        ):
+            ruta = os.path.join(carpeta, "cpu.max")
+            if contenido is not None:
+                with open(ruta, "w") as f:
+                    f.write(contenido)
+            return exec_handler.cpus_disponibles(ruta)
+
+    def test_cuota_del_cgroup(self):
+        self.assertEqual(self.cpus("400000 100000\n"), 4)
+
+    def test_cuota_fraccionaria_redondea_hacia_arriba(self):
+        self.assertEqual(self.cpus("150000 100000\n"), 2)
+
+    def test_sin_limite_usa_los_cpu_del_sistema(self):
+        self.assertEqual(self.cpus("max 100000\n"), 8)
+
+    def test_nunca_mas_que_los_cpu_del_sistema(self):
+        self.assertEqual(self.cpus("1600000 100000\n"), 8)
+
+    def test_fichero_inexistente_o_ilegible(self):
+        self.assertEqual(self.cpus(None), 8)
+        self.assertEqual(self.cpus("basura"), 8)
+        self.assertEqual(self.cpus(None, cpu_count=None), 1)
 
 
 if __name__ == "__main__":

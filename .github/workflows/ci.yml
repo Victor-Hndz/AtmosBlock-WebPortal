@@ -185,6 +185,15 @@ jobs:
         run: |
           touch .env
           docker compose config --format json | python3 .github/scripts/check_compose_puertos.py
+      - name: Módulo de ejecución con límites de recursos (WEB-304)
+        env:
+          PORT: "3000"
+          RABBITMQ_PORT: "5672"
+          RABBITMQ_MANAGEMENT_PORT: "15672"
+          DB_PORT: "5432"
+        run: |
+          touch .env
+          docker compose config --format json | python3 .github/scripts/check_compose_limites.py
       - name: Variables de entorno documentadas en .env.example (WEB-208)
         run: python3 .github/scripts/check_env_example.py
 
