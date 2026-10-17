@@ -13,7 +13,7 @@ Es una tabla **preliminar**: solo hemisferio norte, un año y tres casos elegido
 ## Reproducir
 
 ```bash
-# dentro de la imagen netcdf-base (fijada por digest en .github/workflows/ci.yml)
+# dentro de la imagen victorhndz/netcdf-base@sha256:6f448a9eda3a12073be2c427d524d984387a85fc408a2f5755b648f59361a429 (la del CI hasta ALG-356)
 sh backend/FAST-IBAN_Project/execution/code/tests/resolucion/medir_invariancia.sh <salida> <ficheros.nc>...
 python3 backend/FAST-IBAN_Project/execution/code/tests/resolucion/tabla_invariancia.py <salida> <caso>:<pasos por día>...
 ```

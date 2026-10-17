@@ -54,7 +54,7 @@ jobs:
   c-core:
     runs-on: ubuntu-latest
     container:
-      image: victorhndz/netcdf-base@sha256:6f448a9eda3a12073be2c427d524d984387a85fc408a2f5755b648f59361a429 # latest a 2025-02-03
+      image: victorhndz/netcdf-base@sha256:5ece2f005ca8457d43905e25017d52c3d9a2fda701a09bfeab4a98c0a03d4287 # netcdf-base:alg356 (ALG-356, ncdump arreglado); la misma de execution/Dockerfile (WEB-303)
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # Antes de configurar CMake: los tests de latitudes de ALG-302 se lanzan con valgrind si está instalado.

@@ -29,7 +29,7 @@ No hace falta instalar un compilador de C ni NetCDF. El núcleo se compila dentr
 de Docker que usa el CI, fijada por digest:
 
 ```bash
-IMAGE=victorhndz/netcdf-base@sha256:6f448a9eda3a12073be2c427d524d984387a85fc408a2f5755b648f59361a429
+IMAGE=victorhndz/netcdf-base@sha256:5ece2f005ca8457d43905e25017d52c3d9a2fda701a09bfeab4a98c0a03d4287
 ```
 
 ## 1. Núcleo científico

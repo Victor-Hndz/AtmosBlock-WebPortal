@@ -61,7 +61,7 @@ El margen de 0,15 es un juicio declarado, no un valor de la literatura. **Predic
 
 ## 3. Código (anotado antes de la primera ejecución)
 
-Commit `d9d03b09831a2aa1f2877266fdb3bf9501c840ec` (ALG-361, PR #132), árbol de `backend/FAST-IBAN_Project/execution/code` = `8e27893d2448c393b029e13d69ad4a37fe896bed`. El hash del árbol depende solo del contenido, así que sirve también para `main` después del merge mientras no cambie ese directorio. Se ejecuta ese árbol extraído con `git archive`, compilado en la imagen `netcdf-base` fijada por digest en el CI.
+Commit `d9d03b09831a2aa1f2877266fdb3bf9501c840ec` (ALG-361, PR #132), árbol de `backend/FAST-IBAN_Project/execution/code` = `8e27893d2448c393b029e13d69ad4a37fe896bed`. El hash del árbol depende solo del contenido, así que sirve también para `main` después del merge mientras no cambie ese directorio. Se ejecuta ese árbol extraído con `git archive`, compilado en la imagen `victorhndz/netcdf-base@sha256:6f448a9eda3a12073be2c427d524d984387a85fc408a2f5755b648f59361a429` (la del CI hasta ALG-356).
 
 ## 4. Hemisferio sur: comprobación de funcionamiento (JJA 2015)
 
