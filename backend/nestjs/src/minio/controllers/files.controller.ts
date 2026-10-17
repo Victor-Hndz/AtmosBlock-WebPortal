@@ -16,6 +16,7 @@ import { ConfigService } from "@nestjs/config";
 import { SkipThrottle } from "@nestjs/throttler";
 import { MinioService } from "../services/minio.service";
 import { firmaValida } from "../signed-url";
+import { RequestHashPipe } from "@/shared/request-hash";
 import { Response } from "express";
 import { Readable } from "stream";
 
@@ -41,7 +42,7 @@ export class FilesController {
   @Header("Access-Control-Allow-Methods", "GET, OPTIONS")
   @Header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept")
   async proxyFile(
-    @Param("requestHash") requestHash: string,
+    @Param("requestHash", RequestHashPipe) requestHash: string,
     @Param("filename") filename: string,
     @Query("expires") expires: string,
     @Query("sig") sig: string,

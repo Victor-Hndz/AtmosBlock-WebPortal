@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import { Test, TestingModule } from "@nestjs/testing";
 import { RequestsService } from "./requests.service";
 import { RequestsPublisher } from "@/requests/messaging/requests.publisher";
@@ -9,6 +10,7 @@ import { CreateRequestDto } from "@/requests/dtos/create-request.dto";
 import { requestStatus } from "@/shared/enums/requestStatus.enum";
 
 describe("RequestsService", () => {
+  const HASH = createHash("sha256").update("h1").digest("hex");
   let service: RequestsService;
   const llamadas: string[] = [];
   const progressService = { reset: jest.fn(() => llamadas.push("reset")) };
@@ -49,18 +51,36 @@ describe("RequestsService", () => {
 
   it("un resultado con error deja la petición en EMPTY para poder reintentarla (WEB-211)", async () => {
     requestRepository.findByRequestHash.mockResolvedValue({
-      requestHash: "h1",
+      requestHash: HASH,
       requestStatus: requestStatus.GENERATING,
     });
 
     await service.processResultMessage({
       status: "ERROR",
       message: "",
-      content: { requestHash: "h1", content: "fallo" },
+      content: { requestHash: HASH, content: "fallo" },
     });
 
     expect(requestRepository.update).toHaveBeenCalledWith(
-      expect.objectContaining({ requestHash: "h1", requestStatus: requestStatus.EMPTY })
+      expect.objectContaining({ requestHash: HASH, requestStatus: requestStatus.EMPTY })
     );
+  });
+
+  // V14/WEB-302: el hash del resultado llega por AMQP; uno que no es SHA-256 en hex no debe llegar a la consulta.
+  it.each([
+    ["OK", null],
+    ["OK", undefined],
+    ["OK", "../x"],
+    ["ERROR", null],
+    ["ERROR", undefined],
+    ["ERROR", "../x"],
+  ])("un resultado %s con hash %p no consulta el repositorio", async (status, requestHash) => {
+    await service.processResultMessage({
+      status,
+      message: "",
+      content: { requestHash, content: "x" } as unknown as { requestHash: string; content: string },
+    });
+
+    expect(requestRepository.findByRequestHash).not.toHaveBeenCalled();
   });
 });

@@ -5,6 +5,7 @@ import type { ResultsData } from "../services/generatedFiles.service";
 import { JwtAuthGuard } from "@/auth/guards/jwt-auth.guard";
 import { CurrentUser } from "@/shared/decorators/currentUserDecorator.decorator";
 import { UsersService } from "@/users/services/users.service";
+import { RequestHashPipe } from "@/shared/request-hash";
 
 @ApiTags("results")
 @Controller("results")
@@ -29,7 +30,7 @@ export class GeneratedFilesController {
   @ApiResponse({ status: 401, description: "Authentication required" })
   @ApiResponse({ status: 404, description: "No results found for the request, or it is not the user's" })
   async findAllUrls(
-    @Param("requestHash") requestHash: string,
+    @Param("requestHash", RequestHashPipe) requestHash: string,
     @CurrentUser("id") userId: string
   ): Promise<ResultsData> {
     // WEB-102 (V2): solo el dueño de la petición recibe sus resultados (404 para no revelar que existe).

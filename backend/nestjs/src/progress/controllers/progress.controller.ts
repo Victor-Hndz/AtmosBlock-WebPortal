@@ -18,6 +18,7 @@ import { MAX_PROGRESS } from "@/shared/consts/consts";
 import { JwtAuthGuard } from "@/auth/guards/jwt-auth.guard";
 import { CurrentUser } from "@/shared/decorators/currentUserDecorator.decorator";
 import { UsersService } from "@/users/services/users.service";
+import { RequestHashPipe } from "@/shared/request-hash";
 import { DURACION_URL_FIRMADA_S, firmaRuta, firmaValida } from "@/minio/signed-url";
 
 interface MessageEvent {
@@ -45,7 +46,7 @@ export class ProgressController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async streamUrl(
-    @Param("requestHash") requestHash: string,
+    @Param("requestHash", RequestHashPipe) requestHash: string,
     @CurrentUser("id") userId: string
   ): Promise<{ url: string }> {
     const propias = await this.usersService.getRequestHashesByUserId(userId);
@@ -64,7 +65,7 @@ export class ProgressController {
    */
   @Sse("stream/:requestHash")
   streamProgress(
-    @Param("requestHash") requestHash: string,
+    @Param("requestHash", RequestHashPipe) requestHash: string,
     @Query("expires") expires: string,
     @Query("sig") sig: string
   ): Observable<MessageEvent> {
