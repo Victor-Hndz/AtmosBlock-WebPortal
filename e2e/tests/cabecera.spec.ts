@@ -32,6 +32,18 @@ test.describe("sin sesión", () => {
     await expect(botonIdioma(page, en)).toHaveText("EN");
     expect(await page.evaluate(() => localStorage.getItem("i18nextLng"))).toBe("en");
   });
+
+  test("cada idioma del menú lleva su bandera, decorativa (WEB-308)", async ({ page }) => {
+    await page.goto("/");
+    await botonIdioma(page).click();
+
+    for (const [idioma, bandera] of [["Español", "es"], ["English", "gb"]]) {
+      const svg = page.getByRole("menuitem", { name: idioma }).locator(`svg[data-bandera="${bandera}"]`);
+      await expect(svg).toBeVisible();
+      // El nombre del idioma ya está escrito al lado: la bandera no se anuncia.
+      await expect(svg).toHaveAttribute("aria-hidden", "true");
+    }
+  });
 });
 
 test.describe("con sesión", () => {
