@@ -1,8 +1,13 @@
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setLanguage } from "@/redux/slices/languageSlice";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import { CheckIcon, GlobeIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
+
+/** Languages offered in the switcher (must match `supportedLngs` in i18n.ts) */
+const LANGUAGES = [
+  { code: "en", name: "English" },
+  { code: "es", name: "Español" },
+];
 
 /**
  * Language switcher component
@@ -10,30 +15,38 @@ import { useTranslation } from "react-i18next";
  * @returns A dropdown menu for language selection
  */
 export default function LanguageSwitcher() {
-  const { t } = useTranslation();
-  const dispatch = useAppDispatch();
-  const { currentLanguage, availableLanguages } = useAppSelector(state => state.language);
-
-  /**
-   * Handle language change
-   * @param langCode The language code to switch to
-   */
-  const handleLanguageChange = (langCode: string) => {
-    dispatch(setLanguage(langCode));
-  };
+  // i18next is the single source of truth: its detector restores the language and caches every change in localStorage
+  const { t, i18n } = useTranslation();
+  const currentLanguage = i18n.resolvedLanguage ?? "es";
 
   return (
     // modal={false}: a modal menu locks page scroll and hides the scrollbar, shifting the fixed header and footer
     <DropdownMenu.Root modal={false}>
-      <DropdownMenu.Trigger asChild>
-        <button
-          className="flex items-center gap-1 rounded-md px-2 py-1 text:white hover:text-blue-300"
-          aria-label={t("language.switchLanguage")}
-        >
-          <GlobeIcon className="h-4 w-4" />
-          <span>{currentLanguage.toUpperCase()}</span>
-        </button>
-      </DropdownMenu.Trigger>
+      <Tooltip.Provider delayDuration={300}>
+        <Tooltip.Root>
+          {/* Closing the menu gives focus back to the button from nowhere (no relatedTarget): no tooltip then, only on Tab */}
+          <Tooltip.Trigger asChild onFocus={e => !e.relatedTarget && e.preventDefault()}>
+            <DropdownMenu.Trigger asChild>
+              <button
+                className="flex items-center gap-1 rounded-md px-2 py-1 text:white hover:text-blue-300"
+                aria-label={t("language.switchLanguage")}
+              >
+                <GlobeIcon className="h-4 w-4" />
+                <span>{currentLanguage.toUpperCase()}</span>
+              </button>
+            </DropdownMenu.Trigger>
+          </Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Content
+              className="tooltip-content bg-gray-900 text-white px-4 py-2 rounded-md text-sm z-50 shadow-md"
+              sideOffset={5}
+            >
+              {t("navigation-tooltips.language")}
+              <Tooltip.Arrow className="tooltip-arrow" />
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        </Tooltip.Root>
+      </Tooltip.Provider>
 
       <DropdownMenu.Portal>
         <DropdownMenu.Content
@@ -44,11 +57,11 @@ export default function LanguageSwitcher() {
             {t("language.selectLanguage")}
           </DropdownMenu.Label>
 
-          {availableLanguages.map(language => (
+          {LANGUAGES.map(language => (
             <DropdownMenu.Item
               key={language.code}
               className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-slate-100 data-[highlighted]:bg-slate-100"
-              onClick={() => handleLanguageChange(language.code)}
+              onClick={() => i18n.changeLanguage(language.code)}
             >
               {language.name}
               {currentLanguage === language.code && <CheckIcon className="ml-auto h-4 w-4 text-violet-600" />}

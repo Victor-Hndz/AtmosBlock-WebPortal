@@ -8,7 +8,9 @@
     "requests": "Solicitudes",
     "login": "Iniciar sesión",
     "progress": "Progreso",
-    "prediccion": "Previsión"
+    "prediccion": "Previsión",
+    "welcome": "Bienvenido, {{nombre}}",
+    "menu": "Menú de navegación"
   },
   "navigation-tooltips": {
     "home": "Ir a la Página Principal",
@@ -17,7 +19,9 @@
     "about": "Conocer más sobre esta aplicación",
     "help": "Ayuda",
     "progress": "Ver actualizaciones de progreso en tiempo real",
-    "prediccion": "Probabilidad de bloqueo en las previsiones por conjuntos de ECMWF (experimental)"
+    "prediccion": "Probabilidad de bloqueo en las previsiones por conjuntos de ECMWF (experimental)",
+    "profile": "Tu cuenta: perfil, peticiones y cerrar sesión",
+    "language": "Elegir el idioma del portal"
   },
   "navigation-footer": {
     "about": "Acerca de",

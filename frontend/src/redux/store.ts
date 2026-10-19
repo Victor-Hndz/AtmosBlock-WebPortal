@@ -2,7 +2,6 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slices/authSlice";
 import submitRequestsReducer from "./slices/submitRequestsSlice";
 import viewRequestsReducer from "./slices/viewRequestsSlice";
-import languageReducer from "./slices/languageSlice";
 import userReducer from "./slices/userSlice";
 
 export const store = configureStore({
@@ -10,7 +9,6 @@ export const store = configureStore({
     auth: authReducer,
     submitRequests: submitRequestsReducer,
     viewRequests: viewRequestsReducer,
-    language: languageReducer,
     user: userReducer,
   },
 });

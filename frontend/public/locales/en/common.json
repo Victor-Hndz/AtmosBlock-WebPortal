@@ -8,7 +8,9 @@
     "requests": "Requests",
     "login": "Login",
     "progress": "Progress",
-    "prediccion": "Forecast"
+    "prediccion": "Forecast",
+    "welcome": "Welcome, {{nombre}}",
+    "menu": "Navigation menu"
   },
   "navigation-tooltips": {
     "home": "Go to Homepage",
@@ -17,7 +19,9 @@
     "about": "Learn more about this application",
     "help": "Help",
     "progress": "View real-time progress updates",
-    "prediccion": "Blocking probability in ECMWF ensemble forecasts (experimental)"
+    "prediccion": "Blocking probability in ECMWF ensemble forecasts (experimental)",
+    "profile": "Your account: profile, requests and sign out",
+    "language": "Choose the portal language"
   },
   "navigation-footer": {
     "about": "About",
