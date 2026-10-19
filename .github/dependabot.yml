@@ -39,8 +39,8 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: [version-update:semver-major]
-      # Las imágenes van en Python 3.14 salvo la de ejecución, en 3.10 (netcdf-base), que comparte
-      # utils/requirements.txt: por eso aio-pika sigue en 9.x (la 10 exige 3.11). Dependabot no mira
+      # Todas las imágenes van en Python 3.14; la de ejecución también desde WEB-363 (netcdf-base sobre
+      # Ubuntu 26.04), así que aio-pika ya podría pasar a la 10, que es una mayor y se hace a mano. Dependabot no mira
       # el Python de las imágenes y propone versiones que exigen uno más nuevo: en el stack científico
       # solo parches; los saltos de versión se hacen a mano al cambiar el Python de las imágenes.
       - dependency-name: numpy

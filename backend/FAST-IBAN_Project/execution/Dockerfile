@@ -1,5 +1,5 @@
-# Same base as the c-core CI job, pinned by digest (WEB-303, ALG-356: netcdf-base:alg356, with ncdump fixed).
-FROM victorhndz/netcdf-base@sha256:5ece2f005ca8457d43905e25017d52c3d9a2fda701a09bfeab4a98c0a03d4287
+# Same base as the c-core CI job, pinned by digest (WEB-303; WEB-363: netcdf-base:ubuntu26).
+FROM victorhndz/netcdf-base@sha256:79ad61d67670f6c5a080c9ac0ffd7b6054285711fc4d65dfbdcaef87f3a25cf6
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -25,8 +25,9 @@ COPY ./execution/handler /app/handler
 
 # Copy and install utils dependencies
 COPY ./utils/requirements.txt /app/utils/requirements.txt
+# The system Python is externally managed (PEP 668); this container runs a single application, so pip installs into it.
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --no-cache-dir -r utils/requirements.txt
+    pip install --no-cache-dir --break-system-packages -r utils/requirements.txt
 
 COPY ./utils /app/utils
 

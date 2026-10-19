@@ -1,0 +1,15 @@
+# WEB-363: the MPICH of Ubuntu 26.04 talks through UCX, which formats socket addresses with uninitialised fields while
+# setting up connections (ucs_sockaddr_str under ucp_wireup). False positives of the library: no stack goes through
+# FAST-IBAN. Only frames inside libucs are suppressed.
+{
+   ucx_sockaddr_cond
+   Memcheck:Cond
+   ...
+   obj:*/libucs.so*
+}
+{
+   ucx_sockaddr_value8
+   Memcheck:Value8
+   ...
+   obj:*/libucs.so*
+}
