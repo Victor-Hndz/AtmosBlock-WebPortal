@@ -1,3 +1,4228 @@
 {
- "pasadas": {}
+ "preregistro": "F3 firmado el 2026-09-29; aclaración de F3-5 y variante V1 el 2026-09-30; variante V2 el 2026-10-07 (PLAN_PREDICCION_BLOQUEOS)",
+ "pasadas": {
+  "aifs": 2,
+  "ifs": 2
+ },
+ "pasadas_completas": {
+  "aifs": 0,
+  "ifs": 0
+ },
+ "primario": [],
+ "secundario": [
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "aifs",
+   "sector": "GRL",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "EA",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "EA",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "EA",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "EA",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "EA",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "EA",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "EA",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "EA",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "EA",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "EA",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "EA",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "EA",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "EA",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "EA",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "EA",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "aifs",
+   "sector": "EA",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "aifs",
+   "sector": "EA",
+   "ventana": "dias_1_5",
+   "n": 1,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "aifs",
+   "sector": "EA",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "aifs",
+   "sector": "EA",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "aifs",
+   "sector": "EA",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "aifs",
+   "sector": "EA",
+   "ventana": "dias_6_10",
+   "n": 1,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "aifs",
+   "sector": "EA",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "aifs",
+   "sector": "EA",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "URA",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "aifs",
+   "sector": "URA",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "aifs",
+   "sector": "URA",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "aifs",
+   "sector": "URA",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "aifs",
+   "sector": "URA",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "aifs",
+   "sector": "URA",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "aifs",
+   "sector": "URA",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "aifs",
+   "sector": "URA",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "aifs",
+   "sector": "URA",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "PA",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "PA",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "PA",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "PA",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "PA",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "PA",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "PA",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "PA",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "PA",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "PA",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "PA",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "PA",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "PA",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "PA",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "PA",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "aifs",
+   "sector": "PA",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "aifs",
+   "sector": "PA",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "aifs",
+   "sector": "PA",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "aifs",
+   "sector": "PA",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "aifs",
+   "sector": "PA",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "aifs",
+   "sector": "PA",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "aifs",
+   "sector": "PA",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "aifs",
+   "sector": "PA",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "ventana": "dias_1_5",
+   "n": 1,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "ventana": "dias_6_10",
+   "n": 1,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "ifs",
+   "sector": "GRL",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "EA",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "EA",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "EA",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "EA",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "EA",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "EA",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "EA",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "EA",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "EA",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "EA",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "EA",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "EA",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "EA",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "EA",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "EA",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "ifs",
+   "sector": "EA",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "ifs",
+   "sector": "EA",
+   "ventana": "dias_1_5",
+   "n": 1,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "ifs",
+   "sector": "EA",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "ifs",
+   "sector": "EA",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "ifs",
+   "sector": "EA",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "ifs",
+   "sector": "EA",
+   "ventana": "dias_6_10",
+   "n": 1,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "ifs",
+   "sector": "EA",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "ifs",
+   "sector": "EA",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "URA",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "ifs",
+   "sector": "URA",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "ifs",
+   "sector": "URA",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "ifs",
+   "sector": "URA",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "ifs",
+   "sector": "URA",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "ifs",
+   "sector": "URA",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "ifs",
+   "sector": "URA",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "ifs",
+   "sector": "URA",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "ifs",
+   "sector": "URA",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "PA",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "PA",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "PA",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "PA",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "PA",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "PA",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "PA",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "PA",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "PA",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "PA",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "PA",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "PA",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "PA",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "PA",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "PA",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "ifs",
+   "sector": "PA",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "ifs",
+   "sector": "PA",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "ifs",
+   "sector": "PA",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "ifs",
+   "sector": "PA",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "ifs",
+   "sector": "PA",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "ifs",
+   "sector": "PA",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "ifs",
+   "sector": "PA",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "ifs",
+   "sector": "PA",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "ventana": "dias_1_5",
+   "n": 1,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "ventana": "dias_6_10",
+   "n": 1,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4-V1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "paso": 1,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "paso": 2,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "paso": 3,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "paso": 4,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "paso": 5,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "paso": 6,
+   "n": 2,
+   "sucesos": 2,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "paso": 7,
+   "n": 2,
+   "sucesos": 1,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "paso": 8,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "paso": 9,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "paso": 10,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "paso": 11,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "paso": 12,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "paso": 13,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "paso": 14,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "paso": 15,
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "ventana": "dias_1_5",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "ventana": "dias_1_5",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "inicio_v2",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "ventana": "dias_6_10",
+   "n": 0,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "genesis_F3-4",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "ventana": "dias_6_10",
+   "n": 2,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  }
+ ],
+ "ifs_menos_aifs": [],
+ "por_estacion": [],
+ "calma": [
+  {
+   "modelo": "aifs",
+   "sector": "GRL",
+   "pasadas": 2,
+   "en_calma": 0,
+   "en_calma_v2": 0,
+   "v2_difiere_era5": 0.0,
+   "v2_tambien_en_calma": null
+  },
+  {
+   "modelo": "aifs",
+   "sector": "EA",
+   "pasadas": 2,
+   "en_calma": 0,
+   "en_calma_v2": 1,
+   "v2_difiere_era5": 0.5,
+   "v2_tambien_en_calma": 0.0
+  },
+  {
+   "modelo": "aifs",
+   "sector": "URA",
+   "pasadas": 2,
+   "en_calma": 0,
+   "en_calma_v2": 0,
+   "v2_difiere_era5": 0.0,
+   "v2_tambien_en_calma": null
+  },
+  {
+   "modelo": "aifs",
+   "sector": "PA",
+   "pasadas": 2,
+   "en_calma": 0,
+   "en_calma_v2": 2,
+   "v2_difiere_era5": 1.0,
+   "v2_tambien_en_calma": 0.0
+  },
+  {
+   "modelo": "aifs",
+   "sector": "NAM",
+   "pasadas": 2,
+   "en_calma": 0,
+   "en_calma_v2": 1,
+   "v2_difiere_era5": 0.5,
+   "v2_tambien_en_calma": 0.0
+  },
+  {
+   "modelo": "aifs",
+   "sector": "LLB-Atl",
+   "pasadas": 2,
+   "en_calma": 0,
+   "en_calma_v2": 0,
+   "v2_difiere_era5": 0.0,
+   "v2_tambien_en_calma": null
+  },
+  {
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
+   "pasadas": 2,
+   "en_calma": 0,
+   "en_calma_v2": 0,
+   "v2_difiere_era5": 0.0,
+   "v2_tambien_en_calma": null
+  },
+  {
+   "modelo": "ifs",
+   "sector": "GRL",
+   "pasadas": 2,
+   "en_calma": 0,
+   "en_calma_v2": 0,
+   "v2_difiere_era5": 0.0,
+   "v2_tambien_en_calma": null
+  },
+  {
+   "modelo": "ifs",
+   "sector": "EA",
+   "pasadas": 2,
+   "en_calma": 0,
+   "en_calma_v2": 1,
+   "v2_difiere_era5": 0.5,
+   "v2_tambien_en_calma": 0.0
+  },
+  {
+   "modelo": "ifs",
+   "sector": "URA",
+   "pasadas": 2,
+   "en_calma": 0,
+   "en_calma_v2": 0,
+   "v2_difiere_era5": 0.0,
+   "v2_tambien_en_calma": null
+  },
+  {
+   "modelo": "ifs",
+   "sector": "PA",
+   "pasadas": 2,
+   "en_calma": 0,
+   "en_calma_v2": 2,
+   "v2_difiere_era5": 1.0,
+   "v2_tambien_en_calma": 0.0
+  },
+  {
+   "modelo": "ifs",
+   "sector": "NAM",
+   "pasadas": 2,
+   "en_calma": 0,
+   "en_calma_v2": 1,
+   "v2_difiere_era5": 0.5,
+   "v2_tambien_en_calma": 0.0
+  },
+  {
+   "modelo": "ifs",
+   "sector": "LLB-Atl",
+   "pasadas": 2,
+   "en_calma": 0,
+   "en_calma_v2": 0,
+   "v2_difiere_era5": 0.0,
+   "v2_tambien_en_calma": null
+  },
+  {
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
+   "pasadas": 2,
+   "en_calma": 0,
+   "en_calma_v2": 0,
+   "v2_difiere_era5": 0.0,
+   "v2_tambien_en_calma": null
+  }
+ ],
+ "calma_v2_climatologia": {
+  "GRL": {
+   "DEF": 0.197194,
+   "MAM": 0.084058,
+   "JJA": 0.06087,
+   "SON": 0.056044
+  },
+  "EA": {
+   "DEF": 0.046529,
+   "MAM": 0.034058,
+   "JJA": 0.066667,
+   "SON": 0.030403
+  },
+  "URA": {
+   "DEF": 0.435007,
+   "MAM": 0.398913,
+   "JJA": 0.248551,
+   "SON": 0.39707
+  },
+  "PA": {
+   "DEF": 0.100443,
+   "MAM": 0.078623,
+   "JJA": 0.010145,
+   "SON": 0.07033
+  },
+  "NAM": {
+   "DEF": 0.223412,
+   "MAM": 0.161957,
+   "JJA": 0.047101,
+   "SON": 0.171795
+  },
+  "LLB-Atl": {
+   "DEF": 0.265879,
+   "MAM": 0.416304,
+   "JJA": 0.016304,
+   "SON": 0.069231
+  },
+  "LLB-Pac": {
+   "DEF": 0.344535,
+   "MAM": 0.271014,
+   "JJA": 0.002536,
+   "SON": 0.027106
+  }
+ }
 }
