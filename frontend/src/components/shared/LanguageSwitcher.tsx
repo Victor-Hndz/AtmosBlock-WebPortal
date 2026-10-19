@@ -3,10 +3,35 @@ import * as Tooltip from "@radix-ui/react-tooltip";
 import { CheckIcon, GlobeIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+// WEB-308: inline SVG flags (flag emojis show as letters on Windows). Decorative: the language name is next to them.
+const FLAG_CLASS = "h-3 w-[1.125rem] shrink-0 rounded-[2px] shadow-[0_0_0_1px_rgba(0,0,0,0.1)]";
+
+/** Spain, without the coat of arms: it cannot be made out at this size */
+const FlagES = () => (
+  <svg data-bandera="es" aria-hidden="true" viewBox="0 0 750 500" className={FLAG_CLASS}>
+    <rect width="750" height="500" fill="#c60b1e" />
+    <rect y="125" width="750" height="250" fill="#ffc400" />
+  </svg>
+);
+
+/** United Kingdom (Union Jack) for English */
+const FlagGB = () => (
+  <svg data-bandera="gb" aria-hidden="true" viewBox="0 0 60 30" className={FLAG_CLASS}>
+    <clipPath id="bandera-gb-aspas">
+      <path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z" />
+    </clipPath>
+    <rect width="60" height="30" fill="#012169" />
+    <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6" />
+    <path d="M0,0 L60,30 M60,0 L0,30" clipPath="url(#bandera-gb-aspas)" stroke="#c8102e" strokeWidth="4" />
+    <path d="M30,0 v30 M0,15 h60" stroke="#fff" strokeWidth="10" />
+    <path d="M30,0 v30 M0,15 h60" stroke="#c8102e" strokeWidth="6" />
+  </svg>
+);
+
 /** Languages offered in the switcher (must match `supportedLngs` in i18n.ts) */
 const LANGUAGES = [
-  { code: "en", name: "English" },
-  { code: "es", name: "Español" },
+  { code: "en", name: "English", Flag: FlagGB },
+  { code: "es", name: "Español", Flag: FlagES },
 ];
 
 /**
@@ -60,9 +85,10 @@ export default function LanguageSwitcher() {
           {LANGUAGES.map(language => (
             <DropdownMenu.Item
               key={language.code}
-              className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-slate-100 data-[highlighted]:bg-slate-100"
+              className="relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-slate-100 data-[highlighted]:bg-slate-100"
               onClick={() => i18n.changeLanguage(language.code)}
             >
+              <language.Flag />
               {language.name}
               {currentLanguage === language.code && <CheckIcon className="ml-auto h-4 w-4 text-violet-600" />}
             </DropdownMenu.Item>
