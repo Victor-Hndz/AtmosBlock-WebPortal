@@ -284,15 +284,43 @@
     }
   },
   "about": {
-    "title": "Acerca del Proyecto AtmosBlock Web Portal",
-    "description": "Una plataforma moderna para el procesamiento y análisis de datos meteorológicos.",
-    "projectOverview": "Descripción del Proyecto",
-    "projectDescription": "El proyecto AtmosBlock Web Portal es una solución integral diseñada para procesar, analizar y visualizar datos meteorológicos de manera eficiente. Utiliza técnicas de computación de alto rendimiento para proporcionar a investigadores y meteorólogos información valiosa de conjuntos de datos complejos.",
-    "technologies": "Tecnologías Utilizadas",
+    "title": "Acerca de AtmosBlock",
+    "description": "Detección determinista y clasificación morfológica de bloqueos atmosféricos, con un portal para analizar datos de reanálisis bajo demanda.",
+    "whatIs": {
+      "title": "Qué es",
+      "p1": "Un bloqueo atmosférico es una configuración de altas presiones casi estacionaria y persistente que interrumpe el flujo del oeste en latitudes medias y se asocia a olas de calor, episodios fríos y sequías prolongadas. Hay muchos diagnósticos de bloqueo y no coinciden en la frecuencia, la posición ni el tipo de los episodios que detectan.",
+      "p2": "AtmosBlock no propone un índice de bloqueo más. Ofrece una implementación abierta y reproducible de un detector, con una clasificación de la forma del patrón, y un portal para usarlo sin instalar nada."
+    },
+    "uses": {
+      "title": "Qué puedes hacer aquí",
+      "era5Title": "Analizar ERA5.",
+      "era5": "Eliges la variable, el nivel, las fechas y la región; el portal descarga los datos del Climate Data Store de Copernicus, ejecuta el detector y te devuelve mapas y tablas. Con el geopotencial en 500 hPa, para el que está pensado el método, obtienes los patrones instantáneos detectados: tipo Omega, tipo Rex y altas polares.",
+      "forecastTitle": "Previsión (experimental).",
+      "forecast": "Probabilidad de que cada sector del hemisferio norte esté ocupado por un evento de bloqueo según el índice de Davini (DAV), un índice establecido que se calcula aparte del detector, en las previsiones por conjuntos de ECMWF, por día de plazo. Diagnostica la previsión de ECMWF; su habilidad todavía no está verificada: la verificación frente a ERA5 está en marcha."
+    },
+    "how": {
+      "title": "Cómo funciona",
+      "p1": "El detector, FAST-IBAN, está escrito en C con OpenMP y MPI. Desde cada punto candidato traza 64 rayos de 500 km sobre círculos máximos e interpola el geopotencial en 500 hPa en sus extremos para reconocer altas y bajas; después las agrupa y clasifica la forma del patrón comprobando contornos cerrados y direcciones.",
+      "p2": "Como la distancia de muestreo es física y no un desplazamiento fijo en latitud, el muestreo sigue definido hasta el polo, también por encima de unos 75° de latitud, donde los índices de gradiente habituales (como Tibaldi–Molteni o Davini) no se pueden calcular. A menos de 500 km del polo el círculo de rayos lo rodea y no se puede saber hacia dónde quedan las bajas: las altas centradas ahí se clasifican como altas polares.",
+      "p3": "Es determinista: la misma entrada produce la misma salida, bit a bit, con cualquier número de hilos o procesos. Diagnostica los campos que recibe; no hace predicciones."
+    },
+    "status": {
+      "title": "Estado",
+      "text": "Software de investigación en desarrollo activo. El detector trabaja sobre campos instantáneos: el seguimiento temporal de los episodios y la validación frente a índices de bloqueo establecidos están en la hoja de ruta del proyecto. La sensibilidad del detector cambia con la latitud, así que el número de patrones de una región no es una climatología de bloqueos; en los casos del hemisferio sur revisados, las detecciones se concentran al sur de unos 60°S."
+    },
+    "technologies": "Tecnologías",
     "techStack": {
-      "frontend": "React con TypeScript, Redux y Tailwind CSS para la interfaz de usuario.",
-      "backend": "NestJS con TypeScript para la API y servicios de autenticación.",
-      "processing": "C y python para cálculos numéricos de alto rendimiento y generación de mapas."
+      "frontend": "Interfaz: React con TypeScript, Redux Toolkit, Tailwind CSS y Vite, en español e inglés.",
+      "backend": "API y servicios: NestJS con TypeORM y PostgreSQL; servicios de Python coordinados con RabbitMQ y resultados en MinIO.",
+      "processing": "Cálculo: C con OpenMP y MPI para la detección, y Python con Cartopy para los mapas."
+    },
+    "origin": {
+      "title": "Origen académico",
+      "text": "FAST-IBA³N nació como Trabajo Fin de Grado en la Universidad Miguel Hernández de Elche (2024), dirigido por José Antonio García Orza y Héctor Francisco Migallón Gomis. El portal se desarrolló como Trabajo Fin de Máster en la Universidad de Murcia. Desde entonces el proyecto ha ido más allá de ambos trabajos."
+    },
+    "data": {
+      "title": "Datos",
+      "text": "Los datos que descarga el portal contienen información modificada del Copernicus Climate Change Service {{year}} (ERA5; Hersbach et al., 2023; licencia CC BY 4.0). Ni la Comisión Europea ni el ECMWF son responsables del uso que se haga de la información de Copernicus ni de los datos que contiene. Las previsiones se calculan a partir de los datos abiertos de ECMWF (IFS ENS y AIFS ENS), © European Centre for Medium-Range Weather Forecasts (ECMWF) {{year}}, con licencia CC BY 4.0; los datos se han modificado (cálculo del índice DAV y de las probabilidades)."
     },
     "links": {
       "github": "Ver en GitHub",
