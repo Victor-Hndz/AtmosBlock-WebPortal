@@ -90,6 +90,8 @@ def resumir(registros, n_rep=pu.REPLICAS, calma_clim=None):
     def fila(ap, var, obs, clim, **sel):
         return puntuar(*_series(ap, var, obs, clim, **sel), int(ap["miembros"].values[0]), n_rep)
 
+    # Las primeras pasadas del archivo tienen la historia incompleta: un modelo puede no tener aún ninguna completa.
+    completas = {m: ap for m, ap in completas.items() if ap.sizes["pasada"]}
     for m, ap in completas.items():
         for s in PRIMARIOS:
             for paso in PASOS:
@@ -144,8 +146,9 @@ def resumir(registros, n_rep=pu.REPLICAS, calma_clim=None):
         if not x["solo_recuentos"]:
             x.setdefault("fdr", False)
 
-    if {"ifs", "aifs"} <= set(completas):
-        comunes = sorted(set(completas["ifs"]["fecha"].values) & set(completas["aifs"]["fecha"].values))
+    comunes = (sorted(set(completas["ifs"]["fecha"].values) & set(completas["aifs"]["fecha"].values))
+               if {"ifs", "aifs"} <= set(completas) else [])
+    if comunes:
         ifs, aifs = (completas[m].isel(pasada=np.isin(completas[m]["fecha"].values, comunes)) for m in ("ifs", "aifs"))
         mi, ma = int(ifs["miembros"].values[0]), int(aifs["miembros"].values[0])
         dif = lambda a, b, y: pu.brier(a, y) - pu.brier(b, y)  # noqa: E731

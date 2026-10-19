@@ -75,6 +75,16 @@ class Primario(unittest.TestCase):
                                                            inicio="2026-11-01", historia_incompleta=1)
         self.assertEqual(fila(resumir(regs)["primario"], modelo="ifs", sector="EA", paso=1)["bss"], 1.0)
 
+    def test_sin_pasadas_completas_no_falla(self):
+        # Caso real del 18-10: el primer registro (28-09) es de las 4 pasadas con historia incompleta y el resumen
+        # moría con IndexError al leer los miembros de una selección vacía.
+        regs = [registro("2026-09-28", m, 25, 1, 0.5, historia_incompleta=1) for m in ("ifs", "aifs")]
+        r = resumir(regs)
+        self.assertEqual(r["pasadas"], {"aifs": 1, "ifs": 1})
+        self.assertEqual(r["pasadas_completas"], {"aifs": 0, "ifs": 0})
+        self.assertEqual((r["primario"], r["por_estacion"], r["ifs_menos_aifs"]), ([], [], []))
+        self.assertTrue(r["secundario"])  # el secundario usa todas las pasadas
+
 
 class Secundario(unittest.TestCase):
     def test_inicios_solo_con_calma_y_con_10_observados(self):
