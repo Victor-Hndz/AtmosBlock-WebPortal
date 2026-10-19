@@ -116,11 +116,12 @@ test.describe("con sesión", () => {
   test("los menús de perfil e idioma se abren con la misma animación (WEB-307)", async ({ page }) => {
     await page.goto("/");
 
+    // Cada menú por su nombre: el de perfil sigue en el DOM unos milisegundos mientras se cierra.
     await menuUsuario(page).click();
-    await expect(page.getByRole("menu")).toHaveClass(/\banimate-in\b/);
+    await expect(page.getByRole("menu", { name: es.profile.userMenu })).toHaveClass(/\banimate-in\b/);
     await page.keyboard.press("Escape");
 
     await botonIdioma(page).click();
-    await expect(page.getByRole("menu")).toHaveClass(/\banimate-in\b/);
+    await expect(page.getByRole("menu", { name: es.language.switchLanguage })).toHaveClass(/\banimate-in\b/);
   });
 });
