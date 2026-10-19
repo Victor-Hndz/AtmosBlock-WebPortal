@@ -31,6 +31,25 @@ test("«Acerca de» enlaza al repositorio del proyecto (WEB-223)", async ({ page
   );
 });
 
+for (const [idioma, textos] of [["es", es], ["en", en]] as const) {
+  test(`«Acerca de» explica el proyecto, su estado y la atribución de los datos con el año en curso (WEB-310, ${idioma})`, async ({
+    page,
+  }) => {
+    await page.addInitScript(lng => localStorage.setItem("i18nextLng", lng), idioma);
+    await page.goto("/about");
+
+    const a = textos.about;
+    await expect(page.getByRole("heading", { level: 1, name: a.title })).toBeVisible();
+    for (const seccion of [a.whatIs.title, a.uses.title, a.how.title, a.status.title, a.origin.title, a.data.title]) {
+      await expect(page.getByRole("heading", { level: 2, name: seccion })).toBeVisible();
+    }
+    // Copernicus y ECMWF piden el año en la atribución: el de hoy, sin tocar el texto cada enero.
+    const atribucion = page.getByText(a.data.text.split("{{year}}")[0].slice(0, 40));
+    await expect(atribucion).toContainText(String(new Date().getFullYear()));
+    await expect(atribucion).toContainText("CC BY 4.0");
+  });
+}
+
 test("el selector de idioma cambia a inglés y vuelve a español", async ({ page }) => {
   await page.goto("/");
 
