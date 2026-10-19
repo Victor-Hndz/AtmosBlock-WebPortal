@@ -83,4 +83,11 @@ export default [...compat.extends(
     rules: {
         "jest/prefer-expect-assertions": "off",
     },
+}, {
+    // WEB-305: el SQL de las migraciones lo genera la CLI de TypeORM en una línea por sentencia.
+    files: ["src/database/migrations/**"],
+
+    rules: {
+        "max-len": "off",
+    },
 }];
