@@ -178,8 +178,17 @@ pnpm test --ci
 ```
 
 Resultado esperado: todas las suites pasan. Los tests de integración (`*.int-spec.ts`) necesitan
-PostgreSQL y no forman parte del CI; la cabecera de cada fichero explica cómo levantar uno con Docker
+PostgreSQL y el CI los ejecuta en el job `backend-integration`; la cabecera de cada fichero explica cómo levantar uno con Docker
 y lanzarlos.
+
+El esquema de la base de datos lo crean solo las migraciones de TypeORM (`src/database/migrations/`), que
+la API ejecuta al arrancar. Tras cambiar una entidad, genera una migración contra un PostgreSQL vacío (como
+el de integración) y revisa su SQL:
+
+```bash
+DB_HOST=localhost DB_PORT=55432 DB_USERNAME=test DB_PASSWORD=test DB_NAME=atmos_test \
+  pnpm run migration:generate src/database/migrations/<Nombre>
+```
 
 ### 2.2 Frontend (React)
 

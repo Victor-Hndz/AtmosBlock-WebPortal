@@ -4,6 +4,7 @@
 //     -e POSTGRES_DB=atmos_test -p 55432:5432 postgres:16
 //   pnpm run test:int
 import { DataSource } from "typeorm";
+import { opcionesBase } from "@/database/data-source";
 import { RequestEntity } from "@/requests/persistence/entities/request.entity";
 import { UserEntity } from "@/users/persistence/entities/user.entity";
 import { GeneratedFilesEntity } from "@/generatedFiles/persistence/entities/generatedFiles.entity";
@@ -47,7 +48,8 @@ describe("RequestsService.create contra PostgreSQL (vínculo usuario-petición)"
       password: "test",
       database: "atmos_test",
       entities: [RequestEntity, UserEntity, GeneratedFilesEntity],
-      synchronize: true,
+      migrations: opcionesBase.migrations,
+      migrationsRun: true,
       dropSchema: true,
     });
     await dataSource.initialize();
