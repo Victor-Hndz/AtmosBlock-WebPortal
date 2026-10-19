@@ -57,16 +57,42 @@ const AboutPage: React.FC = (): JSX.Element => {
         <h1 className="text-3xl font-bold mb-4 text-slate-900">{t("about.title")}</h1>
         <p className="text-lg text-slate-600 mb-6">{t("about.description")}</p>
 
-        <div className="project-info-container">
-          <h2 className="text-xl font-semibold mb-3 text-slate-800">{t("about.projectOverview")}</h2>
-          <p className="text-slate-700 mb-4">{t("about.projectDescription")}</p>
+        <div className="project-info-container space-y-4 text-slate-700">
+          <h2 className="text-xl font-semibold text-slate-800">{t("about.whatIs.title")}</h2>
+          <p>{t("about.whatIs.p1")}</p>
+          <p>{t("about.whatIs.p2")}</p>
 
-          <h3 className="text-lg font-medium mt-6 mb-2 text-slate-800">{t("about.technologies")}</h3>
-          <ul className="list-disc pl-6 space-y-1 text-slate-700">
+          <h2 className="text-xl font-semibold pt-2 text-slate-800">{t("about.uses.title")}</h2>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>
+              <strong>{t("about.uses.era5Title")}</strong> {t("about.uses.era5")}
+            </li>
+            <li>
+              <strong>{t("about.uses.forecastTitle")}</strong> {t("about.uses.forecast")}
+            </li>
+          </ul>
+
+          <h2 className="text-xl font-semibold pt-2 text-slate-800">{t("about.how.title")}</h2>
+          <p>{t("about.how.p1")}</p>
+          <p>{t("about.how.p2")}</p>
+          <p>{t("about.how.p3")}</p>
+
+          <h2 className="text-xl font-semibold pt-2 text-slate-800">{t("about.status.title")}</h2>
+          <p>{t("about.status.text")}</p>
+
+          <h3 className="text-lg font-medium pt-2 text-slate-800">{t("about.technologies")}</h3>
+          <ul className="list-disc pl-6 space-y-1">
             <li>{t("about.techStack.frontend")}</li>
             <li>{t("about.techStack.backend")}</li>
             <li>{t("about.techStack.processing")}</li>
           </ul>
+
+          <h2 className="text-xl font-semibold pt-2 text-slate-800">{t("about.origin.title")}</h2>
+          <p>{t("about.origin.text")}</p>
+
+          <h2 className="text-xl font-semibold pt-2 text-slate-800">{t("about.data.title")}</h2>
+          {/* Copernicus and ECMWF attributions carry the year: the current one, like the footer's © */}
+          <p className="text-sm">{t("about.data.text", { year: new Date().getFullYear() })}</p>
         </div>
 
         {/* External Links */}
