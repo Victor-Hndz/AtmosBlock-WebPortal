@@ -1,5 +1,5 @@
 # Same base as the c-core CI job, pinned by digest (WEB-303; WEB-363: netcdf-base:ubuntu26).
-FROM victorhndz/netcdf-base@sha256:79ad61d67670f6c5a080c9ac0ffd7b6054285711fc4d65dfbdcaef87f3a25cf6
+FROM victorhndz/netcdf-base:ubuntu26@sha256:79ad61d67670f6c5a080c9ac0ffd7b6054285711fc4d65dfbdcaef87f3a25cf6
 
 # Set the working directory inside the container
 WORKDIR /app
