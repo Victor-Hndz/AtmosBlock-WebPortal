@@ -212,8 +212,15 @@ const Layout: React.FC = (): JSX.Element => {
                 <NavLink key={item.path} item={item} isActive={location.pathname === item.path} />
               ))}
 
-              {/* Show user profile menu if authenticated */}
-              {isAuthenticated && user && <UserProfileMenu user={user} />}
+              {/* Show welcome and user profile menu if authenticated (first name only) */}
+              {isAuthenticated && user && (
+                <>
+                  {user.name?.trim() && (
+                    <span>{t("navigation-header.welcome", { nombre: user.name.trim().split(/\s+/)[0] })}</span>
+                  )}
+                  <UserProfileMenu user={user} />
+                </>
+              )}
 
               <LanguageSwitcher />
             </div>
@@ -233,7 +240,7 @@ const Layout: React.FC = (): JSX.Element => {
                   <DropdownMenu.Trigger asChild>
                     <button
                       className="p-2 rounded-md transition-colors duration-200 hover:bg-gray-700"
-                      aria-label={t("language.switchLanguage")}
+                      aria-label={t("navigation-header.menu")}
                     >
                       <Menu aria-hidden="true" />
                     </button>
@@ -253,8 +260,11 @@ const Layout: React.FC = (): JSX.Element => {
                   </DropdownMenu.Portal>
                 </DropdownMenu.Root>
 
-                {/* User profile in mobile view when authenticated */}
-                {isAuthenticated && user ? <UserProfileMenu user={user} /> : <LanguageSwitcher />}
+                {/* User profile (when authenticated) and language switcher in mobile view */}
+                <div className="flex gap-4 items-center">
+                  {isAuthenticated && user && <UserProfileMenu user={user} />}
+                  <LanguageSwitcher />
+                </div>
               </div>
             )}
           </div>

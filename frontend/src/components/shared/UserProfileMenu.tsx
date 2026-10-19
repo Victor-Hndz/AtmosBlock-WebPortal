@@ -2,6 +2,7 @@ import React from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Avatar from "@radix-ui/react-avatar";
 import * as Separator from "@radix-ui/react-separator";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { User, LogOut, LayoutList } from "lucide-react";
@@ -71,22 +72,39 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ user }) => {
   return (
     // modal={false}: a modal menu locks page scroll and hides the scrollbar, shifting the fixed header and footer
     <DropdownMenu.Root modal={false}>
-      <DropdownMenu.Trigger asChild>
-        <button
-          className="rounded-full h-8 w-8 flex items-center justify-center bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-          aria-label={t("profile.userMenu")}
-        >
-          <Avatar.Root className="flex items-center justify-center w-8 h-8 rounded-full overflow-hidden">
-            <Avatar.Fallback className="w-full h-full flex items-center justify-center bg-blue-500 text-white text-sm font-medium">
-              {getInitials()}
-            </Avatar.Fallback>
-          </Avatar.Root>
-        </button>
-      </DropdownMenu.Trigger>
+      <Tooltip.Provider delayDuration={300}>
+        <Tooltip.Root>
+          {/* Closing the menu gives focus back to the button from nowhere (no relatedTarget): no tooltip then, only on Tab */}
+          <Tooltip.Trigger asChild onFocus={e => !e.relatedTarget && e.preventDefault()}>
+            <DropdownMenu.Trigger asChild>
+              {/* Halo on hover: the same blue-300 as the hover of the other header items */}
+              <button
+                className="rounded-full h-8 w-8 flex items-center justify-center bg-blue-500 text-white ring-offset-gray-800 transition-all duration-300 hover:bg-blue-600 hover:ring-2 hover:ring-blue-300 hover:ring-offset-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+                aria-label={t("profile.userMenu")}
+              >
+                <Avatar.Root className="flex items-center justify-center w-8 h-8 rounded-full overflow-hidden">
+                  <Avatar.Fallback className="w-full h-full flex items-center justify-center bg-blue-500 text-white text-sm font-medium">
+                    {getInitials()}
+                  </Avatar.Fallback>
+                </Avatar.Root>
+              </button>
+            </DropdownMenu.Trigger>
+          </Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Content
+              className="tooltip-content bg-gray-900 text-white px-4 py-2 rounded-md text-sm z-50 shadow-md"
+              sideOffset={5}
+            >
+              {t("navigation-tooltips.profile")}
+              <Tooltip.Arrow className="tooltip-arrow" />
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        </Tooltip.Root>
+      </Tooltip.Provider>
 
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          className="min-w-[220px] bg-white rounded-md shadow-lg p-2 border border-gray-200 z-50"
+          className="min-w-[220px] animate-in bg-white rounded-md shadow-lg p-2 border border-gray-200 z-50"
           sideOffset={5}
           align="end"
         >
