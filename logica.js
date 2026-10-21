@@ -48,3 +48,135 @@ export function posibleInicio(sector) {
   const avisos = sector.aviso_inicio_v2 ?? [];
   return Object.entries(sector.prob_inicio_v2).map(([ventana, p]) => ({ ventana, p, aviso: avisos.includes(ventana) }));
 }
+
+/** Regiones con zoom (las cinco del mapa; las de baja latitud, no) y días de plazo del producto. */
+export const REGIONES_ZOOM = ["GRL", "EA", "URA", "PA", "NAM"];
+export const ULTIMO_DIA = 15;
+
+/** Caja [oeste, sur, este, norte] del zoom de una región de sectores_geo, con `margen` grados a cada lado, el norte
+ *  hasta 90 y el este continuo a través de ±180 (si este < oeste, +360: el Pacífico va de 110 a 230). */
+export function cajaRegion({ lat: [s, n], lon: [o, e] }, margen = 10) {
+  const este = e < o ? e + 360 : e;
+  return [o - margen, s - margen, este + margen, Math.min(90, n + margen)];
+}
+
+/** Z500 medio de un _z500.json en dam; los del primer formato venían en m. null si no hay. */
+export function enDam(z500) {
+  if (!z500 || z500.unidades !== "m") return z500;
+  return { ...z500, unidades: "dam", z: z500.z.map(dia => dia.map(fila => fila.map(v => v / 10))) };
+}
+
+/** Isolíneas de un campo {lat, lon0, dlon, z[lat][lon]} (Z500 medio en dam, longitudes de toda la vuelta) cada
+ *  `intervalo` dam (6 = 60 m): un MultiLineString por nivel con {valor y etiqueta en dam}. Marching squares con la
+ *  longitud periódica (la columna de cierre en ±180 es la primera), así que las líneas siguen enteras a través de ±180. */
+export function isolineas({ lat, lon0, dlon, z }, intervalo = 6) {
+  const nl = z[0].length;
+  const valores = z.flat();
+  const niveles = [];
+  for (let v = Math.ceil(Math.min(...valores) / intervalo) * intervalo; v <= Math.max(...valores); v += intervalo) {
+    niveles.push(v);
+  }
+  return niveles
+    .map(valor => ({ type: "MultiLineString", coordinates: lineas(lat, lon0, dlon, z, nl, valor), valor, etiqueta: String(valor) }))
+    .filter(l => l.coordinates.length);
+}
+
+function lineas(lat, lon0, dlon, z, nl, v) {
+  const segmentos = [];
+  for (let i = 0; i + 1 < lat.length; i++) {
+    for (let j = 0; j < nl; j++) {
+      const j1 = (j + 1) % nl;
+      const [a, b, c, d] = [z[i][j], z[i][j1], z[i + 1][j1], z[i + 1][j]]; // esquinas SO, SE, NE, NO
+      const t = (p, q) => (v - p) / (q - p);
+      // aristas S, E, N y O con su clave (compartida con la celda vecina) y el punto donde las corta el nivel
+      const aristas = [
+        [a, b, `h${i},${j}`, () => [lon0 + (j + t(a, b)) * dlon, lat[i]]],
+        [b, c, `v${i},${j1}`, () => [lon0 + (j + 1) * dlon, lat[i] + t(b, c) * (lat[i + 1] - lat[i])]],
+        [d, c, `h${i + 1},${j}`, () => [lon0 + (j + t(d, c)) * dlon, lat[i + 1]]],
+        [a, d, `v${i},${j}`, () => [lon0 + j * dlon, lat[i] + t(a, d) * (lat[i + 1] - lat[i])]],
+      ]
+        .map(([p, q, clave, punto], k) => (p >= v) !== (q >= v) && { k, clave, punto: punto() })
+        .filter(Boolean);
+      if (aristas.length === 2) segmentos.push(aristas);
+      else if (aristas.length === 4) {
+        // punto de silla: si el centro está del lado de la esquina SO, se aíslan las esquinas SE y NO
+        const [s, e, n, o] = aristas;
+        const conSO = (a + b + c + d) / 4 >= v === a >= v;
+        segmentos.push(...(conSO ? [[s, e], [n, o]] : [[s, o], [e, n]]));
+      }
+    }
+  }
+  return unir(segmentos);
+}
+
+/** Une los segmentos que comparten arista en líneas; las cerradas repiten el primer punto al final. */
+function unir(segmentos) {
+  const porClave = new Map();
+  segmentos.forEach((s, k) => s.forEach(({ clave }) => porClave.set(clave, [...(porClave.get(clave) ?? []), k])));
+  const usado = new Uint8Array(segmentos.length);
+  const salida = [];
+  segmentos.forEach(([a, b], k0) => {
+    if (usado[k0]) return;
+    usado[k0] = 1;
+    const linea = [a.punto, b.punto];
+    for (const [extremo, alFinal] of [
+      [b.clave, true],
+      [a.clave, false],
+    ]) {
+      let clave = extremo;
+      for (;;) {
+        const k = porClave.get(clave).find(x => !usado[x]);
+        if (k === undefined) break;
+        usado[k] = 1;
+        const siguiente = segmentos[k][0].clave === clave ? segmentos[k][1] : segmentos[k][0];
+        if (alFinal) linea.push(siguiente.punto);
+        else linea.unshift(siguiente.punto);
+        clave = siguiente.clave;
+      }
+    }
+    salida.push(linea);
+  });
+  return salida;
+}
+
+/** Lee #region=EA&dia=3; lo que no sea una región con zoom o un día entero de 0 a 15 queda en null. */
+export function leerHash(hash) {
+  const p = new URLSearchParams(String(hash ?? "").replace(/^#/, ""));
+  const region = REGIONES_ZOOM.includes(p.get("region")) ? p.get("region") : null;
+  const texto = p.get("dia") ?? "";
+  const dia = /^\d{1,2}$/.test(texto) && +texto <= ULTIMO_DIA ? +texto : null;
+  return { region, dia };
+}
+
+/** Hash del zoom; sin región, vacío (la vista del hemisferio). */
+export function escribirHash({ region, dia }) {
+  return region ? `#region=${region}&dia=${dia}` : "";
+}
+
+/** Latitud hasta la que la señal de una región se considera de su borde sur (junto a la banda de baja latitud). */
+export const LAT_BORDE_SUR = 45;
+
+/** De dónde viene la probabilidad de una región de sectores_geo el día `dia`: la banda [sur, norte] de las filas del
+ *  mapa cuyo máximo dentro de las columnas de la región es ≥ la mitad del máximo de la región, y bordeSur si la banda
+ *  no pasa de 45°N. Las columnas, como en sectores.py: [oeste, este), a través de ±180 si este < oeste. null sin señal. */
+export function origenSenal(mapa, dia, { lat: [s, n], lon: [o, e] }) {
+  if (!mapa) return null;
+  const dentro = lon => (o < e ? lon >= o && lon < e : lon >= o || lon < e);
+  const filas = mapa.lat
+    .map((lat, i) => {
+      const enRegion = mapa.prob[dia][i].filter((_, j) => dentro(mapa.lon0 + j * mapa.dlon));
+      return { lat, max: Math.max(0, ...enRegion) };
+    })
+    .filter(f => f.lat >= s && f.lat <= n);
+  const maximo = Math.max(0, ...filas.map(f => f.max));
+  if (maximo <= 0) return null;
+  const lats = filas.filter(f => f.max >= maximo / 2).map(f => f.lat);
+  const banda = [Math.min(...lats), Math.max(...lats)];
+  return { banda, bordeSur: banda[1] <= LAT_BORDE_SUR };
+}
+
+/** Probabilidad de la variante V1 (solo 55–65°N) y su normal el día `dia`; null si el producto no la trae. */
+export function varianteV1(sector, dia) {
+  if (!sector?.probabilidad_v1) return null;
+  return { p: sector.probabilidad_v1[dia], normal: sector.normal_v1?.[dia] ?? null };
+}
