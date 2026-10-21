@@ -13,6 +13,7 @@
   --habitual: #475569;
   --aviso-fondo: #fff7e6;
   --aviso-borde: #f5c26b;
+  --aifs: #b45309;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -29,6 +30,7 @@
     --habitual: #9aa4b6;
     --aviso-fondo: #2a2312;
     --aviso-borde: #7a5c1c;
+    --aifs: #fbbf24;
   }
 }
 
@@ -367,4 +369,210 @@ body.embed main {
 .aviso-inicio {
   font-weight: 600;
   color: var(--mas);
+}
+
+/* zoom por región */
+[hidden] {
+  display: none !important;
+}
+.sector-g {
+  cursor: pointer;
+  outline: none;
+}
+.sector-g .sector {
+  pointer-events: all; /* se pulsa todo el interior de la región, no solo la línea */
+}
+.sector-g:hover .sector,
+.sector-g:focus-visible .sector {
+  stroke: var(--acento);
+  stroke-width: 3;
+  stroke-dasharray: none;
+  opacity: 1;
+}
+.tarjeta[data-region] {
+  cursor: pointer;
+}
+.tarjeta[data-region]:hover {
+  border-color: var(--acento);
+}
+.ver-region {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+.ver-region::after {
+  content: " ›";
+  color: var(--acento);
+}
+.ver-region:focus-visible,
+.volver:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 2px;
+}
+.zoom-cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.zoom-cabecera h2 {
+  margin: 0;
+}
+.volver {
+  font: inherit;
+  color: var(--texto);
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+.zoom-cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 860px) {
+  .zoom-cuerpo {
+    grid-template-columns: 1fr;
+  }
+}
+.lienzo {
+  position: relative;
+}
+.info-celda {
+  position: absolute;
+  pointer-events: none;
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 13px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 15%);
+}
+.zoom-leyenda {
+  display: block;
+}
+.zoom-leyenda p {
+  margin: 4px 0;
+}
+.fronteras {
+  fill: none;
+  stroke: var(--tenue);
+  stroke-width: 0.4;
+  opacity: 0.6;
+}
+.costas {
+  fill: none;
+  stroke: var(--tenue);
+  stroke-width: 0.7;
+}
+.isolinea {
+  fill: none;
+  stroke: var(--texto);
+  stroke-width: 0.9;
+  opacity: 0.75;
+}
+.iso-etiqueta {
+  font-size: 10px;
+  fill: var(--texto);
+  paint-order: stroke;
+  stroke: var(--panel);
+  stroke-width: 3px;
+}
+.recuadro {
+  fill: none;
+  stroke: var(--acento);
+  stroke-width: 2;
+}
+.zoom-panel {
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.zoom-panel h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+.grafica {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.grafica .rejilla {
+  stroke: var(--borde);
+}
+.grafica .eje {
+  font-size: 11px;
+  fill: var(--tenue);
+}
+.grafica .serie {
+  fill: none;
+  stroke-width: 2;
+}
+.grafica .serie.activa {
+  stroke-width: 3.5;
+}
+.grafica .normal {
+  fill: none;
+  stroke: var(--tenue);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+}
+.grafica .marca-dia {
+  stroke: var(--texto);
+  opacity: 0.5;
+}
+.serie-ifs {
+  stroke: var(--acento);
+  border-color: var(--acento);
+}
+.serie-aifs {
+  stroke: var(--aifs);
+  border-color: var(--aifs);
+}
+.series {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 13px;
+  margin: 4px 0 8px;
+}
+.muestra {
+  display: inline-block;
+  width: 18px;
+  border-top-width: 3px;
+  border-top-style: solid; /* el color, de .serie-ifs o .serie-aifs */
+  vertical-align: middle;
+  margin-right: 6px;
+}
+.muestra.normal {
+  border-top: 2px dashed var(--tenue);
+}
+.tabla-zoom {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.tabla-zoom th,
+.tabla-zoom td {
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--borde);
+  text-align: right;
+}
+.tabla-zoom th:first-child {
+  text-align: left;
+  white-space: nowrap;
+}
+.nota {
+  font-size: 12px;
+  margin: 8px 0 0;
 }
