@@ -13,6 +13,8 @@ import {
   leerHash,
   escribirHash,
   enDam,
+  origenSenal,
+  varianteV1,
 } from "./logica.js";
 
 test("compara lo previsto con lo habitual para la época, con un margen de 10 puntos", () => {
@@ -132,4 +134,41 @@ test("el hash del zoom: #region=EA&dia=3, con región y día validados", () => {
   assert.equal(escribirHash({ region: "EA", dia: 3 }), "#region=EA&dia=3");
   assert.equal(escribirHash({ region: null, dia: 3 }), "");
   assert.deepEqual(leerHash(escribirHash({ region: "NAM", dia: 0 })), { region: "NAM", dia: 0 });
+});
+
+/** Mapa como el del JSON (30–75°N, 144 longitudes desde −180) del día 0, con prob(lat, lon) en %. */
+function mapaCon(prob) {
+  const lat = Array.from({ length: 19 }, (_, i) => 30 + 2.5 * i);
+  return { lat, lon0: -180, dlon: 2.5, prob: [lat.map(la => Array.from({ length: 144 }, (_, j) => prob(la, -180 + 2.5 * j)))] };
+}
+const GRL = { lat: [40, 75], lon: [-90, -26.25] };
+const PA = { lat: [40, 75], lon: [120, -140] };
+
+test("de dónde viene la señal: solo del borde sur (40–42,5°N) de la región", () => {
+  const mapa = mapaCon((la, lo) => {
+    if (lo === -50 && (la === 40 || la === 42.5)) return 80;
+    if (lo === -50 && la === 60) return 30; // menos de la mitad del máximo de la región
+    if (la === 37.5 || lo === 0) return 100; // fuera de las filas o de las columnas de la región
+    return 0;
+  });
+  assert.deepEqual(origenSenal(mapa, 0, GRL), { banda: [40, 42.5], bordeSur: true });
+});
+
+test("de dónde viene la señal: en 55–65°N, también en una región que cruza ±180", () => {
+  const mapa = mapaCon((la, lo) => (la >= 55 && la <= 65 && (lo === 177.5 || lo === -177.5) ? (la === 60 ? 90 : 50) : 0));
+  assert.deepEqual(origenSenal(mapa, 0, PA), { banda: [55, 65], bordeSur: false });
+  assert.equal(origenSenal(mapa, 0, GRL), null); // en GRL no hay nada
+});
+
+test("de dónde viene la señal: sin señal o sin mapa, null", () => {
+  assert.equal(origenSenal(mapaCon(() => 0), 0, GRL), null);
+  assert.equal(origenSenal(undefined, 0, GRL), null);
+});
+
+test("variante V1 junto al primario: solo si el producto la trae", () => {
+  const s = { probabilidad: [0.9, 0.88], probabilidad_v1: [0, 0.02], normal_v1: [0.3, 0.31] };
+  assert.deepEqual(varianteV1(s, 1), { p: 0.02, normal: 0.31 });
+  assert.deepEqual(varianteV1({ ...s, normal_v1: null }, 0), { p: 0, normal: null });
+  assert.equal(varianteV1({ probabilidad: [0.9] }, 0), null); // producto anterior al despliegue
+  assert.equal(varianteV1(undefined, 0), null);
 });

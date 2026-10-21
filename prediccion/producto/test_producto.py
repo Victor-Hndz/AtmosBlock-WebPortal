@@ -258,6 +258,11 @@ class Diario(unittest.TestCase):
                                  (True, {"dias_1_5": 1.0, "dias_6_10": 0.0}, ["dias_1_5"]))
                 self.assertEqual(ea["prob_genesis"], {"dias_1_5": 1.0, "dias_6_10": 0.0})  # regla F3-4
                 self.assertEqual(len(j["sectores"]["EA"]["probabilidad"]), 16)
+                with xr.open_dataset(base.with_suffix(".nc")) as ds:  # V1 junto al primario, solo para mostrar
+                    v1 = [round(float(x), 3) for x in ds["prob_sector_v1"].sel(sector="EA").values]
+                self.assertEqual(ea["probabilidad_v1"], v1)
+                self.assertEqual(ea["probabilidad_v1"][3], 1.0)  # el alta, en 60°N: dentro de 55–65°N
+                self.assertNotIn("probabilidad_v1", j["sectores"]["LLB-Atl"])  # V1 solo en los sectores principales
                 self.assertIn("CC-BY-4.0", j["atribucion"])
                 self.assertGreater(base.with_suffix(".png").stat().st_size, 0)
                 z500 = json.loads((pathlib.Path(d) / f"producto_{modelo}_20260930_z500.json").read_text(encoding="utf-8"))
@@ -273,7 +278,9 @@ class Diario(unittest.TestCase):
             clima = pathlib.Path(d) / "clima.nc"
             doy = np.arange(1, 367)
             xr.Dataset({"prob_bloqueo": (("sector", "paso", "dia_del_anio"),
-                                         np.broadcast_to(doy / 1000, (len(SECT), 16, 366)))},
+                                         np.broadcast_to(doy / 1000, (len(SECT), 16, 366))),
+                        "prob_bloqueo_v1": (("sector", "paso", "dia_del_anio"),
+                                            np.broadcast_to(doy / 500, (len(SECT), 16, 366)))},
                        coords={"sector": SECT, "paso": np.arange(16), "dia_del_anio": doy}).to_netcdf(clima)
             self.assertEqual(producto.main(["--fecha", "20260930", "--modelo", "ifs", "--archivo", d, "--salida", d,
                                             "--climatologia", str(clima)]), 0)
@@ -287,6 +294,8 @@ class Diario(unittest.TestCase):
             self.assertEqual(j["sectores_geo"]["PA"], {"lat": [40, 75], "lon": [120, -140]})
             # 30-09 es el día 273 del año: normal del paso s = (273 + s) / 1000
             self.assertEqual(j["sectores"]["EA"]["normal"][:2], [0.273, 0.274])
+            self.assertEqual(j["sectores"]["EA"]["normal_v1"][:2], [0.546, 0.548])  # prob_bloqueo_v1 = día / 500
+            self.assertNotIn("normal_v1", j["sectores"]["LLB-Pac"])
 
     def test_sin_climatologia_no_hay_normal(self):
         with tempfile.TemporaryDirectory() as d:
@@ -295,6 +304,7 @@ class Diario(unittest.TestCase):
                                             "--climatologia", str(pathlib.Path(d) / "no_existe.nc")]), 0)
             j = json.loads((pathlib.Path(d) / "producto_ifs_20260930.json").read_text(encoding="utf-8"))
             self.assertIsNone(j["sectores"]["EA"]["normal"])
+            self.assertIsNone(j["sectores"]["EA"]["normal_v1"])
 
     def test_sin_historia_marca_incompleta(self):
         with tempfile.TemporaryDirectory() as d:
