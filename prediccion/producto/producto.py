@@ -40,6 +40,7 @@ REGLAS = {"F3-4": False, "F3-4-V1": True}  # regla de sector de la génesis: ¿f
 GENESIS, GENESIS_DIVISION = 1, 2
 CLIMATOLOGIA = pathlib.Path(__file__).resolve().parents[1] / "verificacion" / "climatologia_era5_1991_2020.nc"
 LAT_MAPA = (30, 75)  # rejilla del mapa del JSON: donde se calcula DAV
+LAT_Z500 = (20, 90)  # isolíneas del visor: solo visualización, fuera del cálculo preregistrado
 UMBRAL_AVISO = 0.5  # solo para mostrar; la verificación usa la probabilidad entera (F3-5)
 PREREGISTRO = ("F3 firmado el 2026-09-29; aclaración de F3-5 y variante V1 el 2026-09-30; variante V2 el 2026-10-07 "
                "(PLAN_PREDICCION_BLOQUEOS)")
@@ -174,6 +175,16 @@ def resumen_json(ds, modelo, fecha, normal=None):
                      "prob": np.rint(ds["prob_evento"].sel(latitude=slice(*LAT_MAPA)) * 100).astype(int).values.tolist()}}
 
 
+def z500_json(z):
+    """Isolíneas del visor (no entra en el cálculo preregistrado): media de los miembros del Z500 de 00 UTC
+    (number, step, lat, lon) en 20–90°N a 2,5°, en decámetros enteros (error ≤ 5 m frente a isolíneas cada 60 m; la
+    mitad de tamaño que en metros)."""
+    media = dav.a_2p5(z).sel(latitude=slice(*LAT_Z500)).astype("float64").mean("number").transpose("step", ...)
+    return {"lat": [float(x) for x in media.latitude.values], "lon0": float(media.longitude[0]),
+            "dlon": float(media.longitude[1] - media.longitude[0]), "unidades": "dam", "miembros": int(z.sizes["number"]),
+            "z": np.rint(media.values / 10).astype(int).tolist(), "atribucion": ATRIBUCION}
+
+
 def mapa(ds, ruta, titulo):
     import matplotlib
     matplotlib.use("Agg")
@@ -240,6 +251,7 @@ def main(argv=None):
                                                     separators=(",", ":")),
                                          encoding="utf-8")
     mapa(ds, base.with_suffix(".png"), f"{a.modelo.upper()} ENS {a.fecha} 00 UTC")
+    pathlib.Path(f"{base}_z500.json").write_text(json.dumps(z500_json(z), separators=(",", ":")), encoding="utf-8")
     return 0
 
 

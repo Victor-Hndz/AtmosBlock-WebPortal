@@ -218,6 +218,24 @@ def escribir_archivo(carpeta, modelo, fecha, alta_en_pasos=()):
     da.to_dataset(name="z500").to_netcdf(pathlib.Path(carpeta) / f"z500_{modelo}_ens_{fecha}_00z_hn_1p25.nc")
 
 
+class Z500(unittest.TestCase):
+    """Salida de visualización: media de los miembros del Z500 de 00 UTC en 20–90°N, en decámetros enteros
+    (error ≤ 5 m frente a isolíneas cada 60 m)."""
+
+    def test_media_de_los_miembros_redondeada(self):
+        rng = np.random.default_rng(0)
+        datos = (5000 + 800 * rng.random((3, 16, LAT.size, LON.size))).astype("float32")
+        z = xr.DataArray(datos, dims=("number", "step", "latitude", "longitude"),
+                         coords={"number": [1, 2, 3], "step": np.arange(16), "latitude": LAT, "longitude": LON})
+        j = producto.z500_json(z)
+        self.assertEqual(j["lat"], list(np.arange(20, 90.01, 2.5)))
+        self.assertEqual((j["lon0"], j["dlon"], j["unidades"], j["miembros"]), (-180, 2.5, "dam", 3))
+        esperado = np.rint(datos.astype("float64").mean(axis=0) / 10)[:, LAT >= 20]
+        self.assertEqual(np.array(j["z"]).shape, (16, 29, 144))
+        self.assertTrue(all(isinstance(v, int) for v in j["z"][5][7]))
+        np.testing.assert_array_equal(np.array(j["z"]), esperado)
+
+
 class Diario(unittest.TestCase):
     def test_escribe_netcdf_json_y_png(self):
         with tempfile.TemporaryDirectory() as d:
@@ -242,6 +260,10 @@ class Diario(unittest.TestCase):
                 self.assertEqual(len(j["sectores"]["EA"]["probabilidad"]), 16)
                 self.assertIn("CC-BY-4.0", j["atribucion"])
                 self.assertGreater(base.with_suffix(".png").stat().st_size, 0)
+                z500 = json.loads((pathlib.Path(d) / f"producto_{modelo}_20260930_z500.json").read_text(encoding="utf-8"))
+                i, k = z500["lat"].index(60), int((10 + 180) / 2.5)
+                self.assertEqual((z500["miembros"], len(z500["z"]), len(z500["z"][0])), (2, 16, 29))
+                self.assertEqual((z500["z"][0][i][k], z500["z"][3][i][k]), (490, 520))  # el alta, en los pasos 2–9
 
     def test_json_con_mapa_y_normal_para_la_epoca(self):
         with tempfile.TemporaryDirectory() as d:
