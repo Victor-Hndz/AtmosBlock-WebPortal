@@ -81,9 +81,27 @@
               atenuados, al sur de 40°N, los bloqueos de baja latitud: el índice los detecta, pero no suelen frenar el
               flujo del oeste.
             </span>
+            <span data-t="pistaZoom">Pulsa una región para verla de cerca.</span>
           </figcaption>
         </figure>
         <div id="tarjetas" class="tarjetas"></div>
+      </section>
+
+      <section id="zoom" class="zoom" hidden>
+        <div class="zoom-cabecera">
+          <button type="button" id="volver" class="volver" data-t="volver">← Volver al hemisferio</button>
+          <h2 id="zoom-titulo"></h2>
+        </div>
+        <div class="zoom-cuerpo">
+          <figure class="mapa">
+            <div class="lienzo">
+              <svg id="mapa-zoom" viewBox="0 0 600 460" role="img"></svg>
+              <div id="info-celda" class="info-celda" hidden></div>
+            </div>
+            <figcaption id="zoom-leyenda" class="zoom-leyenda"></figcaption>
+          </figure>
+          <div id="zoom-panel" class="zoom-panel"></div>
+        </div>
       </section>
 
       <section id="verificacion" class="verificacion solo-completo">
