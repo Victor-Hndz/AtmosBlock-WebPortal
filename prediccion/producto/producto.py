@@ -135,19 +135,20 @@ def calcular(z, historia, analisis_d):
                "atribucion": ATRIBUCION, "aviso": AVISO})
 
 
-def normal_para_la_epoca(ruta, fecha, pasos):
-    """Probabilidad climatológica (ERA5 1991–2020) del sector bloqueado en la fecha de validez de cada paso, o None."""
+def normal_para_la_epoca(ruta, fecha, pasos, variable="prob_bloqueo"):
+    """Probabilidad climatológica (ERA5 1991–2020) del sector bloqueado en la fecha de validez de cada paso, o None.
+    variable: prob_bloqueo (F3-4) o prob_bloqueo_v1 (F3-4-V1)."""
     if not pathlib.Path(ruta).exists():
         return None
     validez = np.datetime64(f"{fecha[:4]}-{fecha[4:6]}-{fecha[6:]}") + np.arange(pasos).astype("timedelta64[D]")
     doy = (validez - validez.astype("datetime64[Y]")).astype(int)  # índice 0…365
     with xr.open_dataset(ruta) as c:
-        p = c["prob_bloqueo"].isel(paso=xr.DataArray(np.arange(pasos), dims="paso"),
-                                   dia_del_anio=xr.DataArray(doy, dims="paso")).load()
+        p = c[variable].isel(paso=xr.DataArray(np.arange(pasos), dims="paso"),
+                              dia_del_anio=xr.DataArray(doy, dims="paso")).load()
     return {str(s): [round(float(x), 3) for x in p.sel(sector=s).values] for s in p.sector.values}
 
 
-def resumen_json(ds, modelo, fecha, normal=None):
+def resumen_json(ds, modelo, fecha, normal=None, normal_v1=None):
     sect = {}
     def inicio(d, calma, var):
         prob = {v: (None if not calma else round(float(d[var].sel(ventana=v)), 3)) for v in VENTANAS}
@@ -165,6 +166,9 @@ def resumen_json(ds, modelo, fecha, normal=None):
                         "calma_v2": calma_v2, "prob_inicio_v2": prob_v2, "aviso_inicio_v2": aviso_v2,
                         "prob_genesis": {v: round(float(d["prob_genesis"].sel(regla="F3-4", ventana=v)), 3)
                                          for v in VENTANAS}}
+        if s in sectores.PRINCIPALES:  # V1 (55–65°N) junto al primario, solo para mostrar; no aplica a los LLB
+            sect[str(s)].update(probabilidad_v1=[round(float(x), 3) for x in d["prob_sector_v1"].values],
+                                normal_v1=None if normal_v1 is None else normal_v1[str(s)])
     return {"modelo": modelo, "fecha": fecha, "pasada": "00 UTC", "pasos_dias": list(range(ds.sizes["paso"])),
             "historia_incompleta": bool(ds["historia_incompleta"]), "dias_historia": int(ds["dias_historia"]),
             "preregistro": ds.attrs["preregistro"], "version": ds.attrs["version"], "censura": ds.attrs["censura"],
@@ -246,9 +250,10 @@ def main(argv=None):
     base.parent.mkdir(parents=True, exist_ok=True)
     ds.to_netcdf(base.with_suffix(".nc"), encoding={v: {"zlib": True, "complevel": 4} for v in ds.data_vars
                                                      if ds[v].ndim > 0})
-    normal = normal_para_la_epoca(a.climatologia, a.fecha, ds.sizes["paso"])
-    base.with_suffix(".json").write_text(json.dumps(resumen_json(ds, a.modelo, a.fecha, normal), ensure_ascii=False,
-                                                    separators=(",", ":")),
+    normal, normal_v1 = (normal_para_la_epoca(a.climatologia, a.fecha, ds.sizes["paso"], v)
+                         for v in ("prob_bloqueo", "prob_bloqueo_v1"))
+    base.with_suffix(".json").write_text(json.dumps(resumen_json(ds, a.modelo, a.fecha, normal, normal_v1),
+                                                    ensure_ascii=False, separators=(",", ":")),
                                          encoding="utf-8")
     mapa(ds, base.with_suffix(".png"), f"{a.modelo.upper()} ENS {a.fecha} 00 UTC")
     pathlib.Path(f"{base}_z500.json").write_text(json.dumps(z500_json(z), separators=(",", ":")), encoding="utf-8")

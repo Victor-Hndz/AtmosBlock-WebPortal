@@ -152,3 +152,31 @@ export function leerHash(hash) {
 export function escribirHash({ region, dia }) {
   return region ? `#region=${region}&dia=${dia}` : "";
 }
+
+/** Latitud hasta la que la señal de una región se considera de su borde sur (junto a la banda de baja latitud). */
+export const LAT_BORDE_SUR = 45;
+
+/** De dónde viene la probabilidad de una región de sectores_geo el día `dia`: la banda [sur, norte] de las filas del
+ *  mapa cuyo máximo dentro de las columnas de la región es ≥ la mitad del máximo de la región, y bordeSur si la banda
+ *  no pasa de 45°N. Las columnas, como en sectores.py: [oeste, este), a través de ±180 si este < oeste. null sin señal. */
+export function origenSenal(mapa, dia, { lat: [s, n], lon: [o, e] }) {
+  if (!mapa) return null;
+  const dentro = lon => (o < e ? lon >= o && lon < e : lon >= o || lon < e);
+  const filas = mapa.lat
+    .map((lat, i) => {
+      const enRegion = mapa.prob[dia][i].filter((_, j) => dentro(mapa.lon0 + j * mapa.dlon));
+      return { lat, max: Math.max(0, ...enRegion) };
+    })
+    .filter(f => f.lat >= s && f.lat <= n);
+  const maximo = Math.max(0, ...filas.map(f => f.max));
+  if (maximo <= 0) return null;
+  const lats = filas.filter(f => f.max >= maximo / 2).map(f => f.lat);
+  const banda = [Math.min(...lats), Math.max(...lats)];
+  return { banda, bordeSur: banda[1] <= LAT_BORDE_SUR };
+}
+
+/** Probabilidad de la variante V1 (solo 55–65°N) y su normal el día `dia`; null si el producto no la trae. */
+export function varianteV1(sector, dia) {
+  if (!sector?.probabilidad_v1) return null;
+  return { p: sector.probabilidad_v1[dia], normal: sector.normal_v1?.[dia] ?? null };
+}

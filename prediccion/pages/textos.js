@@ -68,8 +68,15 @@ export const TEXTOS = {
     colArea: "Área ocupada",
     colInicio: ventana => `Inicio ${ventana}`,
     notaZoom:
-      "Área ocupada: fracción media de la región dentro de un bloqueo ese día. Inicio: solo se calcula cuando la región lleva 5 días sin bloqueos grandes (si no, —).",
+      "Área ocupada: fracción media de la región dentro de un bloqueo ese día. Inicio: solo se calcula cuando la región lleva 5 días sin bloqueos grandes (si no, —). Contando solo 55–65°N: la misma regla, pero solo cuenta el bloqueo si ocupa la franja de 55–65°N. Nunca supera a la probabilidad principal y sirve para ver qué parte de ella viene de esa franja; es un complemento, no una corrección.",
     sinOtroModelo: modelo => `No hay previsión de ${modelo} para esta fecha.`,
+    lineaV1: (p, normal) => `Contando solo 55–65°N: ${p}${normal === null ? "" : ` · habitual ${normal}`}`,
+    leyendaV1: modelo => `${modelo}, contando solo 55–65°N`,
+    colV1: "Solo 55–65°N",
+    origenBordeSur: (banda, v1) =>
+      `Este día, la señal de bloqueo dentro de la región se concentra en su borde sur (${banda})${
+        v1 === null ? "" : `; contando solo 55–65°N, la probabilidad es del ${v1}`
+      }.`,
     pie: "Datos: previsiones abiertas de ECMWF (IFS ENS y AIFS ENS, CC-BY-4.0) y ERA5 de Copernicus C3S; costas de Natural Earth. Contains modified ECMWF open data and modified Copernicus Climate Change Service information.",
     enlaceDatos: "Datos en JSON",
     enlaceArchivo: "Archivo y mapas",
@@ -141,8 +148,15 @@ export const TEXTOS = {
     colArea: "Area covered",
     colInicio: ventana => `Onset ${ventana}`,
     notaZoom:
-      "Area covered: mean share of the region inside a block that day. Onset: only computed when the region has had no large blocks for 5 days (otherwise, —).",
+      "Area covered: mean share of the region inside a block that day. Onset: only computed when the region has had no large blocks for 5 days (otherwise, —). Counting only 55–65°N: the same rule, but a block only counts if it covers the 55–65°N band. It never exceeds the main probability and shows how much of it comes from that band; it is a complement, not a correction.",
     sinOtroModelo: modelo => `No ${modelo} forecast for this date.`,
+    lineaV1: (p, normal) => `Counting only 55–65°N: ${p}${normal === null ? "" : ` · usual ${normal}`}`,
+    leyendaV1: modelo => `${modelo}, counting only 55–65°N`,
+    colV1: "Only 55–65°N",
+    origenBordeSur: (banda, v1) =>
+      `On this day, the blocking signal inside the region is concentrated at its southern edge (${banda})${
+        v1 === null ? "" : `; counting only 55–65°N, the probability is ${v1}`
+      }.`,
     pie: "Data: ECMWF open forecasts (IFS ENS and AIFS ENS, CC-BY-4.0) and Copernicus C3S ERA5; coastlines from Natural Earth. Contains modified ECMWF open data and modified Copernicus Climate Change Service information.",
     enlaceDatos: "Data in JSON",
     enlaceArchivo: "Archive and maps",

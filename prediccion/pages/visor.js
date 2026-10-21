@@ -13,6 +13,8 @@ import {
   leerHash,
   escribirHash,
   enDam,
+  origenSenal,
+  varianteV1,
 } from "./logica.js";
 import { TEXTOS, elegirIdioma } from "./textos.js";
 
@@ -224,6 +226,7 @@ function dibujarTarjetas() {
       const normal = d.normal ? d.normal[estado.dia] : null;
       const c = comparar(prevista, normal);
       const inicio = (posibleInicio(d) ?? []).filter(x => x.ventana in T.ventanas);
+      const v1 = varianteV1(d, estado.dia);
       return `<article class="tarjeta" data-region="${s}">
         <h3><button type="button" class="ver-region" aria-label="${T.verRegion(nombre)}">${nombre}</button></h3>
         <div class="cifras">
@@ -231,6 +234,7 @@ function dibujarTarjetas() {
           ${normal === null ? "" : `<span class="tenue">${T.habitual}: ${pct(normal)}</span>`}
           ${c.clave in T.compara ? `<span class="chip ${c.clave}">${T.compara[c.clave]}</span>` : ""}
         </div>
+        ${v1 ? `<p class="v1 tenue">${T.lineaV1(pct(v1.p), v1.normal === null ? null : pct(v1.normal))}</p>` : ""}
         ${miniGrafica(d.probabilidad, d.normal, estado.dia)}
         <span class="tenue" style="font-size:12px">${T.notaTarjeta}</span>
         ${
@@ -323,7 +327,7 @@ function etiquetasIsolineas(niveles) {
   return salida;
 }
 
-function graficaZoom(series, normal) {
+function graficaZoom(series, normal, v1) {
   const ancho = 560;
   const alto = 220;
   const [izq, der, arriba, abajo] = [44, 12, 10, 26];
@@ -347,33 +351,53 @@ function graficaZoom(series, normal) {
     ${ejeY}${ejeX}
     ${normal ? `<path class="normal" d="${linea(normal)}"></path>` : ""}
     ${lineas}
+    ${v1 ? `<path class="serie-v1 serie-${estado.modelo}" d="${linea(v1)}"></path>` : ""}
     <line class="marca-dia" x1="${x(estado.dia)}" x2="${x(estado.dia)}" y1="${arriba}" y2="${alto - abajo}"></line>
   </svg>`;
 }
 
-/** Gráfica de los 15 días con IFS y AIFS (el que haya) y lo habitual; tabla del día con área e inicio. */
+const bandaTexto = ([sur, norte]) => {
+  const num = v => v.toLocaleString(T.locale);
+  return sur === norte ? `${num(sur)}°N` : `${num(sur)}–${num(norte)}°N`;
+};
+
+/** Gráfica de los 15 días con IFS y AIFS (el que haya), V1 del modelo activo y lo habitual; tabla del día con V1,
+ *  área e inicio; y, si la probabilidad del día sale del borde sur de la región, una frase con V1. */
 function dibujarPanelZoom(region, otro, delOtro) {
   const series = Object.keys(MODELOS)
     .map(m => [m, (m === estado.modelo ? estado.producto : delOtro)?.sectores?.[region]])
     .filter(([, d]) => d);
   const normal = series.map(([, d]) => d.normal).find(Boolean);
+  const activo = estado.producto.sectores[region];
+  const v1 = varianteV1(activo, estado.dia);
+  const origen = origenSenal(estado.producto.mapa, estado.dia, estado.producto.sectores_geo[region]);
+  const frase =
+    origen?.bordeSur && activo.probabilidad[estado.dia] > 0
+      ? `<p class="origen">${T.origenBordeSur(bandaTexto(origen.banda), v1 ? pct(v1.p) : null)}</p>`
+      : "";
   const filas = series
     .map(([m, d]) => {
       const inicio = Object.fromEntries((posibleInicio(d) ?? []).map(x => [x.ventana, x]));
+      const v1d = varianteV1(d, estado.dia);
       const ventanas = Object.keys(T.ventanas)
         .map(v => `<td class="${inicio[v]?.aviso ? "aviso-inicio" : ""}">${inicio[v] ? pct(inicio[v].p) : "—"}</td>`)
         .join("");
       return `<tr><th scope="row"><span class="muestra serie-${m}"></span>${MODELOS[m]}</th>
-        <td>${pct(d.probabilidad[estado.dia])}</td><td>${pct(d.fraccion_area[estado.dia])}</td>${ventanas}</tr>`;
+        <td>${pct(d.probabilidad[estado.dia])}</td><td class="tenue">${v1d ? pct(v1d.p) : "—"}</td>
+        <td>${pct(d.fraccion_area[estado.dia])}</td>${ventanas}</tr>`;
     })
     .join("");
   const muestras = series.map(([m]) => `<span><span class="muestra serie-${m}"></span>${MODELOS[m]}</span>`).join("");
+  const muestraV1 = `<span><span class="muestra v1 serie-${estado.modelo}"></span>${T.leyendaV1(MODELOS[estado.modelo])}</span>`;
   $("#zoom-panel").innerHTML = `<h3>${T.graficaZoom}</h3>
-    ${graficaZoom(series, normal)}
+    ${frase}
+    ${graficaZoom(series, normal, activo.probabilidad_v1)}
     <p class="tenue series">${muestras}
+      ${v1 ? muestraV1 : ""}
       ${normal ? `<span><span class="muestra normal"></span>${T.habitualEpoca}</span>` : ""}</p>
     <table class="tabla-zoom">
-      <thead><tr><th>${T.colModelo}</th><th>${T.colProbabilidad(estado.dia)}</th><th>${T.colArea}</th>
+      <thead><tr><th>${T.colModelo}</th><th>${T.colProbabilidad(estado.dia)}</th><th>${T.colV1}</th>
+        <th>${T.colArea}</th>
         ${Object.values(T.ventanas)
           .map(v => `<th>${T.colInicio(v)}</th>`)
           .join("")}</tr></thead>

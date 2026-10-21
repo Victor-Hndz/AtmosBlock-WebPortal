@@ -576,3 +576,24 @@ body.embed main {
   font-size: 12px;
   margin: 8px 0 0;
 }
+
+/* variante V1 (solo 55–65°N) junto al primario: secundaria */
+.tarjeta .v1 {
+  margin: 0 0 4px;
+  font-size: 13px;
+}
+.grafica .serie-v1 {
+  fill: none;
+  stroke-width: 2;
+  stroke-dasharray: 1 4;
+  stroke-linecap: round;
+}
+.muestra.v1 {
+  border-top-style: dotted;
+}
+.origen {
+  margin: 4px 0 8px;
+  padding: 6px 10px;
+  border-left: 3px solid var(--acento);
+  font-size: 14px;
+}
