@@ -1,32 +1,32 @@
 {
  "preregistro": "F3 firmado el 2026-09-29; aclaración de F3-5 y variante V1 el 2026-09-30; variante V2 el 2026-10-07 (PLAN_PREDICCION_BLOQUEOS)",
  "pasadas": {
-  "aifs": 8,
-  "ifs": 8
+  "aifs": 9,
+  "ifs": 9
  },
  "pasadas_completas": {
-  "aifs": 4,
-  "ifs": 4
+  "aifs": 5,
+  "ifs": 5
  },
  "primario": [
   {
    "modelo": "aifs",
    "sector": "EA",
    "paso": 1,
-   "n": 4,
+   "n": 5,
    "sucesos": 1,
-   "bs": 0.0025,
-   "bs_justo": 0.002041,
-   "bs_clim": 0.362555,
-   "bss": 0.993104,
+   "bs": 0.002,
+   "bs_justo": 0.001633,
+   "bs_clim": 0.380373,
+   "bss": 0.994742,
    "ic90": [
-    0.993104,
-    0.993104
+    0.994742,
+    0.994742
    ],
    "p": 0.0,
-   "fiabilidad": 0.0025,
-   "resolucion": 0.1875,
-   "incertidumbre": 0.1875,
+   "fiabilidad": 0.002,
+   "resolucion": 0.16,
+   "incertidumbre": 0.16,
    "roc": 1.0,
    "habilidad": true
   },
@@ -34,41 +34,41 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 2,
-   "n": 4,
-   "sucesos": 0,
-   "bs": 0.0004,
-   "bs_justo": 0.000204,
-   "bs_clim": 0.4484,
-   "bss": 0.999108,
+   "n": 5,
+   "sucesos": 1,
+   "bs": 0.00832,
+   "bs_justo": 0.00751,
+   "bs_clim": 0.38009,
+   "bss": 0.97811,
    "ic90": [
-    0.999108,
-    0.999108
+    0.97811,
+    0.97811
    ],
    "p": 0.0,
-   "fiabilidad": 0.0001,
-   "resolucion": 0.0,
-   "incertidumbre": 0.0,
-   "roc": null,
+   "fiabilidad": 0.00808,
+   "resolucion": 0.16,
+   "incertidumbre": 0.16,
+   "roc": 1.0,
    "habilidad": true
   },
   {
    "modelo": "aifs",
    "sector": "EA",
    "paso": 3,
-   "n": 4,
-   "sucesos": 1,
-   "bs": 0.0073,
-   "bs_justo": 0.006327,
-   "bs_clim": 0.362564,
-   "bss": 0.979866,
+   "n": 5,
+   "sucesos": 2,
+   "bs": 0.00616,
+   "bs_justo": 0.005224,
+   "bs_clim": 0.311562,
+   "bss": 0.980229,
    "ic90": [
-    0.979866,
-    0.979866
+    0.980229,
+    0.980229
    ],
    "p": 0.0,
-   "fiabilidad": 0.0067,
-   "resolucion": 0.1875,
-   "incertidumbre": 0.1875,
+   "fiabilidad": 0.00568,
+   "resolucion": 0.24,
+   "incertidumbre": 0.24,
    "roc": 1.0,
    "habilidad": true
   },
@@ -76,20 +76,20 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 4,
-   "n": 4,
-   "sucesos": 2,
-   "bs": 0.0035,
-   "bs_justo": 0.002449,
-   "bs_clim": 0.277623,
-   "bss": 0.987393,
+   "n": 5,
+   "sucesos": 3,
+   "bs": 0.00288,
+   "bs_justo": 0.001959,
+   "bs_clim": 0.243469,
+   "bss": 0.988171,
    "ic90": [
-    0.987393,
-    0.987393
+    0.988171,
+    0.988171
    ],
    "p": 0.0,
-   "fiabilidad": 0.00305,
-   "resolucion": 0.25,
-   "incertidumbre": 0.25,
+   "fiabilidad": 0.0024,
+   "resolucion": 0.24,
+   "incertidumbre": 0.24,
    "roc": 1.0,
    "habilidad": true
   },
@@ -97,20 +97,20 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 5,
-   "n": 4,
-   "sucesos": 3,
-   "bs": 0.0186,
-   "bs_justo": 0.016735,
-   "bs_clim": 0.193225,
-   "bss": 0.903739,
+   "n": 5,
+   "sucesos": 4,
+   "bs": 0.03056,
+   "bs_justo": 0.028245,
+   "bs_clim": 0.176091,
+   "bss": 0.826454,
    "ic90": [
-    0.903739,
-    0.903739
+    0.826454,
+    0.826454
    ],
    "p": 0.0,
-   "fiabilidad": 0.01855,
-   "resolucion": 0.1875,
-   "incertidumbre": 0.1875,
+   "fiabilidad": 0.03052,
+   "resolucion": 0.16,
+   "incertidumbre": 0.16,
    "roc": 1.0,
    "habilidad": true
   },
@@ -118,18 +118,18 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 6,
-   "n": 4,
-   "sucesos": 4,
-   "bs": 0.0698,
-   "bs_justo": 0.066939,
-   "bs_clim": 0.107204,
-   "bss": 0.348903,
+   "n": 5,
+   "sucesos": 5,
+   "bs": 0.09456,
+   "bs_justo": 0.091265,
+   "bs_clim": 0.106853,
+   "bss": 0.115046,
    "ic90": [
-    0.348903,
-    0.348903
+    0.115046,
+    0.115046
    ],
    "p": 0.0,
-   "fiabilidad": 0.06975,
+   "fiabilidad": 0.09448,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -139,18 +139,18 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 7,
-   "n": 4,
-   "sucesos": 4,
-   "bs": 0.1218,
-   "bs_justo": 0.118163,
-   "bs_clim": 0.106853,
-   "bss": -0.13988,
+   "n": 5,
+   "sucesos": 5,
+   "bs": 0.11792,
+   "bs_justo": 0.114122,
+   "bs_clim": 0.106573,
+   "bss": -0.106474,
    "ic90": [
-    -0.13988,
-    -0.13988
+    -0.106474,
+    -0.106474
    ],
    "p": 0.0,
-   "fiabilidad": 0.1218,
+   "fiabilidad": 0.11728,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -160,18 +160,18 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 8,
-   "n": 4,
-   "sucesos": 4,
-   "bs": 0.1646,
-   "bs_justo": 0.16,
-   "bs_clim": 0.106327,
-   "bss": -0.548054,
+   "n": 5,
+   "sucesos": 5,
+   "bs": 0.14136,
+   "bs_justo": 0.13698,
+   "bs_clim": 0.106573,
+   "bss": -0.326418,
    "ic90": [
-    -0.548054,
-    -0.548054
+    -0.326418,
+    -0.326418
    ],
    "p": 0.0,
-   "fiabilidad": 0.1644,
+   "fiabilidad": 0.14072,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -181,18 +181,18 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 9,
-   "n": 4,
-   "sucesos": 4,
-   "bs": 0.1921,
-   "bs_justo": 0.187551,
-   "bs_clim": 0.106503,
-   "bss": -0.803704,
+   "n": 5,
+   "sucesos": 5,
+   "bs": 0.1576,
+   "bs_justo": 0.153469,
+   "bs_clim": 0.107425,
+   "bss": -0.467075,
    "ic90": [
-    -0.803704,
-    -0.803704
+    -0.467075,
+    -0.467075
    ],
    "p": 0.0,
-   "fiabilidad": 0.1919,
+   "fiabilidad": 0.15708,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -202,18 +202,18 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 10,
-   "n": 4,
-   "sucesos": 4,
-   "bs": 0.149,
-   "bs_justo": 0.144694,
-   "bs_clim": 0.107392,
-   "bss": -0.387442,
+   "n": 5,
+   "sucesos": 5,
+   "bs": 0.11992,
+   "bs_justo": 0.116245,
+   "bs_clim": 0.109004,
+   "bss": -0.10014,
    "ic90": [
-    -0.387442,
-    -0.387442
+    -0.10014,
+    -0.10014
    ],
    "p": 0.0,
-   "fiabilidad": 0.149,
+   "fiabilidad": 0.11992,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -223,102 +223,102 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 11,
-   "n": 4,
+   "n": 5,
    "sucesos": 4,
-   "bs": 0.1122,
-   "bs_justo": 0.108163,
-   "bs_clim": 0.109893,
-   "bss": -0.020995,
+   "bs": 0.23088,
+   "bs_justo": 0.227102,
+   "bs_clim": 0.173677,
+   "bss": -0.329365,
    "ic90": [
-    -0.020995,
-    -0.020995
+    -0.329365,
+    -0.329365
    ],
    "p": 0.0,
-   "fiabilidad": 0.1114,
-   "resolucion": 0.0,
-   "incertidumbre": 0.0,
-   "roc": null,
-   "habilidad": false
-  },
-  {
-   "modelo": "aifs",
-   "sector": "EA",
-   "paso": 12,
-   "n": 4,
-   "sucesos": 3,
-   "bs": 0.2324,
-   "bs_justo": 0.227959,
-   "bs_clim": 0.199988,
-   "bss": -0.162069,
-   "ic90": [
-    -0.162069,
-    -0.162069
-   ],
-   "p": 0.0,
-   "fiabilidad": 0.0972,
-   "resolucion": 0.0625,
-   "incertidumbre": 0.1875,
-   "roc": 0.0,
-   "habilidad": false
-  },
-  {
-   "modelo": "aifs",
-   "sector": "EA",
-   "paso": 13,
-   "n": 4,
-   "sucesos": 2,
-   "bs": 0.3087,
-   "bs_justo": 0.304286,
-   "bs_clim": 0.246135,
-   "bss": -0.254189,
-   "ic90": [
-    -0.254189,
-    -0.254189
-   ],
-   "p": 0.0,
-   "fiabilidad": 0.1629,
-   "resolucion": 0.125,
-   "incertidumbre": 0.25,
+   "fiabilidad": 0.23024,
+   "resolucion": 0.16,
+   "incertidumbre": 0.16,
    "roc": 0.25,
    "habilidad": false
   },
   {
    "modelo": "aifs",
    "sector": "EA",
-   "paso": 14,
-   "n": 4,
-   "sucesos": 1,
-   "bs": 0.3045,
-   "bs_justo": 0.299592,
-   "bs_clim": 0.232303,
-   "bss": -0.310786,
+   "paso": 12,
+   "n": 5,
+   "sucesos": 3,
+   "bs": 0.3204,
+   "bs_justo": 0.316245,
+   "bs_clim": 0.233547,
+   "bss": -0.371885,
    "ic90": [
-    -0.310786,
-    -0.310786
+    -0.371885,
+    -0.371885
    ],
    "p": 0.0,
-   "fiabilidad": 0.134433,
-   "resolucion": 0.020833,
-   "incertidumbre": 0.1875,
-   "roc": 0.5,
+   "fiabilidad": 0.21224,
+   "resolucion": 0.14,
+   "incertidumbre": 0.24,
+   "roc": 0.0,
+   "habilidad": false
+  },
+  {
+   "modelo": "aifs",
+   "sector": "EA",
+   "paso": 13,
+   "n": 5,
+   "sucesos": 2,
+   "bs": 0.36864,
+   "bs_justo": 0.364408,
+   "bs_clim": 0.255647,
+   "bss": -0.441989,
+   "ic90": [
+    -0.441989,
+    -0.441989
+   ],
+   "p": 0.0,
+   "fiabilidad": 0.21312,
+   "resolucion": 0.106667,
+   "incertidumbre": 0.24,
+   "roc": 0.166667,
+   "habilidad": false
+  },
+  {
+   "modelo": "aifs",
+   "sector": "EA",
+   "paso": 14,
+   "n": 5,
+   "sucesos": 1,
+   "bs": 0.33608,
+   "bs_justo": 0.331265,
+   "bs_clim": 0.230408,
+   "bss": -0.458632,
+   "ic90": [
+    -0.458632,
+    -0.458632
+   ],
+   "p": 0.0,
+   "fiabilidad": 0.17522,
+   "resolucion": 0.01,
+   "incertidumbre": 0.16,
+   "roc": 0.375,
    "habilidad": false
   },
   {
    "modelo": "aifs",
    "sector": "EA",
    "paso": 15,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.262,
-   "bs_justo": 0.256939,
-   "bs_clim": 0.155526,
-   "bss": -0.684602,
+   "bs": 0.27232,
+   "bs_justo": 0.267265,
+   "bs_clim": 0.155737,
+   "bss": -0.748593,
    "ic90": [
-    -0.684602,
-    -0.684602
+    -0.748593,
+    -0.748593
    ],
    "p": 0.0,
-   "fiabilidad": 0.260933,
+   "fiabilidad": 0.2713,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -328,18 +328,18 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 1,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.3643,
-   "bs_justo": 0.361429,
-   "bs_clim": 0.234711,
-   "bss": -0.552122,
+   "bs": 0.45344,
+   "bs_justo": 0.450776,
+   "bs_clim": 0.230128,
+   "bss": -0.970379,
    "ic90": [
-    -0.552122,
-    -0.552122
+    -0.970379,
+    -0.970379
    ],
    "p": 0.0,
-   "fiabilidad": 0.3643,
+   "fiabilidad": 0.45344,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -349,18 +349,18 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 2,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.5481,
-   "bs_justo": 0.544286,
-   "bs_clim": 0.227292,
-   "bss": -1.411431,
+   "bs": 0.43856,
+   "bs_justo": 0.435429,
+   "bs_clim": 0.222044,
+   "bss": -0.975103,
    "ic90": [
-    -1.411431,
-    -1.411431
+    -0.975103,
+    -0.975103
    ],
    "p": 0.0,
-   "fiabilidad": 0.54745,
+   "fiabilidad": 0.43804,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -370,18 +370,18 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 3,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.2558,
-   "bs_justo": 0.251837,
-   "bs_clim": 0.217451,
-   "bss": -0.176356,
+   "bs": 0.32016,
+   "bs_justo": 0.316245,
+   "bs_clim": 0.212454,
+   "bss": -0.50696,
    "ic90": [
-    -0.176356,
-    -0.176356
+    -0.50696,
+    -0.50696
    ],
    "p": 0.0,
-   "fiabilidad": 0.2556,
+   "fiabilidad": 0.32,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -391,39 +391,39 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 4,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.186,
-   "bs_justo": 0.181429,
-   "bs_clim": 0.207035,
-   "bss": 0.101601,
+   "bs": 0.2208,
+   "bs_justo": 0.216163,
+   "bs_clim": 0.202257,
+   "bss": -0.091678,
    "ic90": [
-    0.101601,
-    0.101601
+    -0.091678,
+    -0.091678
    ],
    "p": 0.0,
-   "fiabilidad": 0.1852,
+   "fiabilidad": 0.22016,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
-   "habilidad": true
+   "habilidad": false
   },
   {
    "modelo": "aifs",
    "sector": "PA",
    "paso": 5,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.174,
-   "bs_justo": 0.17,
-   "bs_clim": 0.197116,
-   "bss": 0.117269,
+   "bs": 0.13992,
+   "bs_justo": 0.13649,
+   "bs_clim": 0.193589,
+   "bss": 0.277233,
    "ic90": [
-    0.117269,
-    0.117269
+    0.277233,
+    0.277233
    ],
    "p": 0.0,
-   "fiabilidad": 0.1738,
+   "fiabilidad": 0.13972,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -433,18 +433,18 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 6,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.0633,
-   "bs_justo": 0.059592,
-   "bs_clim": 0.189037,
-   "bss": 0.665145,
+   "bs": 0.05456,
+   "bs_justo": 0.051102,
+   "bs_clim": 0.186401,
+   "bss": 0.707298,
    "ic90": [
-    0.665145,
-    0.665145
+    0.707298,
+    0.707298
    ],
    "p": 0.0,
-   "fiabilidad": 0.0625,
+   "fiabilidad": 0.05376,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -454,18 +454,18 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 7,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.0963,
-   "bs_justo": 0.093061,
-   "bs_clim": 0.182739,
-   "bss": 0.473019,
+   "bs": 0.08096,
+   "bs_justo": 0.077878,
+   "bs_clim": 0.181906,
+   "bss": 0.554935,
    "ic90": [
-    0.473019,
-    0.473019
+    0.554935,
+    0.554935
    ],
    "p": 0.0,
-   "fiabilidad": 0.096033,
+   "fiabilidad": 0.08072,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -475,18 +475,18 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 8,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.1093,
-   "bs_justo": 0.106122,
-   "bs_clim": 0.179266,
-   "bss": 0.390292,
+   "bs": 0.09392,
+   "bs_justo": 0.090776,
+   "bs_clim": 0.179128,
+   "bss": 0.475682,
    "ic90": [
-    0.390292,
-    0.390292
+    0.475682,
+    0.475682
    ],
    "p": 0.0,
-   "fiabilidad": 0.1093,
+   "fiabilidad": 0.09344,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -496,18 +496,18 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 9,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.0927,
-   "bs_justo": 0.089388,
-   "bs_clim": 0.178123,
-   "bss": 0.479573,
+   "bs": 0.08216,
+   "bs_justo": 0.078857,
+   "bs_clim": 0.177851,
+   "bss": 0.538039,
    "ic90": [
-    0.479573,
-    0.479573
+    0.538039,
+    0.538039
    ],
    "p": 0.0,
-   "fiabilidad": 0.0927,
+   "fiabilidad": 0.08216,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -517,18 +517,18 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 10,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.0806,
-   "bs_justo": 0.077347,
-   "bs_clim": 0.177442,
-   "bss": 0.545768,
+   "bs": 0.08248,
+   "bs_justo": 0.07902,
+   "bs_clim": 0.176229,
+   "bss": 0.531974,
    "ic90": [
-    0.545768,
-    0.545768
+    0.531974,
+    0.531974
    ],
    "p": 0.0,
-   "fiabilidad": 0.080133,
+   "fiabilidad": 0.082107,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -538,18 +538,18 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 11,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.0585,
-   "bs_justo": 0.054898,
-   "bs_clim": 0.176322,
-   "bss": 0.668221,
+   "bs": 0.06992,
+   "bs_justo": 0.066122,
+   "bs_clim": 0.174801,
+   "bss": 0.600003,
    "ic90": [
-    0.668221,
-    0.668221
+    0.600003,
+    0.600003
    ],
    "p": 0.0,
-   "fiabilidad": 0.05845,
+   "fiabilidad": 0.06984,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -559,104 +559,104 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 12,
-   "n": 4,
-   "sucesos": 0,
-   "bs": 0.0441,
-   "bs_justo": 0.040816,
-   "bs_clim": 0.157663,
-   "bss": 0.72029,
+   "n": 5,
+   "sucesos": 1,
+   "bs": 0.13328,
+   "bs_justo": 0.129796,
+   "bs_clim": 0.201789,
+   "bss": 0.339507,
    "ic90": [
-    0.72029,
-    0.72029
+    0.339507,
+    0.339507
    ],
    "p": 0.0,
-   "fiabilidad": 0.04325,
-   "resolucion": 0.0,
-   "incertidumbre": 0.0,
-   "roc": null,
+   "fiabilidad": 0.1326,
+   "resolucion": 0.16,
+   "incertidumbre": 0.16,
+   "roc": 1.0,
    "habilidad": true
   },
   {
    "modelo": "aifs",
    "sector": "PA",
    "paso": 13,
-   "n": 4,
-   "sucesos": 1,
-   "bs": 0.2162,
-   "bs_justo": 0.213469,
-   "bs_clim": 0.204021,
-   "bss": -0.059695,
-   "ic90": [
-    -0.059695,
-    -0.059695
-   ],
-   "p": 0.0,
-   "fiabilidad": 0.0081,
-   "resolucion": 0.0,
-   "incertidumbre": 0.1875,
-   "roc": 0.0,
-   "habilidad": false
-  },
-  {
-   "modelo": "aifs",
-   "sector": "PA",
-   "paso": 14,
-   "n": 4,
+   "n": 5,
    "sucesos": 2,
-   "bs": 0.3725,
-   "bs_justo": 0.37,
-   "bs_clim": 0.288007,
-   "bss": -0.29337,
+   "bs": 0.27096,
+   "bs_justo": 0.267918,
+   "bs_clim": 0.248137,
+   "bss": -0.091979,
    "ic90": [
-    -0.29337,
-    -0.29337
+    -0.091979,
+    -0.091979
    ],
    "p": 0.0,
-   "fiabilidad": 0.192033,
-   "resolucion": 0.083333,
-   "incertidumbre": 0.25,
+   "fiabilidad": 0.10448,
+   "resolucion": 0.09,
+   "incertidumbre": 0.24,
    "roc": 0.5,
    "habilidad": false
   },
   {
    "modelo": "aifs",
    "sector": "PA",
-   "paso": 15,
-   "n": 4,
-   "sucesos": 2,
-   "bs": 0.3636,
-   "bs_justo": 0.36102,
-   "bs_clim": 0.307824,
-   "bss": -0.181193,
+   "paso": 14,
+   "n": 5,
+   "sucesos": 3,
+   "bs": 0.39048,
+   "bs_justo": 0.387592,
+   "bs_clim": 0.325715,
+   "bss": -0.19884,
    "ic90": [
-    -0.181193,
-    -0.181193
+    -0.19884,
+    -0.19884
    ],
    "p": 0.0,
-   "fiabilidad": 0.1225,
-   "resolucion": 0.0,
-   "incertidumbre": 0.25,
-   "roc": 0.625,
+   "fiabilidad": 0.246107,
+   "resolucion": 0.106667,
+   "incertidumbre": 0.24,
+   "roc": 0.666667,
+   "habilidad": false
+  },
+  {
+   "modelo": "aifs",
+   "sector": "PA",
+   "paso": 15,
+   "n": 5,
+   "sucesos": 2,
+   "bs": 0.31136,
+   "bs_justo": 0.308408,
+   "bs_clim": 0.259802,
+   "bss": -0.198452,
+   "ic90": [
+    -0.198452,
+    -0.198452
+   ],
+   "p": 0.0,
+   "fiabilidad": 0.11848,
+   "resolucion": 0.04,
+   "incertidumbre": 0.24,
+   "roc": 0.416667,
    "habilidad": false
   },
   {
    "modelo": "ifs",
    "sector": "EA",
    "paso": 1,
-   "n": 4,
+   "n": 5,
    "sucesos": 1,
-   "bs": 0.0026,
-   "bs_justo": 0.002041,
-   "bs_clim": 0.362555,
-   "bss": 0.992829,
+   "bs": 0.00208,
+   "bs_justo": 0.001633,
+   "bs_clim": 0.380373,
+   "bss": 0.994532,
    "ic90": [
-    0.992829,
-    0.992829
+    0.994532,
+    0.994532
    ],
    "p": 0.0,
-   "fiabilidad": 0.002533,
-   "resolucion": 0.1875,
-   "incertidumbre": 0.1875,
+   "fiabilidad": 0.00202,
+   "resolucion": 0.16,
+   "incertidumbre": 0.16,
    "roc": 1.0,
    "habilidad": true
   },
@@ -664,41 +664,41 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 2,
-   "n": 4,
-   "sucesos": 0,
-   "bs": 0.0017,
-   "bs_justo": 0.001224,
-   "bs_clim": 0.4484,
-   "bss": 0.996209,
+   "n": 5,
+   "sucesos": 1,
+   "bs": 0.00648,
+   "bs_justo": 0.005551,
+   "bs_clim": 0.38009,
+   "bss": 0.982951,
    "ic90": [
-    0.996209,
-    0.996209
+    0.982951,
+    0.982951
    ],
    "p": 0.0,
-   "fiabilidad": 0.000625,
-   "resolucion": 0.0,
-   "incertidumbre": 0.0,
-   "roc": null,
+   "fiabilidad": 0.00562,
+   "resolucion": 0.16,
+   "incertidumbre": 0.16,
+   "roc": 1.0,
    "habilidad": true
   },
   {
    "modelo": "ifs",
    "sector": "EA",
    "paso": 3,
-   "n": 4,
-   "sucesos": 1,
-   "bs": 0.0026,
-   "bs_justo": 0.001837,
-   "bs_clim": 0.362564,
-   "bss": 0.992829,
+   "n": 5,
+   "sucesos": 2,
+   "bs": 0.00216,
+   "bs_justo": 0.001469,
+   "bs_clim": 0.311562,
+   "bss": 0.993067,
    "ic90": [
-    0.992829,
-    0.992829
+    0.993067,
+    0.993067
    ],
    "p": 0.0,
-   "fiabilidad": 0.001733,
-   "resolucion": 0.1875,
-   "incertidumbre": 0.1875,
+   "fiabilidad": 0.001307,
+   "resolucion": 0.24,
+   "incertidumbre": 0.24,
    "roc": 1.0,
    "habilidad": true
   },
@@ -706,20 +706,20 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 4,
-   "n": 4,
-   "sucesos": 2,
-   "bs": 0.0022,
-   "bs_justo": 0.001429,
-   "bs_clim": 0.277623,
-   "bss": 0.992076,
+   "n": 5,
+   "sucesos": 3,
+   "bs": 0.00184,
+   "bs_justo": 0.001143,
+   "bs_clim": 0.243469,
+   "bss": 0.992443,
    "ic90": [
-    0.992076,
-    0.992076
+    0.992443,
+    0.992443
    ],
    "p": 0.0,
-   "fiabilidad": 0.0017,
-   "resolucion": 0.25,
-   "incertidumbre": 0.25,
+   "fiabilidad": 0.001427,
+   "resolucion": 0.24,
+   "incertidumbre": 0.24,
    "roc": 1.0,
    "habilidad": true
   },
@@ -727,20 +727,20 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 5,
-   "n": 4,
-   "sucesos": 3,
-   "bs": 0.0234,
-   "bs_justo": 0.021633,
-   "bs_clim": 0.193225,
-   "bss": 0.878898,
+   "n": 5,
+   "sucesos": 4,
+   "bs": 0.05072,
+   "bs_justo": 0.048327,
+   "bs_clim": 0.176091,
+   "bss": 0.711968,
    "ic90": [
-    0.878898,
-    0.878898
+    0.711968,
+    0.711968
    ],
    "p": 0.0,
-   "fiabilidad": 0.0234,
-   "resolucion": 0.1875,
-   "incertidumbre": 0.1875,
+   "fiabilidad": 0.05072,
+   "resolucion": 0.16,
+   "incertidumbre": 0.16,
    "roc": 1.0,
    "habilidad": true
   },
@@ -748,39 +748,39 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 6,
-   "n": 4,
-   "sucesos": 4,
-   "bs": 0.0605,
-   "bs_justo": 0.057143,
-   "bs_clim": 0.107204,
-   "bss": 0.435654,
-   "ic90": [
-    0.435654,
-    0.435654
-   ],
-   "p": 0.0,
-   "fiabilidad": 0.06045,
-   "resolucion": 0.0,
-   "incertidumbre": 0.0,
-   "roc": null,
-   "habilidad": true
-  },
-  {
-   "modelo": "ifs",
-   "sector": "EA",
-   "paso": 7,
-   "n": 4,
-   "sucesos": 4,
-   "bs": 0.0572,
-   "bs_justo": 0.054082,
+   "n": 5,
+   "sucesos": 5,
+   "bs": 0.09072,
+   "bs_justo": 0.08702,
    "bs_clim": 0.106853,
-   "bss": 0.464687,
+   "bss": 0.150983,
    "ic90": [
-    0.464687,
-    0.464687
+    0.150983,
+    0.150983
    ],
    "p": 0.0,
-   "fiabilidad": 0.0572,
+   "fiabilidad": 0.09068,
+   "resolucion": 0.0,
+   "incertidumbre": 0.0,
+   "roc": null,
+   "habilidad": true
+  },
+  {
+   "modelo": "ifs",
+   "sector": "EA",
+   "paso": 7,
+   "n": 5,
+   "sucesos": 5,
+   "bs": 0.05544,
+   "bs_justo": 0.052245,
+   "bs_clim": 0.106573,
+   "bss": 0.479792,
+   "ic90": [
+    0.479792,
+    0.479792
+   ],
+   "p": 0.0,
+   "fiabilidad": 0.0548,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -790,18 +790,18 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 8,
-   "n": 4,
-   "sucesos": 4,
-   "bs": 0.1058,
-   "bs_justo": 0.101429,
-   "bs_clim": 0.106327,
-   "bss": 0.004957,
+   "n": 5,
+   "sucesos": 5,
+   "bs": 0.09264,
+   "bs_justo": 0.08849,
+   "bs_clim": 0.106573,
+   "bss": 0.130735,
    "ic90": [
-    0.004957,
-    0.004957
+    0.130735,
+    0.130735
    ],
    "p": 0.0,
-   "fiabilidad": 0.105733,
+   "fiabilidad": 0.092587,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -811,18 +811,18 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 9,
-   "n": 4,
-   "sucesos": 4,
-   "bs": 0.1668,
-   "bs_justo": 0.162245,
-   "bs_clim": 0.106503,
-   "bss": -0.566152,
+   "n": 5,
+   "sucesos": 5,
+   "bs": 0.14144,
+   "bs_justo": 0.137143,
+   "bs_clim": 0.107425,
+   "bss": -0.316644,
    "ic90": [
-    -0.566152,
-    -0.566152
+    -0.316644,
+    -0.316644
    ],
    "p": 0.0,
-   "fiabilidad": 0.1668,
+   "fiabilidad": 0.14144,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -832,18 +832,18 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 10,
-   "n": 4,
-   "sucesos": 4,
-   "bs": 0.1395,
-   "bs_justo": 0.135102,
-   "bs_clim": 0.107392,
-   "bss": -0.298981,
+   "n": 5,
+   "sucesos": 5,
+   "bs": 0.11808,
+   "bs_justo": 0.113959,
+   "bs_clim": 0.109004,
+   "bss": -0.08326,
    "ic90": [
-    -0.298981,
-    -0.298981
+    -0.08326,
+    -0.08326
    ],
    "p": 0.0,
-   "fiabilidad": 0.13925,
+   "fiabilidad": 0.11788,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -853,41 +853,41 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 11,
-   "n": 4,
+   "n": 5,
    "sucesos": 4,
-   "bs": 0.0993,
-   "bs_justo": 0.095102,
-   "bs_clim": 0.109893,
-   "bss": 0.096392,
+   "bs": 0.24144,
+   "bs_justo": 0.237714,
+   "bs_clim": 0.173677,
+   "bss": -0.390167,
    "ic90": [
-    0.096392,
-    0.096392
+    -0.390167,
+    -0.390167
    ],
    "p": 0.0,
-   "fiabilidad": 0.0991,
-   "resolucion": 0.0,
-   "incertidumbre": 0.0,
-   "roc": null,
-   "habilidad": true
+   "fiabilidad": 0.24128,
+   "resolucion": 0.16,
+   "incertidumbre": 0.16,
+   "roc": 0.0,
+   "habilidad": false
   },
   {
    "modelo": "ifs",
    "sector": "EA",
    "paso": 12,
-   "n": 4,
+   "n": 5,
    "sucesos": 3,
-   "bs": 0.2463,
-   "bs_justo": 0.241837,
-   "bs_clim": 0.199988,
-   "bss": -0.231573,
+   "bs": 0.33152,
+   "bs_justo": 0.327347,
+   "bs_clim": 0.233547,
+   "bss": -0.419499,
    "ic90": [
-    -0.231573,
-    -0.231573
+    -0.419499,
+    -0.419499
    ],
    "p": 0.0,
-   "fiabilidad": 0.2463,
-   "resolucion": 0.1875,
-   "incertidumbre": 0.1875,
+   "fiabilidad": 0.33152,
+   "resolucion": 0.24,
+   "incertidumbre": 0.24,
    "roc": 0.0,
    "habilidad": false
   },
@@ -895,60 +895,60 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 13,
-   "n": 4,
+   "n": 5,
    "sucesos": 2,
-   "bs": 0.2475,
-   "bs_justo": 0.242653,
-   "bs_clim": 0.246135,
-   "bss": -0.005545,
+   "bs": 0.33248,
+   "bs_justo": 0.328,
+   "bs_clim": 0.255647,
+   "bss": -0.300544,
    "ic90": [
-    -0.005545,
-    -0.005545
+    -0.300544,
+    -0.300544
    ],
    "p": 0.0,
-   "fiabilidad": 0.01225,
-   "resolucion": 0.0,
-   "incertidumbre": 0.25,
-   "roc": 0.75,
+   "fiabilidad": 0.14428,
+   "resolucion": 0.04,
+   "incertidumbre": 0.24,
+   "roc": 0.5,
    "habilidad": false
   },
   {
    "modelo": "ifs",
    "sector": "EA",
    "paso": 14,
-   "n": 4,
+   "n": 5,
    "sucesos": 1,
-   "bs": 0.2766,
-   "bs_justo": 0.271633,
-   "bs_clim": 0.232303,
-   "bss": -0.190684,
+   "bs": 0.3308,
+   "bs_justo": 0.326041,
+   "bs_clim": 0.230408,
+   "bss": -0.435716,
    "ic90": [
-    -0.190684,
-    -0.190684
+    -0.435716,
+    -0.435716
    ],
    "p": 0.0,
-   "fiabilidad": 0.1324,
-   "resolucion": 0.020833,
-   "incertidumbre": 0.1875,
-   "roc": 0.666667,
+   "fiabilidad": 0.21544,
+   "resolucion": 0.026667,
+   "incertidumbre": 0.16,
+   "roc": 0.5,
    "habilidad": false
   },
   {
    "modelo": "ifs",
    "sector": "EA",
    "paso": 15,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.2056,
-   "bs_justo": 0.200816,
-   "bs_clim": 0.155526,
-   "bss": -0.321962,
+   "bs": 0.23648,
+   "bs_justo": 0.231673,
+   "bs_clim": 0.155737,
+   "bss": -0.518461,
    "ic90": [
-    -0.321962,
-    -0.321962
+    -0.518461,
+    -0.518461
    ],
    "p": 0.0,
-   "fiabilidad": 0.2054,
+   "fiabilidad": 0.23632,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -958,39 +958,39 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 1,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.219,
-   "bs_justo": 0.215918,
-   "bs_clim": 0.234711,
-   "bss": 0.066937,
+   "bs": 0.26768,
+   "bs_justo": 0.264327,
+   "bs_clim": 0.230128,
+   "bss": -0.163177,
    "ic90": [
-    0.066937,
-    0.066937
+    -0.163177,
+    -0.163177
    ],
    "p": 0.0,
-   "fiabilidad": 0.219,
+   "fiabilidad": 0.26768,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
-   "habilidad": true
+   "habilidad": false
   },
   {
    "modelo": "ifs",
    "sector": "PA",
    "paso": 2,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.3318,
-   "bs_justo": 0.327143,
-   "bs_clim": 0.227292,
-   "bss": -0.459793,
+   "bs": 0.26616,
+   "bs_justo": 0.262204,
+   "bs_clim": 0.222044,
+   "bss": -0.19868,
    "ic90": [
-    -0.459793,
-    -0.459793
+    -0.19868,
+    -0.19868
    ],
    "p": 0.0,
-   "fiabilidad": 0.33175,
+   "fiabilidad": 0.26612,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -1000,18 +1000,18 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 3,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.1755,
-   "bs_justo": 0.171633,
-   "bs_clim": 0.217451,
-   "bss": 0.192922,
+   "bs": 0.20768,
+   "bs_justo": 0.203592,
+   "bs_clim": 0.212454,
+   "bss": 0.022471,
    "ic90": [
-    0.192922,
-    0.192922
+    0.022471,
+    0.022471
    ],
    "p": 0.0,
-   "fiabilidad": 0.1753,
+   "fiabilidad": 0.20748,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -1021,18 +1021,18 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 4,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.1473,
-   "bs_justo": 0.143061,
-   "bs_clim": 0.207035,
-   "bss": 0.288526,
+   "bs": 0.16784,
+   "bs_justo": 0.163429,
+   "bs_clim": 0.202257,
+   "bss": 0.170166,
    "ic90": [
-    0.288526,
-    0.288526
+    0.170166,
+    0.170166
    ],
    "p": 0.0,
-   "fiabilidad": 0.1473,
+   "fiabilidad": 0.1678,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -1042,18 +1042,18 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 5,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.2474,
-   "bs_justo": 0.243673,
-   "bs_clim": 0.197116,
-   "bss": -0.255101,
+   "bs": 0.2076,
+   "bs_justo": 0.203918,
+   "bs_clim": 0.193589,
+   "bss": -0.072373,
    "ic90": [
-    -0.255101,
-    -0.255101
+    -0.072373,
+    -0.072373
    ],
    "p": 0.0,
-   "fiabilidad": 0.2474,
+   "fiabilidad": 0.2076,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -1063,18 +1063,18 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 6,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.1364,
-   "bs_justo": 0.131837,
-   "bs_clim": 0.189037,
-   "bss": 0.278449,
+   "bs": 0.12264,
+   "bs_justo": 0.118204,
+   "bs_clim": 0.186401,
+   "bss": 0.342065,
    "ic90": [
-    0.278449,
-    0.278449
+    0.342065,
+    0.342065
    ],
    "p": 0.0,
-   "fiabilidad": 0.1362,
+   "fiabilidad": 0.12248,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -1084,39 +1084,39 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 7,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.198,
-   "bs_justo": 0.193673,
-   "bs_clim": 0.182739,
-   "bss": -0.083512,
+   "bs": 0.17192,
+   "bs_justo": 0.167673,
+   "bs_clim": 0.181906,
+   "bss": 0.054897,
    "ic90": [
-    -0.083512,
-    -0.083512
+    0.054897,
+    0.054897
    ],
    "p": 0.0,
-   "fiabilidad": 0.1972,
+   "fiabilidad": 0.17128,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
-   "habilidad": false
+   "habilidad": true
   },
   {
    "modelo": "ifs",
    "sector": "PA",
    "paso": 8,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.1778,
-   "bs_justo": 0.173878,
-   "bs_clim": 0.179266,
-   "bss": 0.008178,
+   "bs": 0.15792,
+   "bs_justo": 0.153959,
+   "bs_clim": 0.179128,
+   "bss": 0.118395,
    "ic90": [
-    0.008178,
-    0.008178
+    0.118395,
+    0.118395
    ],
    "p": 0.0,
-   "fiabilidad": 0.177733,
+   "fiabilidad": 0.15776,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -1126,18 +1126,18 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 9,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.125,
-   "bs_justo": 0.121224,
-   "bs_clim": 0.178123,
-   "bss": 0.298237,
+   "bs": 0.11568,
+   "bs_justo": 0.111837,
+   "bs_clim": 0.177851,
+   "bss": 0.349567,
    "ic90": [
-    0.298237,
-    0.298237
+    0.349567,
+    0.349567
    ],
    "p": 0.0,
-   "fiabilidad": 0.12455,
+   "fiabilidad": 0.114987,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -1147,18 +1147,18 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 10,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.0922,
-   "bs_justo": 0.088163,
-   "bs_clim": 0.177442,
-   "bss": 0.480394,
+   "bs": 0.08528,
+   "bs_justo": 0.081306,
+   "bs_clim": 0.176229,
+   "bss": 0.516085,
    "ic90": [
-    0.480394,
-    0.480394
+    0.516085,
+    0.516085
    ],
    "p": 0.0,
-   "fiabilidad": 0.0916,
+   "fiabilidad": 0.0848,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -1168,18 +1168,18 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 11,
-   "n": 4,
+   "n": 5,
    "sucesos": 0,
-   "bs": 0.1042,
-   "bs_justo": 0.1,
-   "bs_clim": 0.176322,
-   "bss": 0.409036,
+   "bs": 0.09136,
+   "bs_justo": 0.087347,
+   "bs_clim": 0.174801,
+   "bss": 0.477349,
    "ic90": [
-    0.409036,
-    0.409036
+    0.477349,
+    0.477349
    ],
    "p": 0.0,
-   "fiabilidad": 0.1042,
+   "fiabilidad": 0.09072,
    "resolucion": 0.0,
    "incertidumbre": 0.0,
    "roc": null,
@@ -1189,62 +1189,62 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 12,
-   "n": 4,
-   "sucesos": 0,
-   "bs": 0.0957,
-   "bs_justo": 0.091837,
-   "bs_clim": 0.157663,
-   "bss": 0.393009,
+   "n": 5,
+   "sucesos": 1,
+   "bs": 0.19824,
+   "bs_justo": 0.194449,
+   "bs_clim": 0.201789,
+   "bss": 0.017586,
    "ic90": [
-    0.393009,
-    0.393009
+    0.017586,
+    0.017586
    ],
    "p": 0.0,
-   "fiabilidad": 0.0957,
-   "resolucion": 0.0,
-   "incertidumbre": 0.0,
-   "roc": null,
+   "fiabilidad": 0.048427,
+   "resolucion": 0.026667,
+   "incertidumbre": 0.16,
+   "roc": 0.25,
    "habilidad": true
   },
   {
    "modelo": "ifs",
    "sector": "PA",
    "paso": 13,
-   "n": 4,
-   "sucesos": 1,
-   "bs": 0.1805,
-   "bs_justo": 0.177143,
-   "bs_clim": 0.204021,
-   "bss": 0.115287,
+   "n": 5,
+   "sucesos": 2,
+   "bs": 0.27888,
+   "bs_justo": 0.275592,
+   "bs_clim": 0.248137,
+   "bss": -0.123897,
    "ic90": [
-    0.115287,
-    0.115287
+    -0.123897,
+    -0.123897
    ],
    "p": 0.0,
-   "fiabilidad": 0.0653,
-   "resolucion": 0.0625,
-   "incertidumbre": 0.1875,
-   "roc": 0.666667,
-   "habilidad": true
+   "fiabilidad": 0.18672,
+   "resolucion": 0.14,
+   "incertidumbre": 0.24,
+   "roc": 0.5,
+   "habilidad": false
   },
   {
    "modelo": "ifs",
    "sector": "PA",
    "paso": 14,
-   "n": 4,
-   "sucesos": 2,
-   "bs": 0.335,
-   "bs_justo": 0.332245,
-   "bs_clim": 0.288007,
-   "bss": -0.163165,
+   "n": 5,
+   "sucesos": 3,
+   "bs": 0.38968,
+   "bs_justo": 0.386776,
+   "bs_clim": 0.325715,
+   "bss": -0.196384,
    "ic90": [
-    -0.163165,
-    -0.163165
+    -0.196384,
+    -0.196384
    ],
    "p": 0.0,
-   "fiabilidad": 0.20495,
-   "resolucion": 0.125,
-   "incertidumbre": 0.25,
+   "fiabilidad": 0.25096,
+   "resolucion": 0.106667,
+   "incertidumbre": 0.24,
    "roc": 0.5,
    "habilidad": false
   },
@@ -1252,21 +1252,21 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 15,
-   "n": 4,
+   "n": 5,
    "sucesos": 2,
-   "bs": 0.3069,
-   "bs_justo": 0.303878,
-   "bs_clim": 0.307824,
-   "bss": 0.003003,
+   "bs": 0.25352,
+   "bs_justo": 0.250449,
+   "bs_clim": 0.259802,
+   "bss": 0.024179,
    "ic90": [
-    0.003003,
-    0.003003
+    0.024179,
+    0.024179
    ],
    "p": 0.0,
-   "fiabilidad": 0.30625,
-   "resolucion": 0.25,
-   "incertidumbre": 0.25,
-   "roc": 1.0,
+   "fiabilidad": 0.127547,
+   "resolucion": 0.106667,
+   "incertidumbre": 0.24,
+   "roc": 0.916667,
    "habilidad": true
   }
  ],
@@ -1276,7 +1276,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1286,7 +1286,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1296,8 +1296,8 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 2,
-   "n": 8,
-   "sucesos": 0,
+   "n": 9,
+   "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
   },
@@ -1306,7 +1306,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 2,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1316,8 +1316,8 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 3,
-   "n": 8,
-   "sucesos": 1,
+   "n": 9,
+   "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
   },
@@ -1326,7 +1326,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 3,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1336,8 +1336,8 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 4,
-   "n": 8,
-   "sucesos": 2,
+   "n": 9,
+   "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
   },
@@ -1346,7 +1346,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 4,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1356,7 +1356,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -1366,7 +1366,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1376,7 +1376,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -1386,7 +1386,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1396,7 +1396,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -1406,7 +1406,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1416,7 +1416,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 8,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -1426,7 +1426,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 8,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1436,7 +1436,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -1446,7 +1446,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1456,7 +1456,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 10,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -1466,7 +1466,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 10,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1476,7 +1476,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 11,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -1486,7 +1486,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 11,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1496,7 +1496,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 12,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -1506,7 +1506,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 12,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1516,7 +1516,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1526,7 +1526,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1536,7 +1536,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1546,7 +1546,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1556,7 +1556,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -1566,7 +1566,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1596,7 +1596,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1606,7 +1606,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1636,7 +1636,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1646,7 +1646,7 @@
    "modelo": "aifs",
    "sector": "GRL",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1656,7 +1656,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -1666,7 +1666,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 2,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -1676,7 +1676,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 3,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -1686,7 +1686,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 4,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -1696,7 +1696,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -1706,7 +1706,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1716,7 +1716,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1726,7 +1726,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 8,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1736,7 +1736,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1746,7 +1746,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 10,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1756,7 +1756,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 11,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1766,7 +1766,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 12,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1776,7 +1776,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1786,7 +1786,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1796,7 +1796,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1826,7 +1826,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 4,
    "solo_recuentos": true,
    "bss": null
@@ -1836,7 +1836,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 4,
    "solo_recuentos": true,
    "bss": null
@@ -1866,8 +1866,8 @@
    "modelo": "aifs",
    "sector": "EA",
    "ventana": "dias_6_10",
-   "n": 8,
-   "sucesos": 4,
+   "n": 9,
+   "sucesos": 5,
    "solo_recuentos": true,
    "bss": null
   },
@@ -1876,7 +1876,7 @@
    "modelo": "aifs",
    "sector": "EA",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -1886,7 +1886,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 8,
    "solo_recuentos": true,
    "bss": null
@@ -1896,7 +1896,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 6,
    "solo_recuentos": true,
    "bss": null
@@ -1906,7 +1906,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 2,
-   "n": 8,
+   "n": 9,
    "sucesos": 7,
    "solo_recuentos": true,
    "bss": null
@@ -1916,7 +1916,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 2,
-   "n": 8,
+   "n": 9,
    "sucesos": 5,
    "solo_recuentos": true,
    "bss": null
@@ -1926,7 +1926,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 3,
-   "n": 8,
+   "n": 9,
    "sucesos": 6,
    "solo_recuentos": true,
    "bss": null
@@ -1936,7 +1936,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 3,
-   "n": 8,
+   "n": 9,
    "sucesos": 4,
    "solo_recuentos": true,
    "bss": null
@@ -1946,7 +1946,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 4,
-   "n": 8,
+   "n": 9,
    "sucesos": 5,
    "solo_recuentos": true,
    "bss": null
@@ -1956,7 +1956,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 4,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -1966,7 +1966,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 4,
    "solo_recuentos": true,
    "bss": null
@@ -1976,7 +1976,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -1986,7 +1986,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -1996,7 +1996,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -2006,7 +2006,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -2016,7 +2016,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -2026,7 +2026,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 8,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -2036,7 +2036,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 8,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2046,7 +2046,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2056,7 +2056,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2066,7 +2066,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 10,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2076,7 +2076,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 10,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2086,7 +2086,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 11,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2096,7 +2096,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 11,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2106,7 +2106,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 12,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2116,7 +2116,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 12,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2126,7 +2126,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2136,7 +2136,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2146,7 +2146,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2156,7 +2156,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2166,7 +2166,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2176,7 +2176,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2206,7 +2206,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 4,
    "solo_recuentos": true,
    "bss": null
@@ -2216,7 +2216,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2246,7 +2246,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2256,7 +2256,7 @@
    "modelo": "aifs",
    "sector": "URA",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2266,7 +2266,7 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2276,7 +2276,7 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 2,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2286,7 +2286,7 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 3,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2296,7 +2296,7 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 4,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2306,7 +2306,7 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2316,7 +2316,7 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2326,7 +2326,7 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2336,7 +2336,7 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 8,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2346,7 +2346,7 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2356,7 +2356,7 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 10,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2366,7 +2366,7 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 11,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2376,17 +2376,7 @@
    "modelo": "aifs",
    "sector": "PA",
    "paso": 12,
-   "n": 8,
-   "sucesos": 0,
-   "solo_recuentos": true,
-   "bss": null
-  },
-  {
-   "familia": "ocupacion_v1",
-   "modelo": "aifs",
-   "sector": "PA",
-   "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -2395,8 +2385,8 @@
    "familia": "ocupacion_v1",
    "modelo": "aifs",
    "sector": "PA",
-   "paso": 14,
-   "n": 8,
+   "paso": 13,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -2405,8 +2395,18 @@
    "familia": "ocupacion_v1",
    "modelo": "aifs",
    "sector": "PA",
+   "paso": 14,
+   "n": 9,
+   "sucesos": 3,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "PA",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -2436,7 +2436,7 @@
    "modelo": "aifs",
    "sector": "PA",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2446,7 +2446,7 @@
    "modelo": "aifs",
    "sector": "PA",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2476,7 +2476,7 @@
    "modelo": "aifs",
    "sector": "PA",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2486,7 +2486,7 @@
    "modelo": "aifs",
    "sector": "PA",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2496,7 +2496,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -2506,7 +2506,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2516,7 +2516,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 2,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -2526,7 +2526,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 2,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2536,7 +2536,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 3,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -2546,7 +2546,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 3,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2556,7 +2556,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 4,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -2566,7 +2566,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 4,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2576,7 +2576,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -2586,7 +2586,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2596,7 +2596,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -2606,7 +2606,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2616,7 +2616,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -2626,7 +2626,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2636,7 +2636,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 8,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2646,7 +2646,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 8,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2656,7 +2656,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2666,7 +2666,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2676,27 +2676,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 10,
-   "n": 8,
-   "sucesos": 0,
-   "solo_recuentos": true,
-   "bss": null
-  },
-  {
-   "familia": "ocupacion_v1",
-   "modelo": "aifs",
-   "sector": "NAM",
-   "paso": 10,
-   "n": 8,
-   "sucesos": 0,
-   "solo_recuentos": true,
-   "bss": null
-  },
-  {
-   "familia": "ocupacion",
-   "modelo": "aifs",
-   "sector": "NAM",
-   "paso": 11,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -2705,8 +2685,8 @@
    "familia": "ocupacion_v1",
    "modelo": "aifs",
    "sector": "NAM",
-   "paso": 11,
-   "n": 8,
+   "paso": 10,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2715,8 +2695,8 @@
    "familia": "ocupacion",
    "modelo": "aifs",
    "sector": "NAM",
-   "paso": 12,
-   "n": 8,
+   "paso": 11,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -2725,8 +2705,28 @@
    "familia": "ocupacion_v1",
    "modelo": "aifs",
    "sector": "NAM",
+   "paso": 11,
+   "n": 9,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "NAM",
    "paso": 12,
-   "n": 8,
+   "n": 9,
+   "sucesos": 3,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "aifs",
+   "sector": "NAM",
+   "paso": 12,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2736,7 +2736,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -2746,7 +2746,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2756,7 +2756,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -2766,7 +2766,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2776,7 +2776,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -2786,7 +2786,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2816,7 +2816,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2826,7 +2826,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2856,7 +2856,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2866,7 +2866,7 @@
    "modelo": "aifs",
    "sector": "NAM",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -2876,8 +2876,8 @@
    "modelo": "aifs",
    "sector": "LLB-Atl",
    "paso": 1,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -2886,8 +2886,8 @@
    "modelo": "aifs",
    "sector": "LLB-Atl",
    "paso": 2,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -2896,8 +2896,8 @@
    "modelo": "aifs",
    "sector": "LLB-Atl",
    "paso": 3,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -2906,8 +2906,8 @@
    "modelo": "aifs",
    "sector": "LLB-Atl",
    "paso": 4,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -2916,8 +2916,8 @@
    "modelo": "aifs",
    "sector": "LLB-Atl",
    "paso": 5,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -2926,8 +2926,8 @@
    "modelo": "aifs",
    "sector": "LLB-Atl",
    "paso": 6,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -2936,8 +2936,8 @@
    "modelo": "aifs",
    "sector": "LLB-Atl",
    "paso": 7,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -2946,8 +2946,8 @@
    "modelo": "aifs",
    "sector": "LLB-Atl",
    "paso": 8,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -2956,8 +2956,8 @@
    "modelo": "aifs",
    "sector": "LLB-Atl",
    "paso": 9,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -2966,7 +2966,7 @@
    "modelo": "aifs",
    "sector": "LLB-Atl",
    "paso": 10,
-   "n": 8,
+   "n": 9,
    "sucesos": 8,
    "solo_recuentos": true,
    "bss": null
@@ -2976,7 +2976,7 @@
    "modelo": "aifs",
    "sector": "LLB-Atl",
    "paso": 11,
-   "n": 8,
+   "n": 9,
    "sucesos": 7,
    "solo_recuentos": true,
    "bss": null
@@ -2986,7 +2986,7 @@
    "modelo": "aifs",
    "sector": "LLB-Atl",
    "paso": 12,
-   "n": 8,
+   "n": 9,
    "sucesos": 6,
    "solo_recuentos": true,
    "bss": null
@@ -2996,7 +2996,7 @@
    "modelo": "aifs",
    "sector": "LLB-Atl",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 5,
    "solo_recuentos": true,
    "bss": null
@@ -3006,7 +3006,7 @@
    "modelo": "aifs",
    "sector": "LLB-Atl",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 4,
    "solo_recuentos": true,
    "bss": null
@@ -3016,7 +3016,7 @@
    "modelo": "aifs",
    "sector": "LLB-Atl",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -3046,7 +3046,7 @@
    "modelo": "aifs",
    "sector": "LLB-Atl",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -3076,7 +3076,7 @@
    "modelo": "aifs",
    "sector": "LLB-Atl",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3086,7 +3086,7 @@
    "modelo": "aifs",
    "sector": "LLB-Pac",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -3096,7 +3096,7 @@
    "modelo": "aifs",
    "sector": "LLB-Pac",
    "paso": 2,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -3106,7 +3106,7 @@
    "modelo": "aifs",
    "sector": "LLB-Pac",
    "paso": 3,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -3116,7 +3116,7 @@
    "modelo": "aifs",
    "sector": "LLB-Pac",
    "paso": 4,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -3126,7 +3126,7 @@
    "modelo": "aifs",
    "sector": "LLB-Pac",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -3136,7 +3136,7 @@
    "modelo": "aifs",
    "sector": "LLB-Pac",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -3146,7 +3146,7 @@
    "modelo": "aifs",
    "sector": "LLB-Pac",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -3156,17 +3156,7 @@
    "modelo": "aifs",
    "sector": "LLB-Pac",
    "paso": 8,
-   "n": 8,
-   "sucesos": 0,
-   "solo_recuentos": true,
-   "bss": null
-  },
-  {
-   "familia": "ocupacion",
-   "modelo": "aifs",
-   "sector": "LLB-Pac",
-   "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -3175,9 +3165,9 @@
    "familia": "ocupacion",
    "modelo": "aifs",
    "sector": "LLB-Pac",
-   "paso": 10,
-   "n": 8,
-   "sucesos": 3,
+   "paso": 9,
+   "n": 9,
+   "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
   },
@@ -3185,8 +3175,8 @@
    "familia": "ocupacion",
    "modelo": "aifs",
    "sector": "LLB-Pac",
-   "paso": 11,
-   "n": 8,
+   "paso": 10,
+   "n": 9,
    "sucesos": 4,
    "solo_recuentos": true,
    "bss": null
@@ -3195,8 +3185,18 @@
    "familia": "ocupacion",
    "modelo": "aifs",
    "sector": "LLB-Pac",
+   "paso": 11,
+   "n": 9,
+   "sucesos": 5,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "aifs",
+   "sector": "LLB-Pac",
    "paso": 12,
-   "n": 8,
+   "n": 9,
    "sucesos": 5,
    "solo_recuentos": true,
    "bss": null
@@ -3206,7 +3206,7 @@
    "modelo": "aifs",
    "sector": "LLB-Pac",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 4,
    "solo_recuentos": true,
    "bss": null
@@ -3216,7 +3216,7 @@
    "modelo": "aifs",
    "sector": "LLB-Pac",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -3226,7 +3226,7 @@
    "modelo": "aifs",
    "sector": "LLB-Pac",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -3256,7 +3256,7 @@
    "modelo": "aifs",
    "sector": "LLB-Pac",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3286,8 +3286,8 @@
    "modelo": "aifs",
    "sector": "LLB-Pac",
    "ventana": "dias_6_10",
-   "n": 8,
-   "sucesos": 2,
+   "n": 9,
+   "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
   },
@@ -3296,7 +3296,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3306,7 +3306,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3316,8 +3316,8 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 2,
-   "n": 8,
-   "sucesos": 0,
+   "n": 9,
+   "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
   },
@@ -3326,7 +3326,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 2,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3336,8 +3336,8 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 3,
-   "n": 8,
-   "sucesos": 1,
+   "n": 9,
+   "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
   },
@@ -3346,7 +3346,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 3,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3356,8 +3356,8 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 4,
-   "n": 8,
-   "sucesos": 2,
+   "n": 9,
+   "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
   },
@@ -3366,7 +3366,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 4,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3376,7 +3376,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -3386,7 +3386,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3396,7 +3396,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -3406,7 +3406,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3416,7 +3416,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -3426,7 +3426,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3436,7 +3436,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 8,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -3446,7 +3446,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 8,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3456,7 +3456,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -3466,7 +3466,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3476,7 +3476,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 10,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -3486,7 +3486,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 10,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3496,7 +3496,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 11,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -3506,7 +3506,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 11,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3516,7 +3516,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 12,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -3526,7 +3526,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 12,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3536,7 +3536,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3546,7 +3546,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3556,7 +3556,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3566,7 +3566,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3576,7 +3576,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -3586,7 +3586,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3616,7 +3616,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3626,7 +3626,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3656,7 +3656,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3666,7 +3666,7 @@
    "modelo": "ifs",
    "sector": "GRL",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3676,7 +3676,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -3686,7 +3686,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 2,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -3696,7 +3696,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 3,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -3706,7 +3706,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 4,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -3716,7 +3716,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -3726,7 +3726,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3736,7 +3736,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3746,7 +3746,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 8,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3756,7 +3756,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3766,7 +3766,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 10,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3776,7 +3776,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 11,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3786,7 +3786,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 12,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3796,7 +3796,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3806,7 +3806,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3816,7 +3816,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3846,7 +3846,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 4,
    "solo_recuentos": true,
    "bss": null
@@ -3856,7 +3856,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 4,
    "solo_recuentos": true,
    "bss": null
@@ -3886,8 +3886,8 @@
    "modelo": "ifs",
    "sector": "EA",
    "ventana": "dias_6_10",
-   "n": 8,
-   "sucesos": 4,
+   "n": 9,
+   "sucesos": 5,
    "solo_recuentos": true,
    "bss": null
   },
@@ -3896,7 +3896,7 @@
    "modelo": "ifs",
    "sector": "EA",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -3906,7 +3906,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 8,
    "solo_recuentos": true,
    "bss": null
@@ -3916,7 +3916,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 6,
    "solo_recuentos": true,
    "bss": null
@@ -3926,7 +3926,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 2,
-   "n": 8,
+   "n": 9,
    "sucesos": 7,
    "solo_recuentos": true,
    "bss": null
@@ -3936,7 +3936,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 2,
-   "n": 8,
+   "n": 9,
    "sucesos": 5,
    "solo_recuentos": true,
    "bss": null
@@ -3946,7 +3946,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 3,
-   "n": 8,
+   "n": 9,
    "sucesos": 6,
    "solo_recuentos": true,
    "bss": null
@@ -3956,7 +3956,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 3,
-   "n": 8,
+   "n": 9,
    "sucesos": 4,
    "solo_recuentos": true,
    "bss": null
@@ -3966,7 +3966,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 4,
-   "n": 8,
+   "n": 9,
    "sucesos": 5,
    "solo_recuentos": true,
    "bss": null
@@ -3976,7 +3976,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 4,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -3986,7 +3986,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 4,
    "solo_recuentos": true,
    "bss": null
@@ -3996,7 +3996,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -4006,7 +4006,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -4016,7 +4016,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -4026,7 +4026,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -4036,7 +4036,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -4046,7 +4046,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 8,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -4056,7 +4056,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 8,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4066,7 +4066,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4076,7 +4076,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4086,7 +4086,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 10,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4096,7 +4096,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 10,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4106,7 +4106,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 11,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4116,7 +4116,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 11,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4126,7 +4126,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 12,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4136,7 +4136,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 12,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4146,7 +4146,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4156,7 +4156,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4166,7 +4166,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4176,7 +4176,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4186,7 +4186,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4196,7 +4196,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4226,7 +4226,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 4,
    "solo_recuentos": true,
    "bss": null
@@ -4236,7 +4236,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4266,7 +4266,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4276,7 +4276,7 @@
    "modelo": "ifs",
    "sector": "URA",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4286,7 +4286,7 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4296,7 +4296,7 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 2,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4306,7 +4306,7 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 3,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4316,7 +4316,7 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 4,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4326,7 +4326,7 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4336,7 +4336,7 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4346,7 +4346,7 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4356,7 +4356,7 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 8,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4366,7 +4366,7 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4376,7 +4376,7 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 10,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4386,7 +4386,7 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 11,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4396,17 +4396,7 @@
    "modelo": "ifs",
    "sector": "PA",
    "paso": 12,
-   "n": 8,
-   "sucesos": 0,
-   "solo_recuentos": true,
-   "bss": null
-  },
-  {
-   "familia": "ocupacion_v1",
-   "modelo": "ifs",
-   "sector": "PA",
-   "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -4415,8 +4405,8 @@
    "familia": "ocupacion_v1",
    "modelo": "ifs",
    "sector": "PA",
-   "paso": 14,
-   "n": 8,
+   "paso": 13,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -4425,8 +4415,18 @@
    "familia": "ocupacion_v1",
    "modelo": "ifs",
    "sector": "PA",
+   "paso": 14,
+   "n": 9,
+   "sucesos": 3,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "PA",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -4456,7 +4456,7 @@
    "modelo": "ifs",
    "sector": "PA",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4466,7 +4466,7 @@
    "modelo": "ifs",
    "sector": "PA",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4496,7 +4496,7 @@
    "modelo": "ifs",
    "sector": "PA",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4506,7 +4506,7 @@
    "modelo": "ifs",
    "sector": "PA",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4516,7 +4516,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -4526,7 +4526,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4536,7 +4536,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 2,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -4546,7 +4546,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 2,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4556,7 +4556,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 3,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -4566,7 +4566,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 3,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4576,7 +4576,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 4,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -4586,7 +4586,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 4,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4596,7 +4596,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -4606,7 +4606,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4616,7 +4616,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -4626,7 +4626,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4636,7 +4636,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -4646,7 +4646,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4656,7 +4656,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 8,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4666,7 +4666,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 8,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4676,7 +4676,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4686,7 +4686,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4696,27 +4696,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 10,
-   "n": 8,
-   "sucesos": 0,
-   "solo_recuentos": true,
-   "bss": null
-  },
-  {
-   "familia": "ocupacion_v1",
-   "modelo": "ifs",
-   "sector": "NAM",
-   "paso": 10,
-   "n": 8,
-   "sucesos": 0,
-   "solo_recuentos": true,
-   "bss": null
-  },
-  {
-   "familia": "ocupacion",
-   "modelo": "ifs",
-   "sector": "NAM",
-   "paso": 11,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -4725,8 +4705,8 @@
    "familia": "ocupacion_v1",
    "modelo": "ifs",
    "sector": "NAM",
-   "paso": 11,
-   "n": 8,
+   "paso": 10,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4735,8 +4715,8 @@
    "familia": "ocupacion",
    "modelo": "ifs",
    "sector": "NAM",
-   "paso": 12,
-   "n": 8,
+   "paso": 11,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -4745,8 +4725,28 @@
    "familia": "ocupacion_v1",
    "modelo": "ifs",
    "sector": "NAM",
+   "paso": 11,
+   "n": 9,
+   "sucesos": 0,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "NAM",
    "paso": 12,
-   "n": 8,
+   "n": 9,
+   "sucesos": 3,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion_v1",
+   "modelo": "ifs",
+   "sector": "NAM",
+   "paso": 12,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4756,7 +4756,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -4766,7 +4766,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4776,7 +4776,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -4786,7 +4786,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4796,7 +4796,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -4806,7 +4806,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4836,7 +4836,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4846,7 +4846,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4876,7 +4876,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4886,7 +4886,7 @@
    "modelo": "ifs",
    "sector": "NAM",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -4896,8 +4896,8 @@
    "modelo": "ifs",
    "sector": "LLB-Atl",
    "paso": 1,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -4906,8 +4906,8 @@
    "modelo": "ifs",
    "sector": "LLB-Atl",
    "paso": 2,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -4916,8 +4916,8 @@
    "modelo": "ifs",
    "sector": "LLB-Atl",
    "paso": 3,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -4926,8 +4926,8 @@
    "modelo": "ifs",
    "sector": "LLB-Atl",
    "paso": 4,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -4936,8 +4936,8 @@
    "modelo": "ifs",
    "sector": "LLB-Atl",
    "paso": 5,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -4946,8 +4946,8 @@
    "modelo": "ifs",
    "sector": "LLB-Atl",
    "paso": 6,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -4956,8 +4956,8 @@
    "modelo": "ifs",
    "sector": "LLB-Atl",
    "paso": 7,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -4966,8 +4966,8 @@
    "modelo": "ifs",
    "sector": "LLB-Atl",
    "paso": 8,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -4976,8 +4976,8 @@
    "modelo": "ifs",
    "sector": "LLB-Atl",
    "paso": 9,
-   "n": 8,
-   "sucesos": 8,
+   "n": 9,
+   "sucesos": 9,
    "solo_recuentos": true,
    "bss": null
   },
@@ -4986,7 +4986,7 @@
    "modelo": "ifs",
    "sector": "LLB-Atl",
    "paso": 10,
-   "n": 8,
+   "n": 9,
    "sucesos": 8,
    "solo_recuentos": true,
    "bss": null
@@ -4996,7 +4996,7 @@
    "modelo": "ifs",
    "sector": "LLB-Atl",
    "paso": 11,
-   "n": 8,
+   "n": 9,
    "sucesos": 7,
    "solo_recuentos": true,
    "bss": null
@@ -5006,7 +5006,7 @@
    "modelo": "ifs",
    "sector": "LLB-Atl",
    "paso": 12,
-   "n": 8,
+   "n": 9,
    "sucesos": 6,
    "solo_recuentos": true,
    "bss": null
@@ -5016,7 +5016,7 @@
    "modelo": "ifs",
    "sector": "LLB-Atl",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 5,
    "solo_recuentos": true,
    "bss": null
@@ -5026,7 +5026,7 @@
    "modelo": "ifs",
    "sector": "LLB-Atl",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 4,
    "solo_recuentos": true,
    "bss": null
@@ -5036,7 +5036,7 @@
    "modelo": "ifs",
    "sector": "LLB-Atl",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -5066,7 +5066,7 @@
    "modelo": "ifs",
    "sector": "LLB-Atl",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -5096,7 +5096,7 @@
    "modelo": "ifs",
    "sector": "LLB-Atl",
    "ventana": "dias_6_10",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -5106,7 +5106,7 @@
    "modelo": "ifs",
    "sector": "LLB-Pac",
    "paso": 1,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -5116,7 +5116,7 @@
    "modelo": "ifs",
    "sector": "LLB-Pac",
    "paso": 2,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -5126,7 +5126,7 @@
    "modelo": "ifs",
    "sector": "LLB-Pac",
    "paso": 3,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -5136,7 +5136,7 @@
    "modelo": "ifs",
    "sector": "LLB-Pac",
    "paso": 4,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -5146,7 +5146,7 @@
    "modelo": "ifs",
    "sector": "LLB-Pac",
    "paso": 5,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -5156,7 +5156,7 @@
    "modelo": "ifs",
    "sector": "LLB-Pac",
    "paso": 6,
-   "n": 8,
+   "n": 9,
    "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
@@ -5166,7 +5166,7 @@
    "modelo": "ifs",
    "sector": "LLB-Pac",
    "paso": 7,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -5176,17 +5176,7 @@
    "modelo": "ifs",
    "sector": "LLB-Pac",
    "paso": 8,
-   "n": 8,
-   "sucesos": 0,
-   "solo_recuentos": true,
-   "bss": null
-  },
-  {
-   "familia": "ocupacion",
-   "modelo": "ifs",
-   "sector": "LLB-Pac",
-   "paso": 9,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -5195,9 +5185,9 @@
    "familia": "ocupacion",
    "modelo": "ifs",
    "sector": "LLB-Pac",
-   "paso": 10,
-   "n": 8,
-   "sucesos": 3,
+   "paso": 9,
+   "n": 9,
+   "sucesos": 2,
    "solo_recuentos": true,
    "bss": null
   },
@@ -5205,8 +5195,8 @@
    "familia": "ocupacion",
    "modelo": "ifs",
    "sector": "LLB-Pac",
-   "paso": 11,
-   "n": 8,
+   "paso": 10,
+   "n": 9,
    "sucesos": 4,
    "solo_recuentos": true,
    "bss": null
@@ -5215,8 +5205,18 @@
    "familia": "ocupacion",
    "modelo": "ifs",
    "sector": "LLB-Pac",
+   "paso": 11,
+   "n": 9,
+   "sucesos": 5,
+   "solo_recuentos": true,
+   "bss": null
+  },
+  {
+   "familia": "ocupacion",
+   "modelo": "ifs",
+   "sector": "LLB-Pac",
    "paso": 12,
-   "n": 8,
+   "n": 9,
    "sucesos": 5,
    "solo_recuentos": true,
    "bss": null
@@ -5226,7 +5226,7 @@
    "modelo": "ifs",
    "sector": "LLB-Pac",
    "paso": 13,
-   "n": 8,
+   "n": 9,
    "sucesos": 4,
    "solo_recuentos": true,
    "bss": null
@@ -5236,7 +5236,7 @@
    "modelo": "ifs",
    "sector": "LLB-Pac",
    "paso": 14,
-   "n": 8,
+   "n": 9,
    "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
@@ -5246,7 +5246,7 @@
    "modelo": "ifs",
    "sector": "LLB-Pac",
    "paso": 15,
-   "n": 8,
+   "n": 9,
    "sucesos": 1,
    "solo_recuentos": true,
    "bss": null
@@ -5276,7 +5276,7 @@
    "modelo": "ifs",
    "sector": "LLB-Pac",
    "ventana": "dias_1_5",
-   "n": 8,
+   "n": 9,
    "sucesos": 0,
    "solo_recuentos": true,
    "bss": null
@@ -5306,8 +5306,8 @@
    "modelo": "ifs",
    "sector": "LLB-Pac",
    "ventana": "dias_6_10",
-   "n": 8,
-   "sucesos": 2,
+   "n": 9,
+   "sucesos": 3,
    "solo_recuentos": true,
    "bss": null
   }
@@ -5316,330 +5316,330 @@
   {
    "sector": "EA",
    "paso": 1,
-   "n": 4,
-   "dbs": 0.0001,
+   "n": 5,
+   "dbs": 8e-05,
    "ic90": [
-    0.0001,
-    0.0001
+    8e-05,
+    8e-05
    ],
    "p": 0.0
   },
   {
    "sector": "EA",
    "paso": 2,
-   "n": 4,
-   "dbs": 0.0013,
+   "n": 5,
+   "dbs": -0.00184,
    "ic90": [
-    0.0013,
-    0.0013
+    -0.00184,
+    -0.00184
    ],
    "p": 0.0
   },
   {
    "sector": "EA",
    "paso": 3,
-   "n": 4,
-   "dbs": -0.0047,
+   "n": 5,
+   "dbs": -0.004,
    "ic90": [
-    -0.0047,
-    -0.0047
+    -0.004,
+    -0.004
    ],
    "p": 0.0
   },
   {
    "sector": "EA",
    "paso": 4,
-   "n": 4,
-   "dbs": -0.0013,
+   "n": 5,
+   "dbs": -0.00104,
    "ic90": [
-    -0.0013,
-    -0.0013
+    -0.00104,
+    -0.00104
    ],
    "p": 0.0
   },
   {
    "sector": "EA",
    "paso": 5,
-   "n": 4,
-   "dbs": 0.0048,
+   "n": 5,
+   "dbs": 0.02016,
    "ic90": [
-    0.0048,
-    0.0048
+    0.02016,
+    0.02016
    ],
    "p": 0.0
   },
   {
    "sector": "EA",
    "paso": 6,
-   "n": 4,
-   "dbs": -0.0093,
+   "n": 5,
+   "dbs": -0.00384,
    "ic90": [
-    -0.0093,
-    -0.0093
+    -0.00384,
+    -0.00384
    ],
    "p": 0.0
   },
   {
    "sector": "EA",
    "paso": 7,
-   "n": 4,
-   "dbs": -0.0646,
+   "n": 5,
+   "dbs": -0.06248,
    "ic90": [
-    -0.0646,
-    -0.0646
+    -0.06248,
+    -0.06248
    ],
    "p": 0.0
   },
   {
    "sector": "EA",
    "paso": 8,
-   "n": 4,
-   "dbs": -0.0588,
+   "n": 5,
+   "dbs": -0.04872,
    "ic90": [
-    -0.0588,
-    -0.0588
+    -0.04872,
+    -0.04872
    ],
    "p": 0.0
   },
   {
    "sector": "EA",
    "paso": 9,
-   "n": 4,
-   "dbs": -0.0253,
+   "n": 5,
+   "dbs": -0.01616,
    "ic90": [
-    -0.0253,
-    -0.0253
+    -0.01616,
+    -0.01616
    ],
    "p": 0.0
   },
   {
    "sector": "EA",
    "paso": 10,
-   "n": 4,
-   "dbs": -0.0095,
+   "n": 5,
+   "dbs": -0.00184,
    "ic90": [
-    -0.0095,
-    -0.0095
+    -0.00184,
+    -0.00184
    ],
    "p": 0.0
   },
   {
    "sector": "EA",
    "paso": 11,
-   "n": 4,
-   "dbs": -0.0129,
+   "n": 5,
+   "dbs": 0.01056,
    "ic90": [
-    -0.0129,
-    -0.0129
+    0.01056,
+    0.01056
    ],
    "p": 0.0
   },
   {
    "sector": "EA",
    "paso": 12,
-   "n": 4,
-   "dbs": 0.0139,
+   "n": 5,
+   "dbs": 0.01112,
    "ic90": [
-    0.0139,
-    0.0139
+    0.01112,
+    0.01112
    ],
    "p": 0.0
   },
   {
    "sector": "EA",
    "paso": 13,
-   "n": 4,
-   "dbs": -0.0612,
+   "n": 5,
+   "dbs": -0.03616,
    "ic90": [
-    -0.0612,
-    -0.0612
+    -0.03616,
+    -0.03616
    ],
    "p": 0.0
   },
   {
    "sector": "EA",
    "paso": 14,
-   "n": 4,
-   "dbs": -0.0279,
+   "n": 5,
+   "dbs": -0.00528,
    "ic90": [
-    -0.0279,
-    -0.0279
+    -0.00528,
+    -0.00528
    ],
    "p": 0.0
   },
   {
    "sector": "EA",
    "paso": 15,
-   "n": 4,
-   "dbs": -0.0564,
+   "n": 5,
+   "dbs": -0.03584,
    "ic90": [
-    -0.0564,
-    -0.0564
+    -0.03584,
+    -0.03584
    ],
    "p": 0.0
   },
   {
    "sector": "PA",
    "paso": 1,
-   "n": 4,
-   "dbs": -0.1453,
+   "n": 5,
+   "dbs": -0.18576,
    "ic90": [
-    -0.1453,
-    -0.1453
+    -0.18576,
+    -0.18576
    ],
    "p": 0.0
   },
   {
    "sector": "PA",
    "paso": 2,
-   "n": 4,
-   "dbs": -0.2163,
+   "n": 5,
+   "dbs": -0.1724,
    "ic90": [
-    -0.2163,
-    -0.2163
+    -0.1724,
+    -0.1724
    ],
    "p": 0.0
   },
   {
    "sector": "PA",
    "paso": 3,
-   "n": 4,
-   "dbs": -0.0803,
+   "n": 5,
+   "dbs": -0.11248,
    "ic90": [
-    -0.0803,
-    -0.0803
+    -0.11248,
+    -0.11248
    ],
    "p": 0.0
   },
   {
    "sector": "PA",
    "paso": 4,
-   "n": 4,
-   "dbs": -0.0387,
+   "n": 5,
+   "dbs": -0.05296,
    "ic90": [
-    -0.0387,
-    -0.0387
+    -0.05296,
+    -0.05296
    ],
    "p": 0.0
   },
   {
    "sector": "PA",
    "paso": 5,
-   "n": 4,
-   "dbs": 0.0734,
+   "n": 5,
+   "dbs": 0.06768,
    "ic90": [
-    0.0734,
-    0.0734
+    0.06768,
+    0.06768
    ],
    "p": 0.0
   },
   {
    "sector": "PA",
    "paso": 6,
-   "n": 4,
-   "dbs": 0.0731,
+   "n": 5,
+   "dbs": 0.06808,
    "ic90": [
-    0.0731,
-    0.0731
+    0.06808,
+    0.06808
    ],
    "p": 0.0
   },
   {
    "sector": "PA",
    "paso": 7,
-   "n": 4,
-   "dbs": 0.1017,
+   "n": 5,
+   "dbs": 0.09096,
    "ic90": [
-    0.1017,
-    0.1017
+    0.09096,
+    0.09096
    ],
    "p": 0.0
   },
   {
    "sector": "PA",
    "paso": 8,
-   "n": 4,
-   "dbs": 0.0685,
+   "n": 5,
+   "dbs": 0.064,
    "ic90": [
-    0.0685,
-    0.0685
+    0.064,
+    0.064
    ],
    "p": 0.0
   },
   {
    "sector": "PA",
    "paso": 9,
-   "n": 4,
-   "dbs": 0.0323,
+   "n": 5,
+   "dbs": 0.03352,
    "ic90": [
-    0.0323,
-    0.0323
+    0.03352,
+    0.03352
    ],
    "p": 0.0
   },
   {
    "sector": "PA",
    "paso": 10,
-   "n": 4,
-   "dbs": 0.0116,
+   "n": 5,
+   "dbs": 0.0028,
    "ic90": [
-    0.0116,
-    0.0116
+    0.0028,
+    0.0028
    ],
    "p": 0.0
   },
   {
    "sector": "PA",
    "paso": 11,
-   "n": 4,
-   "dbs": 0.0457,
+   "n": 5,
+   "dbs": 0.02144,
    "ic90": [
-    0.0457,
-    0.0457
+    0.02144,
+    0.02144
    ],
    "p": 0.0
   },
   {
    "sector": "PA",
    "paso": 12,
-   "n": 4,
-   "dbs": 0.0516,
+   "n": 5,
+   "dbs": 0.06496,
    "ic90": [
-    0.0516,
-    0.0516
+    0.06496,
+    0.06496
    ],
    "p": 0.0
   },
   {
    "sector": "PA",
    "paso": 13,
-   "n": 4,
-   "dbs": -0.0357,
+   "n": 5,
+   "dbs": 0.00792,
    "ic90": [
-    -0.0357,
-    -0.0357
+    0.00792,
+    0.00792
    ],
    "p": 0.0
   },
   {
    "sector": "PA",
    "paso": 14,
-   "n": 4,
-   "dbs": -0.0375,
+   "n": 5,
+   "dbs": -0.0008,
    "ic90": [
-    -0.0375,
-    -0.0375
+    -0.0008,
+    -0.0008
    ],
    "p": 0.0
   },
   {
    "sector": "PA",
    "paso": 15,
-   "n": 4,
-   "dbs": -0.0567,
+   "n": 5,
+   "dbs": -0.05784,
    "ic90": [
-    -0.0567,
-    -0.0567
+    -0.05784,
+    -0.05784
    ],
    "p": 0.0
   }
@@ -5649,7 +5649,7 @@
   {
    "modelo": "aifs",
    "sector": "GRL",
-   "pasadas": 8,
+   "pasadas": 9,
    "en_calma": 0,
    "en_calma_v2": 0,
    "v2_difiere_era5": 0.0,
@@ -5658,16 +5658,16 @@
   {
    "modelo": "aifs",
    "sector": "EA",
-   "pasadas": 8,
+   "pasadas": 9,
    "en_calma": 0,
    "en_calma_v2": 1,
-   "v2_difiere_era5": 0.125,
+   "v2_difiere_era5": 0.111111,
    "v2_tambien_en_calma": 0.0
   },
   {
    "modelo": "aifs",
    "sector": "URA",
-   "pasadas": 8,
+   "pasadas": 9,
    "en_calma": 0,
    "en_calma_v2": 0,
    "v2_difiere_era5": 0.0,
@@ -5676,25 +5676,25 @@
   {
    "modelo": "aifs",
    "sector": "PA",
-   "pasadas": 8,
+   "pasadas": 9,
    "en_calma": 0,
    "en_calma_v2": 2,
-   "v2_difiere_era5": 0.25,
+   "v2_difiere_era5": 0.222222,
    "v2_tambien_en_calma": 0.0
   },
   {
    "modelo": "aifs",
    "sector": "NAM",
-   "pasadas": 8,
+   "pasadas": 9,
    "en_calma": 0,
    "en_calma_v2": 1,
-   "v2_difiere_era5": 0.125,
+   "v2_difiere_era5": 0.111111,
    "v2_tambien_en_calma": 0.0
   },
   {
    "modelo": "aifs",
    "sector": "LLB-Atl",
-   "pasadas": 8,
+   "pasadas": 9,
    "en_calma": 0,
    "en_calma_v2": 0,
    "v2_difiere_era5": 0.0,
@@ -5703,7 +5703,7 @@
   {
    "modelo": "aifs",
    "sector": "LLB-Pac",
-   "pasadas": 8,
+   "pasadas": 9,
    "en_calma": 0,
    "en_calma_v2": 0,
    "v2_difiere_era5": 0.0,
@@ -5712,7 +5712,7 @@
   {
    "modelo": "ifs",
    "sector": "GRL",
-   "pasadas": 8,
+   "pasadas": 9,
    "en_calma": 0,
    "en_calma_v2": 0,
    "v2_difiere_era5": 0.0,
@@ -5721,16 +5721,16 @@
   {
    "modelo": "ifs",
    "sector": "EA",
-   "pasadas": 8,
+   "pasadas": 9,
    "en_calma": 0,
    "en_calma_v2": 1,
-   "v2_difiere_era5": 0.125,
+   "v2_difiere_era5": 0.111111,
    "v2_tambien_en_calma": 0.0
   },
   {
    "modelo": "ifs",
    "sector": "URA",
-   "pasadas": 8,
+   "pasadas": 9,
    "en_calma": 0,
    "en_calma_v2": 0,
    "v2_difiere_era5": 0.0,
@@ -5739,25 +5739,25 @@
   {
    "modelo": "ifs",
    "sector": "PA",
-   "pasadas": 8,
+   "pasadas": 9,
    "en_calma": 0,
    "en_calma_v2": 2,
-   "v2_difiere_era5": 0.25,
+   "v2_difiere_era5": 0.222222,
    "v2_tambien_en_calma": 0.0
   },
   {
    "modelo": "ifs",
    "sector": "NAM",
-   "pasadas": 8,
+   "pasadas": 9,
    "en_calma": 0,
    "en_calma_v2": 1,
-   "v2_difiere_era5": 0.125,
+   "v2_difiere_era5": 0.111111,
    "v2_tambien_en_calma": 0.0
   },
   {
    "modelo": "ifs",
    "sector": "LLB-Atl",
-   "pasadas": 8,
+   "pasadas": 9,
    "en_calma": 0,
    "en_calma_v2": 0,
    "v2_difiere_era5": 0.0,
@@ -5766,7 +5766,7 @@
   {
    "modelo": "ifs",
    "sector": "LLB-Pac",
-   "pasadas": 8,
+   "pasadas": 9,
    "en_calma": 0,
    "en_calma_v2": 0,
    "v2_difiere_era5": 0.0,
