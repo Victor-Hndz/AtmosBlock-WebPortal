@@ -28,6 +28,8 @@ PRIMARIOS = ("EA", "PA")
 PASOS = range(1, 16)
 MIN_SUCESOS = 10
 MIN_ESTACION = 90
+MIN_PASADAS = 2 * pu.BLOQUE  # ADENDA A-1.1 a F5: por debajo, el bootstrap por bloques no tiene variabilidad
+ADENDA = "ADENDA A-1 a F5 (2026-10-30)"
 ESTACIONES = {"DEF": (12, 1, 2), "MAM": (3, 4, 5), "JJA": (6, 7, 8), "SON": (9, 10, 11)}
 
 
@@ -42,10 +44,12 @@ def _bss(p, o, c):
 
 
 def puntuar(k, o, c, m, n_rep=pu.REPLICAS):
+    """ADENDA A-1.1: con n < MIN_PASADAS se publican los descriptivos, sin IC90 ni p-valor (marca solo_recuentos)."""
     k, o, c = (np.asarray(x, float) for x in (k, o, c))
-    fila = {"n": len(o), "sucesos": int(o.sum())}
+    computable = len(o) >= MIN_PASADAS
+    fila = {"n": len(o), "sucesos": int(o.sum()), "solo_recuentos": not computable}
     p = k / m
-    reps = pu.bootstrap(_bss, p, o, c, n_rep=n_rep)
+    reps = pu.bootstrap(_bss, p, o, c, n_rep=n_rep) if computable else np.empty(0)
     reps = reps[np.isfinite(reps)]
     fiab, resol, incert = pu.murphy(p, o)
     lo, hi = pu.intervalo(reps) if len(reps) else (np.nan, np.nan)
@@ -84,6 +88,7 @@ def resumir(registros, n_rep=pu.REPLICAS, calma_clim=None):
     principales = list(producto.sectores.PRINCIPALES)
     salida = {"preregistro": producto.PREREGISTRO, "pasadas": {m: ap.sizes["pasada"] for m, ap in por_modelo.items()},
               "pasadas_completas": {m: ap.sizes["pasada"] for m, ap in completas.items()},
+              "inferencia": {"bloque": pu.BLOQUE, "minimo_pasadas": MIN_PASADAS, "motivo": ADENDA},
               "primario": [], "secundario": [], "ifs_menos_aifs": [], "por_estacion": [], "calma": [],
               "calma_v2_climatologia": calma_clim}
 
@@ -96,7 +101,7 @@ def resumir(registros, n_rep=pu.REPLICAS, calma_clim=None):
         for s in PRIMARIOS:
             for paso in PASOS:
                 f = fila(ap, "k", "obs", "clim", sector=s, paso=paso)
-                f["habilidad"] = f["ic90"][0] is not None and f["ic90"][0] > 0
+                f["habilidad"] = None if f["solo_recuentos"] else f["ic90"][0] is not None and f["ic90"][0] > 0
                 salida["primario"].append({"modelo": m, "sector": s, "paso": paso, **f})
         meses = np.array([int(f[5:7]) for f in ap["fecha"].values])
         for est, de in ESTACIONES.items():
@@ -137,8 +142,7 @@ def resumir(registros, n_rep=pu.REPLICAS, calma_clim=None):
             salida["secundario"].append({**clave, "n": len(o), "sucesos": int(o.sum()), "solo_recuentos": True,
                                          "bss": None})
         else:
-            salida["secundario"].append({**clave, "solo_recuentos": False,
-                                         **puntuar(k, o, c, int(ap["miembros"].values[0]), n_rep)})
+            salida["secundario"].append({**clave, **puntuar(k, o, c, int(ap["miembros"].values[0]), n_rep)})
     con_p = [x for x in salida["secundario"] if not x["solo_recuentos"] and x["p"] is not None]
     for x, rechazo in zip(con_p, pu.fdr([x["p"] for x in con_p]) if con_p else []):
         x["fdr"] = bool(rechazo)
@@ -156,11 +160,13 @@ def resumir(registros, n_rep=pu.REPLICAS, calma_clim=None):
             for paso in PASOS:
                 ki, o, _ = _series(ifs, "k", "obs", "clim", sector=s, paso=paso)
                 ka, _, _ = _series(aifs, "k", "obs", "clim", sector=s, paso=paso)
-                reps = pu.bootstrap(dif, ki / mi, ka / ma, o, n_rep=n_rep)
-                lo, hi = pu.intervalo(reps)
+                computable = len(o) >= MIN_PASADAS  # ADENDA A-1.1, igual que en el primario y el secundario
+                reps = pu.bootstrap(dif, ki / mi, ka / ma, o, n_rep=n_rep) if computable else np.empty(0)
+                lo, hi = pu.intervalo(reps) if len(reps) else (np.nan, np.nan)
                 salida["ifs_menos_aifs"].append({"sector": s, "paso": paso, "n": len(o),
+                                                 "solo_recuentos": not computable,
                                                  "dbs": _num(dif(ki / mi, ka / ma, o)), "ic90": [_num(lo), _num(hi)],
-                                                 "p": _num(pu.p_valor(reps))})
+                                                 "p": _num(pu.p_valor(reps)) if len(reps) else None})
     return salida
 
 

@@ -34,11 +34,22 @@ export function celdas(mapa, dia) {
   return salida;
 }
 
-/** Lectura sencilla de una fila del resumen de verificación (preregistro: habilidad solo si el IC90 excluye 0). */
+/** Lectura sencilla de una fila del resumen de verificación (preregistro: habilidad solo si el IC90 excluye 0).
+ *  ADENDA A-1 a F5: sin IC90 computable (solo_recuentos, menos de 2 × bloque pasadas) el BSS es provisional y no se
+ *  califica como mejor ni peor. */
 export function nivelBss(fila) {
   if (fila.bss === null || fila.bss === undefined) return "sin_datos";
+  if (fila.solo_recuentos) return "sin_muestra";
   if (fila.habilidad) return "mejor";
   return fila.bss < 0 ? "peor" : "dudoso";
+}
+
+const ORDEN_NIVELES = ["mejor", "dudoso", "peor", "sin_muestra"];
+
+/** Niveles que aparecen en las filas, en orden fijo: la leyenda no nombra «comprobado» si nada lo está. */
+export function nivelesLeyenda(filas) {
+  const presentes = new Set(filas.map(nivelBss));
+  return ORDEN_NIVELES.filter(n => presentes.has(n));
 }
 
 /** Probabilidad de que empiece un bloqueo en los días 1–5 y 6–10 (variante V2 del preregistro), solo si la región

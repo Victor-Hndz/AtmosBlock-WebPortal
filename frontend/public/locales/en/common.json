@@ -462,6 +462,8 @@
       "pendiente": "No runs have been verified yet: each run needs ERA5 for its 15 lead days, which arrives about 5 days late. The first ones around 20 October 2026.",
       "pasadas": "{{completas}} runs with complete history out of {{total}}",
       "habilidad": "* The 90% interval excludes 0: skill against climatology.",
+      "provisional": "With fewer than {{minimo}} runs with complete history the 90% interval cannot be computed (the bootstrap with blocks of 16 runs has no variability): the BSS values are provisional, biased with short samples, and claim neither skill nor its absence. The skill table will come with at least 3 months of archive (January 2027).",
+      "sinIntervalo": "90% interval not computable: fewer than {{minimo}} runs",
       "detalles": "Secondary results, by season and IFS − AIFS difference in the full JSON"
     },
     "vistazo": {
