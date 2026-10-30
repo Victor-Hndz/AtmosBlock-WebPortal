@@ -462,6 +462,8 @@
       "pendiente": "Todavía no hay pasadas verificadas: cada pasada necesita ERA5 de los 15 días de plazo, que llega con unos 5 días de retraso. Las primeras, hacia el 20 de octubre de 2026.",
       "pasadas": "{{completas}} pasadas con historia completa de {{total}}",
       "habilidad": "* El IC90 excluye 0: habilidad frente a la climatología.",
+      "provisional": "Con menos de {{minimo}} pasadas con historia completa no se puede calcular el IC90 (el bootstrap por bloques de 16 pasadas no tiene variabilidad): los BSS son provisionales, sesgados con muestras cortas, y no afirman habilidad ni falta de ella. La tabla de habilidad llegará con al menos 3 meses de archivo (enero de 2027).",
+      "sinIntervalo": "IC90 no calculable: menos de {{minimo}} pasadas",
       "detalles": "Resultados secundarios, por estación y diferencia IFS − AIFS en el JSON completo"
     },
     "vistazo": {
