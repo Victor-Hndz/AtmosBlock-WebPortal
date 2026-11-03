@@ -46,8 +46,15 @@ export const TEXTOS = {
       "Todavía no hay previsiones comprobadas. Cada previsión se compara con lo que realmente pasó (el reanálisis ERA5) cuando han transcurrido sus 15 días y han llegado esos datos, unos 20 días después. Las primeras comprobaciones llegarán hacia el 20 de octubre de 2026.",
     verificacionIntro: n =>
       `Comparación con lo habitual para la época, día a día del 1 al 15. Previsiones comprobadas: ${n}.`,
-    verificacionCelda: (dia, bss) => `Día ${dia}: BSS ${bss}`,
-    nivel: { mejor: "mejor que lo habitual (comprobado)", dudoso: "sin diferencia clara", peor: "peor que lo habitual" },
+    verificacionCelda: (dia, bss, provisional) => `Día ${dia}: BSS ${bss}${provisional ? " (provisional, sin margen de error)" : ""}`,
+    verificacionProvisional: minimo =>
+      `Con menos de ${minimo} previsiones comprobadas no se puede calcular el margen de error: estas cifras son provisionales y todavía no dicen si las previsiones aciertan más o menos que lo habitual. Con tan pocas, el BSS además sale sesgado.`,
+    nivel: {
+      mejor: "mejor que lo habitual (comprobado)",
+      dudoso: "sin diferencia clara",
+      peor: "peor que lo habitual",
+      sin_muestra: "provisional: aún no hay muestra para decir si es mejor o peor",
+    },
     pistaZoom: "Pulsa una región para verla de cerca.",
     verRegion: nombre => `Ver de cerca: ${nombre}`,
     volver: "← Volver al hemisferio",
@@ -126,8 +133,15 @@ export const TEXTOS = {
     verificacionPendiente:
       "No forecast has been checked yet. Each forecast is compared with what actually happened (the ERA5 reanalysis) once its 15 days have passed and those data have arrived, about 20 days later. The first checks will arrive around 20 October 2026.",
     verificacionIntro: n => `Compared with what is usual for the time of year, day by day from 1 to 15. Checked forecasts: ${n}.`,
-    verificacionCelda: (dia, bss) => `Day ${dia}: BSS ${bss}`,
-    nivel: { mejor: "better than usual (checked)", dudoso: "no clear difference", peor: "worse than usual" },
+    verificacionCelda: (dia, bss, provisional) => `Day ${dia}: BSS ${bss}${provisional ? " (provisional, no error margin)" : ""}`,
+    verificacionProvisional: minimo =>
+      `With fewer than ${minimo} checked forecasts the error margin cannot be computed: these figures are provisional and do not yet say whether the forecasts do better or worse than usual. With so few, the BSS is also biased.`,
+    nivel: {
+      mejor: "better than usual (checked)",
+      dudoso: "no clear difference",
+      peor: "worse than usual",
+      sin_muestra: "provisional: not enough data yet to say better or worse",
+    },
     pistaZoom: "Click or tap a region to zoom in.",
     verRegion: nombre => `Zoom in: ${nombre}`,
     volver: "← Back to the hemisphere",
