@@ -6,7 +6,7 @@ por bloques de 16 pasadas consecutivas) excluye 0. Secundario, con FDR de Benjam
 LLB, V1, inicios (solo pasadas en calma según el producto; en V2, en calma-V2) y génesis; con < 10 sucesos
 observados, solo recuentos. De la calma, lo que mandan publicar la aclaración (A) de F3-5 y F5-V2: pasadas en cada
 calma, fracción en que la calma (y la calma-V2) del producto y la de ERA5 difieren, fracción en calma-V2 también en
-calma (A) y frecuencia climatológica.
+calma (A) y frecuencia climatológica. De F5-V1, la fracción de génesis nacidas de una división en la climatología.
 Además: ΔBS IFS − AIFS emparejado en el primario y desglose por estación cuando una estación tiene ≥ 90 pasadas.
 
 Uso: python prediccion/verificacion/resumen.py --registros DIR --salida resumen.json [--climatologia FICHERO]
@@ -81,7 +81,16 @@ def calma_climatologica(ruta):
     return {str(s): {str(e): _num(f.sel(sector=s, estacion=e)) for e in f.estacion.values} for s in f.sector.values}
 
 
-def resumir(registros, n_rep=pu.REPLICAS, calma_clim=None):
+def division_climatologica(ruta):
+    """F5-V1: {regla: {sector: fracción de génesis nacidas de una división en ERA5 1991–2020}}, o None sin el fichero."""
+    if not pathlib.Path(ruta).exists():
+        return None
+    with xr.open_dataset(ruta) as c:
+        f = c["fraccion_genesis_division"].load()
+    return {str(r): {str(s): _num(f.sel(regla=r, sector=s)) for s in f.sector.values} for r in f.regla.values}
+
+
+def resumir(registros, n_rep=pu.REPLICAS, calma_clim=None, division_clim=None):
     modelos = sorted({r.attrs["modelo"] for r in registros})
     por_modelo = {m: _apilar([r for r in registros if r.attrs["modelo"] == m]) for m in modelos}
     completas = {m: ap.isel(pasada=ap["historia_incompleta"].values == 0) for m, ap in por_modelo.items()}
@@ -91,7 +100,7 @@ def resumir(registros, n_rep=pu.REPLICAS, calma_clim=None):
               "pasadas_completas": {m: ap.sizes["pasada"] for m, ap in completas.items()},
               "inferencia": {"bloque": pu.BLOQUE, "minimo_pasadas": MIN_PASADAS, "motivo": ADENDA},
               "primario": [], "secundario": [], "ifs_menos_aifs": [], "por_estacion": [], "calma": [],
-              "calma_v2_climatologia": calma_clim}
+              "calma_v2_climatologia": calma_clim, "genesis_division_climatologia": division_clim}
 
     def fila(ap, var, obs, clim, **sel):
         return puntuar(*_series(ap, var, obs, clim, **sel), int(ap["miembros"].values[0]), n_rep)
@@ -180,7 +189,8 @@ def main(argv=None):
     p.add_argument("--climatologia", type=pathlib.Path, default=AQUI / "climatologia_era5_1991_2020.nc")
     a = p.parse_args(argv)
     regs = [xr.load_dataset(f) for f in sorted(a.registros.glob("verificacion_*_*.nc"))]
-    salida = resumir(regs, calma_clim=calma_climatologica(a.climatologia)) if regs else {"pasadas": {}}
+    salida = resumir(regs, calma_clim=calma_climatologica(a.climatologia),
+                     division_clim=division_climatologica(a.climatologia)) if regs else {"pasadas": {}}
     a.salida.write_text(json.dumps(salida, ensure_ascii=False, indent=1),
                         encoding="utf-8")
     return 0

@@ -2,6 +2,7 @@
 
 Uso: python prediccion/verificacion/test_resumen.py
 """
+import json
 import pathlib
 import sys
 import tempfile
@@ -178,6 +179,24 @@ class CalmaV2(unittest.TestCase):
             c = resumen.calma_climatologica(ruta)
         self.assertEqual(c["EA"], {"DEF": 0.1, "MAM": 0.2, "JJA": 0.3, "SON": 0.4})
         self.assertIsNone(resumen.calma_climatologica(pathlib.Path("no_existe.nc")))
+
+
+class GenesisV1(unittest.TestCase):
+    def test_fraccion_nacida_de_una_division_de_la_climatologia(self):
+        # F5-V1: se publica la fracción de génesis nacidas de una división (la de ERA5 1991–2020, regla × sector)
+        with tempfile.TemporaryDirectory() as d:
+            d = pathlib.Path(d)
+            f = np.full((len(producto.REGLAS), len(SECT)), np.nan)
+            f[:, SECT.index("EA")] = [0.5, 0.25]
+            xr.Dataset({"frecuencia_calma_v2_estacion": (("sector", "estacion"), np.zeros((len(SECT), 4))),
+                        "fraccion_genesis_division": (("regla", "sector"), f)},
+                       coords={"sector": SECT, "estacion": ["DEF", "MAM", "JJA", "SON"],
+                               "regla": list(producto.REGLAS)}).to_netcdf(d / "clima.nc")
+            registro("2026-10-01", "ifs", 25, 1, 0.5).to_netcdf(d / "verificacion_ifs_20261001.nc")
+            resumen.main(["--registros", str(d), "--salida", str(d / "r.json"), "--climatologia", str(d / "clima.nc")])
+            g = json.loads((d / "r.json").read_text(encoding="utf-8"))["genesis_division_climatologia"]
+        self.assertEqual({r: g[r]["EA"] for r in producto.REGLAS}, dict(zip(producto.REGLAS, (0.5, 0.25))))
+        self.assertIsNone(g["F3-4"]["GRL"])
 
 
 class Estaciones(unittest.TestCase):
