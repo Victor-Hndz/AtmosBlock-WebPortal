@@ -48,6 +48,8 @@ publicar "archivo-ens-2026-09 verificacion-2026-09 verificacion-2026-10 producto
 comprobar "baja los registros de todos los meses y publica el resumen" \
   '[[ $(en_origen prediccion/verificacion.json | tr -d " \n") == "{\"registros\":3}" ]]'
 comprobar "solo de los releases de verificación" '! grep -q "download producto-ens" "$T/gh.log"'
+comprobar "publica al lado la discrepancia entre catálogo y ventanas" \
+  'en_origen prediccion/discrepancia_catalogo.json | cmp -s - "$AQUI/discrepancia_catalogo_1991_2020.json"'
 antes=$(commits)
 publicar "verificacion-2026-09 verificacion-2026-10" \
   "verificacion_ifs_20260928.nc verificacion_aifs_20260928.nc verificacion_ifs_20261001.nc"
