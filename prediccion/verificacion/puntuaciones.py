@@ -104,7 +104,11 @@ def p_valor(reps):
 
 
 def fdr(p, q=0.10):
-    """Benjamini-Hochberg: 1 en las hipótesis rechazadas. Wilks (2016) recomienda q = 2·α global (0,10 para 0,05)."""
+    """Benjamini-Hochberg: 1 en las hipótesis rechazadas. q acota en un 10 % la fracción esperada de falsos
+    descubrimientos entre las filas rechazadas. Con pruebas correlacionadas de forma moderada o fuerte, Wilks (2016,
+    BAMS 97, fig. 4) muestra que q = 2·α global da un nivel global aproximado de α = 0,05; con pruebas casi
+    independientes, el nivel global se acerca a q. Su resultado es sobre rejillas espaciales simuladas: aquí la familia
+    (sector × paso × familia × modelo) está muy correlacionada, pero la analogía no está demostrada."""
     p = np.asarray(p, float)
     orden = np.argsort(p)
     bajo = p[orden] <= q * np.arange(1, len(p) + 1) / len(p)
