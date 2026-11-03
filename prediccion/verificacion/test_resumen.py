@@ -21,7 +21,7 @@ M = 50
 
 
 def registro(fecha, modelo, k, obs, clim, calma=1, k_inicio=0, obs_inicio=0, historia_incompleta=0, calma_v2=1,
-             calma_v2_era5=None):
+             calma_v2_era5=None, calma_era5=None):
     """Registro con el mismo valor en todos los sectores y pasos (k miembros, verdad obs, climatología clim)."""
     s, p, v, r = len(SECT), 16, 2, 2
     lleno = lambda forma, x: np.full(forma, x)  # noqa: E731
@@ -29,7 +29,8 @@ def registro(fecha, modelo, k, obs, clim, calma=1, k_inicio=0, obs_inicio=0, his
         {"miembros": M, "k": (("sector", "paso"), lleno((s, p), k)), "obs": (("sector", "paso"), lleno((s, p), obs)),
          "k_v1": (("sector", "paso"), lleno((s, p), k)), "obs_v1": (("sector", "paso"), lleno((s, p), obs)),
          "clim": (("sector", "paso"), lleno((s, p), clim)), "clim_v1": (("sector", "paso"), lleno((s, p), clim)),
-         "calma": (("sector",), lleno(s, calma)), "calma_era5": (("sector",), lleno(s, calma)),
+         "calma": (("sector",), lleno(s, calma)),
+         "calma_era5": (("sector",), lleno(s, calma if calma_era5 is None else calma_era5)),
          "calma_v2": (("sector",), lleno(s, calma_v2)),
          "calma_v2_era5": (("sector",), lleno(s, calma_v2 if calma_v2_era5 is None else calma_v2_era5)),
          "k_inicio": (("sector", "ventana"), lleno((s, v), k_inicio)),
@@ -158,6 +159,14 @@ class CalmaV2(unittest.TestCase):
         c = fila(resumir(regs)["calma"], modelo="ifs", sector="EA")
         self.assertEqual((c["pasadas"], c["en_calma"], c["en_calma_v2"]), (10, 4, 8))
         self.assertEqual((c["v2_difiere_era5"], c["v2_tambien_en_calma"]), (0.2, 0.5))
+
+    def test_calma_a_frente_a_era5(self):
+        # Aclaración (A) de F3-5: se publica la fracción de pasadas en que la calma de la pseudoanálisis y la de ERA5
+        # instantánea difieren. 10 pasadas: 4 en calma en los dos, 3 solo en el producto, 3 en ninguno.
+        regs = (serie(4, "ifs", lambda i, o: 0) +
+                serie(3, "ifs", lambda i, o: 0, inicio="2026-11-01", calma_era5=0) +
+                serie(3, "ifs", lambda i, o: 0, inicio="2026-11-04", calma=0))
+        self.assertEqual(fila(resumir(regs)["calma"], modelo="ifs", sector="EA")["difiere_era5"], 0.3)
 
     def test_frecuencia_climatologica_por_estacion(self):
         with tempfile.TemporaryDirectory() as d:

@@ -4,8 +4,9 @@ Primario: BSS de la ocupación del sector (B_S) por paso 1–15 en EA y PA, IFS 
 climatología ERA5 1991–2020, sin las pasadas con historia incompleta; solo se afirma habilidad si el IC90 (bootstrap
 por bloques de 16 pasadas consecutivas) excluye 0. Secundario, con FDR de Benjamini-Hochberg: resto de sectores y
 LLB, V1, inicios (solo pasadas en calma según el producto; en V2, en calma-V2) y génesis; con < 10 sucesos
-observados, solo recuentos. De la calma, lo que manda publicar F5-V2: pasadas en cada calma, fracción en que la
-calma-V2 del producto y la de ERA5 difieren, fracción en calma-V2 también en calma (A) y frecuencia climatológica.
+observados, solo recuentos. De la calma, lo que mandan publicar la aclaración (A) de F3-5 y F5-V2: pasadas en cada
+calma, fracción en que la calma (y la calma-V2) del producto y la de ERA5 difieren, fracción en calma-V2 también en
+calma (A) y frecuencia climatológica.
 Además: ΔBS IFS − AIFS emparejado en el primario y desglose por estación cuando una estación tiene ≥ 90 pasadas.
 
 Uso: python prediccion/verificacion/resumen.py --registros DIR --salida resumen.json [--climatologia FICHERO]
@@ -122,8 +123,10 @@ def resumir(registros, n_rep=pu.REPLICAS, calma_clim=None):
                 if s in principales:
                     secundario.append(({"familia": "ocupacion_v1", "modelo": m, "sector": s, "paso": paso},
                                        ap, ("k_v1", "obs_v1", "clim_v1"), {"sector": s, "paso": paso}))
-            a, v2, v2_era5 = (ap[x].sel(sector=s).values == 1 for x in ("calma", "calma_v2", "calma_v2_era5"))
+            a, a_era5, v2, v2_era5 = (ap[x].sel(sector=s).values == 1
+                                      for x in ("calma", "calma_era5", "calma_v2", "calma_v2_era5"))
             salida["calma"].append({"modelo": m, "sector": s, "pasadas": len(a), "en_calma": int(a.sum()),
+                                    "difiere_era5": _num((a != a_era5).mean()),
                                     "en_calma_v2": int(v2.sum()), "v2_difiere_era5": _num((v2 != v2_era5).mean()),
                                     "v2_tambien_en_calma": _num((a & v2).sum() / v2.sum()) if v2.any() else None})
             for v in producto.VENTANAS:
