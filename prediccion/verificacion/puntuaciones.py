@@ -92,8 +92,15 @@ def intervalo(reps, nivel=NIVEL):
 
 
 def p_valor(reps):
-    """Bilateral frente a 0 a partir de las réplicas."""
-    return float(min(1.0, 2 * min(np.mean(reps <= 0), np.mean(reps >= 0))))
+    """Bilateral frente a 0 a partir de las réplicas, con la corrección +1 de Monte Carlo.
+
+    ADENDA A-1.3 a F5: p = min(1; 2 · min(1 + #{rep ≤ 0}; 1 + #{rep ≥ 0}) / (R + 1)) (North et al. 2002; Davison &
+    Hinkley 1997). Sin ella el p-valor sale 0 cuando ninguna réplica cruza el 0 —lo que con n ≤ BLOQUE ocurre por
+    construcción, porque las réplicas son la serie original— y el FDR rechaza sin evidencia.
+    """
+    reps = np.asarray(reps, float)
+    extremas = min(np.sum(reps <= 0), np.sum(reps >= 0))
+    return float(min(1.0, 2 * (1 + extremas) / (len(reps) + 1)))
 
 
 def fdr(p, q=0.10):

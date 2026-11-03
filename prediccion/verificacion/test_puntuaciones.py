@@ -93,8 +93,16 @@ class Bootstrap(unittest.TestCase):
         reps = pu.bootstrap(lambda a, b, y: pu.brier(b, y) - pu.brier(a, y), buena, mala, o, n_rep=300)
         lo, hi = pu.intervalo(reps)
         self.assertTrue(0 < lo <= hi)  # la diferencia es la misma en cada pasada: intervalo de anchura 0
-        self.assertEqual(pu.p_valor(reps), 0.0)
-        self.assertEqual(pu.p_valor(np.array([-1.0, 1.0, 2.0, 3.0])), 0.5)
+        # ADENDA A-1.3: (1 + #) / (R + 1), nunca 0
+        self.assertAlmostEqual(pu.p_valor(reps), 2 / 301)
+        # #{rep <= 0} = 1, #{rep >= 0} = 3, R = 4: 2 * (1 + 1) / 5
+        self.assertAlmostEqual(pu.p_valor(np.array([-1.0, 1.0, 2.0, 3.0])), 0.8)
+
+    def test_p_valor_nunca_es_cero(self):
+        """ADENDA A-1.3: con la corrección +1, el p-valor no puede bajar de 2 / (R + 1)."""
+        for reps in (np.ones(1000), -np.ones(1000), np.full(1000, 0.5)):
+            self.assertAlmostEqual(pu.p_valor(reps), 2 / 1001)
+        self.assertEqual(pu.p_valor(np.zeros(10)), 1.0)  # todas tocan el 0: acotado a 1
 
 
 class Fdr(unittest.TestCase):

@@ -37,13 +37,16 @@ interface Producto {
 interface Verificacion {
   pasadas: Partial<Record<Modelo, number>>;
   pasadas_completas?: Partial<Record<Modelo, number>>;
+  /** ADENDA A-1 a F5: por debajo de minimo_pasadas no hay IC90, p ni habilidad (solo_recuentos) */
+  inferencia?: { bloque: number; minimo_pasadas: number };
   primario?: {
     modelo: Modelo;
     sector: Sector;
     paso: number;
     bss: number | null;
     ic90: (number | null)[];
-    habilidad: boolean;
+    habilidad: boolean | null;
+    solo_recuentos?: boolean;
   }[];
 }
 
@@ -86,6 +89,7 @@ const PrediccionPage: React.FC = (): JSX.Element => {
   const [productoCargado, setProductoCargado] = useState<{ clave: string; datos: Producto } | null>(null);
   const [error, setError] = useState(false);
   const [verificacion, setVerificacion] = useState<Verificacion | null>(null);
+  const minimoPasadas = verificacion?.inferencia?.minimo_pasadas ?? 32; // ADENDA A-1.1: 2 × bloque
   const [alturaVisor, setAlturaVisor] = useState(1200);
 
   useEffect(() => {
@@ -345,7 +349,11 @@ const PrediccionPage: React.FC = (): JSX.Element => {
                             {celdas.map(x => (
                               <td
                                 key={x.paso}
-                                title={`IC90 [${x.ic90.map(v => v?.toFixed(2) ?? "–").join(", ")}]`}
+                                title={
+                                  x.solo_recuentos
+                                    ? t("prediccion.verificacion.sinIntervalo", { minimo: minimoPasadas })
+                                    : `IC90 [${x.ic90.map(v => v?.toFixed(2) ?? "–").join(", ")}]`
+                                }
                                 className={`px-1 py-1 text-center text-xs tabular-nums ${x.habilidad ? "font-semibold text-emerald-700" : ""}`}
                               >
                                 {x.bss === null ? "–" : `${x.bss.toFixed(2)}${x.habilidad ? "*" : ""}`}
@@ -358,7 +366,11 @@ const PrediccionPage: React.FC = (): JSX.Element => {
                   </tbody>
                 </table>
               </div>
-              <p className="mb-1 text-xs text-slate-500">{t("prediccion.verificacion.habilidad")}</p>
+              <p className="mb-1 text-xs text-slate-500">
+                {verificacion.primario.some(x => x.solo_recuentos)
+                  ? t("prediccion.verificacion.provisional", { minimo: minimoPasadas })
+                  : t("prediccion.verificacion.habilidad")}
+              </p>
             </>
           )}
           <a className="text-xs text-blue-700 underline" href={`${PREDICCION_URL}/verificacion.json`}>

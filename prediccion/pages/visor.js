@@ -7,6 +7,7 @@ import {
   fechaValida,
   celdas,
   nivelBss,
+  nivelesLeyenda,
   posibleInicio,
   cajaRegion,
   isolineas,
@@ -522,7 +523,8 @@ async function dibujarVerificacion() {
       if (!datos.length) continue;
       const celdasHtml = datos
         .map(
-          x => `<span class="celda ${nivelBss(x)}" title="${T.verificacionCelda(x.paso, x.bss?.toFixed(2) ?? "–")}"></span>`
+          x =>
+            `<span class="celda ${nivelBss(x)}" title="${T.verificacionCelda(x.paso, x.bss?.toFixed(2) ?? "–", x.solo_recuentos)}"></span>`
         )
         .join("");
       filas.push(`<span>${MODELOS[m]} · ${NOMBRES[s]}</span><span class="celdas">${celdasHtml}</span>`);
@@ -531,11 +533,19 @@ async function dibujarVerificacion() {
   const n = Object.entries(v.pasadas_completas ?? {})
     .map(([m, k]) => `${MODELOS[m]}: ${k}`)
     .join(" · ");
+  // ADENDA A-1: la leyenda solo nombra lo que aparece; sin IC computable no se lee «comprobado»
+  const chip = {
+    mejor: `<span class="chip" style="color:#2f9e44">${T.nivel.mejor}</span>`,
+    dudoso: `<span class="chip habitual">${T.nivel.dudoso}</span>`,
+    peor: `<span class="chip" style="color:#e8590c">${T.nivel.peor}</span>`,
+    sin_muestra: `<span class="chip habitual">${T.nivel.sin_muestra}</span>`,
+  };
+  const provisional = v.primario.some(x => x.solo_recuentos)
+    ? `<p class="tenue" style="font-size:13px">${T.verificacionProvisional(v.inferencia?.minimo_pasadas ?? 32)}</p>`
+    : "";
   caja.innerHTML = `<p class="tenue">${T.verificacionIntro(n)}</p>
     <div class="barras">${filas.join("")}</div>
-    <p class="tenue" style="font-size:13px"><span class="chip" style="color:#2f9e44">${T.nivel.mejor}</span>
-      <span class="chip habitual">${T.nivel.dudoso}</span>
-      <span class="chip" style="color:#e8590c">${T.nivel.peor}</span></p>`;
+    <p class="tenue" style="font-size:13px">${nivelesLeyenda(v.primario).map(k => chip[k]).join(" ")}</p>${provisional}`;
 }
 
 // ---------- controles ----------

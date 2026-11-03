@@ -6,6 +6,7 @@ import {
   fechaValida,
   celdas,
   nivelBss,
+  nivelesLeyenda,
   posibleInicio,
   MARGEN_HABITUAL,
   cajaRegion,
@@ -46,6 +47,19 @@ test("lectura sencilla del BSS", () => {
   assert.equal(nivelBss({ bss: 0.1, habilidad: false }), "dudoso");
   assert.equal(nivelBss({ bss: -0.2, habilidad: false }), "peor");
   assert.equal(nivelBss({ bss: null, habilidad: false }), "sin_datos");
+});
+
+test("ADENDA A-1: sin IC90 computable no hay «mejor» ni «peor», aunque el BSS sea alto o negativo", () => {
+  assert.equal(nivelBss({ bss: 0.9, habilidad: null, solo_recuentos: true }), "sin_muestra");
+  assert.equal(nivelBss({ bss: -0.37, habilidad: null, solo_recuentos: true }), "sin_muestra");
+  assert.equal(nivelBss({ bss: null, habilidad: null, solo_recuentos: true }), "sin_datos");
+});
+
+test("la leyenda solo nombra los niveles que aparecen: sin IC no se lee «comprobado»", () => {
+  const provisional = [{ bss: 0.9, solo_recuentos: true }, { bss: -0.1, solo_recuentos: true }];
+  assert.deepEqual(nivelesLeyenda(provisional), ["sin_muestra"]);
+  const conIc = [{ bss: 0.4, habilidad: true }, { bss: -0.2, habilidad: false }, { bss: 0.1, habilidad: false }];
+  assert.deepEqual(nivelesLeyenda(conIc), ["mejor", "dudoso", "peor"]);
 });
 
 test("posible inicio solo con la región en calma (variante V2) y con el aviso de p ≥ 0,5", () => {
