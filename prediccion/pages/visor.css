@@ -326,6 +326,10 @@ select {
 .celda.peor {
   background: #e8590c;
 }
+.celda.sin_muestra {
+  /* ADENDA A-1: BSS provisional, sin IC90; rayado para que no se lea como «sin diferencia clara» */
+  background: repeating-linear-gradient(45deg, var(--borde) 0 3px, transparent 3px 6px);
+}
 .celda.sin_datos {
   background: transparent;
   border: 1px dashed var(--borde);

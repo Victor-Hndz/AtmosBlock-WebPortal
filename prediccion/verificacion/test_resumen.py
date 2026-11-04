@@ -2,6 +2,7 @@
 
 Uso: python prediccion/verificacion/test_resumen.py
 """
+import json
 import pathlib
 import sys
 import tempfile
@@ -21,7 +22,7 @@ M = 50
 
 
 def registro(fecha, modelo, k, obs, clim, calma=1, k_inicio=0, obs_inicio=0, historia_incompleta=0, calma_v2=1,
-             calma_v2_era5=None):
+             calma_v2_era5=None, calma_era5=None):
     """Registro con el mismo valor en todos los sectores y pasos (k miembros, verdad obs, climatología clim)."""
     s, p, v, r = len(SECT), 16, 2, 2
     lleno = lambda forma, x: np.full(forma, x)  # noqa: E731
@@ -29,7 +30,8 @@ def registro(fecha, modelo, k, obs, clim, calma=1, k_inicio=0, obs_inicio=0, his
         {"miembros": M, "k": (("sector", "paso"), lleno((s, p), k)), "obs": (("sector", "paso"), lleno((s, p), obs)),
          "k_v1": (("sector", "paso"), lleno((s, p), k)), "obs_v1": (("sector", "paso"), lleno((s, p), obs)),
          "clim": (("sector", "paso"), lleno((s, p), clim)), "clim_v1": (("sector", "paso"), lleno((s, p), clim)),
-         "calma": (("sector",), lleno(s, calma)), "calma_era5": (("sector",), lleno(s, calma)),
+         "calma": (("sector",), lleno(s, calma)),
+         "calma_era5": (("sector",), lleno(s, calma if calma_era5 is None else calma_era5)),
          "calma_v2": (("sector",), lleno(s, calma_v2)),
          "calma_v2_era5": (("sector",), lleno(s, calma_v2 if calma_v2_era5 is None else calma_v2_era5)),
          "k_inicio": (("sector", "ventana"), lleno((s, v), k_inicio)),
@@ -86,6 +88,35 @@ class Primario(unittest.TestCase):
         self.assertTrue(r["secundario"])  # el secundario usa todas las pasadas
 
 
+class Computabilidad(unittest.TestCase):
+    """ADENDA A-1.1: sin n ≥ 2 × bloque el remuestreo no tiene variabilidad y no hay IC ni p que publicar."""
+
+    def test_pocas_pasadas_no_dan_ic_ni_p_ni_habilidad(self):
+        r = resumir(serie(8, "ifs", lambda i, o: o * M) + serie(8, "aifs", lambda i, o: o * M))
+        f = fila(r["primario"], modelo="ifs", sector="EA", paso=1)
+        self.assertEqual((f["n"], f["solo_recuentos"]), (8, True))
+        self.assertEqual((f["ic90"], f["p"], f["habilidad"]), ([None, None], None, None))
+        self.assertEqual(f["bss"], 1.0)  # el descriptivo se sigue publicando
+        d = fila(r["ifs_menos_aifs"], sector="EA", paso=1)
+        self.assertEqual((d["solo_recuentos"], d["ic90"], d["p"]), (True, [None, None], None))
+        self.assertIsNotNone(d["dbs"])
+        self.assertEqual(r["inferencia"]["minimo_pasadas"], 2 * resumen.pu.BLOQUE)
+
+    def test_secundario_con_sucesos_pero_pocas_pasadas_no_entra_en_el_fdr(self):
+        r = resumir(serie(20, "ifs", lambda i, o: o * M))  # 20 pasadas, 10 sucesos: pasa MIN_SUCESOS, no el suelo
+        f = fila(r["secundario"], familia="ocupacion", modelo="ifs", sector="GRL", paso=1)
+        self.assertEqual((f["n"], f["sucesos"], f["solo_recuentos"]), (20, 10, True))
+        self.assertNotIn("fdr", f)
+
+    def test_con_muestra_suficiente_si_hay_ic_y_p(self):
+        r = resumir(serie(32, "ifs", lambda i, o: o * M) + serie(32, "aifs", lambda i, o: M // 2))
+        f = fila(r["primario"], modelo="ifs", sector="EA", paso=1)
+        self.assertFalse(f["solo_recuentos"])
+        self.assertIsNotNone(f["ic90"][0])
+        self.assertTrue(f["habilidad"])
+        self.assertEqual(fila(r["ifs_menos_aifs"], sector="EA", paso=1)["solo_recuentos"], False)
+
+
 class Secundario(unittest.TestCase):
     def test_inicios_solo_con_calma_y_con_10_observados(self):
         pocos = serie(30, "ifs", lambda i, o: 0, k_inicio=M, obs_inicio=1)[:9] + \
@@ -95,13 +126,14 @@ class Secundario(unittest.TestCase):
         self.assertIsNone(f["bss"])
 
     def test_inicios_v2_con_la_calma_v2(self):
-        # 12 pasadas fuera de la calma de (A) pero en calma-V2, todas con inicio observado
-        regs = serie(12, "ifs", lambda i, o: 0, calma=0, k_inicio=M, obs_inicio=1)
+        # 32 pasadas fuera de la calma de (A) pero en calma-V2, todas con inicio observado (32 = suelo de A-1.1,
+        # antes bastaban 12: con menos, la fila sale de solo recuentos aunque la muestre la calma-V2)
+        regs = serie(32, "ifs", lambda i, o: 0, calma=0, k_inicio=M, obs_inicio=1)
         r = resumir(regs)["secundario"]
         a = fila(r, familia="inicio", modelo="ifs", sector="EA", ventana="dias_1_5")
         v2 = fila(r, familia="inicio_v2", modelo="ifs", sector="EA", ventana="dias_1_5")
         self.assertEqual((a["n"], a["solo_recuentos"]), (0, True))
-        self.assertEqual((v2["n"], v2["sucesos"], v2["solo_recuentos"], v2["bss"]), (12, 12, False, 1.0))
+        self.assertEqual((v2["n"], v2["sucesos"], v2["solo_recuentos"], v2["bss"]), (32, 32, False, 1.0))
 
     def test_familias_y_fdr(self):
         r = resumir(serie(40, "ifs", lambda i, o: o * M) + serie(40, "aifs", lambda i, o: o * M))
@@ -129,6 +161,14 @@ class CalmaV2(unittest.TestCase):
         self.assertEqual((c["pasadas"], c["en_calma"], c["en_calma_v2"]), (10, 4, 8))
         self.assertEqual((c["v2_difiere_era5"], c["v2_tambien_en_calma"]), (0.2, 0.5))
 
+    def test_calma_a_frente_a_era5(self):
+        # Aclaración (A) de F3-5: se publica la fracción de pasadas en que la calma de la pseudoanálisis y la de ERA5
+        # instantánea difieren. 10 pasadas: 4 en calma en los dos, 3 solo en el producto, 3 en ninguno.
+        regs = (serie(4, "ifs", lambda i, o: 0) +
+                serie(3, "ifs", lambda i, o: 0, inicio="2026-11-01", calma_era5=0) +
+                serie(3, "ifs", lambda i, o: 0, inicio="2026-11-04", calma=0))
+        self.assertEqual(fila(resumir(regs)["calma"], modelo="ifs", sector="EA")["difiere_era5"], 0.3)
+
     def test_frecuencia_climatologica_por_estacion(self):
         with tempfile.TemporaryDirectory() as d:
             ruta = pathlib.Path(d) / "clima.nc"
@@ -139,6 +179,24 @@ class CalmaV2(unittest.TestCase):
             c = resumen.calma_climatologica(ruta)
         self.assertEqual(c["EA"], {"DEF": 0.1, "MAM": 0.2, "JJA": 0.3, "SON": 0.4})
         self.assertIsNone(resumen.calma_climatologica(pathlib.Path("no_existe.nc")))
+
+
+class GenesisV1(unittest.TestCase):
+    def test_fraccion_nacida_de_una_division_de_la_climatologia(self):
+        # F5-V1: se publica la fracción de génesis nacidas de una división (la de ERA5 1991–2020, regla × sector)
+        with tempfile.TemporaryDirectory() as d:
+            d = pathlib.Path(d)
+            f = np.full((len(producto.REGLAS), len(SECT)), np.nan)
+            f[:, SECT.index("EA")] = [0.5, 0.25]
+            xr.Dataset({"frecuencia_calma_v2_estacion": (("sector", "estacion"), np.zeros((len(SECT), 4))),
+                        "fraccion_genesis_division": (("regla", "sector"), f)},
+                       coords={"sector": SECT, "estacion": ["DEF", "MAM", "JJA", "SON"],
+                               "regla": list(producto.REGLAS)}).to_netcdf(d / "clima.nc")
+            registro("2026-10-01", "ifs", 25, 1, 0.5).to_netcdf(d / "verificacion_ifs_20261001.nc")
+            resumen.main(["--registros", str(d), "--salida", str(d / "r.json"), "--climatologia", str(d / "clima.nc")])
+            g = json.loads((d / "r.json").read_text(encoding="utf-8"))["genesis_division_climatologia"]
+        self.assertEqual({r: g[r]["EA"] for r in producto.REGLAS}, dict(zip(producto.REGLAS, (0.5, 0.25))))
+        self.assertIsNone(g["F3-4"]["GRL"])
 
 
 class Estaciones(unittest.TestCase):

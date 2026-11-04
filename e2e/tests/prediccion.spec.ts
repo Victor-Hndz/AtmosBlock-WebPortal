@@ -49,6 +49,13 @@ const CON_REGISTROS = {
   pasadas_completas: { ifs: 28, aifs: 28 },
   primario: [...primario("ifs", "EA", 0.42, true), ...primario("ifs", "PA", -0.05, false)],
 };
+// ADENDA A-1 a F5: con menos de 2 × bloque pasadas no hay IC90 ni habilidad, solo el BSS provisional
+const PROVISIONAL = {
+  pasadas: { ifs: 12, aifs: 12 },
+  pasadas_completas: { ifs: 8, aifs: 8 },
+  inferencia: { bloque: 16, minimo_pasadas: 32, motivo: "ADENDA A-1 a F5 (2026-10-30)" },
+  primario: primario("ifs", "EA", 0.42, false).map(x => ({ ...x, ic90: [null, null], habilidad: null, solo_recuentos: true })),
+};
 
 async function simularPages(page: Page, pedidas: string[] = [], verificacion: object = SIN_REGISTROS) {
   await page.route("**/prediccion/verificacion.json", r => r.fulfill({ json: verificacion }));
@@ -151,6 +158,17 @@ test("con registros, la verificación muestra el BSS primario y marca la habilid
   await expect(
     page.getByText(t.verificacion.pasadas.replace("{{completas}}", "28").replace("{{total}}", "30")).first()
   ).toBeVisible();
+});
+
+test("con pocas pasadas, la verificación no marca habilidad y dice por qué (ADENDA A-1)", async ({ page }) => {
+  await simularPages(page, [], PROVISIONAL);
+  await page.goto("/prediccion");
+
+  const tabla = page.getByRole("table", { name: t.verificacion.titulo });
+  const ea = tabla.getByRole("row", { name: new RegExp(`IFS ENS.*${t.sectores.EA}`) });
+  await expect(ea.getByRole("cell").first()).toHaveText("0.42");
+  await expect(page.getByText(t.verificacion.provisional.replace("{{minimo}}", "32"))).toBeVisible();
+  await expect(page.getByText(t.verificacion.habilidad)).toHaveCount(0);
 });
 
 test("la previsión de un vistazo incrusta el visor público con el modelo y la pasada elegidos", async ({ page }) => {
