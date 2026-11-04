@@ -13,7 +13,7 @@ probabilidad por ventana de días 1–5 y 6–10 y la fracción de génesis naci
 
 Probabilidad climatológica por sector, paso y día del año: frecuencia en 1991–2020 en los días a ±15 del día del
 año (circular, periodo 365,25 días). La de inicio, condicionada a la calma del día de la pasada. Es una aproximación
-de la verdad por ventanas: su discrepancia se mide y se publica en la verificación (F5).
+de la verdad por ventanas: su discrepancia la mide discrepancia.py y se publica junto a la verificación (F5).
 
 Uso: python prediccion/verificacion/climatologia.py --era5 DIR --salida climatologia_era5_1991_2020.nc
 """
@@ -133,6 +133,18 @@ def prob_genesis(gen, dias, medio_ancho=MEDIO_ANCHO):
     return p, division
 
 
+def cargar_era5(carpeta, desde, hasta):
+    """Z500 de ERA5 a 00 UTC en m y a 2,5° de los ficheros geopot_500hPa_AAAA_00UTC_HN.nc; exige una serie diaria."""
+    campos = []
+    for anio in range(desde, hasta + 1):
+        with xr.open_dataset(pathlib.Path(carpeta) / f"geopot_500hPa_{anio}_00UTC_HN.nc") as ds:
+            campos.append((dav.a_2p5(ds["z"]) / G).load())
+    z = xr.concat(campos, "time")
+    if not (np.diff(z.time.values.astype("datetime64[D]")) == np.timedelta64(1, "D")).all():
+        raise ValueError("la serie de ERA5 no es diaria y continua")
+    return z
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--era5", required=True, help="carpeta con geopot_500hPa_AAAA_00UTC_HN.nc de 1991 a 2020")
@@ -140,14 +152,8 @@ def main(argv=None):
     p.add_argument("--desde", type=int, default=1991)
     p.add_argument("--hasta", type=int, default=2020)
     a = p.parse_args(argv)
-    campos = []
-    for anio in range(a.desde, a.hasta + 1):
-        with xr.open_dataset(pathlib.Path(a.era5) / f"geopot_500hPa_{anio}_00UTC_HN.nc") as ds:
-            campos.append((dav.a_2p5(ds["z"]) / G).load())
-    z = xr.concat(campos, "time")
+    z = cargar_era5(a.era5, a.desde, a.hasta)
     dias = z.time.values.astype("datetime64[D]")
-    if not (np.diff(dias) == np.timedelta64(1, "D")).all():
-        raise ValueError("la serie de ERA5 no es diaria y continua")
     cat = catalogo(dav.mascara(z).values, tramo=365)
     pb = prob_bloqueo(cat["bloqueado"], dias)
     pi, n = prob_inicio(cat["bloqueado"], cat["calma"], dias)

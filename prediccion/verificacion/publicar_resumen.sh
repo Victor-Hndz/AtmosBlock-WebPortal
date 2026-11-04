@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # PRD-506: baja todos los registros de los releases verificacion-AAAA-MM, calcula el resumen de puntuaciones
 # (resumen.py) y lo publica en la rama gh-pages clonada en $PAGINAS como prediccion/verificacion.json, para el portal.
-# Sin cambios no hace commit.
+# Al lado, la discrepancia entre catálogo continuo y ventanas (discrepancia.py, fija; en un fichero aparte para no
+# engordar el JSON que cargan el visor y el portal). Sin cambios no hace commit.
 # Uso: PAGINAS=paginas bash prediccion/verificacion/publicar_resumen.sh   (requiere gh con GH_TOKEN)
 set -euo pipefail
 
@@ -13,6 +14,7 @@ for tag in $(gh release list --limit 1000 --json tagName -q '.[].tagName' | grep
   gh release download "$tag" -p "verificacion_*.nc" -D registros --skip-existing
 done
 "$PY" prediccion/verificacion/resumen.py --registros registros --salida "$PAGINAS/prediccion/verificacion.json"
+cp "$(dirname "$0")/discrepancia_catalogo_1991_2020.json" "$PAGINAS/prediccion/discrepancia_catalogo.json"
 
 git -C "$PAGINAS" add -A
 if git -C "$PAGINAS" diff --cached --quiet; then

@@ -231,6 +231,7 @@ jobs:
           .venv/bin/python prediccion/verificacion/test_verdad.py
           .venv/bin/python prediccion/verificacion/test_puntuaciones.py
           .venv/bin/python prediccion/verificacion/test_climatologia.py
+          .venv/bin/python prediccion/verificacion/test_discrepancia.py
           .venv/bin/python prediccion/verificacion/test_era5.py
           bash prediccion/verificacion/test_subir_era5.sh
           .venv/bin/python prediccion/verificacion/test_verificar.py
