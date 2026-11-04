@@ -28,7 +28,7 @@ concurrency:
 jobs:
   archivar:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Entorno
@@ -44,6 +44,9 @@ jobs:
           bash prediccion/producto/test_publicar.sh
           node --test prediccion/pages/test_logica.mjs prediccion/pages/test_textos.mjs
       - name: Archivar y subir
+        # Tiempo propio: si ECMWF va lento, el paso falla en vez de cancelarse el trabajo, y el producto, la publicación
+        # y el aviso siguen corriendo (el 2026-10-14 el trabajo se canceló a los 45 min sin generar ni avisar).
+        timeout-minutes: 45
         env:
           GH_TOKEN: ${{ github.token }}
           FECHA: ${{ inputs.fecha }} # por entorno, nunca interpolado en el script; subir.sh valida el formato
