@@ -2,11 +2,14 @@
 # PRD-504: archiva ERA5 Z500 de 00 UTC (la verdad de la verificación) en el release mensual era5-AAAA-MM. Por defecto,
 # los 12 días que acaban en hoy−5 (ERA5T llega con unos 5 días de retraso); omite lo ya subido. Un día de los 7 más
 # recientes que aún no esté en el CDS solo avisa; uno anterior que falle hace fallar el job (clave o licencia del CDS).
+# Cada petición tiene $ESPERA_CDS segundos: desde el 2026-11-03 el CDS acepta la del día más reciente y no la sirve
+# (las demás tardan ~3 min), y sin límite agotaba el tiempo del workflow; una cortada cuenta como no disponible.
 # Uso: FECHA="AAAAMMDD [AAAAMMDD...]" bash prediccion/verificacion/subir_era5.sh
 #      (requiere gh con GH_TOKEN, y CDSAPI_URL y CDSAPI_KEY para el CDS)
 set -euo pipefail
 
 PY=${PY:-.venv/bin/python}
+ESPERA_CDS=${ESPERA_CDS:-600}
 if [[ -z ${FECHA:-} ]]; then
   fechas=""
   for k in $(seq 16 -1 5); do fechas+=" $(date -u -d "-$k day" +%Y%m%d)"; done
@@ -29,10 +32,10 @@ verificación del producto de bloqueo. Contains modified Copernicus Climate Chan
     echo "ya archivado: $n"
     continue
   fi
-  if "$PY" prediccion/verificacion/era5.py --fecha "$f" --salida era5; then
+  if timeout "$ESPERA_CDS" "$PY" prediccion/verificacion/era5.py --fecha "$f" --salida era5; then
     gh release upload "$tag" "era5/$n"
   elif [[ $f > $reciente ]]; then
-    echo "::warning::$n aún no disponible en el CDS; se reintenta en la siguiente ejecución"
+    echo "::warning::$n aún no disponible en el CDS o sin respuesta; se reintenta en la siguiente ejecución"
   else
     echo "::error::no se pudo archivar $n"
     fallos=$((fallos + 1))
