@@ -40,6 +40,10 @@ jobs:
           bash prediccion/verificacion/test_publicar_resumen.sh
           bash prediccion/test_vigilar_archivo.sh
       - name: Archivar ERA5
+        # Tiempo propio: si el CDS va lento, el paso falla en vez de cancelarse el trabajo, y el registro, el resumen,
+        # el vigilante y el aviso siguen corriendo (el 2026-11-03 el trabajo se canceló a los 90 min sin publicar ni
+        # avisar). La ERA5 que falte se baja en la siguiente ejecución.
+        timeout-minutes: 60
         env:
           GH_TOKEN: ${{ github.token }}
           CDSAPI_URL: https://cds.climate.copernicus.eu/api
