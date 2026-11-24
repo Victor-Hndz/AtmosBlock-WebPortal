@@ -48,8 +48,8 @@ caso "un día reciente que aún no está solo avisa" 0 "$reciente" "" "$reciente
 caso "un día antiguo que falla hace fallar el job" 1 "20260920 20260921" "" "20260920" \
   "upload era5-2026-09 era5/z500_era5_20260921"
 CUELGA=$reciente
-caso "una petición colgada se corta, solo avisa y se sigue con el resto" 0 "$reciente 20260930" "" "" \
-  "upload era5-2026-09 era5/z500_era5_20260930" "era5/z500_era5_${reciente}"
+caso "una petición colgada se corta, solo avisa y no se piden más días hasta la siguiente ejecución" 0 \
+  "$reciente 20260930" "" "" "release view era5-${reciente:0:4}-${reciente:4:2}" "era5-2026-09"
 CUELGA=
 caso "fecha mal formada" 2 "2026-09-20" "" "" "" "release"
 caso "por defecto, los 12 días hasta hoy−5" 0 "" "" "" \

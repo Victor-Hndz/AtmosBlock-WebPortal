@@ -3,7 +3,8 @@
 # los 12 días que acaban en hoy−5 (ERA5T llega con unos 5 días de retraso); omite lo ya subido. Un día de los 7 más
 # recientes que aún no esté en el CDS solo avisa; uno anterior que falle hace fallar el job (clave o licencia del CDS).
 # Cada petición tiene $ESPERA_CDS segundos: desde el 2026-11-03 el CDS acepta la del día más reciente y no la sirve
-# (las demás tardan ~3 min), y sin límite agotaba el tiempo del workflow; una cortada cuenta como no disponible.
+# (las demás tardan ~3 min), y sin límite agotaba el tiempo del workflow; una cortada cuenta como no disponible y
+# termina la tanda.
 # Uso: FECHA="AAAAMMDD [AAAAMMDD...]" bash prediccion/verificacion/subir_era5.sh
 #      (requiere gh con GH_TOKEN, y CDSAPI_URL y CDSAPI_KEY para el CDS)
 set -euo pipefail
@@ -32,13 +33,22 @@ verificación del producto de bloqueo. Contains modified Copernicus Climate Chan
     echo "ya archivado: $n"
     continue
   fi
-  if timeout "$ESPERA_CDS" "$PY" prediccion/verificacion/era5.py --fecha "$f" --salida era5; then
+  rc=0
+  timeout "$ESPERA_CDS" "$PY" prediccion/verificacion/era5.py --fecha "$f" --salida era5 || rc=$?
+  if [[ $rc -eq 0 ]]; then
     gh release upload "$tag" "era5/$n"
   elif [[ $f > $reciente ]]; then
     echo "::warning::$n aún no disponible en el CDS o sin respuesta; se reintenta en la siguiente ejecución"
   else
     echo "::error::no se pudo archivar $n"
     fallos=$((fallos + 1))
+  fi
+  # Tras una petición colgada, las siguientes se quedan también en «accepted» (19–23 de noviembre: cada ejecución
+  # sirvió una petición nueva y la siguiente se colgó): se paran aquí y siguen en la próxima ejecución, que encuentra
+  # la colgada ya servida.
+  if [[ $rc -eq 124 ]]; then
+    echo "::warning::el CDS no sirvió $n en ${ESPERA_CDS} s; los días que faltan se piden en la siguiente ejecución"
+    break
   fi
 done
 
