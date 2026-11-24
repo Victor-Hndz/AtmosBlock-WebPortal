@@ -17,6 +17,7 @@ jobs:
 
   backend-build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: backend/nestjs
@@ -35,6 +36,7 @@ jobs:
 
   frontend-build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: frontend
@@ -53,6 +55,7 @@ jobs:
 
   c-core:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     container:
       image: victorhndz/netcdf-base:ubuntu26@sha256:79ad61d67670f6c5a080c9ac0ffd7b6054285711fc4d65dfbdcaef87f3a25cf6 # netcdf-base:ubuntu26 (WEB-363: Ubuntu 26.04, apt congelado en un snapshot); la misma de execution/Dockerfile (WEB-303)
     steps:
@@ -87,6 +90,7 @@ jobs:
 
   imagenes-sin-secretos:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Ningún secreto horneado en las imágenes Docker (WEB-104)
@@ -101,6 +105,7 @@ jobs:
 
   backend-quality:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: backend/nestjs
@@ -124,6 +129,7 @@ jobs:
   backend-integration:
     # WEB-214: pruebas de integración (*.int-spec.ts) contra PostgreSQL real
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: backend/nestjs
@@ -156,6 +162,7 @@ jobs:
 
   frontend-quality:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: frontend
@@ -174,6 +181,7 @@ jobs:
 
   compose-seguridad:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Servicios internos sin puertos publicados (WEB-105)
@@ -196,9 +204,12 @@ jobs:
           docker compose config --format json | python3 .github/scripts/check_compose_limites.py
       - name: Variables de entorno documentadas en .env.example (WEB-208)
         run: python3 .github/scripts/check_env_example.py
+      - name: Todos los jobs de los workflows con tiempo máximo (límite de Actions)
+        run: python3 .github/scripts/check_timeouts.py
 
   python-handlers:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Tests de los handlers de Python (sin dependencias externas)
@@ -210,6 +221,7 @@ jobs:
 
   prediccion-archivo:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Tests del archivo diario de la ENS de ECMWF (PRD-101), del índice DAV (PRD-201), de los eventos y del producto y de la verificación (PRD-301 a 303, 401, 501 a 506)
@@ -284,6 +296,7 @@ jobs:
   dependency-review:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/dependency-review-action@bbc44d14a204704ccc493733616cd1e93a0321ec # v5.0.1
