@@ -23,7 +23,7 @@ concurrency:
 jobs:
   verificar:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Entorno
@@ -42,8 +42,9 @@ jobs:
       - name: Archivar ERA5
         # Tiempo propio: si el CDS va lento, el paso falla en vez de cancelarse el trabajo, y el registro, el resumen,
         # el vigilante y el aviso siguen corriendo (el 2026-11-03 el trabajo se canceló a los 90 min sin publicar ni
-        # avisar). La ERA5 que falte se baja en la siguiente ejecución.
-        timeout-minutes: 60
+        # avisar). La ERA5 que falte se baja en la siguiente ejecución. Cada petición tiene 10 min (ESPERA_CDS) y la
+        # primera colgada corta la tanda, así que 30 min sobran.
+        timeout-minutes: 30
         env:
           GH_TOKEN: ${{ github.token }}
           CDSAPI_URL: https://cds.climate.copernicus.eu/api
