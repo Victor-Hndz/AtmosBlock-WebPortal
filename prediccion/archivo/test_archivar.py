@@ -5,7 +5,9 @@ Uso: python prediccion/archivo/test_archivar.py
 import pathlib
 import sys
 import tempfile
+import types
 import unittest
+from unittest import mock
 
 import numpy as np
 import xarray as xr
@@ -79,6 +81,25 @@ class Escribir(unittest.TestCase):
 
     def test_nombre_del_fichero(self):
         self.assertEqual(archivar.nombre("aifs", "20260929"), "z500_aifs_ens_20260929_00z_hn_1p25.nc")
+
+
+class Descargar(unittest.TestCase):
+    def test_una_fecha_que_ecmwf_ya_no_guarda_se_pide_al_espejo_de_aws(self):
+        fuentes = []
+
+        class Client:  # ecmwf.opendata.Client simulado: ECMWF ya no tiene la fecha y el espejo de AWS sí
+            def __init__(self, source, model):
+                self.source = source
+
+            def retrieve(self, **_):
+                fuentes.append(self.source)
+                if self.source == "ecmwf":
+                    raise ValueError("404 Not Found")
+
+        falso = {"ecmwf": types.ModuleType("ecmwf"), "ecmwf.opendata": types.SimpleNamespace(Client=Client)}
+        with mock.patch.dict(sys.modules, falso):
+            archivar.descargar("ifs", "20261107", "x.grib2")
+        self.assertEqual(fuentes, ["ecmwf", "aws"])
 
 
 if __name__ == "__main__":
