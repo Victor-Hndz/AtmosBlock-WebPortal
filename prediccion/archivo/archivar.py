@@ -2,7 +2,7 @@
 
 Descarga la pasada de 00 UTC (50 miembros perturbados, 0–360 h cada 24 h) y guarda el hemisferio norte a 1,25°
 tomando los nodos de la rejilla de 0,25° (sin interpolar), en int16 con escala de 0,1 m. El servidor de ECMWF solo
-conserva unos 2–3 días: lo que no se archiva se pierde.
+conserva unos 2–3 días; lo anterior se pide a su espejo en AWS.
 
 Uso: python prediccion/archivo/archivar.py [--fecha AAAAMMDD] [--salida DIR] [--modelos ifs aifs]
 """
@@ -72,10 +72,16 @@ def escribir(z, ruta, modelo, fecha):
 
 
 def descargar(modelo, fecha, destino):
+    """Del servidor de ECMWF y, si ya no tiene la fecha, de su espejo en AWS, que guarda las pasadas antiguas: así se
+    recuperaron los días que se perdieron con Actions parado (5–18 de noviembre de 2026)."""
     from ecmwf.opendata import Client  # solo hace falta con red; los tests no la importan
     m = MODELOS[modelo]
-    Client(source="ecmwf", model=m["model"]).retrieve(date=fecha, time=0, stream="enfo", type="pf", levelist=500,
-                                                      param=m["param"], step=PASOS, target=str(destino))
+    peticion = dict(date=fecha, time=0, stream="enfo", type="pf", levelist=500, param=m["param"], step=PASOS,
+                    target=str(destino))
+    try:
+        Client(source="ecmwf", model=m["model"]).retrieve(**peticion)
+    except Exception:
+        Client(source="aws", model=m["model"]).retrieve(**peticion)
 
 
 def archivar(modelo, fecha, salida):
