@@ -4,7 +4,8 @@
 # recientes que aún no esté en el CDS solo avisa; uno anterior que falle hace fallar el job (clave o licencia del CDS).
 # Cada petición tiene $ESPERA_CDS segundos: desde el 2026-11-03 el CDS acepta la del día más reciente y no la sirve
 # (las demás tardan ~3 min), y sin límite agotaba el tiempo del workflow; una cortada cuenta como no disponible y
-# termina la tanda.
+# termina la tanda. Es un retraso del CDS, no un fallo de clave: solo avisa, salvo que el día sea el último de la ventana
+# de 12 (hoy−16), que ya no se vuelve a pedir (el 14-11-2026 se colgó en 3 ejecuciones seguidas).
 # Uso: FECHA="AAAAMMDD [AAAAMMDD...]" bash prediccion/verificacion/subir_era5.sh
 #      (requiere gh con GH_TOKEN, y CDSAPI_URL y CDSAPI_KEY para el CDS)
 set -euo pipefail
@@ -18,6 +19,7 @@ else
   fechas=$FECHA
 fi
 reciente=$(date -u -d "-7 day" +%Y%m%d)
+ultimo=$(date -u -d "-16 day" +%Y%m%d) # el día más antiguo de la ventana: después de hoy no se vuelve a pedir
 fallos=0
 
 for f in $fechas; do
@@ -37,7 +39,7 @@ verificación del producto de bloqueo. Contains modified Copernicus Climate Chan
   timeout "$ESPERA_CDS" "$PY" prediccion/verificacion/era5.py --fecha "$f" --salida era5 || rc=$?
   if [[ $rc -eq 0 ]]; then
     gh release upload "$tag" "era5/$n"
-  elif [[ $f > $reciente ]]; then
+  elif [[ $f > $reciente || ($rc -eq 124 && $f > $ultimo) ]]; then
     echo "::warning::$n aún no disponible en el CDS o sin respuesta; se reintenta en la siguiente ejecución"
   else
     echo "::error::no se pudo archivar $n"
