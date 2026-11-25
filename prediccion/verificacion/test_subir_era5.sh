@@ -50,6 +50,14 @@ caso "un día antiguo que falla hace fallar el job" 1 "20260920 20260921" "" "20
 CUELGA=$reciente
 caso "una petición colgada se corta, solo avisa y no se piden más días hasta la siguiente ejecución" 0 \
   "$reciente 20260930" "" "" "release view era5-${reciente:0:4}-${reciente:4:2}" "era5-2026-09"
+en_ventana=$(date -u -d "-10 day" +%Y%m%d)
+CUELGA=$en_ventana
+caso "una petición colgada de un día antiguo que sigue en la ventana solo avisa" 0 "$en_ventana" "" "" \
+  "release view" "release upload"
+ultimo=$(date -u -d "-16 day" +%Y%m%d)
+CUELGA=$ultimo
+caso "una petición colgada del último día de la ventana hace fallar el job" 1 "$ultimo" "" "" \
+  "release view" "release upload"
 CUELGA=
 caso "fecha mal formada" 2 "2026-09-20" "" "" "" "release"
 caso "por defecto, los 12 días hasta hoy−5" 0 "" "" "" \
