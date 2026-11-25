@@ -84,22 +84,36 @@ class Escribir(unittest.TestCase):
 
 
 class Descargar(unittest.TestCase):
-    def test_una_fecha_que_ecmwf_ya_no_guarda_se_pide_al_espejo_de_aws(self):
-        fuentes = []
+    def cliente(self, sirven):
+        """ecmwf.opendata.Client simulado: anota con qué se crea cada uno y solo descargan las fuentes de `sirven`."""
+        clientes = []
 
-        class Client:  # ecmwf.opendata.Client simulado: ECMWF ya no tiene la fecha y el espejo de AWS sí
-            def __init__(self, source, model):
-                self.source = source
+        class Client:
+            def __init__(self, **kwargs):
+                self.source = kwargs["source"]
+                clientes.append(kwargs)
 
             def retrieve(self, **_):
-                fuentes.append(self.source)
-                if self.source == "ecmwf":
-                    raise ValueError("404 Not Found")
+                if self.source not in sirven:
+                    raise ConnectionError("503 Service Unavailable")
 
         falso = {"ecmwf": types.ModuleType("ecmwf"), "ecmwf.opendata": types.SimpleNamespace(Client=Client)}
-        with mock.patch.dict(sys.modules, falso):
+        return clientes, mock.patch.dict(sys.modules, falso)
+
+    def test_si_una_fuente_falla_prueba_la_siguiente_con_reintentos_acotados(self):
+        # El 24-11-2026 el portal de ECMWF respondía 503 (más de 500 conexiones) y después también AWS; el cliente
+        # reintenta 500 veces cada 120 s por defecto y agotó los 45 min del paso sin pasar a otra fuente.
+        clientes, parche = self.cliente(sirven={"aws"})
+        with parche:
             archivar.descargar("ifs", "20261107", "x.grib2")
-        self.assertEqual(fuentes, ["ecmwf", "aws"])
+        self.assertEqual([c["source"] for c in clientes], ["ecmwf", "google", "aws"])
+        self.assertTrue(all(c["maximum_retries"] * c["retry_after"] <= 120 for c in clientes))
+
+    def test_si_ninguna_fuente_lo_tiene_falla(self):
+        clientes, parche = self.cliente(sirven=set())
+        with parche, self.assertRaises(ConnectionError):
+            archivar.descargar("aifs", "20261125", "x.grib2")
+        self.assertEqual(len(clientes), 3)
 
 
 if __name__ == "__main__":
