@@ -2,7 +2,7 @@
 # PRD-101: archiva las pasadas de 00 UTC pedidas (por defecto hoy y ayer, UTC) y las sube al release mensual
 # archivo-ens-AAAA-MM. Omite lo que ya está subido, así que repetirlo no descarga nada de más.
 # Hoy puede no estar publicado todavía (sobre todo AIFS): su fallo solo avisa. El de un día anterior hace fallar
-# el job: ni el servidor de ECMWF (guarda 2–3 días) ni su espejo en AWS lo tienen.
+# el job: los espejos de ECMWF guardan las pasadas antiguas, así que no es un retraso.
 # Uso: FECHA="AAAAMMDD [AAAAMMDD...]" bash prediccion/archivo/subir.sh   (requiere gh con GH_TOKEN)
 set -euo pipefail
 

@@ -1,8 +1,8 @@
 """PRD-101: archivo diario de Z500 de las previsiones por conjuntos abiertas de ECMWF (IFS ENS y AIFS ENS).
 
 Descarga la pasada de 00 UTC (50 miembros perturbados, 0–360 h cada 24 h) y guarda el hemisferio norte a 1,25°
-tomando los nodos de la rejilla de 0,25° (sin interpolar), en int16 con escala de 0,1 m. El servidor de ECMWF solo
-conserva unos 2–3 días; lo anterior se pide a su espejo en AWS.
+tomando los nodos de la rejilla de 0,25° (sin interpolar), en int16 con escala de 0,1 m. Del portal de ECMWF o,
+si falla, de sus espejos en Google Cloud y AWS, que conservan las pasadas antiguas.
 
 Uso: python prediccion/archivo/archivar.py [--fecha AAAAMMDD] [--salida DIR] [--modelos ifs aifs]
 """
@@ -28,6 +28,9 @@ MODELOS = {
 RANGO_M = (4000.0, 6500.0)  # Z500 físico; fuera de aquí son unidades o datos equivocados
 CODIFICACION = {"dtype": "int16", "scale_factor": 0.1, "add_offset": 5000.0, "_FillValue": -32768, "zlib": True,
                 "complevel": 5, "shuffle": True}  # 0,1 m de resolución entre 1723,2 y 8276,7 m
+# El portal de ECMWF es el más rápido, pero solo guarda 2–3 días y responde 503 si pasa de 500 conexiones; sus
+# espejos en Google Cloud y AWS (los mismos ficheros) conservan las pasadas antiguas.
+FUENTES = ("ecmwf", "google", "aws")
 ATRIBUCION = ("Contains modified ECMWF open data (IFS/AIFS ensemble, stream enfo), "
               "https://www.ecmwf.int/en/forecasts/datasets/open-data")
 
@@ -72,16 +75,20 @@ def escribir(z, ruta, modelo, fecha):
 
 
 def descargar(modelo, fecha, destino):
-    """Del servidor de ECMWF y, si ya no tiene la fecha, de su espejo en AWS, que guarda las pasadas antiguas: así se
-    recuperaron los días que se perdieron con Actions parado (5–18 de noviembre de 2026)."""
+    """Prueba FUENTES en orden, cada una con reintentos acotados: el cliente reintenta por defecto 500 veces cada
+    120 s, y el 24-11-2026, con el portal de ECMWF y después AWS respondiendo 503, agotó los 45 min del paso."""
     from ecmwf.opendata import Client  # solo hace falta con red; los tests no la importan
     m = MODELOS[modelo]
-    peticion = dict(date=fecha, time=0, stream="enfo", type="pf", levelist=500, param=m["param"], step=PASOS,
-                    target=str(destino))
-    try:
-        Client(source="ecmwf", model=m["model"]).retrieve(**peticion)
-    except Exception:
-        Client(source="aws", model=m["model"]).retrieve(**peticion)
+    for fuente in FUENTES:
+        try:
+            Client(source=fuente, model=m["model"], maximum_retries=2, retry_after=30).retrieve(
+                date=fecha, time=0, stream="enfo", type="pf", levelist=500, param=m["param"], step=PASOS,
+                target=str(destino))
+            return
+        except Exception as e:  # la siguiente fuente; si ninguna lo tiene, sale el error de la última
+            error = e
+            print(f"{modelo} {fecha} desde {fuente}: {type(e).__name__}: {e}"[:300], file=sys.stderr)
+    raise error
 
 
 def archivar(modelo, fecha, salida):
