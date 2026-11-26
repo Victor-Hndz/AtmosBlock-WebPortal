@@ -5,6 +5,10 @@ name: Verificación
 # GitHub Pages. Necesita el secreto CDSAPI_KEY (token del CDS, con la licencia de ERA5 aceptada en la web del CDS).
 on:
   schedule:
+    # Dos al día: el CDS deja colgada la primera petición nueva de cada ejecución y la sirve antes de la siguiente,
+    # así que cada ejecución archiva un día de ERA5; con una sola, el retraso no bajaba nunca (en noviembre de 2026
+    # iba 6 días tarde). Cada una tarda ~14 min: ~850 min al mes, gratis porque el repositorio es público.
+    - cron: "0 0 * * *"
     - cron: "0 12 * * *"
   workflow_dispatch:
     inputs:
