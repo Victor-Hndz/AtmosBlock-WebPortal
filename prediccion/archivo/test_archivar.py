@@ -2,6 +2,7 @@
 
 Uso: python prediccion/archivo/test_archivar.py
 """
+import io
 import pathlib
 import sys
 import tempfile
@@ -87,6 +88,9 @@ class Descargar(unittest.TestCase):
     def cliente(self, sirven):
         """ecmwf.opendata.Client simulado: anota con qué se crea cada uno y solo descargan las fuentes de `sirven`."""
         clientes = []
+        silencio = mock.patch("sys.stderr", new_callable=io.StringIO)  # los 503 simulados no ensucian el log
+        silencio.start()
+        self.addCleanup(silencio.stop)
 
         class Client:
             def __init__(self, **kwargs):
